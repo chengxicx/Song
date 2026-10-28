@@ -11,6 +11,11 @@
   <canvas class="pdf-page-canvas"></canvas>
 
   {% for word in words %}
+  {# A space the extractor saw between this word and the previous one on
+     the line.  The boxes are absolutely positioned, so without this
+     hidden span no space exists anywhere in the DOM and sentence
+     extraction (translation, copy, Anki) glued the words together. #}
+  {% if word['space_before'] %}<span class="pdf-space" style="display: none;"> </span>{% endif %}
   <div class="pdf-word"
        style="left: {{ '%.3f'|format(word['box'][0]) }}%; top: {{ '%.3f'|format(word['box'][1]) }}%; width: {{ '%.3f'|format(word['box'][2]) }}%; height: {{ '%.3f'|format(word['box'][3]) }}%;">
     {# Each token gets a flex slot sized by its character count, so

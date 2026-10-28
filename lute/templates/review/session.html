@@ -1,20 +1,23 @@
 {% extends 'base.html' %}
 
-{% block title %}Review session{% endblock %}
-{% block header %}Review{% endblock %}
+{% block title %}{{ t('Review session') }}{% endblock %}
+{% block header %}{{ t('Review') }}{% endblock %}
 
 {% block body %}
 
 {# Cards are pronounced, so the page needs the TTS layer: window.luteTtsSpeak
    lives in tts.js, which the reading page loads for itself and no other page
-   has.  Deferred, and resolved at call time by lute-review.js, which is
-   loaded (without defer) from base.html. #}
+   has.  Shadowing cards record through lute-recorder.js, the same capture +
+   submit/poll plumbing the reading page's shadowing panel uses.  Both
+   deferred, and resolved at call time by lute-review.js, which is loaded
+   (without defer) from base.html. #}
 <script type="text/javascript" src="{{ vstatic_js('tts.js') }}" charset="utf-8" defer></script>
+<script type="text/javascript" src="{{ vstatic_js('lute-recorder.js') }}" charset="utf-8" defer></script>
 
 <div id="review_session_container">
   <div class="rv-topbar">
     <div id="review_progress" class="rv-progress"></div>
-    <button class="btn btn-secondary" id="review_undo" hidden>Undo <kbd>Ctrl+Z</kbd></button>
+    <button class="btn btn-secondary" id="review_undo" hidden>{{ t('Undo') }} <kbd>Ctrl+Z</kbd></button>
   </div>
   <div id="review_card"></div>
 </div>
@@ -52,10 +55,10 @@
       if (!box) return;
       box.style.display = "block";
       box.innerHTML =
-        "<p>The review script did not load, so the session cannot start.</p>" +
+        "<p>" + I18N.t('The review script did not load, so the session cannot start.') + "</p>" +
         "<p class='rv-detail'>" + detail + "</p>" +
-        "<p>Reload the page (a hard reload clears a stale cache).</p>" +
-        "<p><a href='/review/index'>Back to review index</a></p>";
+        "<p>" + I18N.t('Reload the page (a hard reload clears a stale cache).') + "</p>" +
+        "<p><a href='/review/index'>" + I18N.t('Back to review index') + "</a></p>";
     }
 
     // Loading it by hand recovers a dropped or cache-mangled request --

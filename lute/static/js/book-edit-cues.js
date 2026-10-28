@@ -194,8 +194,8 @@
     var lines = textarea.value.replace(/\r/g, "").split("\n");
     if (lines.length !== cues.length) {
       warnBox.textContent =
-        "Line count no longer matches the subtitle cues (" + cues.length +
-        ") \u2014 the timing edits will not be saved. Keep one line per subtitle line.";
+        I18N.t("Line count no longer matches the subtitle cues (") + cues.length +
+        I18N.t(") \u2014 the timing edits will not be saved. Keep one line per subtitle line.");
       warnBox.style.display = "block";
       return;
     }
@@ -217,7 +217,7 @@
     rowsBox.innerHTML = "";
     for (var i = 0; i < cues.length; i++) rowsBox.appendChild(buildRow(cues[i], i));
     autosizeAll();
-    countEl.textContent = " (" + cues.length + " lines)";
+    countEl.textContent = " (" + cues.length + " " + I18N.t("lines") + ")";
     rowsBox.scrollTop = st;
     lastActive = -1;
     setActiveRow();
@@ -303,7 +303,7 @@
     var set = document.createElement("button");
     set.type = "button";
     set.className = "cue-set-btn";
-    set.title = "Set start to current playback time";
+    set.title = I18N.t("Set start to current playback time");
     set.innerHTML =
       '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
       'stroke-width="2.2" stroke-linecap="round" aria-hidden="true">' +
@@ -329,7 +329,7 @@
     times.className = "cue-times";
     ["start", "end"].forEach(function (key) {
       var lab = document.createElement("label");
-      lab.textContent = key === "start" ? "Start" : "End";
+      lab.textContent = key === "start" ? I18N.t("Start") : I18N.t("End");
       var inp = document.createElement("input");
       inp.type = "text";
       inp.className = "cue-time-in cue-time-" + key;
@@ -369,7 +369,7 @@
     // Click anywhere on the line that isn't an editor control to play
     // that line from its start -- the edit-page counterpart of tapping
     // the reading player's subtitle to re-listen while checking edits.
-    idx.title = "Click to play this line";
+    idx.title = I18N.t("Click to play this line");
     bind_line_click(row, function (e) {
       var tag = e.target && e.target.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "BUTTON") return;

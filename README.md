@@ -45,7 +45,7 @@ Human civilization has long been trapped by the **Tower of Babel** — the etern
 
 | Requirement     | Notes                                    |
 | --------------- | ---------------------------------------- |
-| **Python 3.8+** | Tested on 3.9 – 3.11 (3.11 recommended). |
+| **Python 3.10+** | Tested on 3.10 – 3.13 (3.11 recommended). |
 | **Git**         | Only needed to clone the repository.     |
 | **MeCab**       | Only needed for Japanese. See below.     |
 

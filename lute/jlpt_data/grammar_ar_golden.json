@@ -1,0 +1,218 @@
+{
+ "ar_questions": {
+  "examples": [
+   {
+    "arabic": "هل أنت هنا؟",
+    "zh": "你在这儿吗？",
+    "en": "Are you here?"
+   }
+  ]
+ },
+ "ar_prep_pron": {
+  "examples": [
+   {
+    "arabic": "وضعت الكتاب عليها.",
+    "zh": "我把书放在它上面。",
+    "en": "I put the book on it."
+   }
+  ]
+ },
+ "ar_demonstratives": {
+  "examples": [
+   {
+    "arabic": "هذا الكتاب جديد.",
+    "zh": "这本书是新的。",
+    "en": "This book is new."
+   }
+  ]
+ },
+ "ar_neg_la": {
+  "examples": [
+   {
+    "arabic": "لا أعرف.",
+    "zh": "我不知道。",
+    "en": "I do not know."
+   }
+  ]
+ },
+ "ar_kana": {
+  "examples": [
+   {
+    "arabic": "كان الجو جميلاً.",
+    "zh": "天气很好。",
+    "en": "The weather was lovely."
+   }
+  ]
+ },
+ "ar_pronouns": {
+  "examples": [
+   {
+    "arabic": "أنا طالب.",
+    "zh": "我是学生。",
+    "en": "I am a student."
+   }
+  ]
+ },
+ "ar_but": {
+  "examples": [
+   {
+    "arabic": "أردت الذهاب لكنه كان مشغولاً.",
+    "zh": "我想去，但他很忙。",
+    "en": "I wanted to go, but he was busy."
+   }
+  ]
+ },
+ "ar_because": {
+  "examples": [
+   {
+    "arabic": "بقيت في البيت لأن المطر كان غزيراً.",
+    "zh": "我留在家里，因为雨很大。",
+    "en": "I stayed at home because the rain was heavy."
+   }
+  ]
+ },
+ "ar_when": {
+  "examples": [
+   {
+    "arabic": "عندما وصلنا بدأ الحفل.",
+    "zh": "我们到达时，晚会开始了。",
+    "en": "When we arrived, the party began."
+   }
+  ]
+ },
+ "ar_sawfa": {
+  "examples": [
+   {
+    "arabic": "سوف أذهب إلى السوق.",
+    "zh": "我将去市场。",
+    "en": "I will go to the market."
+   }
+  ]
+ },
+ "ar_also": {
+  "examples": [
+   {
+    "arabic": "جاء علي أيضاً.",
+    "zh": "阿里也来了。",
+    "en": "Ali came too."
+   }
+  ]
+ },
+ "ar_every": {
+  "examples": [
+   {
+    "arabic": "كل الطلاب حاضرون.",
+    "zh": "所有学生都到了。",
+    "en": "All the students are present."
+   }
+  ]
+ },
+ "ar_anna": {
+  "examples": [
+   {
+    "arabic": "قال إنه سيأتي.",
+    "zh": "他说他会来。",
+    "en": "He said that he would come."
+   }
+  ]
+ },
+ "ar_if": {
+  "examples": [
+   {
+    "arabic": "لو كان عندي وقت، سافرت.",
+    "zh": "如果我有时间，我就去了。",
+    "en": "If I had had time, I would have travelled."
+   }
+  ]
+ },
+ "ar_lan_lam": {
+  "examples": [
+   {
+    "arabic": "لم يذهب.",
+    "zh": "他没去。",
+    "en": "He did not go."
+   }
+  ]
+ },
+ "ar_relative": {
+  "examples": [
+   {
+    "arabic": "الرجل الذي رأيته هناك.",
+    "zh": "我在那里见到的那个男人。",
+    "en": "The man whom I saw there."
+   }
+  ]
+ },
+ "ar_qad": {
+  "examples": [
+   {
+    "arabic": "قد انتهى العمل.",
+    "zh": "工作已经结束了。",
+    "en": "The work has already finished."
+   }
+  ]
+ },
+ "ar_suffix_ha": {
+  "examples": [
+   {
+    "arabic": "كتابها على الطاولة.",
+    "zh": "她的书在桌上。",
+    "en": "Her book is on the table."
+   }
+  ]
+ },
+ "ar_suffix_plural": {
+  "examples": [
+   {
+    "arabic": "هذا بيتهم.",
+    "zh": "这是他们的家。",
+    "en": "This is their house."
+   }
+  ]
+ },
+ "ar_hatta": {
+  "examples": [
+   {
+    "arabic": "انتظر حتى جاء.",
+    "zh": "他一直等到他来。",
+    "en": "He waited until he came."
+   }
+  ]
+ },
+ "ar_laysa": {
+  "examples": [
+   {
+    "arabic": "ليس صعباً.",
+    "zh": "不难。",
+    "en": "It is not difficult."
+   }
+  ]
+ },
+ "ar_wish": {
+  "examples": [
+   {
+    "arabic": "ليت عندي وقتاً.",
+    "zh": "但愿我有时间。",
+    "en": "If only I had time."
+   }
+  ]
+ },
+ "ar_kullama": {
+  "examples": [
+   {
+    "arabic": "كلما كبر تحسن.",
+    "zh": "他越长大越优秀。",
+    "en": "The older he grows, the better he becomes."
+   }
+  ]
+ },
+ "ar_lam_yakun": {
+  "examples": [
+   {
+    "arabic": "لم يكن هناك أحد.",
+    "zh": "那里没有一个人。",
+    "en": "There was no one there."
+   }
+  ]
+ }
+}

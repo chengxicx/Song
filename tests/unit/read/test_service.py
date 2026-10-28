@@ -299,6 +299,216 @@ MANGA_PAGES = [
 ]
 
 
+def _make_manga_book(title, pages, language):
+    "Add a manga book carrying the given OCR pages, return the db book."
+    b = Book()
+    b.title = title
+    b.language_id = language.id
+    b.book_type = "manga"
+    b.manga_data = json.dumps(
+        {"version": "0.2.1", "title": title, "pages": pages}, ensure_ascii=False
+    )
+    repo = Repository(db.session)
+    dbbook = repo.add(b)
+    repo.commit()
+    return dbbook
+
+
+def _block_row_texts(blocks):
+    "The rendered characters of a block set, in reading order."
+    return "".join(
+        ti.html_display_text
+        for block in blocks
+        for row in block["line_items"]
+        for ti in row
+    )
+
+
+def test_manga_word_split_across_ocr_columns_keeps_its_term(japanese, app_context):
+    """
+    An OCR row boundary inside a word does not break the word.
+
+    Mokuro cuts a speech balloon's rows wherever the text ran out of
+    room, which for Japanese often lands mid-word.  Tokenizing each row
+    on its own turned プレゼント into プレゼン + ト, neither of which
+    matched the term in the database: the reader hovered a word whose
+    popup came back empty, so no card appeared at all.
+    """
+    pages = [
+        {
+            "img_path": "page_01.jpg",
+            "img_width": 100,
+            "img_height": 100,
+            "blocks": [
+                {
+                    "box": [10, 10, 40, 60],
+                    "vertical": True,
+                    "font_size": 10,
+                    # プレゼント split down the middle.
+                    "lines": ["プレゼン", "トです。"],
+                }
+            ],
+        }
+    ]
+    dbbook = _make_manga_book("Split word manga", pages, japanese)
+    svc = Service(db.session)
+
+    # First open creates the page's terms; プレゼント is its own word.
+    svc.manga_page_context(dbbook, 1, True)  # creates the page's terms
+    blocks = svc._manga_page_blocks(dbbook, 1)
+
+    rendered = _block_row_texts(blocks)
+    assert rendered == "プレゼントです。", "every character is still rendered"
+
+    # The two halves are separate spans, both addressing the one word.
+    halves = [
+        ti
+        for row in blocks[0]["line_items"]
+        for ti in row
+        if ti.html_display_text in ("プレゼン", "ト")
+    ]
+    assert len(halves) == 2, "the word renders as two column pieces"
+    assert all(ti.is_split_piece for ti in halves), "both are marked as pieces"
+    assert (
+        halves[0].term is halves[1].term
+    ), "both pieces share the one Term for the word"
+
+    # And that term is the whole word, not a fragment of it.
+    assert halves[0].term.text == "プレゼント"
+    assert halves[0].term.text_lc in {t.text_lc for t in db.session.query(Term).all()}
+
+    # TTS speaks the whole word from either piece, not the rendered
+    # fragment; an ordinary word speaks its own text.
+    assert halves[0].tts_text == "プレゼント"
+    assert halves[1].tts_text == "プレゼント"
+    desu = [ti for row in blocks[0]["line_items"] for ti in row if ti.text == "です"][0]
+    assert desu.tts_text is None
+
+    # The fragments are not saved as words in their own right: プレゼン
+    # and ト must never appear as terms.
+    all_texts = {t.text for t in db.session.query(Term).all()}
+    assert "プレゼン" not in all_texts, "no term for the first half"
+    assert "ト" not in all_texts, "no term for the second half"
+
+
+def test_manga_split_word_matches_an_existing_term(japanese, app_context):
+    """
+    A split word joins a term that is already in the database.
+
+    This is the production case: プレゼント was saved long before the
+    page was read, so the column pieces have to find it rather than
+    minting new fragments.
+    """
+    t = Term.create_term_no_parsing(japanese, "プレゼント")
+    t.translation = "展示"
+    t.status = 99
+    db.session.add(t)
+    db.session.commit()
+
+    pages = [
+        {
+            "img_path": "page_01.jpg",
+            "img_width": 100,
+            "img_height": 100,
+            "blocks": [
+                {
+                    "box": [10, 10, 40, 60],
+                    "vertical": True,
+                    "font_size": 10,
+                    "lines": ["プレゼン", "トです。"],
+                }
+            ],
+        }
+    ]
+    dbbook = _make_manga_book("Existing term manga", pages, japanese)
+    svc = Service(db.session)
+    svc.manga_page_context(dbbook, 1, True)
+
+    blocks = svc._manga_page_blocks(dbbook, 1)
+    halves = [
+        ti
+        for row in blocks[0]["line_items"]
+        for ti in row
+        if ti.html_display_text in ("プレゼン", "ト")
+    ]
+    assert len(halves) == 2
+    assert {ti.wo_id for ti in halves} == {t.id}, "both halves show the saved word"
+    assert all(ti.wo_status == 99 for ti in halves), "the saved status shows too"
+
+
+def test_manga_page_rows_keep_their_own_words(japanese, app_context):
+    """
+    Words that straddle no boundary are untouched by the row joining.
+
+    The rows are tokenized as one run, so this guards the other
+    direction: the ordinary case must still render one span per word,
+    in the right row.
+    """
+    pages = [
+        {
+            "img_path": "page_01.jpg",
+            "img_width": 100,
+            "img_height": 100,
+            "blocks": [
+                {
+                    "box": [0, 0, 100, 100],
+                    "vertical": False,
+                    "font_size": 10,
+                    "lines": ["猫が好き。", "犬も好き。"],
+                }
+            ],
+        }
+    ]
+    dbbook = _make_manga_book("Clean rows manga", pages, japanese)
+    svc = Service(db.session)
+    svc.manga_page_context(dbbook, 1, True)  # creates the page's terms
+    blocks = svc._manga_page_blocks(dbbook, 1)
+
+    assert _block_row_texts(blocks) == "猫が好き。犬も好き。"
+    assert len(blocks[0]["line_items"]) == 2, "one rendered row per source row"
+    assert not any(
+        ti.is_split_piece for row in blocks[0]["line_items"] for ti in row
+    ), "nothing needed splitting"
+
+
+def test_manga_sentence_is_the_whole_block(japanese, app_context):
+    """
+    A block's rows are one sentence, so "copy sentence" reads it all.
+
+    sentence_number used to count OCR rows, which made a word split
+    across two columns come back as two half-sentences.
+    """
+    pages = [
+        {
+            "img_path": "page_01.jpg",
+            "img_width": 100,
+            "img_height": 100,
+            "blocks": [
+                {
+                    "box": [10, 10, 40, 60],
+                    "vertical": True,
+                    "font_size": 10,
+                    "lines": ["プレゼン", "トです。"],
+                },
+                {
+                    "box": [0, 0, 50, 10],
+                    "vertical": False,
+                    "font_size": 10,
+                    "lines": ["猫が好き。"],
+                },
+            ],
+        }
+    ]
+    dbbook = _make_manga_book("Sentence numbering manga", pages, japanese)
+    svc = Service(db.session)
+    blocks = svc._manga_page_blocks(dbbook, 1)
+
+    first = [ti for row in blocks[0]["line_items"] for ti in row]
+    second = [ti for row in blocks[1]["line_items"] for ti in row]
+    assert {ti.sentence_number for ti in first} == {1}, "both rows are sentence 1"
+    assert {ti.sentence_number for ti in second} == {2}, "the next block is sentence 2"
+
+
 def _term_statuses():
     "All terms as 'text; status', sorted."
     return sorted(f"{t.text_lc}; {t.status}" for t in db.session.query(Term).all())
@@ -359,6 +569,34 @@ def test_pdf_page_done_route_marks_page_known(app, client, app_context, english)
         assert_sql_result(sql, ["cat; 99", "dog; 99", "hello; 99"], "after")
     finally:
         shutil.rmtree(pdf_dir, ignore_errors=True)
+
+
+def test_same_page_refetch_keeps_sub_screen(app, client, app_context, english):
+    """
+    Refetching the page already on screen keeps the reader's sub-screen.
+
+    Finishing the last screen posts page_done with relative page 0, and the
+    follow-up refetch reset curScreen to 0: the reader was bounced back to
+    the page's first sub-screen, and -- because the split's _renderScreen
+    saves the position -- that rewind was persisted as their place.
+    goto_relative_page now flags the same-page case and _finishPageSwap
+    restores the stored sub-screen for it, as an initial load does.
+    """
+    b = Book()
+    b.title = "Refetch check"
+    b.language_id = english.id
+    b.text = "Hello cat. Another line here."
+    r = Repository(db.session)
+    dbbook = r.add(b)
+    r.commit()
+
+    resp = client.get(f"/read/{dbbook.id}")
+    assert resp.status_code == 200, "reading page renders"
+    body = resp.get_data(as_text=True)
+    assert "keepScreen: actualPage === pagenumNow" in body, "same-page flag set"
+    assert (
+        "initial || keepScreen ? _storedScreenFor(actualPage) : null" in body
+    ), "stored sub-screen honoured on a same-page refetch"
 
 
 def _render_items(text, language):

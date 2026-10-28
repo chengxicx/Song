@@ -3,6 +3,7 @@ Term entity.
 """
 
 from lute.db import db
+from lute.term import pos_tags
 
 wordparents = db.Table(
     "wordparents",
@@ -49,7 +50,7 @@ class TermTag(db.Model):
     __tablename__ = "tags"
 
     id = db.Column("TgID", db.Integer, primary_key=True)
-    text = db.Column("TgText", db.String(20))
+    text = db.Column("TgText", db.String(50))
     _comment = db.Column("TgComment", db.String(200))
 
     def __init__(self, text, comment=None):
@@ -106,6 +107,14 @@ class Term(
     token_count = db.Column("WoTokenCount", db.Integer)
     sync_status = db.Column("WoSyncStatus", db.Boolean)
 
+    # The parser's part-of-speech tuple for this word *as it appeared on
+    # the page*, joined with "|": 動詞|非自立可能|*|*|五段-サ行|意志推量形.
+    # Only set by Term.create_term_no_parsing(); None for terms typed
+    # into a form by hand, and for terms created before 2026-10-16.
+    # Used to auto-tag a term when it is first saved (see
+    # lute.term.model.Repository._build_db_term).
+    pos = db.Column("WoPos", db.String(64))
+
     language = db.relationship("Language")
     term_tags = db.relationship("TermTag", secondary="wordtags")
     parents = db.relationship(
@@ -150,7 +159,7 @@ class Term(
             self.text = text
 
     @staticmethod
-    def create_term_no_parsing(language, text):
+    def create_term_no_parsing(language, text, pos=None):
         """
         Create a term, but do not reparse it during creation.
 
@@ -161,12 +170,19 @@ class Term(
         the UI or during CSV import.  This method is used
         when new terms are created from an already-parsed
         and already-tokenized page of text.
+
+        `pos` is the parser's POS tuple for the token *as it appeared
+        on the page*, and is stored as-is (see lute.term.pos_tags).  It
+        cannot be recomputed later: re-parsing the bare text gives a
+        different answer.  Optional, because not every parser has POS
+        (MeCab exposes only a numeric id) and not every caller has it.
         """
         t = Term()
         t.language = language
         t._text = text  # pylint: disable=protected-access
         t.text_lc = language.get_lowercase(text)
         t.romanization = language.parser.get_reading(text)
+        t.pos = pos_tags.pos_to_text(pos)
         t._calc_token_count()  # pylint: disable=protected-access
         return t
 

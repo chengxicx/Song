@@ -181,7 +181,8 @@ def test_arabic_grammar_analysis_uses_ar_engine(client, empty_db, arabic):
     keys = {g["key"] for g in data}
     assert "ar_questions" in keys
     assert "ar_kana" in keys
-    assert "ar_al" in keys
+    # A merged data-layer row fires here too (على, from grammar_ar.json).
+    assert any(k.startswith("agm_") for k in keys)
     for g in data:
         assert g["examples"], f"语法点 {g['name']} 缺少例句"
 
@@ -703,3 +704,37 @@ def test_hidden_cefr_level_filters_english_results(client, empty_db):
 
     data = json.loads(client.get(url).data.decode("utf-8"))
     assert all(g.get("level") != hidden for g in data), f"{hidden} 应被隐藏"
+
+
+def test_german_grammar_library_page_lists_the_corpus(client, empty_db, german):
+    """/grammar/<de> 应列出德语语法库，而不是落到"该语言没有语法库"页。"""
+    pytest.importorskip("spacy")
+    pytest.importorskip("de_core_news_sm")
+    db.session.add(german)
+    db.session.commit()
+
+    resp = client.get(f"/grammar/{german.id}")
+    assert resp.status_code == 200, resp.data
+    body = resp.data.decode("utf-8")
+    # The unsupported page is the failure mode this guards against.
+    assert "unsupported" not in body.lower()
+    # A point from the hand-written rules and one from the data layer.
+    assert "es gibt" in body
+    assert "第二格" in body or "Genitiv" in body or "最高级" in body
+
+
+def test_german_grammar_library_detail_page_renders(client, empty_db, german):
+    """详情页应能打开某个语法点并渲染它的例句。"""
+    pytest.importorskip("spacy")
+    pytest.importorskip("de_core_news_sm")
+    db.session.add(german)
+    db.session.commit()
+
+    de_engine = pytest.importorskip("lute.read.render.grammar_analysis_de")
+    entry = de_engine.library_entries("en")[0]
+
+    resp = client.get(f"/grammar/{german.id}/{entry['key']}")
+    assert resp.status_code == 200, resp.data
+    body = resp.data.decode("utf-8")
+    assert entry["name"] in body
+    assert entry["examples"][0]["text"] in body

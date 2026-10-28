@@ -7,6 +7,36 @@ from lute.db import db
 from lute.parse.registry import get_parser, is_supported
 
 
+def _local_dict_tab_entry(lang, d):
+    """
+    The tab entry for one 'localdict' dictionary row, or None when the
+    dictionary's file is no longer installed in the server's pool.
+
+    Lives at module level with a lazy import: the dict service needs the
+    Flask app (static folder), and importing it at module load time
+    would make lute.models depend on lute.dict at import time.
+    """
+    from lute.dict import (
+        service as dict_service,
+    )  # pylint: disable=import-outside-toplevel
+
+    filename = d.dicturi
+    if not dict_service.is_pool_name(filename) or not dict_service.is_installed(
+        filename
+    ):
+        return None
+    info = dict_service.status(filename)
+    title = info.get("title") or None
+    label = title or filename[: -len(".db")]
+    tooltip = f"{title} ({filename})" if title else f"Local dictionary: {filename}"
+    return {
+        "url": f"/read/localdict/{lang.id}/{filename}/[LUTE]",
+        "dicttype": "localdict",
+        "label": label,
+        "title": tooltip,
+    }
+
+
 class LanguageDictionary(db.Model):
     """
     Language dictionary.
@@ -23,6 +53,9 @@ class LanguageDictionary(db.Model):
     dicttype = db.Column("LdType", db.String(20), nullable=False)
     dicturi = db.Column("LdDictURI", db.String(200), nullable=False)
     is_active = db.Column("LdIsActive", db.Boolean, default=True)
+    # Kept configured but no tab in the reading page's dictionary strip:
+    # for dictionaries that are rarely used but not worth re-entering.
+    is_hidden = db.Column("LdIsHidden", db.Boolean, default=False)
     sort_order = db.Column("LdSortOrder", db.SmallInteger, nullable=False)
 
 
@@ -52,6 +85,9 @@ class Language(
     _word_characters = db.Column("LgRegexpWordCharacters", db.String(500))
     right_to_left = db.Column("LgRightToLeft", db.Boolean)
     show_romanization = db.Column("LgShowRomanization", db.Boolean)
+    # Furigana display on the reading page (Japanese readings above
+    # kanji words).  Only acted on for Japanese-capable parsers.
+    show_furigana = db.Column("LgShowFurigana", db.Boolean)
     parser_type = db.Column("LgParserType", db.String(20))
     is_active = db.Column("LgIsActive", db.Boolean, default=True)
 
@@ -83,6 +119,32 @@ class Language(
     # `hidden_grammar_levels` list property below.
     _hidden_grammar_levels = db.Column("LgHiddenGrammarLevels", db.String(500))
 
+    # The local (MDX) dictionary this language reads used to be a
+    # single file name here (LgLocalDict); it is now one or more
+    # 'localdict' rows in self.dictionaries -- see active_dict_uris.
+    # The column survives in the schema (back-filled by migration
+    # 20261012) but nothing reads or writes it any more.
+
+    # Whether the term popup adds this language's local dictionary
+    # definition, for terms with no translation yet.  Per language
+    # rather than global: a reader of two languages rarely wants the
+    # same answer for both.
+    # Whether the term popup adds this language's local dictionary
+    # definition, for terms with no translation yet.  Per language
+    # rather than global: a reader of two languages rarely wants the
+    # same answer for both.
+    term_popup_show_dict_gloss = db.Column(
+        "LgTermPopupShowDictGloss", db.Boolean, default=True
+    )
+
+    # What fills a new term's translation: 'online' (machine
+    # translation, the old behaviour) or 'local_dict' -- the language's
+    # local dictionaries (see the 'localdict' rows in self.dictionaries)
+    # in tab order, online as fallback when none of them has an entry.
+    term_translation_source = db.Column(
+        "LgTermTranslationSource", db.String(20), default="online"
+    )
+
     def __init__(self):
         self.character_substitutions = "´='|`='|’='|‘='|...=…|..=‥"
         self.regexp_split_sentences = ".!?"
@@ -90,6 +152,7 @@ class Language(
         self.word_characters = "a-zA-ZÀ-ÖØ-öø-ȳáéíóúÁÉÍÓÚñÑ"
         self.right_to_left = False
         self.show_romanization = False
+        self.show_furigana = False
         self.parser_type = "spacedel"
         self.dictionaries = []
         self.is_active = True
@@ -97,6 +160,8 @@ class Language(
         self.kiwi_stemming = True
         self.kiwi_filter_particles = False
         self.kiwi_join_compound_nouns = False
+        self.term_popup_show_dict_gloss = True
+        self.term_translation_source = "online"
 
     def __repr__(self):
         return f"<Language {self.id} '{self.name}'>"
@@ -154,10 +219,50 @@ class Language(
             )
 
     def active_dict_uris(self, use_for):
-        "Get sorted uris for active dicts of correct type."
-        actives = [d for d in self.dictionaries if d.is_active and d.usefor == use_for]
+        """
+        Get sorted uris for active dicts of correct type.
+
+        Hidden dicts stay configured (and pass the "must have an active
+        dictionary" validation) but offer no tab anywhere.
+
+        'localdict' rows are converted on the way out: their dicturi is
+        a file name in the server's dictionary pool (see lute/dict), and
+        the tab needs a URL on this server plus its display name.  A
+        local dictionary whose file is no longer installed offers no
+        tab -- same as the old single-dictionary behaviour.
+        """
+        # Hidden dicts stay configured (and pass the "must have an active
+        # dictionary" validation) but offer no tab anywhere.
+        actives = [
+            d
+            for d in self.dictionaries
+            if d.is_active and not d.is_hidden and d.usefor == use_for
+        ]
         sorted_actives = sorted(actives, key=lambda x: x.sort_order)
-        return [{"url": d.dicturi, "dicttype": d.dicttype} for d in sorted_actives]
+        ret = []
+        for d in sorted_actives:
+            if d.dicttype == "localdict":
+                entry = _local_dict_tab_entry(self, d)
+                if entry is not None:
+                    ret.append(entry)
+            else:
+                ret.append({"url": d.dicturi, "dicttype": d.dicttype})
+        return ret
+
+    def local_dict_files(self):
+        """
+        The pool file names of this language's active, visible local
+        dictionaries, in tab order -- the order the term popup's gloss
+        and the term form's local-dict fill try them in.
+        """
+        return [
+            d.dicturi
+            for d in sorted(self.dictionaries, key=lambda x: x.sort_order)
+            if d.dicttype == "localdict"
+            and d.is_active
+            and not d.is_hidden
+            and d.usefor == "terms"
+        ]
 
     @property
     def sentence_dict_uris(self):
@@ -192,6 +297,7 @@ class Language(
             dd["active"] = d.is_active
             ret["dictionaries"].append(dd)
         ret["show_romanization"] = self.show_romanization
+        ret["show_furigana"] = self.show_furigana
         ret["right_to_left"] = self.right_to_left
         ret["parser_type"] = self.parser_type
         ret["character_substitutions"] = self.character_substitutions
@@ -224,6 +330,7 @@ class Language(
         mappings = {
             "name": "name",
             "show_romanization": "show_romanization",
+            "show_furigana": "show_furigana",
             "right_to_left": "right_to_left",
             "parser_type": "parser_type",
             "character_substitutions": "character_substitutions",
@@ -257,6 +364,8 @@ class Language(
                 dtype = "embeddedhtml"
             elif dtype == "popup":
                 dtype = "popuphtml"
+            elif dtype in ("localdict", "local"):
+                dtype = "localdict"
             else:
                 raise ValueError(f"Invalid dictionary type {dtype}")
 

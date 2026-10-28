@@ -171,6 +171,26 @@ def test_transcribe_clip_returns_text_and_duration(model_dir_tmp):
     assert os.path.exists(wav)
 
 
+def test_transcribe_clip_strips_japanese_word_spaces(monkeypatch):
+    "Shadowing compares this text, so the spaces must go."
+    try:
+        import numpy as np
+    except ImportError:
+        pytest.skip("numpy not installed")
+
+    monkeypatch.setattr(
+        sensevoice,
+        "_decode_16k_mono",
+        lambda _p: (16000, np.zeros(16000, dtype=np.float32), 1.0),
+    )
+    with patch.object(
+        sensevoice, "_recognizer", return_value=_FakeRecognizer(" こん にち は。")
+    ):
+        text, duration = sensevoice.transcribe_clip("whatever.wav", "ja")
+    assert text == "こんにちは。"
+    assert duration == 1.0
+
+
 # ---------------------------------------------------------------------
 # Streaming audiobook transcription (sherpa_onnx stubbed at sys.modules)
 # ---------------------------------------------------------------------
@@ -345,6 +365,105 @@ def test_transcribe_to_cues_short_pause_marks_clause(model_dir_tmp, monkeypatch)
     assert text == "seg 1、\nseg 2、\nseg 3。"
 
 
+def test_strip_word_spaces_only_for_languages_written_without_them():
+    """
+    SenseVoice pads Japanese/Chinese with spaces ("させ て もらいま
+    した"), which is noise there and breaks exact comparison; Korean and
+    English use spaces and must keep them.
+    """
+    from lute.book.whisper_transcribe import strip_word_spaces
+
+    assert strip_word_spaces("させ て もらいま した", "ja") == "させてもらいました"
+    assert strip_word_spaces("中国 式 に し ましょう", "zh") == "中国式にしましょう"
+    assert strip_word_spaces("中国\u3000式", "yue") == "中国式"
+    assert strip_word_spaces("hello world", "en") == "hello world"
+    assert strip_word_spaces("안녕 하세요", "ko") == "안녕 하세요"
+
+
+def test_segment_padding_never_exceeds_half_the_silence_gap(monkeypatch):
+    """
+    Padding must stay <= min_silence / 2 or two neighbouring segments
+    would overlap in the audio fed to the recognizer, transcribing the
+    neighbour's words twice.
+    """
+    assert sensevoice._segment_pad_seconds() == 0.3  # 0.6 / 2
+    monkeypatch.setattr(sensevoice, "VAD_SEGMENT_PAD_SECONDS", 5.0)
+    assert sensevoice._segment_pad_seconds() == sensevoice.VAD_MIN_SILENCE_SECONDS / 2
+
+
+class _RecordingRecognizer:
+    "Records the sample count handed to it, so padding is measurable."
+
+    def __init__(self):
+        self.lengths = []
+
+    def create_stream(self):
+        return _RecordingStream(self.lengths)
+
+    def decode_stream(self, _stream):
+        pass
+
+
+class _RecordingStream:
+    def __init__(self, lengths):
+        self.lengths = lengths
+        self.result = type("R", (), {"text": "ことば"})()
+
+    def accept_waveform(self, _sr, samples):
+        self.lengths.append(len(samples))
+
+
+def test_segments_are_padded_before_recognition(model_dir_tmp, monkeypatch):
+    """
+    The VAD boundary sits after the real onset, so each segment is fed
+    with a little silence glued on both ends; the cue timeline itself is
+    untouched (asserted in the punctuation test below).
+    """
+    try:
+        import numpy  # noqa: F401
+        import av  # noqa: F401
+    except ImportError:
+        pytest.skip("PyAV/numpy not installed")
+
+    model_dir_tmp.mkdir()
+    wav = model_dir_tmp / "book.wav"
+    _write_wav(str(wav), 3)
+
+    _install_fake_sherpa(monkeypatch)
+    rec = _RecordingRecognizer()
+    with patch.object(sensevoice, "_recognizer", return_value=rec):
+        text, cues_json = sensevoice.transcribe_to_cues(str(wav), "ja")
+
+    pad = int(sensevoice._segment_pad_seconds() * 16000)
+    assert pad == 4800
+    # Fake VAD emits 2 s of speech per segment.
+    assert rec.lengths == [2 * 16000 + 2 * pad]
+    cues = json.loads(cues_json)
+    # Raw boundaries, not padded ones: 0.0 - 2.0.
+    assert cues[0]["start"] == 0.0
+    assert cues[0]["end"] == 2.0
+
+
+def test_drop_wordless_cues_keeps_words_and_drops_punctuation():
+    """
+    A punctuation-only cue carries no words; anything with a real
+    character (including a stray '♪' line, which is unusual enough to
+    keep) stays.
+    """
+    from lute.book.whisper_transcribe import drop_wordless_cues
+
+    cues = [
+        {"start": 0.0, "end": 1.0, "text": "。"},
+        {"start": 1.0, "end": 2.0, "text": "？"},
+        {"start": 2.0, "end": 3.0, "text": "… 「 」"},
+        {"start": 3.0, "end": 4.0, "text": "はい。"},
+        {"start": 4.0, "end": 5.0, "text": "♪"},
+        {"start": 5.0, "end": 6.0, "text": "OK"},
+    ]
+    drop_wordless_cues(cues)
+    assert [c["text"] for c in cues] == ["はい。", "♪", "OK"]
+
+
 def test_punctuate_cues_respects_existing_punctuation_and_languages():
     from lute.book.whisper_transcribe import punctuate_cues
 
@@ -384,3 +503,99 @@ def test_iter_16k_mono_chunks(model_dir_tmp):
     assert sr == 16000
     assert samples.size == 25 * 16000
     assert duration == 25.0
+
+
+def test_transcribe_to_cues_uses_loose_vad_thresholds(model_dir_tmp, monkeypatch):
+    """
+    The VAD must not cut a sentence in half.
+
+    Prod regression (book 789, a 157 s textbook mp3): at the silero
+    defaults of 0.25 s silence / 0.25 s speech the detector split
+    sentences mid-clause and the loop emitted 65 cues, many of them
+    fragments.  These thresholds are the fix, so they are pinned here.
+    """
+    try:
+        import numpy  # noqa: F401
+        import av  # noqa: F401
+    except ImportError:
+        pytest.skip("PyAV/numpy not installed")
+
+    model_dir_tmp.mkdir()
+    wav = model_dir_tmp / "book.wav"
+    _write_wav(str(wav), 3)
+
+    seen = {}
+
+    class _Inner:
+        pass
+
+    class _FakeVadModelConfig:
+        def __init__(self):
+            self.silero_vad = _Inner()
+            self.sample_rate = 16000
+
+    def _make_vad(cfg, buffer_size_in_seconds=120):
+        seen["min_silence"] = cfg.silero_vad.min_silence_duration
+        seen["min_speech"] = cfg.silero_vad.min_speech_duration
+        seen["max_speech"] = cfg.silero_vad.max_speech_duration
+        return _FakeVad()
+
+    fake = types.ModuleType("sherpa_onnx")
+    fake.VadModelConfig = _FakeVadModelConfig
+    fake.VoiceActivityDetector = _make_vad
+    monkeypatch.setitem(sys.modules, "sherpa_onnx", fake)
+
+    with patch.object(sensevoice, "_recognizer", return_value=_CountingRecognizer()):
+        sensevoice.transcribe_to_cues(str(wav), "ja")
+
+    assert seen == {
+        "min_silence": sensevoice.VAD_MIN_SILENCE_SECONDS,
+        "min_speech": sensevoice.VAD_MIN_SPEECH_SECONDS,
+        "max_speech": sensevoice.VAD_MAX_SPEECH_SECONDS,
+    }
+    # Half-second silence still holds a sentence together, and a segment
+    # may run to 30 s before being force-cut.
+    assert seen["min_silence"] >= 0.5
+    assert seen["max_speech"] >= 30
+
+
+class _WordlessRecognizer:
+    "Answers '。' for odd segments, words for even ones."
+
+    def __init__(self):
+        self._n = 0
+
+    def create_stream(self):
+        self._n += 1
+        return _FakeStream("。" if self._n % 2 else "ことば")
+
+    def decode_stream(self, _stream):
+        pass
+
+
+def test_punctuation_only_cues_are_dropped(model_dir_tmp, monkeypatch):
+    """
+    A cue whose transcript is only punctuation carries no words and shows
+    up in the reader as a stray '。' line (prod: the first two cues of
+    book 789 were exactly that).
+    """
+    try:
+        import numpy  # noqa: F401
+        import av  # noqa: F401
+    except ImportError:
+        pytest.skip("PyAV/numpy not installed")
+
+    model_dir_tmp.mkdir()
+    wav = model_dir_tmp / "book.wav"
+    _write_wav(str(wav), 7)
+
+    _install_fake_sherpa(monkeypatch)
+    with patch.object(sensevoice, "_recognizer", return_value=_WordlessRecognizer()):
+        text, cues_json = sensevoice.transcribe_to_cues(str(wav), "ja")
+
+    cues = json.loads(cues_json)
+    # Segments 1 and 3 are punctuation-only; only the words survive, and
+    # the timestamps of the dropped ones do not leak into the output.
+    assert [c["text"] for c in cues] == ["ことば。"]
+    assert cues[0]["start"] == 3.0
+    assert text == "ことば。"

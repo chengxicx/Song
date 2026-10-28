@@ -18,6 +18,8 @@ Rules come from two places:
   ``zh.json`` beside them holds this project's Chinese glosses, keyed by the
   upstream entry id, and ``zh_enrichment.json`` the Chinese wording for the
   rows' 接续 / 注意点 / 参考例句译文 (the vendored files stay verbatim).
+  ``ko_enrichment.json`` and ``en_enrichment.json`` do the same for the
+  Korean and English display languages.
 
 Matcher specs are *derived* from each entry's descriptive pattern and
 validated against that entry's own examples -- see ``_load_level``.
@@ -230,6 +232,7 @@ def _match_spans(rule, tokens, sentence_text):
     spans = []
     offsets = _token_offsets(tokens)
     token_ends = [o + len(t["surface"]) for o, t in zip(offsets, tokens)]
+    token_end_set = set(token_ends)
     for spec in rule["patterns"]:
         if spec["type"] == "regex":
             for m in spec["re"].finditer(sentence_text):
@@ -243,6 +246,16 @@ def _match_spans(rule, tokens, sentence_text):
                     m.start(), m.end(), offsets, token_ends
                 ):
                     continue
+                # A literal may not *end* inside a token either, whatever it
+                # starts with: an end that is not a token boundary means the
+                # literal is a prefix of a longer word, not the construction.
+                # もので (the short form of 〜ものだから) is a literal prefix of
+                # ものです (もの + です), so 〜ものだから was reported for
+                # 写真は祖父母が若いときのものです。; the same hole gave ので
+                # (〜ので) and もの (〜もの) a free hit on that sentence.
+                # Starting inside a token stays allowed -- see above.
+                if m.end() not in token_end_set:
+                    continue
                 # Neither may any literal start inside a 動詞 (see above).
                 if _starts_inside_verb(m.start(), tokens, offsets):
                     continue
@@ -254,15 +267,41 @@ def _match_spans(rule, tokens, sentence_text):
             )
         else:  # tokens
             runs = _token_span_runs(spec["conds"], tokens)
-            # A token spec may name a token that must not sit immediately in
-            # front of the run (see _NOT_AFTER).  A run at the start of the
-            # sentence has nothing in front of it, so nothing excludes it.
-            if spec.get("not_after") is not None:
-                runs = [
-                    (s, e)
-                    for (s, e) in runs
-                    if s == 0 or not _match_condition(spec["not_after"], tokens[s - 1])
-                ]
+        # A spec may name a token that must not sit immediately in front of
+        # the run (see _NOT_AFTER).  A run at the start of the sentence has
+        # nothing in front of it, so nothing excludes it.  Anchors specs take
+        # the same guard: the run starts at the first anchor, so the token in
+        # front of it is the anchor's own left context (しか preceded by a
+        # verb is 〜しかない "no choice", not 〜しか "only").
+        if spec.get("not_after") is not None:
+            runs = [
+                (s, e)
+                for (s, e) in runs
+                if s == 0 or not _match_condition(spec["not_after"], tokens[s - 1])
+            ]
+        # Mirror image: a token that must not sit immediately *after* the
+        # run.  〜てください is the request; 〜てくださいました / 〜てくださ
+        # います is the honorific "did for me", and the token that follows
+        # the bare ください is what tells the two apart -- the tokens
+        # matcher cannot look ahead any other way.
+        #
+        # Which token that is depends on what the run is.  A token spec's run
+        # *is* the construction, so the guard is the token behind it.  An
+        # anchors spec's run opens with the `before` sequence and closes at
+        # the far anchor, so what matters is the first token of the gap --
+        # あまり + に is the degree reading ("too much", its own row), while
+        # あまり + a predicate is the "not very" the 〜あまり〜ない row wants.
+        if spec.get("not_next") is not None:
+            head = len(spec["before"]) if spec["type"] == "anchors" else None
+            guarded = []
+            for start, end in runs:
+                index = end if head is None else start + head
+                if index < len(tokens) and _match_condition(
+                    spec["not_next"], tokens[index]
+                ):
+                    continue
+                guarded.append((start, end))
+            runs = guarded
         for start, end in runs:
             if end > start:
                 # A pattern may match up to (and including) the final
@@ -327,7 +366,14 @@ _N5_RULES = [
         "there is/are (animate or inanimate)",
         ["公園に猫がいます。", "机の上に本があります。"],
         [
-            {"type": "tokens", "conds": [_SURF("が"), _LEMMA("いる", "ある")]},
+            # not_after こと: in ことがあります the が+ある run is the polite
+            # form of the experience construction 〜ことがある (its own row),
+            # not the existence reading this rule reports.
+            {
+                "type": "tokens",
+                "conds": [_SURF("が"), _LEMMA("いる", "ある")],
+                "not_after": {"lemma": {"こと"}},
+            },
         ],
     ),
     _rule(
@@ -366,15 +412,6 @@ _N5_RULES = [
         ],
     ),
     _rule(
-        "ta_koto_ga_arimasu",
-        "〜たことがあります",
-        "have done before; experienced",
-        ["日本に行ったことがあります。", "寿司を食べたことがありません。"],
-        [
-            {"type": "regex", "re": re.compile(r"たこと")},
-        ],
-    ),
-    _rule(
         "de_place_means",
         "〜で（place/means）",
         "marks the place of action or the means of doing something",
@@ -393,15 +430,24 @@ _N5_RULES = [
         "is/am/are doing (progressive) or resultant state",
         ["今、ご飯を食べています。", "電気がついています。"],
         [
-            # て *or* で -- and no 動詞 constraint in front, deliberately.
+            # て *or* で, but only the connective form (助詞,接続助詞).
             # Widening て -> て/で is worth +8 pages of 400 (む/ぶ/ぬ/ぐ verbs
-            # like 読んでいます, which were silently missed), and requiring a
-            # 動詞 right before the て would take back 5 of them: in the passive
-            # 言われています / 展示されていました the token before て is the
-            # 受身 auxiliary, not the verb.  Costing those back to exclude
-            # 元気でいる is a bad trade -- でいる after a な-adjective states a
-            # continuing condition and reads correctly as 〜ている.
-            {"type": "tokens", "conds": [_SURF_IN("て", "で"), _LEMMA("いる")]},
+            # like 読んでいます, which were silently missed).  Requiring a
+            # 動詞 right before the て would take back 5 of them: in the
+            # passive 言われています / 展示されていました the token before て
+            # is the 受身 auxiliary, not the verb -- so the earlier review
+            # kept the な-adjective 元気でいる in this row's claims as the
+            # lesser cost.  The part of speech does the same job for free:
+            # the copula's て-form (元気**で**いる, lemma だ) is 助動詞, the
+            # verb's is 助詞,接続助詞, so the passive stays and the copula
+            # moves to the 〜でいる row that is about exactly that state.
+            {
+                "type": "tokens",
+                "conds": [
+                    {"surface_in": ("て", "で"), "pos2": "接続助詞"},
+                    _LEMMA("いる"),
+                ],
+            },
         ],
     ),
     _rule(
@@ -413,9 +459,15 @@ _N5_RULES = [
             # 動詞 + て/で + ください.  The で form is the same request -- 読んで,
             # 遊んで, 死んで -- and a bare て-regex missed all of them, which is
             # how 読んでください ended up reported as 〜ないでください.
+            # not_next: a ます tail after the bare ください is the honorific
+            # (〜てくださいました / 〜てくださいます, "kindly did for me"), not
+            # the request -- V-て + くださる is the くださる row's reading, and
+            # the request row must not claim it too.  てくださいませんか keeps
+            # its ませ token and stays a request.
             {
                 "type": "tokens",
                 "conds": [_P("動詞"), _SURF_IN("て", "で"), _SURF("ください")],
+                "not_next": {"surface_in": ("まし", "ます")},
             },
         ],
     ),
@@ -962,6 +1014,11 @@ _DUPLICATE_IDS = frozenset(
         "naide",
         "desu-674648",
         "masu",
+        # ておく: the N4 material row collides with the jkindrix te-oku row
+        # ("Verb-て form + おく", richer meaning/notes/related, zh.json gloss
+        # present) -- one construction, two levels, reported 17x on the
+        # overlap corpus (2026-10-16 audit).
+        "teoku-7dcaca",
         "darou",
         "deshiyou",
         "nasai",
@@ -969,6 +1026,15 @@ _DUPLICATE_IDS = frozenset(
         "kamoshirenai",
         "kotonisuru",
         "kotoninaru",
+        # koto-nominalizer sat silent for years only by accident: its bare
+        # こと fragment was a *substring* of the hand-written たこと regex
+        # literal, so _covered_by_hand_written swallowed it -- coverage that
+        # rule never actually provided (言うこと has no た).  Retiring the
+        # loose hand-written row (folded into ds_ta-koto-ga-aru, 2026-10-16)
+        # un-suppressed it; keep it silent on purpose, because a bare-こと
+        # row fires on nearly every page and restates the word popup plus
+        # the ことがある / ことにする / ことになる family rows.
+        "koto-nominalizer",
         "nisuru",
         "nisuru-138b7a",
         "ninaru",
@@ -1093,6 +1159,124 @@ _DUPLICATE_IDS = frozenset(
         # family row already carries.
         "wake",
         "noda-e4b5a5",
+        # 限り family (2026-10-16 overlap audit): 限り is one literal with
+        # five readings, and before this review four rows carried the same
+        # bare `限り` regex -- every 限り in the language, including the
+        # verb 限る's own inflections, fired on all of them.  The readings
+        # are now separated per row in _SLOT_SPECS; these three *material*
+        # rows each duplicate a jkindrix row that stays, so they silence.
+        "kagiri-as-long-as",  # N3 conditional 限り -> rihanairiha (N2,
+        #   jkindrix, same formation: である/動詞/ない + 限り(は))
+        "ni-kagiri",  # N2 に限り notice -> niru-071752 (N3 に限る, the
+        #   same restriction reading; that row's derived lemma spec also
+        #   claimed に限って / に限らず until this review)
+        "kagiri-da-emotional",  # N2 限りだ -> rida (N1, jkindrix)
+        # ところ family (2026-10-16 overlap audit): ところ is a formal noun
+        # carrying a dozen constructions, and several rows had derived the
+        # same bare `ところ` literal, so one sentence with one reading
+        # reported three or four of them.  The readings are now separated
+        # per row in _SLOT_SPECS; these rows each duplicate a row that
+        # stays.
+        "ta-tokoro-de",  # N2 material たところで ("even if") -> takaorode
+        #   (N1 jkindrix, same construction)
+        "tokoro-wo",  # N1 material ところを -> tokoroo (N2 jkindrix)
+        "to-itta-tokoro-da",  # N1 material といったところだ ->
+        #   toiutokorodatoitatokoro (N1 jkindrix), whose といったところ
+        #   spec also covers the です form this row's literal missed
+        "tokorodata",  # N1 ところだった -> tokorodata-df8a13 (N3): the same
+        #   point listed in two books; keep the row with the fuller
+        #   formation and both examples
+        # てやる/てもらう family (2026-10-16 overlap audit): the N4 merged
+        # rows carry the union of the forms (〜てやる/てあげる/てさしあげる,
+        # 〜てもらう/いただく) with the fuller formations and examples, so the
+        # single-form rows fold into them -- the same て+やる / て+もらう
+        # token spec on two rows reported one sentence twice.
+        "teyaru",  # N3 てやる -> teyaruteagerutesashiageru (N4 merged row)
+        "te-ageru-favor-given",  # N4 material てあげる -> same merged row
+        "temorau",  # N3 てもらう -> temorauteitadaku (N4 merged row)
+        "te-morau-request-favor",  # N4 material てもらう -> same merged row
+        "te-itadaku-polite-favor-received",  # N4 material いただく -> same
+        #   merged row (〜てもらう・いただく)
+        # もの family (2026-10-16 overlap audit): もの is a formal noun
+        # carrying a dozen constructions (〜もの reason, 〜ものだ,
+        # 〜ものではない, 〜ものだから, 〜ものの, 〜ものがある, 〜ものか,
+        # 〜ものなら, 〜ものを, 〜というもの ...) and the derivation handed
+        # the reason row the same bare `もの` literal as all of them, so
+        # every もの in the language reported as 〜もの.  The readings are
+        # separated per row in _SLOT_SPECS; mono-da-general's ものだ spec
+        # duplicated the N2 jkindrix row and is silenced here.
+        "mono-da-general",  # N3 material ものだ -> monodamonodehanai
+        #   (N2 jkindrix, same spec plus ものではない)
+        # 〜のだろう / のでしょう listed twice in the same merge: the second
+        # arrival collided on the id and got the hash suffix (2026-10-16
+        # overlap audit, 13-count pair).  Same pattern, same formation, same
+        # spec -- the glosses only differ in wording.
+        "nodarounodeshiyou-9ec170",
+        # 思う/向け/あまり family (2026-10-16 overlap audit).  思う: the plain
+        # と思う reading lived on two rows (to-omou, toutohawanai) with the
+        # same bare と思う literal -- the surviving row carries とは思わない
+        # too, and the volitional ようと思う is a different reading with its
+        # own row (now spec-separated).  向け/向き: the same-level book rows
+        # duplicated the fuller rows and are folded into them.
+        "to-omou",  # N4 material と思う -> toutohawanai (N4 jkindrix, same
+        #   reading, 12 examples, とは思わない as well)
+        "mat-e459cf",  # N3 向け -> muke-targeted-for (N3, same construction,
+        #   fuller: 向け / 向けに / 向けの)
+        "mat-d26c40",  # N3 向き -> muki-suitable-for (N3, same construction,
+        #   fuller: 向き / 向きの)
+        # Containing-form pairs (2026-10-16 overlap audit, second pass): each
+        # silenced row's derived spec is a strict subset of the row that
+        # stays -- the shorter row's literal sits inside the longer row's
+        # form set (を機にして contains を機に, つきまして contains つき ...),
+        # so both fired on the same sentence with the same highlight.  The
+        # surviving row claims every sentence the silenced one did.
+        "oni",  # N1 を機に -> wo-ki-ni-shite (を機にして / を機に, same
+        #   "taking X as an opportunity" point)
+        "okomete",  # N2 をこめて -> okometeokometa (+ をこめた)
+        "nishite-8d1c26",  # N2 に際して -> nishitenishinishiteno (+ に際し)
+        "oniganinate",  # N2 を契機に -> wo-keiki-ni (+ を契機として)
+        "wo-yogi-naku-sareru",  # N1 を余儀なくされる -> onakusareruonakusaseru
+        #   (same passive row plus the active を余儀なくさせる)
+        "wa-tomokaku",  # N2 はともかく -> hatomokakutoshitenaratomokakutoshite
+        #   (+ ならともかく)
+        "made-mo-nai",  # N2 までもない -> mademonaimadenokotomonai
+        #   (+ までのこともない)
+        "nitsukinitsukimashite",  # N2 につきまして -> ni-tsuki-due-to, whose
+        #   につき spec already claims つきまして sentences and covers both
+        #   senses of つき (due to / per) -- the narrower gloss loses nothing
+        "ni-kakawarazu-regardless",  # N2 にかかわらず ->
+        #   nikakawarazunihakakawarinaku (+ にかかわりなく)
+        "kaimonaku",  # N1 かいもなく -> kaigaarugaigaarukaimonaku
+        #   (かいがある / かいもなく)
+        "mat-510d37",  # N2 material 得る -> uru-possible (N2 jkindrix
+        #   得る / 得ない; the material row's [lemma 得る] spec matches the
+        #   same 得/得る tokens, with a worse highlight on 得ない)
+        "toshitaratosurutotosureba",  # N1 としたら -> to-sureba
+        #   (とすれば / とすると / としたら)
+        "ka-no-you-ni",  # N2 かのように -> ka-no-you-da
+        #   (かのようだ / かのように / かのような)
+        # Same-surface different-reading pairs (2026-10-16 overlap audit,
+        # second pass): one word, two rows, where one row's spec fires on
+        # the other row's reading as well.  ごとく is the 連体形 of ごとし
+        # and the ごとし row's lemma spec already claims it; ばよかった is
+        # one formation of the fuller 〜ばよかった・とよかった row.
+        "gotoku-as-if",  # N1 ごとく -> gotoshi (lemma spec covers ごとし /
+        #   ごとく / ごとき, with the fuller formation)
+        "ba-yokatta",  # N3 よかった -> bayokatatarayokatatoyokata
+        #   (ば / たら / と / なければ + よかった, five formations)
+        # Same-construction book twins (2026-10-16 overlap audit, third
+        # pass): each silenced row's derived spec is a subset of the row
+        # that stays, so the survivor already claims every sentence.
+        "shidai-de",  # N2 次第で・次第では -> dehaniyoteda
+        #   (次第で / 次第では / 次第だ -- same 视…而定 point, one book
+        #   each; 次第で matches inside 次第では)
+        "nitaerutaenai",  # N1 にたえる・たえない -> nitaerunitaenai
+        #   (same に + たえる token spec, and its にたえない literal keeps
+        #   the negative reading)
+        "kedakenikeno",  # N2 向けの -> muke-targeted-for (向け / 向けに /
+        #   向けの)
+        "kidakinikino",  # N2 向きだ・向きの -> muki-suitable-for
+        #   (向きの / 向き -- the bare 向き covers 向きだ)
     }
 )
 
@@ -1216,7 +1400,7 @@ _SLOT_SPECS = {
     # on its own (から alone: 84% of pages).  Reviewed specs below restate
     # the construction the entry actually describes.
     "karamade": (
-        "〜から〜まで",
+        "から〜まで",
         [
             {
                 "type": "anchors",
@@ -1236,17 +1420,23 @@ _SLOT_SPECS = {
                 "before": [{"surface": "あまり"}],
                 "after": [{"lemma": {"ない", "ぬ"}}],
                 "maxgap": 8,
+                # not_next に: あまり + に is the other degree reading --
+                # あまりに寒くて外に出られない ("so cold that ...", its own
+                # 〜あまりに row) -- and the gap bridged straight across it.
+                # For an anchors spec the guard looks at the token right
+                # after the あまり anchor.
+                "not_next": {"surface_in": ("に",)},
             }
         ],
     ),
     "kunaru": (
-        "〜くなる",
+        "くなる",
         # く rides inside the adjective token (明るく), so the condition is
         # the adjective POS, not a bare く surface.
         [{"type": "tokens", "conds": [{"pos1": "形容詞"}, {"lemma": {"なる"}}]}],
     ),
     "kusuru": (
-        "〜くする",
+        "くする",
         [
             # く rides inside the adjective token (明るく), so the condition
             # is the adjective POS, not a bare く surface.  Sudachi also reads
@@ -1259,7 +1449,7 @@ _SLOT_SPECS = {
     ),
     # なか（形式名词）is the superlative "among these", always なかで.
     "naka": (
-        "〜なか",
+        "なか",
         [{"type": "tokens", "conds": [{"surface": "なか"}, {"surface": "で"}]}],
     ),
     # N1/N2/N3 book merge (2026-09-30).  These entries' descriptive pattern is
@@ -1278,7 +1468,16 @@ _SLOT_SPECS = {
     ),
     "naru": (
         "なる",
-        [{"type": "tokens", "conds": [{"pos1": "助動詞", "lemma": {"なり"}}]}],
+        [
+            # Only the 連体形 spells なる (健全なる精神, 改革なるもの).  The
+            # lemma alone also matched the conditional なら and the classical
+            # 未然形 なら of 〜ならでは / のみならず, so every なら reported
+            # this row as well.
+            {
+                "type": "tokens",
+                "conds": [{"pos1": "助動詞", "lemma": {"なり"}, "surface": "なる"}],
+            }
+        ],
     ),
     "tote": (
         "とて",
@@ -1291,7 +1490,10 @@ _SLOT_SPECS = {
     # 〜しか〜ない: the derivation produced an unanchored `しか` regex, which
     # also matched the しかし conjunction ("しか" sits inside しかし).  The
     # entry describes a two-anchor construction -- しか licensed by a negative
-    # predicate -- so match it as one, like あまり〜ない.
+    # predicate -- so match it as one, like あまり〜ない.  not_after 動詞: a
+    # verb right in front is the other reading -- 歩く + しかない ("no choice
+    # but to walk", the 〜しかない row), while 名 + しか (+ negative) is this
+    # row's "only" (100円しかない, 日本語しか話せません).
     "shika-nai": (
         "しか",
         [
@@ -1302,7 +1504,928 @@ _SLOT_SPECS = {
                 # ん of ありません.
                 "after": [{"lemma": {"ない", "ぬ"}}],
                 "maxgap": 8,
+                "not_after": {"pos1": "動詞"},
             }
+        ],
+    ),
+    # ように has two readings and a bare literal cannot tell them apart: the
+    # *purpose* marker ("so that / in order to", 聞こえるように / 忘れないように)
+    # and the *resemblance* marker ("like ___", 氷のように冷たい).  The
+    # derivation produced an unanchored `ように` regex for the purpose entry, so
+    # 氷の**ように**冷たい手です was reported as 为了……；以便 -- the gloss of a
+    # construction that sentence does not contain.
+    #
+    # What separates them is the left context, and it is load-bearing: a purpose
+    # ように takes a verb / ない / な / adjective in front of it, the resemblance
+    # reading takes 名詞 + の (or a demonstrative 様).  So the purpose entry is
+    # matched on the token run よう + に -- Sudachi splits ように into よう
+    # (形状詞,助動詞語幹) + に (助動詞,連用形-ニ) -- and the left context is
+    # reviewed in _NOT_AFTER below.
+    #
+    # The n4 entry 〜ように ("purpose / wish") needs no guard of its own: it is
+    # in _DUPLICATE_IDS (its row would shadow this one), so it never fires.
+    "you-ni-purpose": (
+        "ように",
+        [{"type": "tokens", "conds": [{"surface": "よう"}, {"surface": "に"}]}],
+    ),
+    # The reading the entry above must not claim, as its own library row
+    # (you-ni-resemblance): the 比況助動詞 in its 連用形 / 連体形, which the
+    # 終止形-only 〜ようだ row cannot see at all.  Guarding the purpose entry
+    # alone would only delete the row -- the panel would then say nothing about
+    # a construction the sentence is made of.
+    #
+    # Three specs, disjoint by left context:
+    #
+    #   1. 名詞 + の + ように / ような -- the simile proper.  The run starts at
+    #      the noun, so the highlight covers the whole 氷のように.
+    #   2. この / その / あの / どの + ように / ような -- the demonstrative 様.
+    #   3. a bare ような -- the 連体形 after a predicate (人の手ではないような
+    #      手, 何も知らないような顔), which is neither a noun + の nor a
+    #      demonstrative.  `not_after` keeps it off the two contexts above so
+    #      the three specs cannot both claim one ような.
+    #
+    # ように after a *predicate* (雨が降るように見える) is deliberately not
+    # claimed here: it is ambiguous with the purpose reading (雨が降るように
+    # 祈る) and the purpose entry owns it.
+    "you-ni-resemblance": (
+        "のように・のような",
+        [
+            {
+                "type": "tokens",
+                "conds": [
+                    {"pos1": "名詞"},
+                    {"surface": "の"},
+                    {"surface": "よう"},
+                    {"surface_in": ("に", "な")},
+                ],
+            },
+            {
+                "type": "tokens",
+                "conds": [
+                    {"surface_in": ("この", "その", "あの", "どの")},
+                    {"surface": "よう"},
+                    {"surface_in": ("に", "な")},
+                ],
+            },
+            {
+                "type": "tokens",
+                "conds": [{"surface": "よう"}, {"surface": "な"}],
+                "not_after": {
+                    "surface_in": ("の", "この", "その", "あの", "どの"),
+                },
+            },
+        ],
+    ),
+    # --- 限り / 限る: one literal, five readings ---------------------------
+    #
+    # 限り carries five readings (max extent 力の限り / conditional
+    # 生きている限り / knowledge scope 限りでは / notice に限り /
+    # recommendation に限る) and the derivation handed four rows the same
+    # bare `限り` regex, so every 限り in the language fired on all of
+    # them -- including the verb 限る's own inflections: Sudachi reads
+    # 背広に**限り**ます as に + 限り with lemma 限る, so no literal test
+    # can see that it is the verb.  What separates the readings is the
+    # token context, so each row below matches only the context its own
+    # formation names, and every 限り cond pins the *noun* (lemma 限り)
+    # rather than the verb (lemma 限る).
+    "mat-51adc0": (
+        "限り",
+        [
+            # 名「の」+限り (力の限り): の must sit directly in front --
+            # 私の見る限りでは has the verb in between and is the
+            # knowledge-scope reading (riderideha), not this one.
+            {
+                "type": "tokens",
+                "conds": [{"surface": "の"}, {"surface": "限り", "lemma": {"限り"}}],
+            },
+            # 動詞 + 限りの + N (思いつく限りのアイデア): the adnominal
+            # half of the max-extent formation.
+            {
+                "type": "tokens",
+                "conds": [{"surface": "限り", "lemma": {"限り"}}, {"surface": "の"}],
+            },
+            # できる限り is a single 副詞 token, so no token run can
+            # claim it; the anchored regex is exactly that one token.
+            {"type": "regex", "re": re.compile("できる限り"), "anchor": True},
+        ],
+    ),
+    "riderideha": (
+        "限りでは",
+        [
+            # 名「の」+限り(で)は (取り調べの限りでは).
+            {
+                "type": "tokens",
+                "conds": [
+                    {"surface": "の"},
+                    {"surface": "限り", "lemma": {"限り"}},
+                    {"surface": "で"},
+                ],
+            },
+            # 動詞+限り(で)は (私の見る限りでは, 生きている限りでは).
+            {
+                "type": "tokens",
+                "conds": [
+                    {"pos1": "動詞"},
+                    {"surface": "限り", "lemma": {"限り"}},
+                    {"surface": "で"},
+                ],
+            },
+            # 動詞「た」+限り(で)は (昨日調べた限りでは): た is 助動詞,
+            # so the verb POS above misses it.
+            {
+                "type": "tokens",
+                "conds": [
+                    {"lemma": {"た"}},
+                    {"surface": "限り", "lemma": {"限り"}},
+                    {"surface": "で"},
+                ],
+            },
+            # The emotional 限りで (お恥ずかしい限りで, 残念な限りで)
+            # shares the 限り+で tail but takes an adjective in front,
+            # which none of the three contexts above allow; it has no
+            # row of its own (the 限りだ entries teach 限りだ/限りです).
+        ],
+    ),
+    "rihanairiha": (
+        "限り・ない限り",
+        [
+            # 動詞/である+限り (会員である限り, 生きている限り): the
+            # token in front is ある (動詞,非自立可能).
+            {
+                "type": "tokens",
+                "conds": [{"pos1": "動詞"}, {"surface": "限り", "lemma": {"限り"}}],
+            },
+            # イ辞+限り(は): the は separates the conditional adjective
+            # (私の目の黒い限りは) from the emotional 限りだ, which
+            # carries だ/です in that slot (嬉しい限りです -> rida).
+            # The library's own example spells it 限り(は), so the
+            # parenthesis is an optional cond of its own.
+            {
+                "type": "tokens",
+                "conds": [
+                    {"pos1": "形容詞"},
+                    {"surface": "限り", "lemma": {"限り"}},
+                    {"surface_in": ("(", "（"), "optional": True},
+                    {"surface": "は"},
+                ],
+            },
+            # ない+限り (確かめない限り): ない is 助動詞, not 動詞.
+            {
+                "type": "tokens",
+                "conds": [{"lemma": {"ない"}}, {"surface": "限り", "lemma": {"限り"}}],
+            },
+        ],
+    ),
+    "niru-071752": (
+        "に限る",
+        [
+            # に限る / に限り / に限ります.  The derivation's lemma chain
+            # (に + 限る) also claimed に限って / に限らず /
+            # に限ったことではない -- separate rows with separate
+            # readings -- so the surface is pinned to the two forms this
+            # entry teaches.  The notice に限り shares the run with the
+            # ni-kagiri row (silenced 2026-10-16, same reading).
+            {
+                "type": "tokens",
+                "conds": [{"surface": "に"}, {"surface_in": ("限る", "限り")}],
+            },
+        ],
+    ),
+    "niru": (
+        "に限る",
+        [
+            # Same spec and same headline as niru-071752 above: the N3
+            # restriction reading ("only X") and the N2 recommendation
+            # reading ("X is best") are one form carrying two glosses,
+            # which _merge_same_name lists on a single row.  The literal
+            # に限る the derivation chose missed the ます-form of this
+            # entry's own example (服装は背広に限りますよ).
+            {
+                "type": "tokens",
+                "conds": [{"surface": "に"}, {"surface_in": ("限る", "限り")}],
+            },
+        ],
+    ),
+    "rida": (
+        "限りだ",
+        [
+            # イ辞+限りだ/限りです (寂しい限りだ, 嬉しい限りです): the
+            # derivation's literal 限りだ never matched the polite
+            # 限りです of this entry's own first example.  The left
+            # context is required so a knowledge-scope 限りです
+            # (私の知る限りです) is not read as an emotional one.
+            {
+                "type": "tokens",
+                "conds": [
+                    {"pos1": "形容詞"},
+                    {"surface": "限り", "lemma": {"限り"}},
+                    {"surface_in": ("だ", "です")},
+                ],
+            },
+            # ナ「な」+限りだ/限りです (幸せな限りです): な is 助動詞
+            # with lemma だ.
+            {
+                "type": "tokens",
+                "conds": [
+                    {"lemma": {"だ"}},
+                    {"surface": "限り", "lemma": {"限り"}},
+                    {"surface_in": ("だ", "です")},
+                ],
+            },
+        ],
+    ),
+    # --- ところ: one formal noun, a dozen readings ------------------------
+    #
+    # ところ carries a dozen constructions (temporal 〜ところ, sequential
+    # たところ, source ところでは, even-if たところで, almost ところだった,
+    # just-when ところに/を/へ/から, place というところ ...) and the
+    # derivation handed three rows the same bare `ところ` literal, so a
+    # sentence with one reading reported three or four of them.  Each row
+    # below matches only the context its own formation names.
+    "ta-tokoro": (
+        "ところ",
+        [
+            # V non-past / V-ている + ところ + だ/です (今から出かける
+            # ところだ, 食べているところです).  The だ/です the formation
+            # calls optional is what keeps this off 〜ところでは (source),
+            # 〜ところだった (almost) and 〜ところに/を/へ/から, which all
+            # share the V+ところ run.
+            {
+                "type": "tokens",
+                "conds": [
+                    {"pos1": "動詞"},
+                    {"surface": "ところ"},
+                    {"surface_in": ("だ", "です")},
+                ],
+            },
+            # V-た + ところ + だ/です (着いたところです): た is 助動詞,
+            # so the verb POS above misses it.
+            {
+                "type": "tokens",
+                "conds": [
+                    {"pos1": "動詞"},
+                    {"lemma": {"た"}},
+                    {"surface": "ところ"},
+                    {"surface_in": ("だ", "です")},
+                ],
+            },
+        ],
+    ),
+    "tatokoro": (
+        "たところ",
+        [
+            # た+ところ + a following clause (相談したところ、彼は…;
+            # 思ったところが、…).  Every other た+ところ form has a row of
+            # its own -- たところで (even if), たところです (just did),
+            # たところだ, ところだった (almost), ところに/を/へ/から --
+            # and a token cond cannot name what must *not* follow, so the
+            # exclusion is a negative lookahead on the literal.  A bare
+            # た+ところ token pair would claim all of them: Sudachi reads
+            # 謝った as 謝っ + た.
+            {
+                "type": "regex",
+                "re": re.compile("たところ(?!で|です|だ|に|を|へ|から)"),
+            },
+        ],
+    ),
+    "tokorotokorodehatokoroniyoru": (
+        "ところでは",
+        [
+            # 動詞+ところ(では) (わたしの聞くところでは).  The library's
+            # own example spells it 聞くところ(では), so the parenthesis
+            # is an optional cond of its own.  The bare た+ところ this
+            # entry also listed (本人に確かめたところ、…) is the sequential
+            # reading and stays with takaoro.
+            {
+                "type": "tokens",
+                "conds": [
+                    {"pos1": "動詞"},
+                    {"surface": "ところ"},
+                    {"surface_in": ("(", "（"), "optional": True},
+                    {"surface": "で"},
+                ],
+            },
+        ],
+    ),
+    "toiutokoro": (
+        "というところ",
+        [
+            # 名+というところ+に/で (森の里というところに住んで).  The
+            # particle the entry's own examples carry is what keeps this
+            # off the N1 approximation reading (〜というところだ), which
+            # shares the というところ run.
+            {
+                "type": "tokens",
+                "conds": [
+                    {"surface": "と"},
+                    {"surface": "いう"},
+                    {"surface": "ところ"},
+                    {"surface_in": ("に", "で")},
+                ],
+            },
+        ],
+    ),
+    "temorauteitadaku": (
+        "てもらう・いただく",
+        [
+            # 動詞+て+もらう.  もらえる (てもらえませんか) is the same
+            # construction in its request form, and Sudachi reports it as
+            # its own lemma, so the dictionary form alone missed every
+            # polite request.
+            {
+                "type": "tokens",
+                "conds": [{"lemma": {"て"}}, {"lemma": {"もらう", "もらえる"}}],
+            },
+            # 動詞+て+いただく, same request-form note: いただけますか /
+            # いただけませんか reads いただける.
+            {
+                "type": "tokens",
+                "conds": [{"lemma": {"て"}}, {"lemma": {"いただく", "いただける"}}],
+            },
+        ],
+    ),
+    # 〜という (N1) is the repeated-noun reading -- 壁という壁, 力という力,
+    # "every single wall / all the strength there is" -- and the derivation
+    # handed it a bare `という` literal, so the row fired on every という in
+    # the language: 〜ということ, 〜というもの, 〜というより, 〜というのは all
+    # reported as "所有的......".  The construction is the noun said twice,
+    # so the spec says it twice: a backreference pins the word after という
+    # to the one in front of it, which is also what keeps the row off the
+    # nested forms above (each has a row of its own).
+    "toiu-ee4dee": (
+        "という",
+        [
+            {
+                "type": "regex",
+                "re": re.compile(r"([一-龥]+)という\1"),
+                "anchor": True,
+            },
+        ],
+    ),
+    # --- もの: one formal noun, a dozen readings --------------------------
+    #
+    # Same shape as ところ: もの carries the reason 〜もの, 〜ものだ,
+    # 〜ものではない, 〜ものだから, 〜ものの, 〜ものがある, 〜ものか,
+    # 〜ものなら, 〜ものを, 〜というもの ..., and the derivation handed the
+    # reason row the same bare `もの` literal as all of them.  The reason
+    # reading is the one at a clause boundary -- the sentence-end もの of
+    # 疲れているもの。/ 寒いんだもの、... -- so the spec requires that
+    # boundary; every suffixed form (ものだ, ものから, ものの ...) has a
+    # row of its own and stops here.  The lookbehind keeps it off 〜という
+    # もの, which is the N5 explanation row's form, never the reason.
+    "mono-reason-assertion": (
+        "もの",
+        [
+            {
+                "type": "regex",
+                "re": re.compile(r"(?<!という)(?:もの|もん)(?=[。、！？」』!?．]|$)"),
+            },
+        ],
+    ),
+    # 〜ものだから / もので: the bare もので literal also matched the もの
+    # では of 〜ものではない and the もの でも of 〜ないものでもない, both
+    # of which have rows of their own, so the も tail is excluded.
+    "mono-dakara": (
+        "ものだから",
+        [
+            {"type": "regex", "re": re.compile("ものだから")},
+            {"type": "regex", "re": re.compile("もので(?!は|も)")},
+        ],
+    ),
+    # 〜ものだ / ものではない: the ものだ literal also matched the もの だ
+    # から of 〜ものだから (mono-dakara's row), so から is excluded.
+    "monodamonodehanai": (
+        "ものだ / ものではない",
+        [
+            # The predicate readings (動詞/形容詞 + ものだ) against the nominal
+            # ones (名 + の / という / ような / その + ものだ): what sits in
+            # front of もの is what tells them apart.  の covers every
+            # 名+の+もの (ぐらいの / ほどの / ゆえの / 私の ...), いう the
+            # 〜という+もの quotation (友だちというものは...), ような the
+            # resemblance (試金石のようなものだ -- the 〜ように row owns it),
+            # その the 〜そのもの "nothing but" row, んな the
+            # こんな/そんな/どんな + もの demonstratives.  Every one of those
+            # has a row of its own; the predicate readings never end in any
+            # of them, so nothing the entry's own examples do is lost.
+            {
+                "type": "regex",
+                "re": re.compile("(?<!その)(?<!いう)(?<!ような)(?<!の)(?<!んな)ものだ(?!から)"),
+            },
+            {
+                "type": "regex",
+                "re": re.compile("(?<!その)(?<!いう)(?<!ような)(?<!の)(?<!んな)ものではない"),
+            },
+        ],
+    ),
+    # 〜くださる: Sudachi reports ください (the request form of 〜てください)
+    # with the same lemma くださる as the honorific verb itself, so the
+    # derived [lemma くださる] spec claimed every てください on the page for
+    # the honorific row (68-count overlap with the hand-written te_kudasai
+    # rule).  What separates them is the form, not the lemma: the honorific
+    # inflects (くださる / くださった / くださって) or takes a polite tail
+    # (くださいました, 〜てくださいます), while the request is a bare くだ
+    # さい at the clause end.  A blanket not_after て would be wrong --
+    # V-て + くださる/くださった is the honorific reading itself
+    # (お手紙をくださってありがとうございます).
+    "kudasaru-honorific-verb": (
+        "くださる",
+        [
+            # くださる / くださった / くださって / ...: any くださる-family
+            # token that is not the bare ください.
+            {
+                "type": "tokens",
+                "conds": [{"surface_not": ["ください"], "lemma": {"くださる"}}],
+            },
+            # くださいました / 〜てくださいます: the polite honorific, where
+            # the ます tail follows the ください surface.
+            {
+                "type": "tokens",
+                "conds": [{"surface": "ください"}, {"surface_in": ("まし", "ます")}],
+            },
+        ],
+    ),
+    # 〜をください: the request "give me X".  The bare literal also matched
+    # the honorific をくださいました / をくださいませんか (先生が本をください
+    # ました), whose ます tail is what tells the two apart.
+    "okudasai": (
+        "をください",
+        [{"type": "regex", "re": re.compile("をください(?!ま)")}],
+    ),
+    # --- 思う: one verb, five attachments ---------------------------------
+    #
+    # 思う attaches to a plain-form clause (〜と思う "I think"), a volitional
+    # (ようと思う "I intend to"), たい (たいと思う "I want to"), か (ようか
+    # と思う "I'm wondering") and た+か (かと思うと "no sooner ... than").
+    # The derivation handed the plain row and the volitional row the same
+    # bare と思う literal, so one sentence reported both -- 早く起きようと思
+    # います read as "I think I'll get up early".  Each row now matches only
+    # the attachment its own formation names.
+    "you-to-omou-volitional-intent": (
+        "と思う",
+        [
+            # よう/おう + と思う: the volitional tail precedes the と.  A
+            # token cond cannot name a surface ending, so the lookbehind
+            # does it.
+            {
+                "type": "regex",
+                "re": re.compile(r"(?<=よう|おう)(?:と思う|と思い|と思っ|と思わ)"),
+            },
+        ],
+    ),
+    "toutohawanai": (
+        "と思う・とは思わない",
+        [
+            # Plain-form clause + 思う in any inflection (と思う / と思い
+            # ます / と思って / と思っています / と思った ...).  The
+            # volitional (起きようと思う), たい (行きたいと思う) and
+            # ようか attachments are separate rows with separate readings,
+            # and the characters in front of the と are what name them
+            # -- so they are excluded with a lookbehind on the literal.
+            # ようか / おうか needs its own (three-character) lookbehind:
+            # the か question mark sits between the volitional and the と,
+            # so the two-character one sails past it.
+            {
+                "type": "regex",
+                "re": re.compile(r"(?<!よう|おう|たい)(?<!ようか|おうか)(?:と思う|と思い|と思っ|と思わ)"),
+            },
+            # とは思わない / とは思っていない / とは思いませんでした.
+            {
+                "type": "tokens",
+                "conds": [{"surface": "と"}, {"surface": "は"}, {"lemma": {"思う"}}],
+            },
+        ],
+    ),
+    # 〜かと思う ("I'm wondering whether to") is the volitional question:
+    # しようか / おうか + かと思う, in every inflection of 思う (かと思う /
+    # かと思います / かと思っている -- the bare かと思う literal missed all
+    # of the 思っ/思い ones, so 買おうか思います was reported by nobody).
+    # The lookbehind keeps the row off its near neighbours: 〜ないかと思う
+    # ("I thought maybe ..."), 日本人かと思うほど ("so fluent I'd take him
+    # for Japanese") and た+かと思うと ("no sooner ... than", a row of its
+    # own) all spell the same かと思う without a volitional in front.
+    "you-ka-to-omou": (
+        "かと思う",
+        [
+            {
+                "type": "regex",
+                "re": re.compile(r"(?<=よう|おう)か(?:と思う|と思い|と思っ|と思わ)"),
+            },
+        ],
+    ),
+    # --- あまり: two readings, one literal --------------------------------
+    #
+    # あまり is the degree adverb of あまり〜ない ("not very") and the noun
+    # of 〜のあまり ("from too much X").  The derivation gave the N2 "too
+    # much" row a bare あまり literal, so it fired on every あまり〜ない
+    # sentence as well.  The reading attaches to a preceding の / な / た
+    # (驚きのあまり, 働きすぎたあまり); the adverb stands in front of its
+    # predicate and has its own anchors row.
+    "amari-too-much": (
+        "あまり",
+        [
+            {
+                "type": "tokens",
+                "conds": [
+                    {"surface_in": ("の", "な", "た")},
+                    {"surface": "あまり"},
+                ],
+            },
+        ],
+    ),
+    # 〜たいと思う: the desire attachment.  The derived spec pinned the
+    # terminal 思う only, so 行きたいと思います / 探したいと思っていました
+    # never fired; the lemma family covers every inflection.
+    "tai-to-omou-want-to-think": (
+        "たいと思う",
+        [
+            {
+                "type": "tokens",
+                "conds": [
+                    {"pos1": "動詞"},
+                    {"surface": "たい"},
+                    {"surface": "と"},
+                    {"lemma": {"思う"}},
+                ],
+            },
+        ],
+    ),
+    # --- 〜のだろう: spoken contraction and a homograph の -----------------
+    #
+    # The derived spec was a bare のだろう regex, and five of the entry's six
+    # examples are the spoken contraction 〜んだろう / 〜んでしょう, so the row
+    # never fired on the sentences it exists to explain.  Token specs rather
+    # than an anchored regex: なんでしょう ("I wonder why") spells the same
+    # んでしょう but its ん sits inside the single なん token, and the ん of
+    # 〜てくださいませんでしょうが is the negative 助動詞 (lemma ぬ), not the
+    # copula's 助詞 -- neither is this construction.  The の branch is token-
+    # anchored for the mirror reason: the の inside もの (〜ものだろうか,
+    # "I wonder if...") is part of the noun, not the explanatory の.
+    "nodarounodeshiyou": (
+        "のだろう",
+        [
+            {
+                "type": "tokens",
+                "conds": [{"surface": "の"}, {"surface_in": ("だろう", "でしょう")}],
+            },
+            {
+                "type": "tokens",
+                "conds": [
+                    {"surface": "ん", "pos1": "助詞"},
+                    {"surface_in": ("だろう", "でしょう")},
+                ],
+            },
+        ],
+    ),
+    # --- てご覧: request vs. honorific, and the ください homograph --------
+    #
+    # 〜てご覧ください is the request ("please try it"), 〜てご覧くださいます /
+    # 〜てご覧くださいました is the honorific ("kindly tried"), and Sudachi
+    # reports the request form ください with the same lemma くださる as the
+    # honorific verb -- so the honorific row's [て, ご覧, くださる] spec
+    # claimed every てご覧ください on the page, and the request row's bare
+    # てご覧 literal claimed every てご覧になる in return.  The ます tail is
+    # what separates them, and every spec below is validated against the
+    # entry's own examples (the load-time guard drops a slot that is not),
+    # which is why the honorific row's one-token くださいます form has no
+    # spec of its own: no example of the entry spells it out.
+    "tegokudasarutegoninaru": (
+        "てご覧くださる・てご覧になる",
+        [
+            # て + ご覧 + ください + まし/ます/ませ: the honorific with its
+            # polite tail (くださいました / くださいます split / ませんか).
+            # A bare てご覧ください has no such tail and stays with the
+            # request row.
+            {
+                "type": "tokens",
+                "conds": [
+                    {"surface_in": ("て", "で")},
+                    {"surface": "ご覧"},
+                    {"surface": "ください"},
+                    {"surface_in": ("まし", "ます", "ませ")},
+                ],
+            },
+            # ご覧になる / ご覧になって / ご覧になりました ...: the honorific
+            # proper, which the request row's bare てご覧 must not claim.
+            # な(?:る|[りっ]) is the whole inflection family -- なって and
+            # なった are な+っ/て, and a literal になる only ever matched the
+            # dictionary form.
+            {"type": "regex", "re": re.compile("てご覧にな(?:る|[りっ])")},
+        ],
+    ),
+    "tegotegonasaitegokudasai": (
+        "てご覧・てご覧なさい・てご覧ください",
+        [
+            # Bare てご覧 ("try it and see"): the lookahead keeps it off the
+            # honorific てご覧になる / てご覧になって / てご覧くださいます and
+            # off its own longer siblings, each of which has a spec below.
+            # にな covers every inflection of the honorific -- なって is not
+            # なる, so a literal になる would have missed all of them.
+            {"type": "regex", "re": re.compile("てご覧(?!にな|くださ|なさい|ください)")},
+            {"type": "regex", "re": re.compile("てご覧なさい")},
+            # The request; a まし/ます/ませ tail is the honorific
+            # (〜てご覧くださいました / 〜てご覧くださいませんか), owned by the
+            # てご覧くださる row.
+            {"type": "regex", "re": re.compile("てご覧ください(?!まし|ます|ませ)")},
+        ],
+    ),
+    # --- なさい: the command form is not the honorific ----------------------
+    #
+    # なさい is both the imperative of なさる ("食べなさい", the 〜なさい row)
+    # and, spelled the same, the 連用形 inside なさいます (なさい + ます,
+    # the 〜なさる row).  Each row's literal claimed both readings, so one
+    # sentence reported two cards; the ます tail is the whole difference.
+    # The honorific row's spec is the lookahead form plus なさっ / なさら
+    # (なさって / なさった / なさらない) -- its own examples spell なさいます,
+    # which is what keeps the spec valid at load time.
+    "nasai-command": (
+        "なさい",
+        [
+            # The command: なさい with no ます tail behind it.
+            {"type": "regex", "re": re.compile("なさい(?!ます)")},
+        ],
+    ),
+    "nasaru-honorific": (
+        "なさる",
+        [
+            # なさいます = なさい + ます: the polite honorific, and the only
+            # なさい the honorific row may claim.  なさって / なさった /
+            # なさらない spell なさっ / なさら and never なさい.  One regex,
+            # because the load-time guard validates a spec as a whole: the
+            # なさい(?=ます) branch is what the entry's own examples carry,
+            # and it carries the なさ[っら] branch along.
+            {"type": "regex", "re": re.compile(r"なさい(?=ます)|なさ[っら]")},
+        ],
+    ),
+    # --- あろうとも: the volitional reading is not the 接尾辞 ----------------
+    #
+    # 〜あろうとも ("no matter what") carried a bare とも regex beside its
+    # あろうとも literal, so the row fired on every とも in the language --
+    # 男女とも, 2日とも, the 接尾辞 reading the 〜とも row owns.  The reading
+    # is volitional + とも (起きようとも / 行こうとも / あろうとも), and the
+    # lookbehind says exactly that; あろう ends in ろう, not おう, so it
+    # keeps a literal of its own.
+    "aro-u-tomo": (
+        "あろうとも",
+        [
+            # One regex, as with なさる: the あろうとも branch is what the
+            # entry's own examples carry and it carries the lookbehind
+            # branch along.  あろう ends in ろう, not おう, so it needs the
+            # literal beside the volitional lookbehind.
+            {"type": "regex", "re": re.compile(r"(?<=よう|おう)とも|あろうとも")},
+        ],
+    ),
+    # --- しかない: "no choice but to" --------------------------------------
+    #
+    # The other reading of the しか literal: verb + しかない ("have no choice
+    # but to"), which the 〜しか row must not claim and this one must not
+    # claim 名 + しか + negative (see the not_after note on shika-nai above).
+    "shikanai": (
+        "しかない",
+        [
+            {
+                "type": "tokens",
+                "conds": [{"pos1": "動詞"}, {"surface": "しか"}, {"lemma": {"ない"}}],
+            },
+        ],
+    ),
+    # --- でいる: the copula's て-form, not the verb's ------------------------
+    #
+    # でいる is 名 / ナ + で + いる ("remain in a state"), where the で is the
+    # copula's て-form (lemma だ, 助動詞).  The derived bare でいる regex also
+    # matched the *verb's* て-form で (読んでいる, 助詞,接続助詞), which is the
+    # 〜ている row's reading -- 22 sentences carried both cards.  The part of
+    # speech tells them apart, and おる covers the humble でおり the entry's
+    # own second example spells.
+    "deiru": (
+        "でいる",
+        [
+            {
+                "type": "tokens",
+                "conds": [
+                    {"surface": "で", "pos1": "助動詞"},
+                    {"lemma": {"いる", "おる"}},
+                ],
+            },
+        ],
+    ),
+    # --- だろうか・でしょうか: the polite question has its own row ----------
+    #
+    # The entry teaches both だろうか and でしょうか, and its derived spec
+    # claimed both -- but でしょうか is also a point of its own (the polite
+    # ですか / ますか), with a row that glosses it as such.  The entry keeps
+    # the だろうか it is really about; bare でしょうか goes to that row.
+    "daroukadeshiyouka": (
+        "だろうか・でしょうか",
+        [{"type": "regex", "re": re.compile("だろうか")}],
+    ),
+    # --- 次第: 视…而定 vs. the formal 原委 --------------------------------    #
+    # One word, two readings, three rows: 名 + 次第で / 次第だ ("depends on",
+    # 视…而定) and 動詞 + 次第だ / 次第です ("that is why I...", the formal
+    # report closing).  The token before 次第 is what names the reading --
+    # 気分次第だ / 天気次第で are nouns, 差し上げた次第です / 申し上げる次第で
+    # ございます are a verb (or its た), and each row claimed both shapes.
+    "dehaniyoteda": (
+        "次第で・次第だ",
+        [
+            {
+                "type": "tokens",
+                "conds": [
+                    {"pos1": "名詞"},
+                    {"surface": "次第"},
+                    {"surface_in": ("で", "だ")},
+                ],
+            },
+        ],
+    ),
+    "mat-8c61a1": (
+        "次第だ",
+        [
+            # 動詞 + 次第だ / 次第です (申し上げる次第でございます).
+            {
+                "type": "tokens",
+                "conds": [
+                    {"pos1": "動詞"},
+                    {"surface": "次第"},
+                    {"surface_in": ("です", "で", "だ")},
+                ],
+            },
+            # The た-form: 差し上げた次第です -- the token in front is the
+            # 助動詞 た, not the verb itself.
+            {
+                "type": "tokens",
+                "conds": [
+                    {"pos1": "助動詞", "surface": "た"},
+                    {"surface": "次第"},
+                    {"surface_in": ("です", "で", "だ")},
+                ],
+            },
+        ],
+    ),
+    # The two 〜次第 rows (N3 结果次第で / 着き次第 and N2 到着次第 -- same
+    # display name, so the panel folds them into one) carried a bare anchored
+    # 次第 regex, which claimed every 次第 in the language: the 视…而定
+    # sentences (結果次第で / 気分次第だ, the two rows above), the formal
+    # 原委 (差し上げた次第です / 申し上げる次第でございます, mat-8c61a1) and
+    # even the adverb 次第に ("gradually").  What is left after the tail is
+    # the "as soon as" reading -- V ます-stem + 次第 at a clause break
+    # (着き次第、電話します) -- which is why the tail, not the head, is the
+    # discriminator.
+    "shidai-depending": (
+        "次第",
+        [
+            {
+                "type": "tokens",
+                "conds": [{"surface": "次第"}],
+                "not_next": {"surface_in": ("です", "で", "だ", "に")},
+            },
+        ],
+    ),
+    "mat-2cf646": (
+        "次第",
+        [
+            {
+                "type": "tokens",
+                "conds": [{"surface": "次第"}],
+                "not_next": {"surface_in": ("です", "で", "だ", "に")},
+            },
+        ],
+    ),
+    # --- にしても: three rows, one literal ---------------------------------
+    #
+    # にしても is claimed by three entries (N3 即使 / N2 从…角度 / N2 排除
+    # 一切条件), and each also teaches a distinctive sibling -- にしたら,
+    # にしたって.  The shared form goes to the N3 row (即使, the plainest
+    # reading) and each N2 row keeps only the sibling it is named for.
+    "nishitaranisurebanishitemo": (
+        "にしたら・にしても",
+        [{"type": "regex", "re": re.compile("にしたら")}],
+    ),
+    "nishitatenishitemo": (
+        "にしたって・にしても",
+        [{"type": "regex", "re": re.compile("にしたって")}],
+    ),
+    # --- ならともかく: the hand-written row owns it ------------------------
+    #
+    # Hand-written nara_tomo_kaku reports ならともかく already; the N2 data
+    # row claims both はともかく and ならともかく, so the same sentence
+    # carried two cards.  The data row keeps はともかく (what its own
+    # examples spell); ならともかく stays with the hand-written row.
+    "hatomokakutoshitenaratomokakutoshite": (
+        "はともかく・ならともかく",
+        [{"type": "regex", "re": re.compile("はともかく")}],
+    ),
+    # --- あまり: のあまり is the N2 row's ----------------------------------
+    #
+    # のあまり ("驚きのあまり", from too much X) is the N2 〜あまり row's own
+    # reading and its token spec claims it; this row's のあまり literal
+    # reported the same sentences again.  Its distinctive form is あまりに
+    # (あまりに寒い), which the N2 row does not claim.
+    "amarininoamarini": (
+        "あまりに・のあまり",
+        [{"type": "regex", "re": re.compile("あまりに")}],
+    ),
+    # --- たことがある: the spoken が-ellipsis -------------------------------
+    #
+    # 動詞 + た + こと + が + ある is the experience construction, and the
+    # derivation required the が outright -- so the way it is actually
+    # spoken, 見たことありますか / 見たことない, never fired.  The retired
+    # hand-written たこと regex did cover those, and covered every
+    # nominalization with them (転校したことです, 忘れたことに, 言ったことは),
+    # which is why it is gone; restoring the bare literal would bring all of
+    # that back.  Anchors instead: 動詞+た+こと, then at most one token, then
+    # ある/ない -- the gap is the が (or も / は) when it is spelled, and a
+    # nominalization never ends in ある/ない.  not_next で keeps out
+    # 〜たことである, the written judgement, which is not the experience
+    # reading; everything the entry's own examples carry (ことがあります,
+    # ことがありません) sits in the gap the spec allows.
+    "ta-koto-ga-aru": (
+        "ことがある",
+        [
+            {
+                "type": "anchors",
+                "before": [
+                    {"pos1": "動詞"},
+                    {"surface_in": ("た", "だ")},
+                    {"lemma": {"こと"}},
+                ],
+                "after": [{"lemma": {"ある", "ない", "ぬ"}}],
+                "maxgap": 1,
+                "not_next": {"surface_in": ("で",)},
+            },
+        ],
+    ),
+    # ---- reference-only rows recovered as matchable -----------------------
+    #
+    # These rows describe real constructions but yielded no fragment: their
+    # pattern is "<placeholder> + <short kana>" (〜末, 〜際, 〜折, お〜くだ
+    # さい), and the one-kana floor in _jp_fragments drops the literal.  They
+    # were listed as reference-only, i.e. a reader could browse them but the
+    # reader never flagged them.  Each spec below is reviewed, validated
+    # against the entry's own examples at load time, and deliberately narrow:
+    # the pattern requires the particle or the preceding の/た that makes the
+    # literal distinctive, so 際 is not found inside 実際 and 折 is not found
+    # inside 折り紙.
+    #
+    # The measured share of the corpus' example sentences each one reaches
+    # is 0.1-1.0%, i.e. the same order as the existing reviewed slots.
+    "location-nouns-ue-shita": (
+        "の上・の下・の前…",
+        [
+            {
+                "type": "regex",
+                "re": re.compile(r"の(?:上|下|中|前|後ろ|横|隣|間)(?:に|で|へ)"),
+            }
+        ],
+    ),
+    "aida-ni": (
+        "間（に）",
+        [
+            {"type": "regex", "re": re.compile(r"の間(?:に|は|、)")},
+            {"type": "regex", "re": re.compile(r"(?:ている|ていた)間")},
+        ],
+    ),
+    # The three below take the V-た form, which is voiced (…だ) on voiced
+    # stems: 悩んだ末, 読んだ際, 行った折.  Matching only た silently dropped
+    # half of the real uses.
+    "sue-ni-after": (
+        "末（に）",
+        [{"type": "regex", "re": re.compile(r"(?:[ただ]|の)末(?:に|は|、)")}],
+    ),
+    "sai-ni": (
+        "際（に）",
+        [{"type": "regex", "re": re.compile(r"(?:の|る|[ただ])際(?:に|は|、)")}],
+    ),
+    "ori-ni": (
+        "折（に）",
+        [{"type": "regex", "re": re.compile(r"(?:の|る|[ただ])折(?:に|は|、)")}],
+    ),
+    "o-v-kudasai-polite-honor": (
+        "お…ください",
+        [
+            # Token-based, not a regex over the text: Sudachi keeps the ご of
+            # ご飯 ("rice") fused into the noun, so requiring a *standalone*
+            # お/ご is what keeps ご飯をください ("please give me rice") out
+            # while お待ちください / ご注意ください (お + 待ち + ください) fire.
+            {
+                "type": "anchors",
+                "before": [{"surface_in": ("お", "ご")}],
+                "after": [{"surface": "ください"}],
+                "maxgap": 3,
+            },
+        ],
+    ),
+    "humble-o-suru": (
+        "お…する",
+        [
+            # お + <stem> + し + ます / する.  Anchoring on し + ます as a run
+            # is what separates the humble form (お貸しします) from a plain
+            # sentence that merely opens with お (お茶を飲みます).
+            {
+                "type": "anchors",
+                "before": [{"surface_in": ("お", "ご")}],
+                "after": [{"surface": "し"}, {"surface": "ます"}],
+                "maxgap": 2,
+            },
         ],
     ),
 }
@@ -1323,10 +2446,24 @@ _TE_CONNECTIVE = {"pos1": "助詞", "pos2": "接続助詞", "surface_in": ("て"
 # claim them.  The auxiliary's own part of speech cannot be used instead: 行き /
 # 来 / あり are 動詞,非自立可能 too, so nothing about the auxiliary separates it
 # from 行き -- what precedes it does.
+#
+# The left context that makes a ように a *resemblance* rather than a purpose:
+# 名詞 + の ("like a hand", 氷のように冷たい) and the demonstrative 様
+# (この / その / あの / どの + ように, "like this").  A purpose ように instead
+# takes a verb / ない / な / adjective in front of it, which is every other
+# token, so the exclusion is written as the marked cases.  See _SLOT_SPECS.
+_YOU_NI_RESEMBLANCE_BEFORE = {
+    "surface_in": ("の", "この", "その", "あの", "どの"),
+}
+
 _NOT_AFTER = {
     "masu-polite-verb": _TE_CONNECTIVE,
     "mashita-polite-past-verb": _TE_CONNECTIVE,
     "masendeshita-polite-past-negative-verb": _TE_CONNECTIVE,
+    # 〜ように is the purpose marker only when what precedes it is a predicate;
+    # after 名詞 + の (or a demonstrative) it is the resemblance marker, which
+    # has its own entry (you-ni-resemblance).
+    "you-ni-purpose": _YOU_NI_RESEMBLANCE_BEFORE,
 }
 
 # Widest 〜 gap tolerated between the two anchors of a gapped construction
@@ -1628,6 +2765,27 @@ def _load_ko_enrichment():
 _KO_ENRICH = _load_ko_enrichment()
 
 
+def _load_en_enrichment():
+    """
+    English wording for the data rows' examples, keyed by data entry id:
+    ``{"examples": {<jp>: <en>}}``.
+
+    The mirror image of the two files above.  The vendored jkindrix rows
+    ship ``english`` on every example, but the merged material rows carry
+    only ``chinese`` -- they were written for a Chinese reader -- so the
+    English panel quoted 2025 bare Japanese sentences.  Keyed by the
+    Japanese sentence, so an index shift can never mis-assign one.
+    """
+    path = os.path.join(_DATA_DIR, "en_enrichment.json")
+    if not os.path.exists(path):
+        return {}
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+_EN_ENRICH = _load_en_enrichment()
+
+
 def _notes_text(notes):
     "Formation notes in one display string; list or scalar, or '' when absent."
     if not notes:
@@ -1685,6 +2843,7 @@ def _make_data_rule(
     entry_id = item.get("id") or ""
     enrichment = _ZH_ENRICH.get(entry_id) or {}
     ko_enrichment = _KO_ENRICH.get(entry_id) or {}
+    en_enrichment = _EN_ENRICH.get(entry_id) or {}
     reference = _curated_reference(item, None if skipped else specs)
     return {
         "key": "ds_" + _slug(item.get("id") or f"{level}-{idx}"),
@@ -1694,6 +2853,18 @@ def _make_data_rule(
         "meaning": item.get("meaning_en") or "",
         "meaning_zh": _ZH_BY_ID.get(entry_id, ""),
         "meaning_ko": _KO_BY_ID.get(entry_id, ""),
+        # The long explanation, register and cross-links the curated rows
+        # carry but the panel never showed.  `related` holds upstream entry
+        # ids; _related_entries resolves them to keys/names below.  The
+        # entry id itself is kept because the rule key is slugged, so it is
+        # no longer recoverable from the key alone.
+        "entry_id": entry_id,
+        "meaning_detailed": item.get("meaning_detailed") or "",
+        "formality": item.get("formality") or "",
+        "related": list(item.get("related") or []),
+        # n3.json lists an alternate spelling beside the main pattern
+        # (〜つつある / 〜つつ); recorded but unused by the matcher.
+        "pattern_alt": item.get("pattern_alt") or "",
         "formation": item.get("formation") or "",
         # Chinese wording for the 接续 / 注意点 / 例句译文 of the English-only
         # vendored rows (see _load_zh_enrichment); empty for the merged
@@ -1719,7 +2890,41 @@ def _make_data_rule(
         # normalize to one string so the panel can drop it in verbatim.
         "formation_notes": _notes_text(item.get("formation_notes")),
         "reference": reference,
+        # The matcher only ever needs the Japanese sentence, but the
+        # library page prints a translation under it, so the full rows are
+        # kept alongside.  ``examples`` used to be flattened to bare
+        # sentences here, which is why the /grammar pages showed Japanese
+        # with no gloss while the Spanish and Russian ones showed one.
         "examples": [e["japanese"] for e in item.get("examples") or []],
+        # One row per sentence, with the translation for each display
+        # language filled in from wherever the corpus carries it: the
+        # vendored rows have ``english``, the merged material rows have
+        # ``chinese``, and the three enrichment files carry the *other*
+        # ones.  All of them are keyed by the Japanese sentence itself, so
+        # a library update that inserts a row can never shift a
+        # translation onto another sentence.
+        "example_rows": [
+            {
+                "japanese": (e.get("japanese") or "").strip(),
+                "english": (
+                    (e.get("english") or "").strip()
+                    or (en_enrichment.get("examples") or {}).get(
+                        (e.get("japanese") or "").strip(), ""
+                    )
+                ).strip(),
+                "chinese": (
+                    (e.get("chinese") or "").strip()
+                    or (enrichment.get("examples") or {}).get(
+                        (e.get("japanese") or "").strip(), ""
+                    )
+                ).strip(),
+                "ko": (ko_enrichment.get("examples") or {})
+                .get((e.get("japanese") or "").strip(), "")
+                .strip(),
+            }
+            for e in item.get("examples") or []
+            if (e.get("japanese") or "").strip()
+        ],
         # "patterns" is what the matcher reads, so an empty list is how a
         # skipped rule stays silent.  "derived" keeps whatever the derivation
         # did produce, for introspection: scripts/screen_grammar_library.py
@@ -1731,6 +2936,28 @@ def _make_data_rule(
         "kind": kind,
         "skipped": skipped,
     }
+
+
+# Fragments whose negative counterpart an entry teaches as part of the same
+# point but does not name in its pattern: 〜ことがある lists only the
+# affirmative, yet its own examples and notes cover ことがない ("have never
+# done"), and before the hand-written N5 〜たことがあります row was folded
+# into this entry, that row's loose たこと regex still reported the negative.
+# Each alias derives a second spec for the same rule, with the same left
+# context, validated against the entry's own examples like any fragment.
+_FRAGMENT_ALIASES = {
+    "ことがある": ["ことがない"],
+}
+
+# Per-entry replacement for the fragments the generic derivation reads out of
+# the pattern.  Used when the pattern's shape yields pieces that each validate
+# against the entry's own examples yet are not constructions on their own:
+# "Noun + の + こと + ながら" yields こと and ながら, and both halves then fire
+# on bare こと / 〜ながら sentences (〜ことだ, ということ, 〜ながら), while the
+# construction is the contiguous ことながら.
+_FRAGMENT_OVERRIDES = {
+    "koto-nagara": ["ことながら"],
+}
 
 
 def _load_level(level):
@@ -1803,6 +3030,10 @@ def _load_level(level):
             # yields bare endings, so they are never matched loosely either.)
             fragments = _jp_fragments(item.get("formation") or "")
 
+        # See _FRAGMENT_OVERRIDES: a reviewed entry whose derivation pieces are
+        # not constructions on their own keeps the contiguous literal instead.
+        fragments = _FRAGMENT_OVERRIDES.get(item.get("id") or "", fragments)
+
         if slot is not None:
             shown = [slot[0]]
             specs = list(slot[1])
@@ -1831,6 +3062,15 @@ def _load_level(level):
                     if spec is not None:
                         specs.append(spec)
                         matched.append(fragment)
+                        # See _FRAGMENT_ALIASES: the negative counterpart of
+                        # the fragment is the same grammar point and reports
+                        # on the same row; it never extends the title.
+                        for alias in _FRAGMENT_ALIASES.get(fragment, []):
+                            alias_spec = _fragment_spec(
+                                alias, joined, example_tokens, prefix
+                            )
+                            if alias_spec is not None:
+                                specs.append(alias_spec)
                 if not specs:
                     rules.append(_make_data_rule(level, item, idx, skipped=True))
                     continue
@@ -1925,6 +3165,48 @@ def _get_all_rules():
         return _all_rules_cache
 
 
+# The curated rows' `related` field names upstream entry ids, which differ
+# from the rules' own `key` (slugged), so following a cross-link needs both
+# an id -> rule lookup and a display name.  Built once, lazily, beside the
+# rules it is derived from.
+_related_index_cache = None
+
+
+def _get_related_index():
+    "{entry id: {key, name, level}} over the curated rows, memoised."
+    global _related_index_cache  # pylint: disable=global-statement
+    with _rules_lock:
+        if _related_index_cache is None:
+            index = {}
+            for rule in _get_data_rules():
+                entry_id = rule.get("entry_id")
+                if entry_id and entry_id not in index:
+                    index[entry_id] = {
+                        "key": rule["key"],
+                        "name": rule["pattern"],
+                        "level": rule["level"],
+                    }
+            _related_index_cache = index
+        return _related_index_cache
+
+
+def _related_entries(rule):
+    """
+    The rule's `related` ids resolved to {id, key, name, level}, in order.
+
+    Ids the corpus does not define are dropped rather than rendered as a
+    dangling link: the curated files are hand-maintained, and a typo there
+    must not put a dead anchor on the page.
+    """
+    index = _get_related_index()
+    out = []
+    for entry_id in rule.get("related") or []:
+        info = index.get(entry_id)
+        if info:
+            out.append({"id": entry_id, **info})
+    return out
+
+
 # Korean descriptions for the hand-written rules (data rules get theirs
 # from ko.json by entry id) -- the panel's 한국어 display language.
 _KO_HAND = {
@@ -1933,7 +3215,6 @@ _KO_HAND = {
     "kara_reason": '이유를 나타내는 から("~때문에").',
     "suki_kirai": "좋아함·싫어함을 나타내는 好きです/嫌いです(대상은 が).",
     "tai": '"~하고 싶다"의 소망을 나타내는 たい.',
-    "ta_koto_ga_arimasu": '경험을 나타내는 たことがあります("~해 본 적이 있다").',
     "de_place_means": "동작의 장소나 수단을 나타내는 で.",
     "te_iru": "진행이나 결과 상태를 나타내는 ている.",
     "te_kudasai": '"~해 주세요"의 부탁 てください.',
@@ -1977,7 +3258,6 @@ _ZH_DESC = {
     "〜から": "因为；由于",
     "〜が好きです / 〜が嫌いです": "喜欢……／讨厌……",
     "〜たい": "想要做……",
-    "〜たことがあります": "曾经做过……；有……的经历",
     "〜で（place/means）": "表示动作的场所或方式、手段",
     "〜ている": "正在……；表示进行或持续的状态",
     "〜てください": "请做……",
@@ -2324,6 +3604,24 @@ def analyze_japanese(page_text, display_lang="en"):
                     "desc": _desc(rule, display_lang),
                     "examples": [],
                 }
+                # Register (neutral / formal / casual) -- shipped as the raw
+                # upstream token; the front end maps it to the display
+                # language, so no translation table is needed here.
+                formality = (rule.get("formality") or "").strip()
+                if formality:
+                    entry["formality"] = formality
+                # The long explanation is English prose with no zh/ko
+                # translation in the data, so it is emitted only for an
+                # English panel -- a zh/ko panel must never show English.
+                detailed = (rule.get("meaning_detailed") or "").strip()
+                if detailed and display_lang == "en":
+                    entry["meaning_detailed"] = detailed
+                # Cross-links to the other points this one is contrasted
+                # with.  The names are Japanese fragments, so they are shown
+                # in every display language.
+                related = _related_entries(rule)
+                if related:
+                    entry["related"] = related
                 # Panel-enrichment fields (formation line, folded reference
                 # block); only emitted when the underlying entry carries
                 # them *in the display language* -- hand-written rules and
@@ -2392,3 +3690,176 @@ def analyze_japanese(page_text, display_lang="en"):
             }
         )
     return _merge_same_name(matched)
+
+
+# ---- library export --------------------------------------------------
+#
+# The /grammar page lists the whole corpus at once, where the panel lists
+# only what the current page happens to contain.  Same display fields as
+# the panel entries (minus the page-specific match offsets), so the page
+# can reuse the panel's markup and CSS.
+
+_GOLDEN_PATH = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "jlpt_data",
+        "grammar_ja_golden.json",
+    )
+)
+
+_golden_lock = threading.Lock()
+_golden_cache = None
+
+
+def _golden_examples():
+    """
+    Curated example sentences for the hand-written rules, keyed by rule key.
+
+    Shape ``key -> [{"japanese", "english", "chinese", "ko"}, ...]``, the
+    same store the tests re-run through each rule.  Built from the
+    curated library rows by ``scripts/generate_grammar_ja_golden.py``, so
+    the sentences are the corpus' own rather than invented here, and the
+    Korean gloss comes from the same per-sentence enrichment table the
+    data rows use.
+    """
+    global _golden_cache  # pylint: disable=global-statement
+    with _golden_lock:
+        if _golden_cache is None:
+            examples = {}
+            if os.path.exists(_GOLDEN_PATH):
+                with open(_GOLDEN_PATH, encoding="utf-8") as fh:
+                    for key, entry in json.load(fh).items():
+                        examples[key] = [
+                            e
+                            for e in entry.get("examples") or []
+                            if (e.get("japanese") or "").strip()
+                        ]
+            _golden_cache = examples
+        return _golden_cache
+
+
+def _example_gloss(row, display_lang):
+    """
+    The translation for one example row, in the display language.
+
+    The curated data carries English and/or Chinese per sentence, so a
+    Chinese panel reads ``chinese`` and an English one reads ``english``.
+    A Korean panel reads ``ko``, which ``ko_enrichment.json`` supplies per
+    sentence (``reference_ko`` holds the gloss of the *reference* sentence
+    only, so it is not enough here).  Any of the three stays empty and the
+    template shows no gloss line rather than the wrong language.
+
+    A missing translation is never back-filled from the other language:
+    an English gloss under a Chinese heading is worse than none.
+    """
+    if display_lang == "ko":
+        return (row.get("ko") or "").strip()
+    if display_lang == "zh":
+        return (row.get("chinese") or "").strip()
+    return (row.get("english") or "").strip()
+
+
+def _example_rows(rule, display_lang, examples=None):
+    """
+    The rule's examples as display rows.
+
+    ``examples`` overrides what the rule itself carries: the hand-written
+    basics take their sentences from the golden set, the data rows ship
+    ``example_rows`` (japanese + english + chinese + ko).  Either way a row
+    comes back as ``{"text", "tr"}`` where a translation exists for the
+    display language and as a plain string where it does not -- the
+    template renders both shapes.
+    """
+    if examples is None:
+        examples = rule.get("example_rows") or rule.get("examples") or []
+    rows = []
+    for row in examples:
+        if isinstance(row, dict):
+            text = (row.get("japanese") or "").strip()
+            if not text:
+                continue
+            tr = _example_gloss(row, display_lang)
+            rows.append({"text": text, "tr": tr} if tr else text)
+        else:
+            text = (row or "").strip()
+            if text:
+                rows.append(text)
+    return rows
+
+
+def _library_entry(rule, display_lang, examples=None):
+    """
+    One curated rule as a library row, display-ready.
+
+    Every rule is included -- even the ones the matcher skips -- because a
+    skipped row is still a grammar point a reader may want to look up; the
+    ``skipped`` flag lets the page mark it as reference-only instead of
+    hiding it.
+
+    ``examples`` comes back as ``{"text", "tr"}`` rows where the corpus
+    carries a translation for the display language, and as a plain string
+    where it does not (the rows the enrichment files never covered).  The
+    template renders both shapes, so a missing gloss simply shows no gloss
+    line rather than an empty one.  The library has no page text to
+    highlight, so the match offsets the panel computes are irrelevant here.
+    """
+    entry = {
+        "key": rule["key"],
+        "name": rule["pattern"],
+        "level": rule["level"],
+        "desc": _desc(rule, display_lang),
+        "examples": _example_rows(rule, display_lang, examples),
+        "skipped": bool(rule.get("skipped")),
+    }
+    formation = _enrichment(rule, "formation", display_lang)
+    if formation:
+        entry["formation"] = formation
+    notes = _enrichment(rule, "formation_notes", display_lang)
+    if notes:
+        entry["notes"] = notes
+    reference = rule.get("reference")
+    if reference:
+        text = _reference_text(reference, rule, display_lang)
+        if text:
+            entry["reference"] = {"japanese": reference["japanese"], "text": text}
+    formality = (rule.get("formality") or "").strip()
+    if formality:
+        entry["formality"] = formality
+    detailed = (rule.get("meaning_detailed") or "").strip()
+    if detailed and display_lang == "en":
+        entry["meaning_detailed"] = detailed
+    related = _related_entries(rule)
+    if related:
+        entry["related"] = related
+    return entry
+
+
+def library_entries(display_lang="en"):
+    """
+    The whole Japanese grammar library, in level order (N5 -> N1).
+
+    Built on first use like the rules themselves, so an app start-up with
+    no Japanese books does not pay for the Sudachi dictionary.  Within a
+    level the hand-written basics come first: they are listed before the
+    curated rows in the source order, and the sort is stable.
+
+    The hand-written basics take their example sentences from the golden
+    set (``grammar_ja_golden.json``); the curated rows carry their own.
+    """
+    golden = _golden_examples()
+    rules = [
+        (rule, golden.get(rule["key"]) or rule.get("examples") or [])
+        for rule in _N5_RULES + _CONSTRUCTION_RULES
+    ]
+    rules += [
+        (rule, rule.get("example_rows") or rule.get("examples") or [])
+        for rule in _get_data_rules()
+    ]
+    entries = [_library_entry(rule, display_lang, examples) for rule, examples in rules]
+    ordered = sorted(
+        enumerate(entries),
+        key=lambda pair: (_LEVEL_RANK.get(pair[1]["level"], 9), pair[0]),
+    )
+    return [entry for _, entry in ordered]

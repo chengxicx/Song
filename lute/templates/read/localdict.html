@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>{{ t('Dictionary') }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ vstatic('css/styles.css') }}" />
+    {% if theme_css_hash %}
+    <link rel="stylesheet" type="text/css" href="/theme/current?v={{ theme_css_hash }}">
+    {% endif %}
+    {% if custom_styles %}
+    <link rel="stylesheet" type="text/css" href="/theme/custom_styles?v={{ custom_styles_hash }}">
+    {% endif %}
+    <style>
+      body {
+        margin: 0;
+        padding: 1.1rem 1.4rem 1.4rem;
+      }
+
+      .localdict-card {
+        max-width: 46rem;
+      }
+
+      /* Eyebrow label above the term: small, spaced-out, muted. */
+      .localdict-eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: color-mix(in srgb, var(--font-color, #888) 55%, transparent);
+        margin: 0 0 0.35rem 0;
+      }
+      .localdict-eyebrow svg {
+        width: 0.9rem;
+        height: 0.9rem;
+        flex: none;
+        opacity: 0.75;
+      }
+
+      /* The term itself.  A short accent underline marks it as the
+         lookup key without needing a heavy heading background. */
+      .localdict-head {
+        font-size: 1.45rem;
+        font-weight: 700;
+        line-height: 1.25;
+        margin: 0;
+        padding-bottom: 0.55rem;
+        margin-bottom: 0.85rem;
+        position: relative;
+        overflow-wrap: anywhere;
+      }
+      .localdict-head::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 2.6rem;
+        height: 3px;
+        border-radius: 999px;
+        background: var(--link-color, #4a90d9);
+        opacity: 0.85;
+      }
+
+      /* Same treatment as the popup's gloss (see styles.css): a rule
+         down the left edge, no filled background, so it stays readable
+         under the dark themes.  Softened with the font colour at low
+         alpha instead of a hardcoded grey, so it follows the theme. */
+      .localdict-gloss {
+        border-left: 3px solid
+          color-mix(in srgb, var(--link-color, #4a90d9) 55%, transparent);
+        padding: 0.15rem 0 0.15rem 0.8rem;
+        font-size: 0.95rem;
+        color: color-mix(in srgb, var(--font-color, #000) 88%, transparent);
+        overflow-wrap: anywhere;
+      }
+      .localdict-gloss > * {
+        margin: 0.3rem 0;
+      }
+
+      /* The entry's own headword line (headword【reading with accent】),
+         kept when the entry was reached through a different spelling. */
+      .ld-headword {
+        color: color-mix(in srgb, var(--font-color, #888) 62%, transparent);
+        font-size: 0.85rem;
+      }
+
+      /* Part of speech: a quiet accent chip. */
+      .ld-pos {
+        display: inline-block;
+        font-size: 0.7rem;
+        font-weight: 700;
+        line-height: 1;
+        padding: 0.28rem 0.5rem;
+        border-radius: 6px;
+        background: color-mix(in srgb, var(--link-color, #4a90d9) 15%, transparent);
+        color: var(--link-color, #4a90d9);
+      }
+
+      /* Phonetic line (/wɜːd/ ; NAmE /wɜːrd/): quiet, between the term
+         and the senses -- information, not content. */
+      .ld-phonetic {
+        color: color-mix(in srgb, var(--font-color, #888) 62%, transparent);
+        font-size: 0.85rem;
+      }
+
+      /* Section headers (惯用语 / 补充说明): a hairline and a label. */
+      .ld-section {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        color: color-mix(in srgb, var(--font-color, #888) 55%, transparent);
+        margin-top: 0.7rem !important;
+      }
+      .ld-section::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: color-mix(in srgb, var(--font-color, #888) 14%, transparent);
+      }
+
+      /* Numbered senses.  The dictionaries carry no explicit numbers,
+         so the parser assigns them per sense run; a hanging indent
+         keeps the wrapped lines aligned under the text.  A bilingual
+         entry's English counterpart (a unit of language under 词；单词)
+         rides under the Chinese, muted like the example translations. */
+      .ld-sense {
+        display: flex;
+        gap: 0.5rem;
+        line-height: 1.6;
+      }
+      .ld-no {
+        flex: none;
+        min-width: 1.1rem;
+        text-align: right;
+        font-weight: 700;
+        font-size: 0.82rem;
+        line-height: 1.85;
+        color: var(--link-color, #4a90d9);
+      }
+      .ld-sense-en {
+        color: color-mix(in srgb, var(--font-color, #888) 65%, transparent);
+        font-size: 0.85rem;
+        line-height: 1.5;
+      }
+
+      /* Example pairs: the Japanese line, then its translation under
+         it, muted and slightly smaller. */
+      .ld-example {
+        margin-left: 1.6rem !important;
+      }
+      .ld-ex-ja {
+        line-height: 1.55;
+      }
+      .ld-ex-zh {
+        color: color-mix(in srgb, var(--font-color, #888) 65%, transparent);
+        font-size: 0.85rem;
+        line-height: 1.5;
+      }
+
+      /* Unnumbered prose (补充说明 paragraphs). */
+      .ld-note {
+        color: color-mix(in srgb, var(--font-color, #888) 72%, transparent);
+        font-size: 0.88rem;
+        line-height: 1.65;
+      }
+
+      /* Cross-references: "See also" entries become links into the
+         same tab, so a kana homophone list is one click from the word
+         it points at. */
+      .ld-xref {
+        display: block;
+        width: fit-content;
+        color: var(--link-color, #4a90d9);
+        text-decoration: none;
+        font-size: 0.9rem;
+      }
+      .ld-xref:hover {
+        text-decoration: underline;
+      }
+      .ld-xref-reading {
+        color: color-mix(in srgb, var(--font-color, #888) 60%, transparent);
+        font-size: 0.82rem;
+      }
+
+      .localdict-gloss-plain {
+        white-space: pre-line;
+        line-height: 1.65;
+        font-size: 0.95rem;
+      }
+
+      /* Empty state: quiet, centred, unmistakably "no result". */
+      .localdict-empty {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        border-left: 3px solid
+          color-mix(in srgb, var(--font-color, #888) 22%, transparent);
+        padding: 0.15rem 0 0.15rem 0.8rem;
+        color: color-mix(in srgb, var(--font-color, #888) 62%, transparent);
+        font-size: 0.95rem;
+      }
+      .localdict-empty svg {
+        width: 1.05rem;
+        height: 1.05rem;
+        flex: none;
+        margin-top: 0.18rem;
+        opacity: 0.65;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="localdict-card">
+      <p class="localdict-eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+        <span>{{ t('Local dictionary') }}</span>
+      </p>
+      <p class="localdict-head">{{ text }}</p>
+      {% if blocks %}
+      <div class="localdict-gloss">
+        {% for b in blocks %}
+          {% if b.t == 'pos' %}
+        <span class="ld-pos">{{ b.text }}</span>
+          {% elif b.t == 'phonetic' %}
+        <div class="ld-phonetic">{{ b.text }}</div>
+          {% elif b.t == 'section' %}
+        <div class="ld-section">{{ b.text }}</div>
+          {% elif b.t == 'headword' %}
+        <div class="ld-headword">{{ b.text }}</div>
+          {% elif b.t == 'sense' %}
+        <div class="ld-sense"><span class="ld-no">{{ b.n }}</span><span>{% if b.en %}<div class="ld-sense-text">{{ b.text }}</div><div class="ld-sense-en">{{ b.en }}</div>{% else %}{{ b.text }}{% endif %}</span></div>
+          {% elif b.t == 'example' %}
+        <div class="ld-example">
+          <div class="ld-ex-ja">{{ b.text }}</div>
+          {% if b.translation %}<div class="ld-ex-zh">{{ b.translation }}</div>{% endif %}
+        </div>
+          {% elif b.t == 'note' %}
+        <div class="ld-note">{{ b.text }}</div>
+          {% elif b.t == 'xref' %}
+        <a class="ld-xref" href="/read/localdict/{{ langid }}/{{ b.text | urlencode }}{% if b.reading %}?reading={{ b.reading | urlencode }}{% endif %}">→ {{ b.text }}{% if b.reading %}<span class="ld-xref-reading"> 【{{ b.reading }}】</span>{% endif %}</a>
+          {% else %}
+        <div class="ld-plain">{{ b.text }}</div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% elif gloss %}
+      <div class="localdict-gloss localdict-gloss-plain">{{ gloss }}</div>
+      {% else %}
+      <div class="localdict-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span>{{ t('Not in the installed dictionary.') }}</span>
+      </div>
+      {% endif %}
+    </div>
+  </body>
+</html>

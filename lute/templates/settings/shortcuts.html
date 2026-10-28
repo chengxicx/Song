@@ -1,20 +1,20 @@
 {% extends 'base.html' %}
 
-{% block title %}Keyboard shortcuts{% endblock %}
-{% block header %}Shortcuts{% endblock %}
+{% block title %}{{ t('Keyboard shortcuts') }}{% endblock %}
+{% block header %}{{ t('Shortcuts') }}{% endblock %}
 
 {% block body %}
 
 <form method="POST">
 
-  <p style="width: 60%; margin-bottom: 20px;">To set a hotkey for a function, click on its text box, and then hit the combination of keys you'd like to use.  To disable any function, uncheck its checkbox.  Click Save when done.</p>
+  <p style="width: 60%; margin-bottom: 20px;">{{ t("To set a hotkey for a function, click on its text box, and then hit the combination of keys you'd like to use.  To disable any function, uncheck its checkbox.  Click Save when done.") }}</p>
 
   <table id="shortcutstable">
 
     <tr>
-      <th>Setting</th>
-      <th>Shortcut</th>
-      <th>Enabled</th>
+      <th>{{ t('Setting') }}</th>
+      <th>{{ t('Shortcut') }}</th>
+      <th>{{ t('Enabled') }}</th>
     </tr>
 
     {% for cat, catsets in categorized_settings.items() %}
@@ -33,8 +33,8 @@
   </table>
 
   <div class="form-action-row">
-    <button id="btnSubmit" type="submit" class="btn btn-primary">Save</button>
-    <button type="button" class="btn btn-secondary" onclick="window.location = '/'; return false;">Cancel</button>
+    <button id="btnSubmit" type="submit" class="btn btn-primary">{{ t('Save') }}</button>
+    <button type="button" class="btn btn-secondary" onclick="window.location = '/'; return false;">{{ t('Cancel') }}</button>
   </div>
 </form>
 

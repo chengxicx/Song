@@ -1,24 +1,24 @@
 {% extends "base.html" %}
 
-{% block title %}About Song{% endblock %}
-{% block header %}About Song{% endblock %}
+{% block title %}{{ t('About Song') }}{% endblock %}
+{% block header %}{{ t('About Song') }}{% endblock %}
 
 {% block body %}
 
-<p>Song(颂) — based on Lute</p>
+<p>{{ t('Song(颂) — based on Lute') }}</p>
 
 <div style="margin-top:20px;">
-  <p>Version: {{ version }}</p>
-  <p>Data path: {{ datapath }}</p>
-  <p>Database: {{ database }}</p>
+  <p>{{ t('Version:') }} {{ version }}</p>
+  <p>{{ t('Data path:') }} {{ datapath }}</p>
+  <p>{{ t('Database:') }} {{ database }}</p>
   {% if is_docker %}
-  <p><i>Note these are paths in your container, not on the host.  You mounted host paths when you started the container.</i></p>
+  <p><i>{{ t('Note these are paths in your container, not on the host. You mounted host paths when you started the container.') }}</i></p>
   {% endif %}
 </div>
 
 <div style="margin-top:20px;">
-  <p>Repository: <a href="https://github.com/chengxicx/Song">Song</a></p>
-  <p>Lute is released under the MIT License.</p>
+  <p>{{ t('Repository:') }} <a href="https://github.com/chengxicx/Song">Song</a></p>
+  <p>{{ t('Lute is released under the MIT License.') }}</p>
 </div>
 
 {% endblock %}

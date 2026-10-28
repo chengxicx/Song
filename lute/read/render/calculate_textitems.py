@@ -39,7 +39,14 @@ def get_string_indexes(strings, content):
     strings and content must be lowercased!
     """
     searchcontent = zws + content + zws
-    zwsindexes = [index for index, letter in enumerate(searchcontent) if letter == zws]
+    # Position of each zws -> its ordinal (token index): a dict lookup
+    # per match instead of a list.index() linear scan.
+    zws_position_to_ordinal = {
+        position: ordinal
+        for ordinal, position in enumerate(
+            i for i, letter in enumerate(searchcontent) if letter == zws
+        )
+    }
 
     ret = []
 
@@ -50,7 +57,7 @@ def get_string_indexes(strings, content):
         #   how-to-use-regex-to-find-all-overlapping-matches
         pattern = rf"(?=({re.escape(zws + s + zws)}))"
         add_matches = [
-            (s, zwsindexes.index(m.start()))
+            (s, zws_position_to_ordinal[m.start()])
             for m in re.finditer(pattern, searchcontent)
         ]
         ret.extend(add_matches)
@@ -76,19 +83,41 @@ def _make_textitem(index, text, text_lc, count, sentence_number, term):
 def _create_missing_status_0_terms(tokens, terms, language):
     "Make new terms as needed for all tokens, using case of last instance."
 
-    original_word_tokens = {t.token for t in tokens if t.is_word}
     parser = language.parser
-    lc_word_tokens = {parser.get_lowercase(t): t for t in original_word_tokens}
+    # Keep the ParsedToken itself, not just its text.  The token carries
+    # the POS the parser assigned it *in this sentence*, and that is
+    # what lets the term be tagged when it is first saved -- re-parsing
+    # the word on its own would give a different answer.
+    #
+    # As before, the last occurrence of a word on the page wins, which
+    # is also what decides its POS when the same spelling is analysed
+    # two different ways on one page.
+    lc_word_tokens = {}
+    for tok in tokens:
+        if tok.is_word:
+            lc_word_tokens[parser.get_lowercase(tok.token)] = tok
     term_text_lcs = {t.text_lc for t in terms}
 
     missing_word_tokens = [
-        original for lc, original in lc_word_tokens.items() if lc not in term_text_lcs
+        tok for lc, tok in lc_word_tokens.items() if lc not in term_text_lcs
     ]
 
     # Note: create the terms _without parsing_ because some parsers
     # break up characters when the words are given out of context.
-    missing_word_tokens = list(set(missing_word_tokens))
-    new_terms = [Term.create_term_no_parsing(language, t) for t in missing_word_tokens]
+    # The dedupe is by text, because two spellings can share one
+    # lowercase form.
+    seen_texts = set()
+    unique_tokens = []
+    for tok in missing_word_tokens:
+        if tok.token in seen_texts:
+            continue
+        seen_texts.add(tok.token)
+        unique_tokens.append(tok)
+
+    new_terms = [
+        Term.create_term_no_parsing(language, tok.token, pos=tok.pos)
+        for tok in unique_tokens
+    ]
     for t in new_terms:
         t.status = 0
 

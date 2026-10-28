@@ -26,7 +26,7 @@ let show_translation_for_text = function(text) {
     // Same feedback as the LuteForMobile sentence sheet ("No dictionaries
     // configured"): a silent no-op made both the hotkey and the term
     // form's Sentence button feel broken.
-    alert('No sentence translation dictionaries are configured for this language.');
+    alert(I18N.t('No sentence translation dictionaries are configured for this language.'));
     return;
   }
 
@@ -81,7 +81,7 @@ function send_selected_terms_to_anki() {
     $('.ui-tooltip').remove();
     elements.forEach(function(el) {
       if ($(el).data("wid") == term_id) {
-        _show_element_message_tooltip(el, "Anki exports", results, 0);
+        _show_element_message_tooltip(el, I18N.t("Anki exports"), results, 0);
       }
     });
   }
@@ -186,6 +186,34 @@ function grammarCleanText(t) {
     .normalize("NFC");
 }
 
+// textContent minus <rt>/<rp>: furigana wraps a word's display text in
+// <ruby>base<rt>reading</rt></ruby>, and plain textContent flattens the
+// reading into the sentence ("動く" became "動くうごく").  The ring pipeline
+// must index the text the reader actually sees -- the base characters -- so
+// every collector below (page snippet, run cells, per-node text, the
+// cellCharRects walker) reads through this instead of raw textContent.
+// Otherwise offsets stay self-consistent (both sides equally polluted) but
+// land inside rt nodes, whose client rects render up in the ruby row: the
+// amber ring ends up circling the reading instead of the word.
+function grammarVisibleText(el) {
+  var out = "";
+  var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+    acceptNode: function (n) {
+      var p = n.parentNode;
+      while (p && p !== el) {
+        if (p.nodeType === 1 && (p.tagName === "RT" || p.tagName === "RP")) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        p = p.parentNode;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  var n;
+  while ((n = walker.nextNode())) out += n.data;
+  return out;
+}
+
 // All .textitem cells of a node run, with their cleaned text and offsets
 // inside the run's concatenated text.
 function grammarRunCells(nodes) {
@@ -194,10 +222,10 @@ function grammarRunCells(nodes) {
     var items = n.querySelectorAll(".textitem");
     if (items.length) {
       items.forEach(function (it) {
-        cells.push({ el: it, t: grammarCleanText(it.textContent) });
+        cells.push({ el: it, t: grammarCleanText(grammarVisibleText(it)) });
       });
     } else {
-      cells.push({ el: n, t: grammarCleanText(n.textContent) });
+      cells.push({ el: n, t: grammarCleanText(grammarVisibleText(n)) });
     }
   });
   return cells;
@@ -281,7 +309,7 @@ function open_grammar_analysis(opts) {
     // collapsing the whole page into one pseudo-sentence.
     snippet = Array.from(theText.querySelectorAll(":scope > p"))
       .filter(function (p) { return p.style.display !== "none" && p.textContent; })
-      .map(function (p) { return p.textContent; })
+      .map(function (p) { return grammarVisibleText(p); })
       .join("\n");
   }
   const url = `/read/grammar_analysis/${bookid}/${pagenum}` +
@@ -304,6 +332,9 @@ function open_grammar_analysis(opts) {
   // (term-form + dictionary) state.  Exposed globally so clicking a word
   // (LuteTermFormOpened) can restore the default view.
   function closeGrammarAnalysis() {
+    // A whole-book poll belongs to this panel: leaving it running would
+    // keep re-rendering a panel that is no longer on the page.
+    stopBookPolling();
     // The per-open "click elsewhere" listener (see clearPinnedSelection) is a
     // closure over that panel's own state, and the panel element is the only
     // handle on it -- so unhook it here, before remove() drops the handle.
@@ -354,12 +385,74 @@ function open_grammar_analysis(opts) {
     if (btm) btm.classList.add("open-dict");
   }
 
+  // The panel's sentence-narrowing state.  Declared before the header is
+  // built because the header renders the sentence button only when a
+  // sentence is available, and `var` hoisting would otherwise leave it
+  // undefined at that point -- the button would never appear.
+  //   sentenceFilter      the sentence the panel is narrowed to (null = all)
+  //   filterableSentence  remembered after widening, so the control toggles
+  //                       back without a fresh analysis
+  //   renderedCards       element <-> data pairing for each rendered card
+  var sentenceFilter = null;
+  var filterableSentence = null;
+  var renderedCards = [];
+  // Which text the panel is currently showing: "sentence", "page" or
+  // "book".  Switching to a wider scope re-runs the backend analysis, so
+  // the last fetched rows are kept to render the new scope from.
+  var scope = "page";
+  var lastResults = null;
+  // The page scope's rows, kept while the book scope is showing, so
+  // switching back re-renders rather than re-fetches.
+  var pageResults = null;
+  // The whole-book analysis runs in the background (the backend answers
+  // 202 "computing" instead of blocking), so the panel polls the same URL.
+  // The deadline keeps a book that never finishes from spinning forever.
+  var bookPollTimer = null;
+  var bookPollDeadline = 0;
+
   function header() {
+    // The library index for this book's language -- the way to find a
+    // grammar point the current page does not happen to contain.
+    const langid = $("#lang_id").val();
+    const library = langid
+      ? '<a class="grammar-analysis-panel__library" href="/grammar/' + encodeURIComponent(langid) + '">' + I18N.t('Grammar library') + '</a>'
+      : "";
+    // The scope controls sit at the top-left of the header as one group.
+    // They answer "how much text am I looking at": the sentence the panel
+    // was opened from, the screen, or the whole book.  The panel title
+    // already says "grammar", so each button carries only its own scope
+    // word -- three buttons reading "... grammar" each was noise.
+    //
+    // The sentence button only exists when the panel was opened from a
+    // sentence (the reading menu's entry has no target).  The book button
+    // is hidden for manga and PDF, whose pages carry no running text: the
+    // backend would rebuild each page from its OCR blocks, which is a lot
+    // of work for a scope nobody asked for on a picture book.
+    const fixedPage = typeof LUTE_BOOK_TYPE !== "undefined" &&
+      (LUTE_BOOK_TYPE === "manga" || LUTE_BOOK_TYPE === "pdf");
+    const scopeGroup =
+      '<span class="grammar-analysis-panel__scopes">' +
+      (filterableSentence
+        ? '<button type="button" class="grammar-analysis-panel__scope" data-scope="sentence">' +
+          I18N.t("This sentence") +
+          "</button>"
+        : "") +
+      '<button type="button" class="grammar-analysis-panel__scope" data-scope="page">' +
+      I18N.t("This page") +
+      "</button>" +
+      (fixedPage
+        ? ""
+        : '<button type="button" class="grammar-analysis-panel__scope" data-scope="book">' +
+          I18N.t("This book") +
+          "</button>") +
+      "</span>";
     return (
       '<div class="grammar-analysis-panel__header">' +
-      '<span class="grammar-analysis-panel__title">Grammar Analysis</span>' +
+      scopeGroup +
+      '<span class="grammar-analysis-panel__title">' + I18N.t('Grammar Analysis') + '</span>' +
       '<span id="grammar-count" class="grammar-analysis-panel__badge">…</span>' +
-      '<button type="button" class="grammar-analysis-panel__close" aria-label="Close">&times;</button>' +
+      library +
+      '<button type="button" class="grammar-analysis-panel__close" aria-label="' + I18N.t('Close') + '">&times;</button>' +
       "</div>"
     );
   }
@@ -367,7 +460,7 @@ function open_grammar_analysis(opts) {
   const panel = $("<div/>", {
     id: "grammar-analysis-panel",
     class: "grammar-analysis-panel",
-  }).html(header() + '<div class="grammar-analysis-panel__body"><div class="grammar-analysis-panel__state">Analyzing…</div></div>');
+  }).html(header() + '<div class="grammar-analysis-panel__body"><div class="grammar-analysis-panel__state">' + I18N.t('Analyzing…') + '</div></div>');
 
   if (pane) {
     pane.classList.add("grammar-mode");
@@ -388,7 +481,117 @@ function open_grammar_analysis(opts) {
     panel[0].style.fontSize = window.convertPixelsToRem(clamp(gfs, 8, 60)) + "rem";
   }
 
-  panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
+  // The panel's narrow/widen switch over the already-rendered cards.  The
+  // term form's Grammar button narrows the panel to the grammar of the one
+  // sentence the reader was in; the header's page control widens it back to
+  // every point the current screen contains.  Both act on the rendered DOM,
+  // so switching is instant and never re-runs the backend analysis.
+  // The state itself is declared above, before the header is built.
+
+  function refreshPanelVisibility() {
+    var root = panel[0];
+    if (!root || typeof root.querySelectorAll !== "function") return;
+    Array.prototype.forEach.call(
+      root.querySelectorAll(".grammar-group"),
+      function (grp) {
+        var any = grp.querySelector(
+          ".grammar-item:not(.grammar-item--filtered-out)"
+        );
+        grp.classList.toggle("grammar-group--filtered-out", !any);
+      }
+    );
+    var visible = root.querySelectorAll(
+      ".grammar-item:not(.grammar-item--filtered-out)"
+    ).length;
+    panel.find("#grammar-count").text(
+      visible + (visible === 1 ? I18N.t(' point') : I18N.t(' points'))
+    );
+    var empty = root.querySelector(".grammar-analysis-panel__filter-empty");
+    if (empty) empty.hidden = !(sentenceFilter && visible === 0);
+  }
+
+  function filterToSentence(sentence) {
+    sentenceFilter = sentence;
+    renderedCards.forEach(function (card) {
+      var keep = !!(
+        card.rec &&
+        card.rec.examples.some(function (ex) {
+          return ex.nodes.indexOf(sentence) !== -1;
+        })
+      );
+      card.el.classList.toggle("grammar-item--filtered-out", !keep);
+    });
+    refreshPanelVisibility();
+  }
+
+  function showPageGrammar() {
+    sentenceFilter = null;
+    renderedCards.forEach(function (card) {
+      card.el.classList.remove("grammar-item--filtered-out");
+    });
+    refreshPanelVisibility();
+  }
+
+  function syncScopeControl() {
+    var root = panel[0];
+    if (!root || typeof root.querySelectorAll !== "function") return;
+    var buttons = root.querySelectorAll(".grammar-analysis-panel__scope");
+    Array.prototype.forEach.call(buttons, function (btn) {
+      btn.classList.toggle(
+        "grammar-analysis-panel__scope--active",
+        btn.getAttribute("data-scope") === scope
+      );
+    });
+  }
+
+  function bindPanelControls() {
+    panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
+    // Three scopes, three behaviours:
+    //   sentence -- narrow the already-rendered rows to the one sentence,
+    //               purely in the DOM (instant, no request)
+    //   page     -- the current screen's grammar; also instant, it is what
+    //               the panel opened with
+    //   book     -- a wider text, so it needs a fresh analysis
+    panel.find(".grammar-analysis-panel__scope").on("click", function () {
+      var next = this.getAttribute("data-scope");
+      if (next === scope) return;
+      if (next === "sentence") {
+        if (!filterableSentence) return;
+        stopBookPolling();
+        bookPollDeadline = 0;
+        scope = "sentence";
+        filterToSentence(filterableSentence);
+      } else if (next === "page") {
+        stopBookPolling();
+        bookPollDeadline = 0;
+        scope = "page";
+        // Coming back from "book" has to re-render the page's own rows:
+        // the book's response replaced them.  When the panel is still on
+        // the page scope (the reader only narrowed it to a sentence) the
+        // rows are already the page's, so lifting the filter is enough.
+        if (pageResults) {
+          lastResults = pageResults;
+          pageResults = null;
+          renderResults(lastResults);
+        } else {
+          showPageGrammar();
+        }
+      } else {
+        scope = "book";
+        // The sentence filter is meaningless over a whole book, and the
+        // rows are about to be replaced anyway.
+        sentenceFilter = null;
+        // A click is a fresh attempt: give the background job a fresh
+        // polling window rather than inheriting an expired one.
+        bookPollDeadline = 0;
+        fetchBookScope();
+      }
+      syncScopeControl();
+    });
+    syncScopeControl();
+  }
+
+  bindPanelControls();
 
   // The panel can be closed while this request is in flight -- clicking a
   // word does it, and the term form re-posts LuteTermFormOpened when it
@@ -400,13 +603,150 @@ function open_grammar_analysis(opts) {
     return !panel[0].isConnected;
   }
 
-  $.getJSON(url)
-    .done(function (data) {
-      if (panelIsGone()) return;
-      let bodyHtml;
-      if (!data || data.length === 0) {
-        bodyHtml = '<div class="grammar-analysis-panel__state">No known grammar points detected on this page.</div>';
-      } else {
+  // Fetch the book scope's rows and render them.  The whole-book analysis
+  // is precomputed in the background, so an unanalysed book answers
+  // "computing" instead of holding the request open for half a minute: the
+  // panel paints a waiting state and polls this same URL until the rows are
+  // ready.  Polling is per-panel state, so every way out of the panel
+  // (close, widen, narrow) has to stop it.
+  function stopBookPolling() {
+    if (bookPollTimer) {
+      clearTimeout(bookPollTimer);
+      bookPollTimer = null;
+    }
+  }
+
+  function bookStateHtml(main, hint) {
+    return (
+      '<div class="grammar-analysis-panel__state">' +
+      "<div>" +
+      escapeHtml(main) +
+      "</div>" +
+      (hint
+        ? '<div class="grammar-analysis-panel__state-hint">' +
+          escapeHtml(hint) +
+          "</div>"
+        : "") +
+      "</div>"
+    );
+  }
+
+  function showBookRetry(message) {
+    stopBookPolling();
+    panel
+      .find(".grammar-analysis-panel__body")
+      .html(
+        '<div class="grammar-analysis-panel__state">' +
+          "<div>" +
+          escapeHtml(message) +
+          "</div>" +
+          '<button type="button" class="grammar-analysis-panel__retry">' +
+          escapeHtml(I18N.t("Try again")) +
+          "</button></div>"
+      );
+    panel.find(".grammar-analysis-panel__retry").on("click", function () {
+      bookPollDeadline = 0;
+      fetchBookScope();
+    });
+  }
+
+  function pollBookScope() {
+    stopBookPolling();
+    bookPollTimer = setTimeout(function () {
+      bookPollTimer = null;
+      if (panelIsGone() || scope !== "book") return;
+      if (Date.now() > bookPollDeadline) {
+        showBookRetry(
+          I18N.t("The whole-book analysis took too long. Please try again.")
+        );
+        return;
+      }
+      fetchBookScope();
+    }, 2000);
+  }
+
+  function fetchBookScope() {
+    const bookUrl = `/read/grammar_analysis/${bookid}/${pagenum}?scope=book`;
+    panel
+      .find(".grammar-analysis-panel__body")
+      .html(bookStateHtml(I18N.t("Analyzing the whole book…")));
+    $.getJSON(bookUrl)
+      .done(function (data) {
+        if (panelIsGone()) return;
+        if (data && data.state === "computing") {
+          // First answer starts the clock; a poll does not extend it.
+          if (!bookPollDeadline) bookPollDeadline = Date.now() + 10 * 60 * 1000;
+          panel
+            .find(".grammar-analysis-panel__body")
+            .html(
+              bookStateHtml(
+                data.status === "queued"
+                  ? I18N.t("Waiting for the background analysis to start…")
+                  : I18N.t("Analyzing the whole book…"),
+                I18N.t(
+                  "It keeps running in the background, so you can keep reading."
+                )
+              )
+            );
+          pollBookScope();
+          return;
+        }
+        if (data && data.state === "error") {
+          showBookRetry(
+            I18N.t("The whole-book analysis failed. Please try again.")
+          );
+          return;
+        }
+        stopBookPolling();
+        bookPollDeadline = 0;
+        // Keep the page's rows so switching back re-renders them instead
+        // of re-fetching: the book's response is about to replace them.
+        pageResults = lastResults;
+        lastResults = data;
+        renderResults(data);
+      })
+      .fail(function () {
+        if (panelIsGone()) return;
+        showBookRetry(I18N.t("Analysis failed. Please try again."));
+      });
+  }
+
+  // Render the rows the backend returned into the panel.  Split out of the
+  // request's callback so switching scope to "book" can re-render from its
+  // own response with the same code.
+  // narrowToTarget: only the render that opens the panel (the term form's
+  // Grammar button) may narrow to the clicked word's sentence.  The word
+  // stays in this closure for the panel's whole life, so a later render
+  // cannot infer "the reader just came from that word": the book scope's
+  // examples come from every other page, have no nodes on this screen, and
+  // narrowing there filtered nearly every card away while the level headers
+  // still counted the whole payload ("This book: 1 point", N5: 10).
+  function renderResults(data, narrowToTarget) {
+    // Resolved before the header is built: header() renders the "This
+    // sentence" button only when a sentence is known, and syncScopeControl
+    // marks the active scope from `scope` -- both must see it on the first
+    // render, not whenever the next scope switch rebuilds the header.
+    var targetSentence = null;
+    if (
+      narrowToTarget &&
+      data &&
+      data.length &&
+      targetWordEl &&
+      targetWordEl.isConnected
+    ) {
+      targetSentence = grammarTargetSentence(targetWordEl);
+      if (targetSentence) {
+        filterableSentence = targetSentence;
+        // A book request may already be in flight (the reader switched
+        // scope while this response was on its way): do not claim the
+        // sentence scope for a render that is about to be replaced.
+        if (scope === "page") scope = "sentence";
+      }
+    }
+    let bodyHtml;
+    if (!data || data.length === 0) {
+      bodyHtml = '<div class="grammar-analysis-panel__state">' + I18N.t('No known grammar points detected on this page.') + '</div>';
+    } else {
         // Render one example sentence, wrapping the backend-reported matched
         // words (exact character offsets) in <mark>.
         function renderExample(ex) {
@@ -430,21 +770,36 @@ function open_grammar_analysis(opts) {
           });
           return html + escapeHtml(s.slice(pos));
         }
-        // JLPT levels (Japanese/Korean engines) and CEFR levels (European
-        // engines); a response speaks one scale or the other, so the group
-        // order picks the scale the data uses.
+        // JLPT levels (Japanese engine), CEFR levels (European engines) and
+        // TOPIK bands (Korean engine); a response speaks one scale or the
+        // other, so the group order picks the scale the data uses.
         const JLPT_LEVELS = ["N5", "N4", "N3", "N2", "N1"];
         const CEFR_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
+        const TOPIK_LEVELS = ["TOPIK 1-2", "TOPIK 3-4", "TOPIK 5-6"];
         const LEVELS = data.some(function (g) {
           return JLPT_LEVELS.indexOf(g.level) !== -1;
         })
           ? JLPT_LEVELS
+          : data.some(function (g) {
+              return TOPIK_LEVELS.indexOf(g.level) !== -1;
+            })
+          ? TOPIK_LEVELS
           : CEFR_LEVELS;
 
+        // The TOPIK strings carry a space, which cannot ride in a class
+        // name, so each band maps to its own token (same mapping and
+        // accents as the library pages, see grammar/routes.py).
+        const TOPIK_CLASSES = {
+          "TOPIK 1-2": "TOPIK12",
+          "TOPIK 3-4": "TOPIK34",
+          "TOPIK 5-6": "TOPIK56",
+        };
+
         function levelClass(lvl) {
-          return JLPT_LEVELS.indexOf(lvl) === -1 && CEFR_LEVELS.indexOf(lvl) === -1
-            ? "N"
-            : lvl;
+          if (JLPT_LEVELS.indexOf(lvl) !== -1 || CEFR_LEVELS.indexOf(lvl) !== -1) {
+            return lvl;
+          }
+          return TOPIK_CLASSES[lvl] || "N";
         }
 
         // The two aggregated buckets ("Basic forms: …", "Particles: …") fire
@@ -454,13 +809,34 @@ function open_grammar_analysis(opts) {
           return g.key === "basic_forms" || g.key === "basic_particles";
         }
 
+        // Register of the grammar point, as the curated rows record it
+        // (neutral / formal / casual).  The token is untranslated in the
+        // data, so it is labelled here; an unknown value shows nothing
+        // rather than a raw English word under a translated heading.
+        const FORMALITY_LABEL = {
+          neutral: I18N.t("neutral"),
+          formal: I18N.t("formal"),
+          casual: I18N.t("casual"),
+        };
+
         function itemHtml(g, withLevelChip) {
           const fold = isAggregate(g);
           const level =
             withLevelChip && g.level
               ? '<span class="grammar-item__level">' + escapeHtml(g.level) + "</span>"
               : "";
+          const formality = FORMALITY_LABEL[g.formality]
+            ? '<span class="grammar-item__formality">' +
+              escapeHtml(FORMALITY_LABEL[g.formality]) +
+              "</span>"
+            : "";
           const desc = g.desc ? '<div class="grammar-item__desc">' + escapeHtml(g.desc) + "</div>" : "";
+          // The long explanation, English-only in the data: the backend
+          // emits it for an English panel and omits it otherwise (see
+          // analyze_japanese), so whatever arrives here is displayable.
+          const detailed = g.meaning_detailed
+            ? '<div class="grammar-item__detail">' + escapeHtml(g.meaning_detailed) + "</div>"
+            : "";
           const formation = g.formation
             ? '<div class="grammar-item__formation">' + escapeHtml(g.formation) + "</div>"
             : "";
@@ -491,11 +867,39 @@ function open_grammar_analysis(opts) {
               "</div></div>"
             : "";
           const cjk = /[\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]/.test(g.desc || "");
-          const moreLabel = cjk ? "参考例句 · 注意点" : "Reference · notes";
+          const moreLabel = cjk ? "参考例句 · 注意点" : I18N.t("Reference · notes");
+          // The reference block starts expanded.  The panel owns a whole
+          // column of the reader, so there is room for the translated
+          // example without a click -- and it is the only place a reader
+          // sees a sentence with its gloss, since the page's own examples
+          // are the reading text itself.  The grammar detail page has
+          // expanded it for the same reason.
           const more =
             ref || notes
-              ? '<details class="grammar-item__more"><summary>' + moreLabel + "</summary>" +
+              ? '<details class="grammar-item__more" open><summary>' + moreLabel + "</summary>" +
                 ref + notes + "</details>"
+              : "";
+          // Cross-links into the grammar library, anchored on the other
+          // point's key so the click lands on that card (#hash).
+          const langidForRelated = $("#lang_id").val();
+          const related =
+            g.related && g.related.length && langidForRelated
+              ? '<div class="grammar-item__related">' +
+                '<span class="grammar-item__related-label">' + I18N.t("Related grammar") + "</span>" +
+                g.related
+                  .map(function (r) {
+                    return (
+                      '<a class="grammar-item__related-link" href="/grammar/' +
+                      encodeURIComponent(langidForRelated) +
+                      "/" +
+                      encodeURIComponent(r.key || "") +
+                      '">' +
+                      escapeHtml(r.name) +
+                      "</a>"
+                    );
+                  })
+                  .join("") +
+                "</div>"
               : "";
           return (
             '<div class="grammar-item grammar-item--' +
@@ -508,12 +912,15 @@ function open_grammar_analysis(opts) {
             '<div class="grammar-item__head"' + (fold ? ' role="button"' : "") + ">" +
             level +
             '<span class="grammar-item__name">' + escapeHtml(g.name) + "</span>" +
+            formality +
             (fold ? '<span class="grammar-item__fold" aria-hidden="true">&#9656;</span>' : "") +
             "</div>" +
             formation +
             desc +
+            detailed +
             '<div class="grammar-item__examples">' + examples + "</div>" +
             more +
+            related +
             "</div>"
           );
         }
@@ -575,13 +982,18 @@ function open_grammar_analysis(opts) {
             );
           })
           .join("");
-        bodyHtml = '<div class="grammar-analysis-panel__body">' + items + "</div>";
+        bodyHtml =
+          '<div class="grammar-analysis-panel__body">' +
+          items +
+          '<div class="grammar-analysis-panel__filter-empty" hidden>' +
+          I18N.t('No known grammar points for this sentence.') +
+          "</div></div>";
       }
       panel.html(header() + bodyHtml);
       panel.find("#grammar-count").text(
-        data.length + (data.length === 1 ? " point" : " points")
+        data.length + (data.length === 1 ? I18N.t(' point') : I18N.t(' points'))
       );
-      panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
+      bindPanelControls();
 
       // Cross-highlight: hovering a grammar entry on the right draws a blue
       // ring around the whole example sentence and an amber glow around the
@@ -755,7 +1167,21 @@ function open_grammar_analysis(opts) {
         function cellCharRects(el, a, b) {
           var pieces = [];
           var total = 0;
-          var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+          // Same filter as grammarVisibleText: skip rt/rp so the pieces here
+          // index exactly the text grammarRunCells collected for this cell.
+          var filter = {
+            acceptNode: function (n) {
+              var p = n.parentNode;
+              while (p && p !== el) {
+                if (p.nodeType === 1 && (p.tagName === "RT" || p.tagName === "RP")) {
+                  return NodeFilter.FILTER_REJECT;
+                }
+                p = p.parentNode;
+              }
+              return NodeFilter.FILTER_ACCEPT;
+            }
+          };
+          var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, filter);
           var n;
           while ((n = walker.nextNode())) {
             var t = grammarCleanText(n.data);
@@ -845,7 +1271,7 @@ function open_grammar_analysis(opts) {
           phraseNodes = textRoot.querySelectorAll(".textrow, p");
         }
         var sentences = Array.prototype.slice.call(phraseNodes).map(function (el) {
-          return { el: el, t: stripText(el.textContent) };
+          return { el: el, t: stripText(grammarVisibleText(el)) };
         });
 
         // Ring the example sentence only (blue outline) and draw one amber
@@ -951,10 +1377,16 @@ function open_grammar_analysis(opts) {
         // One record per rendered card, in DOM order, so the auto-select
         // below can ask "which card matches the sentence I came from?".
         var boundItems = [];
+        // Registered under its element so the header's page control can map a
+        // card back to its data (rec stays null when a card has no analysable
+        // entry, which the narrow switch treats as never matching).
+        var cards = [];
         Array.prototype.forEach.call(
           panel[0].querySelectorAll(".grammar-item"),
           function (item, itemIdx) {
             var g = dataItems[itemIdx];
+            var card = { el: item, rec: null };
+            cards.push(card);
             // Fold toggle for the aggregated rows (see itemHtml): the click
             // does not need the row's data, so it is bound even if the data
             // pairing below ever fails.
@@ -968,6 +1400,7 @@ function open_grammar_analysis(opts) {
             }
             if (!g) return;
             var rec = { itemEl: item, examples: [] };
+            card.rec = rec;
             boundItems.push(rec);
             var exampleEls = item.querySelectorAll(".grammar-item__example");
 
@@ -1023,16 +1456,21 @@ function open_grammar_analysis(opts) {
             }
           }
         );
+        renderedCards = cards;
 
-        // The term form's Grammar button: jump straight to the card for the
-        // sentence the reader was in, and pin its rings so the highlight
-        // stays put.  Nothing to do when the sentence carries no known
-        // grammar -- the panel then reads exactly as it did before.
-        if (targetWordEl && targetWordEl.isConnected) {
-          var targetSentence = grammarTargetSentence(targetWordEl);
-          var picked = targetSentence
-            ? grammarPickTarget(boundItems, targetSentence, targetWordEl)
-            : null;
+        // The opening render narrows the panel to the grammar of the
+        // sentence the reader was in, and jumps to -- and pins -- its card.
+        // Every other render passes narrowToTarget false, so widening the
+        // scope lifts the filter and the badge recounts the whole payload.
+        // The sentence is remembered even when it carries no known grammar
+        // (the panel then shows the "nothing for this sentence" state).
+        if (targetSentence) {
+          var picked = grammarPickTarget(
+            boundItems,
+            targetSentence,
+            targetWordEl
+          );
+          filterToSentence(targetSentence);
           if (picked) {
             // A collapsed aggregate row hides its examples (display:none),
             // and getClientRects() on hidden cells is empty, so the rings
@@ -1041,13 +1479,24 @@ function open_grammar_analysis(opts) {
             setPinned(picked.runs, picked.itemEl);
             picked.itemEl.scrollIntoView({ block: "nearest" });
           }
+          syncScopeControl();
         }
       }
+  }
+
+  // The panel's own request.  Rendered from the response on arrival, and
+  // again whenever the scope changes (see fetchBookScope).  This is the one
+  // render allowed to narrow to the clicked word's sentence.
+  $.getJSON(url)
+    .done(function (data) {
+      if (panelIsGone()) return;
+      lastResults = data;
+      renderResults(data, true);
     })
     .fail(function () {
       if (panelIsGone()) return;
-      panel.html(header() + '<div class="grammar-analysis-panel__body"><div class="grammar-analysis-panel__state">Analysis failed. Please try again.</div></div>');
-      panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
+      panel.html(header() + '<div class="grammar-analysis-panel__body"><div class="grammar-analysis-panel__state">' + I18N.t('Analysis failed. Please try again.') + '</div></div>');
+      bindPanelControls();
     });
 }
 
@@ -1134,7 +1583,7 @@ function _page_data() {
 }
 
 function delete_current_page() {
-  if (!confirm("Delete current page?"))
+  if (!confirm(I18N.t("Delete current page?")))
     return;
   const d = _page_data()
   window.location = `/read/delete_page/${d.bookid}/${d.pagenum}`;
@@ -1305,9 +1754,12 @@ function post_bulk_update(updates) {
     anchor_ordinal: anchor_ordinal,
     anchor_id: anchor_id,
   };
+  // settle:0 keeps the fragment's script evaluation in the same task as
+  // the swap: htmx's default 20ms settle delay painted the raw
+  // (span-less) page for a frame before the word spans came back.
   htmx.ajax('POST', '/term/bulk_update_status', {
     target: '#thetext',
-    swap: 'innerHTML',
+    swap: 'innerHTML settle:0',
     values: payload,
   });
 }

@@ -17,7 +17,7 @@ import unicodedata
 
 from typing import List
 
-from lute.parse.base import ParsedToken, AbstractParser
+from lute.parse.base import ParsedToken, AbstractParser, character_substitution_pairs
 
 
 class SpaceDelimitedParser(AbstractParser):
@@ -167,6 +167,14 @@ class SpaceDelimitedParser(AbstractParser):
         clean_text = clean_text.replace(chr(0x200B), "")
 
         return self._parse_to_tokens(clean_text, language)
+
+    def text_substitutions(self, language):
+        "Replacements applied before tokenizing, in order."
+        return (
+            [(chr(0x200B), "")]
+            + character_substitution_pairs(language)
+            + [("{", "["), ("}", "]")]
+        )
 
     def preg_match_capture(self, pattern, subject):
         """

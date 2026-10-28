@@ -11,10 +11,19 @@ body {
   --status-99-color: #419252;
 
   --background-color: #48484a;
+  /* 纸面外观跟随主题：深色纸 + 反相正文（见 styles.css 的 .epub-look-original）。 */
+  --paper-bg: #16161d;
+  --paper-filter: invert(0.88) hue-rotate(180deg);
+  /* 纸内正文是「反相」出来的：生词蓝要先写成深色，反相后才亮。
+     #003399 反相后约 #98bfff（styles.css 的 --paper-status-0-color）。 */
+  --paper-status-0-color: #003399;
   --light-grey: #c4c8ce;
   --font-color: #EBEBEB;
   --dark-grey: #333333;
   --border-bottom-color: #333333;
+
+  /* 语法匹配环：暗底上保留亮琥珀（styles.css 的默认深琥珀是给纸色主题的）。 */
+  --grammar-match-color: rgba(255, 214, 90, 0.9);
 
   --form-border-color: var(--light-grey);
 

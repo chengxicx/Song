@@ -56,15 +56,20 @@ def _entry(**overrides):
     return entry
 
 
-def _render(entries):
+def _render(entries, click=None, book_type=None):
     "Render a panel payload through the real module and return its parts."
     if NODE is None:
         pytest.skip("node is not on PATH")
     if not os.path.exists(_HARNESS) or not os.path.exists(_MODULE):
         pytest.skip("grammar panel JS not found")
+    payload = {"data": entries}
+    if click:
+        payload["click"] = click
+    if book_type:
+        payload["book_type"] = book_type
     proc = subprocess.run(
         [NODE, _HARNESS, _MODULE],
-        input=json.dumps({"data": entries}),
+        input=json.dumps(payload),
         capture_output=True,
         text=True,
         check=False,
@@ -184,3 +189,157 @@ def test_reference_offsets_outside_the_sentence_are_ignored():
     assert out["has_refex"], out["html"]
     assert out["marks"] == []
     assert sentence in out["refex"], out["refex"]
+
+
+def test_formality_chip_renders_when_present_and_is_omitted_otherwise():
+    """
+    The register (neutral / formal / casual) is an optional chip beside the
+    name; a row without one must not leave an empty badge behind.
+    """
+    out = _render([_entry(formality="formal")])
+    assert out["formality"] == "formal"
+    assert _render([_entry()])["formality"] is None
+
+
+def test_curated_detail_renders_when_present_and_is_omitted_otherwise():
+    "The long explanation is optional; absent means no empty block."
+    out = _render([_entry(meaning_detailed="A longer curated explanation.")])
+    assert out["detail"] == "A longer curated explanation."
+    assert _render([_entry()])["detail"] is None
+
+
+def test_related_links_render_as_library_deep_links():
+    """
+    Each cross-link opens the other point's own library page, so the href
+    must be /grammar/<langid>/<key> and the label the point's name.
+    """
+    out = _render(
+        [
+            _entry(
+                related=[
+                    {
+                        "id": "kara-from",
+                        "key": "ds_particle-kara-from",
+                        "name": "〜から",
+                        "level": "N5",
+                    }
+                ]
+            )
+        ]
+    )
+    assert out["related"] == [
+        {"href": "/grammar/1/ds_particle-kara-from", "name": "〜から"}
+    ]
+
+
+def test_no_related_renders_no_block():
+    "A row with no cross-links leaves the related block out entirely."
+    assert _render([_entry()])["related"] == []
+
+
+def test_topik_bands_ride_their_own_accent_tokens_and_order():
+    """
+    The Korean bands' raw strings carry a space, so the panel maps each to
+    a class-safe token (TOPIK12/34/56) -- the same mapping and accents the
+    library pages use, so a band reads as one hue in both places.  The
+    level grouping must also sort the bands easiest-first even when the
+    payload's match order is reversed.
+    """
+    out = _render(
+        [
+            _entry(level="TOPIK 5-6", key="kgm_a__000001"),
+            _entry(level="TOPIK 3-4", key="kgm_b__000002"),
+            _entry(level="TOPIK 1-2", key="kgm_c__000003"),
+        ]
+    )
+    assert "grammar-group--TOPIK56" in out["html"], out["html"][:400]
+    assert "grammar-item--TOPIK34" in out["html"], out["html"][:400]
+    assert "grammar-group--TOPIK12" in out["html"], out["html"][:400]
+    assert out["keys"] == ["kgm_c__000003", "kgm_b__000002", "kgm_a__000001"]
+
+
+# ---- the header's scope group -------------------------------------------
+#
+# The panel answers "how much text am I looking at" with three scopes: the
+# sentence it was opened from, the screen, the whole book.  They used to be
+# one "Current page grammar" button that only toggled a sentence filter, so
+# there was no way to ask about the rest of the book -- and the button's own
+# label said "page" while it filtered to a sentence.
+
+
+def test_header_carries_page_and_book_scopes():
+    "The panel can show the screen's grammar and the whole book's."
+    out = _render([_entry()])
+    assert "page" in out["scopes"], out["scopes"]
+    assert "book" in out["scopes"], out["scopes"]
+    # Opened from the reading menu (no sentence), so no sentence button.
+    assert "sentence" not in out["scopes"], out["scopes"]
+    # The panel opens on the page scope.
+    assert out["active_scope"] == "page", out["active_scope"]
+
+
+def test_scope_labels_drop_the_redundant_grammar_word():
+    """
+    The panel title already says "grammar", so each button carries only its
+    scope word.  The old label was "Current page grammar".
+    """
+    out = _render([_entry()])
+    assert "Current page grammar" not in out["html"]
+    for label in ("This page", "This book"):
+        assert label in out["html"], label
+
+
+def test_book_scope_asks_the_backend_for_the_whole_book():
+    """
+    Switching to the book scope is a different text, so it is a fresh
+    request carrying ?scope=book -- not a re-render of the page's rows.
+    """
+    out = _render([_entry()], click="book")
+    assert any("scope=book" in u for u in out["urls"]), out["urls"]
+
+
+def test_book_scope_becomes_the_active_one():
+    "The clicked scope is the one marked active."
+    out = _render([_entry()], click="book")
+    assert out["active_scope"] == "book", out["active_scope"]
+
+
+def test_fixed_page_books_have_no_book_scope():
+    """
+    Manga and PDF pages carry no running text: the backend would rebuild
+    every page from its OCR blocks for a scope nobody asked for on a
+    picture book, so the button is not offered.
+    """
+    for book_type in ("manga", "pdf"):
+        out = _render([_entry()], book_type=book_type)
+        assert "book" not in out["scopes"], (book_type, out["scopes"])
+        assert "page" in out["scopes"], (book_type, out["scopes"])
+
+
+# ---- the reference block starts open ------------------------------------
+#
+# The panel owns a whole column of the reader, so the translated example is
+# worth showing without a click.  It is the only place a reader sees a
+# sentence with its gloss: the page's own examples are the reading text.
+
+
+def test_reference_block_starts_expanded():
+    "The folded block is open on render, not one click away."
+    out = _render(
+        [
+            _entry(
+                reference={
+                    "sentence": "무리하게 확장한 나머지 위기를 맞았다.",
+                    "text": "过度扩张，结果陷入了危机。",
+                    "matches": [{"start": 8, "end": 13}],
+                }
+            )
+        ]
+    )
+    assert out["more_open"], out["html"][-600:]
+
+
+def test_reference_block_without_a_reference_stays_absent():
+    "No reference and no notes means no details element at all."
+    out = _render([_entry()])
+    assert "grammar-item__more" not in out["html"]

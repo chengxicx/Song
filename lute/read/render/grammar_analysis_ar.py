@@ -17,11 +17,17 @@ pyarabic is imported lazily so the base install works without it; the
 route falls back to the generic rule library on ImportError.
 """
 
+import json
+import os
 import re
+import threading
 
 from lute.read.render.grammar_analysis_matcher import (
     analyze_tokens,
+    desc_for_rule,
     make_rule,
+    match_rule,
+    paired_examples,
     spec_surface,
 )
 
@@ -87,49 +93,50 @@ _AR_RULES = [
         "ar_questions",
         "Question words (هل / ماذا / كيف...)",
         "A1",
-        "هل makes a yes/no question; ماذا/متى/أين/كيف/كم/لماذا ask for " "information.",
-        {
-            "seq": [
-                spec_surface(
-                    "هل", "ماذا", "ما", "متى", "أين", "كيف", "كم", "لماذا", "من"
-                )
-            ]
-        },
+        "هل makes a yes/no question; ماذا/متى/أين/كيف/كم/لماذا/أي ask for "
+        "information.",
+        {"seq": [spec_surface("هل", "ماذا", "متى", "أين", "كيف", "كم", "لماذا", "أي")]},
         zh="疑问词：هل 一般疑问；ماذا/متى/أين/كيف/كم/لماذا 特殊疑问。",
     ),
     make_rule(
-        "ar_prepositions",
-        "Prepositions (في / من / إلى / على...)",
+        "ar_prep_pron",
+        "Preposition + attached pronoun (فيه / منها / عليه)",
         "A1",
-        "في/من/إلى/على/عن/مع are always followed by a genitive noun or "
-        "attached pronoun.",
+        "في/من/على/إلى/لـ fuse with a pronoun suffix into one word: فيه = "
+        "in it, منها = from it, عليه = on him.",
         {
             "seq": [
                 spec_surface(
-                    "في",
-                    "من",
-                    "إلى",
-                    "على",
-                    "عن",
-                    "مع",
-                    "بين",
-                    "بعد",
-                    "قبل",
-                    "عند",
-                    "تحت",
-                    "فوق",
+                    "فيه",
+                    "فيها",
+                    "فيهم",
+                    "منه",
+                    "منها",
+                    "منهم",
+                    "عليه",
+                    "عليها",
+                    "عليهم",
+                    "إليه",
+                    "إليها",
+                    "إليهم",
+                    "به",
+                    "بها",
+                    "بهم",
+                    "له",
+                    "لها",
+                    "لهم",
+                    "لنا",
+                    "لك",
+                    "لكم",
+                    "عنه",
+                    "عنها",
+                    "معه",
+                    "معها",
+                    "معهم",
                 )
             ]
         },
-        zh="常用介词：في/من/إلى/على/عن/مع 等，后接属格名词或 Attached pronoun。",
-    ),
-    make_rule(
-        "ar_al",
-        "ال- (definite article)",
-        "A1",
-        "ال- prefixes the definite noun: البيت = the house.",
-        {"seq": [{"surface_re": re.compile(r"ال.+")}]},
-        zh="定冠词 ال-：البيت = 这个房子。",
+        zh="介词 + 接尾代词融合成一个词：فيه = 在里面，منها = 从它，عليه = 在他身上。",
     ),
     make_rule(
         "ar_demonstratives",
@@ -149,11 +156,12 @@ _AR_RULES = [
     ),
     make_rule(
         "ar_kana",
-        "كان / أصبح (kana verbs)",
+        "كان (kana verbs)",
         "A1",
-        "كان = was/were, أصبح = became; the predicate stays in the " "nominative.",
-        {"seq": [spec_surface("كان", "كانت", "كانوا", "يكون", "أصبح", "أصارت")]},
-        zh="كان 类动词：كان = 曾经是，أصبح = 变得；表语仍为主格。",
+        "كان = was/were; the predicate stays in the nominative.  The other "
+        "sisters (أصبح/ظل/بات/صار) have their own library rows.",
+        {"seq": [spec_surface("كان", "كانت", "كانوا", "يكون")]},
+        zh="كان 类动词：كان = 曾经是；表语仍为主格。其余姐妹词见各条目。",
     ),
     make_rule(
         "ar_pronouns",
@@ -168,7 +176,7 @@ _AR_RULES = [
         "لكن (but)",
         "A1",
         "لكن = but / however.",
-        {"seq": [spec_surface("لكن", "لكنه", "لكنها", "غير أن")]},
+        {"seq": [spec_surface("لكن", "لكنه", "لكنها", "لكنهم")]},
         zh="لكن：但是、然而。",
     ),
     # ---- A2 ----
@@ -192,7 +200,7 @@ _AR_RULES = [
         "ar_sawfa",
         "سوف / سـ (future)",
         "A2",
-        "سوف (or the prefix سـ) before a present verb makes it future: " "سوف أذهب.",
+        "سوف (or the prefix سـ) before a present verb makes it future: سوف أذهب.",
         {"seq": [spec_surface("سوف")]},
         zh="将来标记：سوف（或动词前加 سـ）+ 现在时动词（سوف أذهب 我将去）。",
     ),
@@ -215,12 +223,12 @@ _AR_RULES = [
     # ---- B1 ----
     make_rule(
         "ar_anna",
-        "أن / إن (that)",
+        "أن / أنّ (that)",
         "B1",
-        "أن/إن introduce a content clause after verbs like قال/عرف; إنّ "
+        "أن/أنّ introduce a content clause after verbs like قال/عرف; أنّ "
         "also emphasizes.",
-        {"seq": [spec_surface("أن", "إن", "أنه", "أنها", "إنه", "إنها")]},
-        zh="أن / إنّ：引导宾语从句『……说/知道……』；إنّ 亦表强调。",
+        {"seq": [spec_surface("أن", "أنه", "إنه")]},
+        zh="أن / أنّ：引导宾语从句『……说/知道……』；إنّ 亦表强调。",
     ),
     make_rule(
         "ar_if",
@@ -258,16 +266,38 @@ _AR_RULES = [
         "ar_suffix_ha",
         "ـها (her / its)",
         "B1",
-        "the suffix ها attaches to nouns and prepositions: كتابها, فيها.",
-        {"seq": [{"surface_re": re.compile(r".+ها")}]},
-        zh="词尾 ها：她/它（ attached pronoun：كتابها 她的书）。",
+        "the suffix ها attaches to a noun to mark a possessor: كتابها = her "
+        "book.  Preposition + ها fusion (فيها, منها) is reported by "
+        "ar_prep_pron instead, and the particles that merely end in ها "
+        "(أيها, أنها, نفسها) are excluded here.",
+        {
+            "seq": [
+                {
+                    "surface_re": re.compile(
+                        r"^(?!أيها$|أيتها$|أنها$|إنها$|نفسها$|فيها$|منها$|عليها$"
+                        r"|إليها$|بها$|لها$|معها$|عنها$).+ها$"
+                    )
+                }
+            ]
+        },
+        zh="词尾 ها：她/它（attached pronoun：كتابها 她的书）。介词融合（فيها/منها）另见「介词+接尾代词」。",
     ),
     make_rule(
         "ar_suffix_plural",
         "ـهم / ـكم / ـنا (their / your / our)",
         "B1",
         "plural possessive suffixes attach directly to the word: بيوتهم.",
-        {"seq": [{"surface_re": re.compile(r".{2,}(?:هم|هن|كم|كن|نا)")}]},
+        {
+            "seq": [
+                {
+                    "surface_re": re.compile(
+                        r"^(?!أنا$|أحيانا$|هنا$|لنا$|معنا$|عندنا$|بيننا$|كلنا$"
+                        r"|فيهم$|منهم$|عليهم$|إليهم$|بهم$|لهم$|لكم$|معهم$)"
+                        r".{2,}(?:هم|هن|كم|كن|نا)$"
+                    )
+                }
+            ]
+        },
         zh="复数词尾：هم/كم/نا 等（بيوتهم 他们的家）。",
     ),
     make_rule(
@@ -300,7 +330,7 @@ _AR_RULES = [
         "ar_kullama",
         "كلما (the more / whenever)",
         "B2",
-        "كلما pairs with وقد/كان for 'the more ... the more': كلما كبر، " "ازاد علمه.",
+        "كلما pairs with وقد/كان for 'the more ... the more': كلما كبر، ازاد علمه.",
         {"seq": [spec_surface("كلما")]},
         zh="كلما：越……越……；每当……。",
     ),
@@ -315,6 +345,211 @@ _AR_RULES = [
 ]
 
 
+# Rows the reading panel silences: the page never shows them, but the
+# library page and the overlap audit still do.  Re-derived by
+# scripts/audit_grammar_ar_overlaps.py whenever the library grows.
+_DUPLICATE_RULE_IDS = frozenset()
+
+
+# ---- data layer (grammar_ar.json) ---------------------------------------
+#
+# Merged material rows become rules whose matcher specs are derived from the
+# row's `focus` words and kept only when they fire on the row's own example
+# sentences, so a stale spec can never enter the panel silently.  Mirrors the
+# French engine, minus the lemma story: pyarabic has no tagger, so every spec
+# here is a literal surface sequence.
+
+
+def _norm_name(name):
+    "Fold a rule name for the hand-written / data-layer overlap check."
+    return re.sub(r"[^0-9a-z\u0600-\u06FF]+", "", _normalise(name or "").lower())
+
+
+_HANDWRITTEN_NORMS = {_norm_name(r["name"]) for r in _AR_RULES}
+
+_DATA_PATH = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "jlpt_data",
+        "grammar_ar.json",
+    )
+)
+
+
+def _focus_words(focus):
+    words = []
+    for f in focus or []:
+        w = _normalise(f).strip()
+        if w:
+            words.append(w)
+    return words
+
+
+def _focus_word_spec(word):
+    "One focus word as a spec; 'a/b' alternatives become surface variants."
+    return spec_surface(*word.split("/"))
+
+
+def _focus_specs(focus):
+    """
+    Candidate matcher specs derived from one row's focus list.
+
+    Focus vocabulary: plain words match adjacently (seq); one "..." marks a
+    bounded gap (left/right, up to 4 words); a "a/b" slash marks surface
+    alternatives.  There is no short-word floor: Arabic function words are
+    one to three letters (لم, قد, ما) and each row's frequency is judged on
+    the corpus instead (see scripts/measure_grammar_panel.py --engine ar).
+    """
+    words = _focus_words(focus)
+    if not words:
+        return []
+    if words.count("...") == 1:
+        i = words.index("...")
+        left_w, right_w = words[:i], words[i + 1 :]
+        if not left_w or not right_w:
+            return []
+        return [
+            {
+                "left": [_focus_word_spec(w) for w in left_w],
+                "right": [_focus_word_spec(w) for w in right_w],
+                "min_gap": 0,
+                "max_gap": 4,
+            }
+        ]
+    if "..." in words:
+        return []  # at most one gap anchor pair is expressible
+    return [{"seq": [_focus_word_spec(w) for w in words]}]
+
+
+def _flash(spec, examples):
+    "True when spec fires on at least one of the row's example sentences."
+    for sentence in examples:
+        text = _normalise(sentence)
+        if match_rule({"match": spec}, _tokens_for_page(text), text):
+            return True
+    return False
+
+
+def _first_glossed(pairs):
+    """
+    The first example that carries a translation, shaped for the panel.
+
+    ``sentence`` is the field the front end reads first.  Every translation
+    the example carries is kept, not only the Chinese one: the shared
+    ``reference_gloss`` resolves whichever the panel's display language
+    asks for, so an English panel is not served a Chinese gloss.
+    """
+    for pair in pairs:
+        if not isinstance(pair, dict):
+            continue
+        if not (pair.get("zh") or pair.get("en") or pair.get("ko")):
+            continue
+        sentence = (pair.get("arabic") or "").strip()
+        if not sentence:
+            continue
+        reference = {"sentence": sentence}
+        for field in ("zh", "en", "ko"):
+            value = (pair.get(field) or "").strip()
+            if value:
+                reference[field] = value
+        return reference
+    return None
+
+
+def _load_data_rules():
+    """
+    Rules for the merged grammar-point rows (jlpt_data/grammar_ar.json).
+
+    Specs are derived from each row's `focus` and kept only when they match
+    at least one of the row's own examples.
+    """
+    if not os.path.exists(_DATA_PATH):
+        return []
+    with open(_DATA_PATH, encoding="utf-8") as fh:
+        entries = json.load(fh)
+    rules = []
+    for item in entries:
+        name = item.get("name") or ""
+        if not name or _norm_name(name) in _HANDWRITTEN_NORMS:
+            continue  # already covered precisely by a hand-written rule
+        examples = [e for e in (_normalise(x) for x in item.get("examples") or []) if e]
+        if not examples:
+            continue
+        validated = [s for s in _focus_specs(item.get("focus")) if _flash(s, examples)]
+        if not validated:
+            continue
+        key = item.get("key") or name
+        _AR_RULE_EXAMPLES[key] = examples
+        library_examples = paired_examples("arabic", examples, item)
+        rule = make_rule(
+            key,
+            name,
+            item.get("level") or "B1",
+            (item.get("meaning") or "").strip() or name,
+            {"any_of": validated} if len(validated) > 1 else validated[0],
+            zh=item.get("zh") or None,
+            at_start=bool(item.get("at_start")),
+        )
+        # Library-page fields (the /grammar detail card renders them when
+        # present); the panel ignores keys it does not read.
+        rule["formation"] = (item.get("formation") or "").strip()
+        rule["notes"] = (item.get("notes") or "").strip()
+        rule["examples"] = library_examples
+        # The panel's folded reference block: the row's own example with its
+        # gloss, so a reader sees a translated sentence and not only the
+        # rule description above it.
+        rule["reference"] = _first_glossed(library_examples)
+        rules.append(rule)
+    return rules
+
+
+# The data rules are built on first use, not at import: _load_data_rules()
+# tokenizes the rows' examples, and this module is imported at app start-up.
+_rules_lock = threading.RLock()
+_data_rules_cache = None
+_all_rules_cache = None
+_AR_RULE_EXAMPLES = {}
+
+
+def _get_data_rules():
+    "The data-driven rules, built on first use and memoised."
+    global _data_rules_cache  # pylint: disable=global-statement
+    with _rules_lock:
+        if _data_rules_cache is None:
+            _data_rules_cache = _load_data_rules()
+        return _data_rules_cache
+
+
+def _get_all_rules():
+    """
+    Hand-written plus data-driven rules, built and memoised on first use.
+
+    The hand-written rules keep their illustrative sentence in the golden
+    set, so their panel reference block is attached here -- on a copy, so
+    the module-level rule list stays exactly as written.
+    """
+    global _all_rules_cache  # pylint: disable=global-statement
+    with _rules_lock:
+        if _all_rules_cache is None:
+            golden = _golden_examples()
+            combined = []
+            for rule in _AR_RULES:
+                if not rule.get("reference"):
+                    reference = _first_glossed(golden.get(rule["key"]) or [])
+                    if reference:
+                        rule = dict(rule, reference=reference)
+                combined.append(rule)
+            combined += [
+                rule
+                for rule in _get_data_rules()
+                if rule["key"] not in _DUPLICATE_RULE_IDS
+            ]
+            _all_rules_cache = combined
+        return _all_rules_cache
+
+
 def analyze_arabic(page_text, display_lang="en"):
     """
     Analyze a page of Arabic text for grammar points.
@@ -322,4 +557,111 @@ def analyze_arabic(page_text, display_lang="en"):
     Returns a list of dicts:
       {"key", "name", "level", "desc", "examples": [{"sentence", "matches"}]}
     """
-    return analyze_tokens(page_text, _AR_RULES, _tokens_for_page, display_lang)
+    return analyze_tokens(page_text, _get_all_rules(), _tokens_for_page, display_lang)
+
+
+# ---- library export ----------------------------------------------------
+
+
+_CEFR_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"]
+
+_GOLDEN_PATH = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "jlpt_data",
+        "grammar_ar_golden.json",
+    )
+)
+
+_golden_cache = None
+
+
+def _golden_examples():
+    """
+    Curated example sentences for the hand-written rules.
+
+    Keyed ``key -> [{"arabic", "zh"}, ...]``.  The golden set is the single
+    store of these examples: the tests re-run every sentence through its own
+    rule, and the library serves the same sentences to readers, so the page
+    can never show a point whose matcher does not actually recognise it.
+    """
+    global _golden_cache  # pylint: disable=global-statement
+    with _rules_lock:
+        if _golden_cache is None:
+            examples = {}
+            if os.path.exists(_GOLDEN_PATH):
+                with open(_GOLDEN_PATH, encoding="utf-8") as fh:
+                    for key, entry in json.load(fh).items():
+                        examples[key] = [
+                            e
+                            for e in entry.get("examples") or []
+                            if (e.get("arabic") or "").strip()
+                        ]
+            _golden_cache = examples
+        return _golden_cache
+
+
+def _library_entry(rule, display_lang):
+    "One rule as a library-page row, with its formation / notes / examples."
+    rows = []
+    for example in rule.get("examples") or []:
+        if isinstance(example, dict):
+            text = (example.get("arabic") or example.get("text") or "").strip()
+            if not text:
+                continue
+            tr = ""
+            if display_lang == "zh":
+                tr = (example.get("zh") or "").strip()
+            elif display_lang == "ko":
+                tr = (example.get("ko") or "").strip()
+            else:
+                tr = (example.get("en") or "").strip()
+            rows.append({"text": text, "tr": tr} if tr else text)
+        else:
+            text = (example or "").strip()
+            if text:
+                rows.append(text)
+    entry = {
+        "key": rule["key"],
+        "name": rule["name"],
+        "level": rule["level"],
+        "desc": desc_for_rule(rule, display_lang),
+        "examples": rows,
+        "skipped": False,
+    }
+    for field in ("formation", "notes"):
+        value = (rule.get(field) or "").strip()
+        if value:
+            entry[field] = value
+    return entry
+
+
+def library_entries(display_lang="en"):
+    """
+    The whole Arabic grammar library, in CEFR order (A1 -> C2).
+
+    Hand-written rules take their examples from the golden set; the merged
+    data rows carry their own.  Built on first use so an app start-up with
+    no Arabic books does not pay for pyarabic.
+    """
+    golden = _golden_examples()
+    rules = []
+    for rule in _AR_RULES:
+        if not rule.get("examples"):
+            rule = dict(rule)
+            rule["examples"] = golden.get(rule["key"]) or []
+        rules.append(rule)
+    rules += _get_data_rules()
+    entries = [_library_entry(rule, display_lang) for rule in rules]
+    ordered = sorted(
+        enumerate(entries),
+        key=lambda pair: (
+            _CEFR_ORDER.index(pair[1]["level"])
+            if pair[1]["level"] in _CEFR_ORDER
+            else 9,
+            pair[0],
+        ),
+    )
+    return [entry for _, entry in ordered]

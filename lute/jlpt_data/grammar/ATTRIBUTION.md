@@ -33,6 +33,20 @@ private-authors/private-authors, private-press 2014), transcribed into
 - These entries are a derivative of the CC BY-SA 4.0 data ecosystem and are
   distributed under **CC BY-SA 4.0** as well.
 
+### Coverage-audit gap-fill entries (65 entries, 2026-10-16)
+
+65 further entries written for this project after a coverage audit against a
+public JLPT grammar list.  The audit compared point names only; every
+`meaning`, `formation`, and example sentence here is written for this project.
+The `sources` field of each such entry records the cross-check.
+
+- Counts: N1 29, N2 19, N3 16, N4 1 (total 65; three audited candidates —
+  それが sentence connector, 〜っぱい, からの — were deliberately dropped
+  because their literal fragments would false-positive on common unrelated
+  text).
+- Same matching pipeline as above: specs derived from `pattern` at load time
+  and validated against each entry's own examples.
+
 Entries whose construction jkindrix already carries (or that are bare
 vocabulary) are listed in `_VOCAB_IDS` / `_DUPLICATE_IDS` inside
 `lute/read/render/grammar_analysis_ja.py` and never fire; the merged
@@ -46,7 +60,7 @@ rules.  Nothing in this directory is hand-tuned per entry.
 
 ## `zh.json`
 
-Simplified-Chinese glosses for all 1310 entries above, keyed by the upstream
+Simplified-Chinese glosses for all 1375 entries above, keyed by the upstream
 `id`.  Written for this project (Song), so the reading-page grammar panel can
 describe points in Chinese; the glosses for the jkindrix 595 are a derivative
 of the CC BY-SA 4.0 data above and are distributed under the same license.
@@ -97,9 +111,42 @@ the CC BY-SA 4.0 source above and is distributed under the same license; the
 material half is a derivative of the CC BY-SA 4.0 data ecosystem and is
 distributed under CC BY-SA 4.0 as well.
 
+## `ko_enrichment.json`
+
+Korean wording for the same three fields, extended to *every* entry rather
+than the jkindrix 595 — the panel's Korean display language needs a gloss on
+the merged material rows too, and those ship only `chinese`.  Shape as above;
+1310 of the 1376 entries carry a `formation` line and all 1310 carry the
+notes block, while **all 4007 sentences carry a translation** — the same
+sentences `zh_enrichment.json` and `en_enrichment.json` cover, so the Korean
+panel never quotes bare Japanese.  The 66 entries with `examples` only are
+the merged material rows, whose `formation` and notes are already covered by
+the Chinese file.  The sentences are keyed by the Japanese sentence, so an
+index shift can never mis-assign one; a sentence shared by two entries is
+stored under both ids, because the panel looks the gloss up by entry id.
+Written for this project (Song), distributed under **CC BY-SA 4.0**.
+
+## `en_enrichment.json`
+
+English wording for the merged material rows' example sentences, keyed by the
+upstream `id`:
+
+```json
+{"atodeatoha": {"examples": {"毎日、晩ご飯のあとで、…テレビを見ます。": "Every day after dinner I watch TV …"}}}
+```
+
+The mirror image of `zh_enrichment.json`.  The 595 vendored rows ship
+`english` on every example, but the 715 merged material rows were transcribed
+from Chinese-language study materials and carry only `chinese`, so the
+English panel quoted 2025 bare Japanese sentences (the Chinese panel was
+already complete).  Only `examples` is present — the `formation` and notes
+columns of those rows are already English.  Translations are written for this
+project (Song) and distributed under **CC BY-SA 4.0**, as a derivative of the
+data ecosystem above.
+
 ## `ko.json`
 
-Korean glosses for all 1310 entries, mirroring `zh.json` (한국어 display
+Korean glosses for all 1375 entries, mirroring `zh.json` (한국어 display
 language of the panel).  Same license terms as `zh.json`.
 
 ## N5 hand-written rules
@@ -168,3 +215,83 @@ kimchi snapshot above under a different name (`A/V-거니와`, `V-지 그래요?
 then a bug in the coverage audit's containment test was found to be hiding real
 gaps, and fixing it surfaced 26 more points plus one re-merge, taking the total
 to 63.
+
+## `../grammar_th.json` — 286 entries (2026-10-17)
+
+The Thai grammar library: one row per grammar point.  The inventory was
+assembled from the section outline of a standard reference grammar of Thai
+(the `section` field keeps that outline's numbering, so a card can be traced
+to where the point is described; `topic` is the coarse area — verb, particle,
+question, …).  Point names, `formation` lines and the English and Chinese
+glosses were written for this project; the `examples` are the short
+illustrative sentences carried by the reference materials themselves (a few
+words each, at most three per row), kept as citation-style illustrations of
+the pattern.  Each example string is `"thai · romanisation — english ／ 中文"`:
+the Chinese after the ` ／ ` is a translation written for this project and is
+rendered on its own line by `templates/grammar/detail.html`.
+
+- Levels are CEFR bands (A1–C1) used as a display approximation.  Thai has no
+  JLPT/TOPIK-style grading, so the corpus is an inventory, not a graded
+  syllabus: the bands say "core / intermediate / advanced", nothing more.
+- A row fires when one of its `focus` literals occurs in the sentence — see
+  `_get_corpus_rules()` in `lute/read/render/grammar_analysis_th.py`.  The
+  match runs over the sentence text rather than over tokens, because Thai is
+  written without word spaces and the tokenizer splits fixed expressions.
+- A row whose triggers are already owned by a hand-written rule carries no
+  rule of its own (`focus_all` keeps the literals so the library can still
+  report it as matchable); a row with no usable literal is shown as
+  "reference only".
+- `grammar_th.json` is the source of truth and is maintained by hand; there is
+  no generator that rebuilds it from a source file.
+
+### Chapter 16 — `section` 16.1–16.11, 11 rows
+
+The first pass covered the outline above.  A second reference grammar of Thai
+was then read for **coverage only**: it is transcribed in a romanised
+phonetic script rather than Thai script, so it supplied no example sentences,
+but its inventory of minor form-classes could be checked against the corpus.
+Everything it lists as a distinct form-class turned out to be already covered
+by chapters 3–15 except for the eleven points below, which were written for
+this project (Thai script, romanisation, English and Chinese glosses, and the
+example sentences are new):
+
+    ด้วยกัน · เดี๋ยวนี้ · จนกว่า · จนถึง · ทันที · ทีเดียว
+    ถึงจะ · ตามที่ · เนื่องจาก · การที่ · กระทั่ง
+
+Chapter 16 is therefore an addition to the outline, not a transcription of it.
+
+# Arabic grammar data
+
+## `../grammar_ar.json` — 83 entries (2026-10-19)
+
+The Arabic grammar library: one row per point, built from the section
+outline of three reference grammars of Arabic — two modern-standard
+teaching grammars and one classical نحو primer.  Only the outline (which
+points a course teaches, and in what order) was taken from them; the row
+wording, the Chinese glosses and the `focus` sequences were written for
+this project.  Book titles are deliberately not recorded here.
+
+- Every row is anchored on literal word forms.  `pyarabic` ships no
+  part-of-speech tagger, so a `focus` list is a surface sequence, with at
+  most one bounded gap (`"..."`) or an `a/b` alternative set — never a
+  `§`-style word-class slot.  Points that need case or mood analysis
+  (الإعراب endings, أوزان الصرف, الحال / التمييز / البدل) are out of scope
+  and are not rows: without a tagger their spans cannot be validated.
+- Examples come from two places.  Where a reference text carries a clean
+  sentence for the point, that sentence is lifted as-is (vocalisation
+  included, after dropping lines that are paradigm notation or a page
+  fragment).  The remaining rows are illustrated with sentences written
+  for this project on the point the reference describes.  Every row is
+  re-checked through the engine matcher on its own examples by
+  `scripts/merge_grammar_ar_materials.py`, so a row whose `focus` never
+  fires on its examples cannot reach the panel.
+- Levels are CEFR bands (A1–C2) used as a display approximation; Arabic has
+  no JLPT/TOPIK-style grading.
+- `units.json` under `scripts/grammar_materials_ar/` is the source of
+  truth.  `grammar_ar.json` is rebuilt from it with
+  `python -m scripts.merge_grammar_ar_materials --write` (the rebuild is a
+  pure function of the materials; do not hand-edit the JSON).
+- `scripts/audit_grammar_ar_overlaps.py` re-derives
+  `grammar_analysis_ar._DUPLICATE_RULE_IDS` when the library grows; the
+  suffixed-pronoun rules (`ـها`, `ـهم/ـكم/ـنا`) exclude the particles they
+  would otherwise double-report.

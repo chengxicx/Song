@@ -29,6 +29,13 @@ def delete_all_data(session):
         "delete from reviewlogs",
         "delete from reviewcards",
         "delete from reviewspecs",
+        # Shadowing takes would cascade on the language delete, but every
+        # new table must be listed here or a wipe leaves it alive (the
+        # lesson the reviewspecs survival taught).
+        "delete from shadowattempts",
+        # Whole-book grammar analyses cascade on the book delete below, but
+        # every new table is listed here so a wipe cannot leave one alive.
+        "delete from bookgrammar",
         "delete from languages",
         "delete from tags",
         "delete from tags2",
@@ -127,6 +134,8 @@ def add_default_user_settings(session, default_user_backup_path):
         "japanese_sudachi_mode": "C",
         "japanese_reading": "hiragana",
         "current_theme": "Default.css",
+        # UI display language (lute.i18n): "en", "zh", "ja" or "ko".
+        "ui_language": "en",
         "custom_styles": "/* Custom css to modify Lute's appearance. */",
         "show_highlights": True,
         "current_language_id": 0,
@@ -140,6 +149,9 @@ def add_default_user_settings(session, default_user_backup_path):
         # Term popups:
         "term_popup_promote_parent_translation": True,
         "term_popup_show_components": True,
+        # The local dictionary's gloss is no longer a user setting: it is
+        # per language (Language.term_popup_show_dict_gloss), because the
+        # dictionary itself is now chosen per language.
         # Anki:
         "use_ankiconnect": False,
         "ankiconnect_url": "http://127.0.0.1:8765",
@@ -153,6 +165,7 @@ def add_default_user_settings(session, default_user_backup_path):
         # Review queue:
         "review_desired_retention": "0.9",
         "review_max_new_per_day": 20,
+        "review_max_shadowing_per_day": 10,
         "review_card_types": '{"recognition": 1, "cloze": 1}',
         "review_speak_cards": True,
     }

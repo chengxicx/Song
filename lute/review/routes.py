@@ -20,6 +20,7 @@ from lute.review import enqueue, scheduler, service
 from lute.review.forms import ReviewSettingsForm
 from lute.review.scheduler import SchedulerUnavailableError
 from lute.settings.current import refresh_global_settings
+from lute.i18n import t
 
 
 bp = Blueprint("review", __name__, url_prefix="/review")
@@ -64,6 +65,7 @@ def review_settings():
                 "submit",
                 "card_recognition",
                 "card_cloze",
+                "card_shadowing",
             ):
                 repo.set_value(field.id, field.data)
         enabled = [
@@ -71,22 +73,29 @@ def review_settings():
             for ct, field in (
                 ("recognition", form.card_recognition),
                 ("cloze", form.card_cloze),
+                ("shadowing", form.card_shadowing),
             )
             if field.data
         ]
         enqueue.set_enabled_card_types(db.session, enabled)
         db.session.commit()
         refresh_global_settings(db.session)
-        flash("Review settings updated.", "success")
+        flash(t("Review settings updated."), "success")
         return redirect("/review/index", 302)
 
     enabled = enqueue.enabled_card_types(db.session)
     form.card_recognition.data = "recognition" in enabled
     form.card_cloze.data = "cloze" in enabled
+    form.card_shadowing.data = "shadowing" in enabled
 
     # Show what is actually stored, so the form is not the only truth.
     for field in form:
-        if field.id in ("csrf_token", "card_recognition", "card_cloze"):
+        if field.id in (
+            "csrf_token",
+            "card_recognition",
+            "card_cloze",
+            "card_shadowing",
+        ):
             continue
         try:
             field.data = repo.get_value(field.id)
@@ -121,6 +130,7 @@ def grade():
             int(data["card_id"]),
             int(data["rating"]),
             data.get("typed"),
+            shadowing_score=data.get("shadowing_score"),
         )
         return jsonify(ret)
     except SchedulerUnavailableError as ex:

@@ -16,6 +16,7 @@ from lute.models.srsexport import SrsExportSpec
 from lute.ankiexport.forms import SrsExportSpecForm
 from lute.ankiexport.exceptions import AnkiExportConfigurationError
 from lute.db import db
+from lute.i18n import t
 
 
 bp = Blueprint("ankiexport", __name__, url_prefix="/ankiexport")
@@ -95,7 +96,7 @@ def delete_spec(spec_id):
     spec = db.session.query(SrsExportSpec).filter(SrsExportSpec.id == spec_id).first()
     db.session.delete(spec)
     db.session.commit()
-    flash("Export mapping deleted.")
+    flash(t("Export mapping deleted."))
     return redirect("/ankiexport/index", 302)
 
 

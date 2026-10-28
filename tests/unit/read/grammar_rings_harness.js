@@ -28,6 +28,12 @@ const modPath = process.argv[2];
 
 /* ---------- fake layout ---------- */
 
+
+/* The reading page injects window.I18N via base.html; the harness runs
+   the module bare in Node, so provide the identity fallback it uses. */
+globalThis.LUTE_I18N = {};
+globalThis.I18N = { t: (k) => k };
+
 const CHAR_W = 10;
 const LINE_TOP = 50;
 const LINE_H = 20;
@@ -107,6 +113,13 @@ const sentenceNode = new FakeEl("span");
 sentenceNode.classes.add("textsentence");
 sentenceNode.textContent = "AAA。BBB。";
 sentenceNode.qaAll[".textitem"] = [cell1, cell2];
+// grammarVisibleText walks the node's text nodes (skipping rt/rp), so the
+// sentence's visible text comes from its text nodes, not textContent --
+// mirror the real DOM where the sentence's text lives in the cells.
+sentenceNode.textNodes = [
+  { data: "AAA。", cell: cell1 },
+  { data: "BBB。", cell: cell2 },
+];
 
 const textRoot = new FakeEl("div");
 textRoot.qaAll[".textsentence"] = [sentenceNode];

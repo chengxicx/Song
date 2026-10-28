@@ -25,7 +25,7 @@ from types import SimpleNamespace
 
 import lute
 from lute.book.types import subtitle_book_types
-from lute.read.routes import _page_cue_line_map
+from lute.read.routes import _cue_page_starts, _page_cue_line_map
 
 _STATIC_JS = os.path.join(os.path.dirname(lute.__file__), "static", "js")
 _TEMPLATES = os.path.join(os.path.dirname(lute.__file__), "templates", "read")
@@ -34,6 +34,7 @@ _ROUTES = os.path.join(os.path.dirname(lute.__file__), "read", "routes.py")
 PLAYING_LINE_JS = os.path.join(_STATIC_JS, "lute-playing-line.js")
 MEDIA_JS = os.path.join(_STATIC_JS, "media-player-base.js")
 TTS_JS = os.path.join(_STATIC_JS, "tts-player.js")
+TTS_UI_JS = os.path.join(_STATIC_JS, "tts-ui.js")
 INDEX_HTML = os.path.join(_TEMPLATES, "index.html")
 PAGE_CONTENT_HTML = os.path.join(_TEMPLATES, "page_content.html")
 
@@ -129,6 +130,55 @@ def test_a_non_subtitle_book_has_no_map():
     assert _page_cue_line_map(book, 1) == []
 
 
+# ---------------------------------------------------------------------
+# The per-page first cue index.
+#
+# The players turn the page when the playhead leaves the page being read,
+# and they resolve "which page" from this map.  It is positional, exactly
+# like the line map above, so the tests are about drift: an off-by-one
+# here does not fail loudly, it sends the reader one page off.
+
+
+def test_the_starts_are_the_first_cue_of_each_page():
+    book = _book(
+        _SUBTITLE_TYPE,
+        [_cue("a"), _cue("b"), _cue("c"), _cue("d")],
+        [(1, "a\nb"), (2, "c\nd")],
+    )
+    assert _cue_page_starts(book) == [0, 2]
+
+
+def test_a_multiline_cue_is_counted_by_its_lines():
+    "A two-line subtitle pushes the next page's first cue along by two."
+    book = _book(_SUBTITLE_TYPE, [_cue("a\nb"), _cue("c")], [(1, "a\nb"), (2, "c")])
+    assert _cue_page_starts(book) == [0, 1]
+
+
+def test_a_page_that_runs_past_the_cues_has_no_starts():
+    """
+    The page text is hand-editable, so it can gain a line the cues don't
+    cover -- which would shift every later page.  No map, so the reader
+    follows nothing rather than turning to a page that is off by one.
+    """
+    book = _book(_SUBTITLE_TYPE, [_cue("a")], [(1, "a\nb")])
+    assert _cue_page_starts(book) == []
+
+
+def test_a_hole_in_the_page_numbers_has_no_starts():
+    "Page numbers must run 1..N; a deleted page leaves a hole."
+    book = _book(_SUBTITLE_TYPE, [_cue("a"), _cue("b")], [(1, "a"), (3, "b")])
+    assert _cue_page_starts(book) == []
+
+
+def test_a_book_without_cues_has_no_starts():
+    assert _cue_page_starts(_book(_SUBTITLE_TYPE, [], [(1, "a")])) == []
+
+
+def test_a_non_subtitle_book_has_no_starts():
+    "A plain text book has no cues, so there is no page to follow into."
+    assert _cue_page_starts(_book("text", [_cue("a")], [(1, "a")])) == []
+
+
 def test_the_reading_page_loads_the_helper():
     """
     Without this script the whole feature is silent: the players call
@@ -198,3 +248,144 @@ def test_the_tts_player_marks_and_clears_the_sentence():
     assert "LutePlayingLine.clear()" in _function_body(
         js, "ttsDeactivateCue"
     ), "the mark must come off when the TTS player stops"
+
+
+# ---------------------------------------------------------------------
+# Following the playhead across pages.
+#
+# Two halves, both silent when either is missing: the reading page has to
+# ship the per-page cue map and expose the follow helper, and the players
+# have to call it at the right moment.  The helper lives in the reading
+# page's own script (curScreen / subScreens are plain top-level bindings,
+# so nothing outside can reach them), and the call sites are inside
+# closures -- hence the source checks, as for the call sites above.
+
+
+def test_the_reading_page_ships_the_page_starts():
+    "Without the map the media side cannot tell which page a cue is on."
+    assert "LUTE_CUE_PAGE_STARTS" in _read(INDEX_HTML)
+    routes = _read(_ROUTES)
+    assert "cue_page_starts=_cue_page_starts(book)" in routes, (
+        "the reading page must be handed the per-page cue starts"
+    )
+
+
+def test_the_reading_page_exposes_the_follow_helper():
+    """
+    showLine / pageOfCue / requestPage are what the players call.  A
+    missing member is a silent no-op at the call site.
+    """
+    html = _read(INDEX_HTML)
+    assert "window.LuteReaderFollow" in html
+    for member in ("showLine:", "pageOfCue:", "requestPage:", "active:"):
+        assert member in html, f"LuteReaderFollow must expose {member}"
+    # The turn must not go through navigateNext(): that runs
+    # handle_page_done, which marks the reader's words as known.
+    assert "goto_relative_page(target - now)" in html
+
+
+def test_the_media_player_follows_the_playhead():
+    js = _read(MEDIA_JS)
+    assert "ytFollowPlayhead(idx)" in _function_body(js, "ytActivateCue"), (
+        "activating a cue must also move the page text to it"
+    )
+    follow = _function_body(js, "ytFollowPlayhead")
+    assert "LuteReaderFollow" in follow
+    assert "requestPage(" in follow
+    # Not while paused: the cue activated when the book opens is the seek
+    # to the saved position, and paging under a paused reader is not
+    # following anything.
+    assert "ytPlaying" in follow
+
+
+def test_the_tts_player_turns_the_page_and_resumes():
+    js = _read(TTS_JS)
+    assert "ttsFollowToNextPage()" in _function_body(js, "ttsAdvance"), (
+        "running out of cues must try the next page before stopping"
+    )
+    follow = _function_body(js, "ttsFollowToNextPage")
+    assert "ttsContinueOnSwap = true" in follow
+    assert "requestPage(" in follow
+    # The cue list is per page, so the rebuild after the swap is what
+    # resumes -- tts-ui.js owns that rebuild.
+    ui = _read(TTS_UI_JS)
+    assert "ttsContinueOnSwap" in ui, (
+        "the cue rebuild must know a page turn is waiting to resume"
+    )
+    assert "ttsPlayCue(0)" in ui, (
+        "the rebuilt page's first cue is where the reading goes on"
+    )
+
+
+# ---------------------------------------------------------------------
+# The subtitle strip's height.
+#
+# The strip sits in the flow above the reading text, which the page
+# re-flows to fill the space left over (read/index.html
+# _splitToScreens on a ResizeObserver watching #thetext).  A cue that
+# wraps onto a second line must not make the strip taller than a
+# one-line cue, or the text below is re-paginated on every other
+# sentence -- measured on an MP3 book: the strip went 63px -> 114px and
+# the text moved 51px.
+
+
+_CSS = os.path.join(os.path.dirname(lute.__file__), "static", "css", "player-styles.css")
+
+YT_PLAYERS = [os.path.join(_STATIC_JS, "youtube-player.js"),
+              os.path.join(_STATIC_JS, "bilibili-player.js")]
+
+
+def test_the_player_reserves_the_strip_height():
+    """
+    The shared engine publishes a reserved height for the strip and the
+    reading page's players apply it before the text is re-flowed -- an
+    engine that measures but nothing that publishes (or the reverse) is
+    a fix that silently does nothing.
+
+    The height is published through the shared registry, not written to
+    the document by the player itself: both bars (audio and TTS) reserve
+    on the same <body> property, so switching players doesn't resize the
+    strip.  That is why the property is checked on the registry here.
+    """
+    js = _read(MEDIA_JS)
+    sync = _function_body(js, "ytSyncStripHeight")
+    assert 'LuteStripReserve.publish("media"' in sync, (
+        "ytSyncStripHeight must publish the reserved height, or the strip"
+        " falls back to the stylesheet's height and moves on every cue"
+    )
+    registry = js[js.index("window.LuteStripReserve = {"):]
+    assert 'setProperty("--yt-subtitle-reserve"' in registry, (
+        "the registry must write the reserved height as"
+        " --yt-subtitle-reserve on <body>"
+    )
+    assert "ytSyncStripHeight()" in _function_body(js, "ytActivateCue"), (
+        "each cue activation must keep the strip's height settled"
+    )
+    for path in YT_PLAYERS:
+        name = os.path.basename(path)
+        assert "api.syncStripHeight()" in _read(path), (
+            f"{name} must apply the strip's reserved height at init, or"
+            " the reading page is first laid out for a strip height that"
+            " changes as soon as playback starts"
+        )
+
+
+def test_the_stylesheet_uses_the_reserved_height():
+    """
+    The reserve is a min-height on the strip: a cue taller than anything
+    measured still grows the strip instead of being cut off, and the
+    mobile mini-bar rules (one non-wrapping line) keep their own height.
+    """
+    css = _read(_CSS)
+    base = css[css.index(".yt-scrolling-subtitle {") :]
+    base = base[: base.index("}")]
+    assert "min-height: var(--yt-subtitle-reserve," in base, (
+        "the strip's min-height must come from --yt-subtitle-reserve"
+    )
+    # The collapsed mobile mini-bar keeps its fixed height: its strip is
+    # one line that cannot wrap, so it has nothing to reserve.
+    mini = css[css.index(".yt-scrolling-subtitle {\n    order: -1;") :]
+    mini = mini[: mini.index("}")]
+    assert "min-height: 2.75rem" in mini and "--yt-subtitle-reserve" not in mini, (
+        "the mobile mini-bar must keep its own fixed height"
+    )

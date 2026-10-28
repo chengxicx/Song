@@ -9,7 +9,7 @@ name = "lute_korean_parser"
 name = "lute3-korean"
 dynamic = ['version']
 description = "Learning Using Texts - Korean Parser"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 authors = [
   {name = "chengxicn"}
 ]
@@ -17,7 +17,7 @@ readme = "README_PyPi.md"
 
 dependencies = [
   "lute3>=3.4.2",
-  "kiwipiepy>=0.15.0"
+  "kiwipiepy>=0.22.0"
 ]
 
 

@@ -19,6 +19,7 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms.widgets import ListWidget, CheckboxInput
 
 from lute.book.types import selectable_type_choices, subtitle_book_types
+from lute.i18n import lazy_t
 
 # Global configuration for allowed audio files
 ALLOWED_AUDIO_EXTENSIONS = [
@@ -62,6 +63,23 @@ MEDIA_VALIDATION_MSG = (
     f"({', '.join(ALLOWED_MEDIA_EXTENSIONS)})"
 )
 
+# Decompressed-text formats accepted by the "Text file" upload.
+# The Kindle extensions mirror lute.book.kindle_parser.KINDLE_EXTENSIONS
+# (kept literal here to avoid importing the parser into the form module).
+ALLOWED_TEXT_EXTENSIONS = [
+    "txt",
+    "epub",
+    "mobi",
+    "azw",
+    "azw3",
+    "pdf",
+    "srt",
+    "vtt",
+]
+TEXT_VALIDATION_MSG = (
+    "Please upload a valid text (txt, epub, mobi, azw3, pdf, srt, vtt)"
+)
+
 # Book types whose reading text is generated from subtitles: the text
 # field holds the SRT original and the player follows srt_data cues.
 # Kept as a module-level name (used by routes too); derived from the
@@ -95,8 +113,8 @@ class NewBookForm(FlaskForm):
         "Text file",
         validators=[
             FileAllowed(
-                ["txt", "epub", "pdf", "srt", "vtt"],
-                "Please upload a valid text (txt, epub, pdf, srt, vtt)",
+                ALLOWED_TEXT_EXTENSIONS,
+                TEXT_VALIDATION_MSG,
             )
         ],
     )
@@ -174,8 +192,8 @@ class EditBookForm(FlaskForm):
         "Text file",
         validators=[
             FileAllowed(
-                ["txt", "epub", "pdf", "srt", "vtt"],
-                "Please upload a valid text (txt, epub, pdf, srt, vtt)",
+                ALLOWED_TEXT_EXTENSIONS,
+                TEXT_VALIDATION_MSG,
             )
         ],
     )
@@ -356,7 +374,7 @@ class BookSettingsForm(FlaskForm):
     """
 
     book_series_tags = SelectMultipleField(
-        "Book Sets tags",
+        lazy_t("Book Sets tags"),
         choices=[],
         widget=ListWidget(prefix_label=False),
         option_widget=CheckboxInput(),

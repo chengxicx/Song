@@ -1,0 +1,3254 @@
+[
+ {
+  "key": "dgm_WegenTrotzGenitiv__4f0bb6",
+  "name": "Wegen / Trotz + Genitiv",
+  "slug": "Wegen / Trotz + Genitiv",
+  "meaning": "because of / despite + genitive",
+  "type": "composite",
+  "examples": [
+   "Wegen des Regens bleiben alle zu Hause.",
+   "Trotz des Wetters wollte sie nicht Tennis spielen."
+  ],
+  "example_zh": [
+   "因为下雨，大家都待在家里。",
+   "尽管天气不好，她还是不想打网球。"
+  ],
+  "focus": [
+   "wegen",
+   "des"
+  ],
+  "zh": "wegen / trotz + 第二格（表原因、让步）",
+  "level": "B1",
+  "formation": "wegen / trotz / aufgrund + des + 名词(第二格)",
+  "notes": "这类介词后面的名词一律用第二格：wegen des Regens（阴性名词 des + -s）。",
+  "example_en": [
+   "Because of the rain, everyone is staying at home.",
+   "Despite the weather, she did not want to play tennis."
+  ]
+ },
+ {
+  "key": "dgm_amsten__1bc4de",
+  "name": "am + -sten",
+  "slug": "am + -sten",
+  "meaning": "superlative with am + -sten",
+  "type": "composite",
+  "examples": [
+   "Mein Sohn ist am ältesten.",
+   "Meine Tochter ist am ältesten."
+  ],
+  "example_zh": [
+   "我儿子年纪最大。",
+   "我女儿年纪最大。"
+  ],
+  "focus": [
+   "am",
+   "ältesten"
+  ],
+  "zh": "am + 形容词加 -sten 构成最高级",
+  "level": "B1",
+  "formation": "am / eine + 形容词最高级(-ste / -sten / -ster)",
+  "notes": "作状语用 am + 第三格最高级（am besten），作定语用 -ste 形式（die beste Lösung）。",
+  "example_en": [
+   "My son is the oldest.",
+   "My daughter is the oldest."
+  ]
+ },
+ {
+  "key": "dgm_Komparativals__baed3e",
+  "name": "Komparativ + als",
+  "slug": "Komparativ + als",
+  "meaning": "comparative with -er and als",
+  "type": "composite",
+  "examples": [
+   "Das Gymnasium ist größer als die Grundschule.",
+   "Der Saal ist größer als das Klassenzimmer."
+  ],
+  "example_zh": [
+   "文理中学比小学大。",
+   "礼堂比教室大。"
+  ],
+  "focus": [
+   "größer",
+   "als"
+  ],
+  "zh": "比较级：形容词加 -er，后接 als",
+  "level": "B1",
+  "formation": "形容词 + -er + als",
+  "notes": "德语比较级一律用 als 引导，不用英文的 than。",
+  "example_en": [
+   "The grammar school is bigger than the primary school.",
+   "The hall is bigger than the classroom."
+  ]
+ },
+ {
+  "key": "dgm_PassivmitModalverb__233e10",
+  "name": "Passiv mit Modalverb",
+  "slug": "Passiv mit Modalverb",
+  "meaning": "passive with a modal",
+  "type": "composite",
+  "examples": [
+   "Das Haus muss gebaut werden.",
+   "Die Rechnung muss bezahlt werden."
+  ],
+  "example_zh": [
+   "这栋房子必须建起来。",
+   "账单必须付清。"
+  ],
+  "focus": [
+   "werden"
+  ],
+  "zh": "情态动词 + werden + 分词",
+  "level": "B1",
+  "formation": "Modal + Partizip II + werden",
+  "notes": "情态动词变成被动时，被动不定式整体后移：Das Haus muss gebaut werden。",
+  "example_en": [
+   "The house has to be built.",
+   "The bill has to be paid."
+  ]
+ },
+ {
+  "key": "dgm_ZustandspassivistPartizip__cb5c46",
+  "name": "Zustandspassiv (ist + Partizip)",
+  "slug": "Zustandspassiv (ist + Partizip)",
+  "meaning": "stative passive with sein + participle",
+  "type": "composite",
+  "examples": [
+   "Das Haus ist gebaut.",
+   "Die Brücke ist gebaut."
+  ],
+  "example_zh": [
+   "房子已经建好了。",
+   "桥已经建好了。"
+  ],
+  "focus": [
+   "ist",
+   "gebaut"
+  ],
+  "zh": "用 sein 的状态被动，表示结果状态",
+  "level": "B2",
+  "formation": "sein + Partizip II",
+  "notes": "若动作已完成并留下结果状态，用 sein 而不用 werden：Die Tür ist geschlossen。",
+  "example_en": [
+   "The house has been built.",
+   "The bridge has been built."
+  ]
+ },
+ {
+  "key": "dgm_unbestimmterAkkusativ__72f1f8",
+  "name": "unbestimmter Akkusativ",
+  "slug": "unbestimmter Akkusativ",
+  "meaning": "indefinite accusative endings",
+  "type": "composite",
+  "examples": [
+   "Ich suche einen guten Arzt.",
+   "Wir kaufen eine neue Wohnung."
+  ],
+  "example_zh": [
+   "我在找一位好医生。",
+   "我们买一套新公寓。"
+  ],
+  "focus": [
+   "einen"
+  ],
+  "zh": "阳性/阴性不定冠词在第四格要变形（einen / eine）",
+  "level": "A1",
+  "formation": "einen (阳性) / eine (阴性) / ein (中性)",
+  "notes": "定冠词第四格：der→den、die→die、das→das；不定冠词第四格：ein→einen/eine/ein。",
+  "example_en": [
+   "I am looking for a good doctor.",
+   "We are buying a new flat."
+  ]
+ },
+ {
+  "key": "dgm_WechselpräpositionAkkusativ__b97017",
+  "name": "Wechselpräposition Akkusativ",
+  "slug": "Wechselpräposition Akkusativ",
+  "meaning": "two-way preposition with accusative (movement)",
+  "type": "composite",
+  "examples": [
+   "Wir fahren in die Berge.",
+   "Sie gehen heute in die Berge."
+  ],
+  "example_zh": [
+   "我们到山里去。",
+   "他们今天到山里去。"
+  ],
+  "focus": [
+   "in",
+   "die",
+   "Berge"
+  ],
+  "zh": "可分介词接第四格表示移动方向",
+  "level": "A2",
+  "formation": "in / an / auf / über / unter / vor / zwischen + Akkusativ",
+  "notes": "同一介词接第三格表示位置（in der Stadt 城里），接第四格表示方向（in die Stadt 去城里）。",
+  "example_en": [
+   "We are driving into the mountains.",
+   "They are going into the mountains today."
+  ]
+ },
+ {
+  "key": "dgm_PräpositionDativinderStadt__32d17b",
+  "name": "Präposition + Dativ (in der Stadt)",
+  "slug": "Präposition + Dativ (in der Stadt)",
+  "meaning": "preposition + dative (location)",
+  "type": "composite",
+  "examples": [
+   "Sie arbeitet in der Stadt.",
+   "Meine Schwester wohnt in der Stadt."
+  ],
+  "example_zh": [
+   "她在城里工作。",
+   "我姐姐住在城里。"
+  ],
+  "focus": [
+   "in",
+   "der",
+   "Stadt"
+  ],
+  "zh": "表示地点的介词短语接第三格",
+  "level": "A2",
+  "formation": "in / an / auf / bei / mit / nach / seit / von / zu + Dativ",
+  "notes": "有方向含义的介词（in/auf/zu/von）接第三格时是固定用法：in der Stadt arbeiten。",
+  "example_en": [
+   "She works in the town.",
+   "My sister lives in the town."
+  ]
+ },
+ {
+  "key": "dgm_PerfektmitModalverb__ee8ba1",
+  "name": "Perfekt mit Modalverb",
+  "slug": "Perfekt mit Modalverb",
+  "meaning": "modal in the perfect keeps the infinitive",
+  "type": "composite",
+  "examples": [
+   "Viele Leute haben schwimmen können.",
+   "Die Schüler haben schwimmen können."
+  ],
+  "example_zh": [
+   "很多人会游泳。",
+   "学生们会游泳。"
+  ],
+  "focus": [
+   "haben",
+   "schwimmen",
+   "können"
+  ],
+  "zh": "情态动词的完成时保留原形，不用分词",
+  "level": "B2",
+  "formation": "haben / sein + Modal + Infinitiv",
+  "notes": "这是德语学习者最常错的地方：说成 *hat gekonnt* 是错的，正确是 hat können。",
+  "example_en": [
+   "Many people were able to swim.",
+   "The pupils were able to swim."
+  ]
+ },
+ {
+  "key": "dgm_Doppelinfinitivsehenlassen__705dda",
+  "name": "Doppelinfinitiv (sehen / lassen)",
+  "slug": "Doppelinfinitiv (sehen / lassen)",
+  "meaning": "double infinitive after perception and causation verbs",
+  "type": "composite",
+  "examples": [
+   "Ich sehe sie im Garten arbeiten.",
+   "Wir hören den Mann Gitarre spielen."
+  ],
+  "example_zh": [
+   "我看见她在花园里干活。",
+   "我们听见那个男人弹吉他。"
+  ],
+  "focus": [
+   "sehen"
+  ],
+  "zh": "感官/使役动词后接双不定式",
+  "level": "B2",
+  "formation": "sehen / hören / lassen / fühlen + Infinitiv（留在句尾）",
+  "notes": "两个不定式都在句尾：Ich sehe ihn kommen。 lassen 还可以拆成 lassen + zu + Infinitiv。",
+  "example_en": [
+   "I see her working in the garden.",
+   "We hear the man playing the guitar."
+  ]
+ },
+ {
+  "key": "dgm_Infinitivsatzmitumohne__b26c8a",
+  "name": "Infinitivsatz mit um / ohne",
+  "slug": "Infinitivsatz mit um / ohne",
+  "meaning": "infinitive clauses with um / ohne",
+  "type": "composite",
+  "examples": [
+   "Sie geht nach Hause, ohne dafür zu bezahlen.",
+   "Er lernt Russisch, um in Moskau zu arbeiten."
+  ],
+  "example_zh": [
+   "她回家却不付钱。",
+   "他学俄语，以便在莫斯科工作。"
+  ],
+  "focus": [
+   "ohne"
+  ],
+  "zh": "用 zu 不定式表达目的或方式",
+  "level": "B2",
+  "formation": "um ... zu / ohne ... zu / anstatt ... zu + Infinitiv",
+  "notes": "同一个主句动词只能带一个 zu；主句动词若在句尾，不定式从句的 zu 也在句尾。",
+  "example_en": [
+   "She goes home without paying for it.",
+   "He is learning Russian in order to work in Moscow."
+  ]
+ },
+ {
+  "key": "dgm_KonjunktivIberichtetedasssei__a27580",
+  "name": "Konjunktiv I (berichtete, dass ... sei)",
+  "slug": "Konjunktiv I (berichtete, dass ... sei)",
+  "meaning": "Konjunktiv I for indirect speech",
+  "type": "composite",
+  "examples": [
+   "Der Reporter berichtete, dass niemand die Rede verstehe.",
+   "Der Reporter berichtete, dass die alte Frau gestorben sei."
+  ],
+  "example_zh": [
+   "记者报道说没有人听懂演讲。",
+   "记者报道说那位老妇人去世了。"
+  ],
+  "focus": [
+   "dass"
+  ],
+  "zh": "转述他人话时用虚拟式 I",
+  "level": "C1",
+  "formation": "berichten / fragen, dass + 主语 + 虚拟式 I（sei/habe/werde）",
+  "notes": "Konjunktiv I 的形式（sei/seien/habe/werde）在当代口语中常被 Konjunktiv II 替代。",
+  "example_en": [
+   "The reporter reported that nobody understood the speech.",
+   "The reporter reported that the old woman had died."
+  ]
+ },
+ {
+  "key": "dgm_KonjunktivIIwürdehättewäre__7929d1",
+  "name": "Konjunktiv II (würde / hätte / wäre)",
+  "slug": "Konjunktiv II (würde / hätte / wäre)",
+  "meaning": "Konjunktiv II for unreal conditions and politeness",
+  "type": "composite",
+  "examples": [
+   "An deiner Stelle würde ich sofort absagen.",
+   "Wenn ich mehr Zeit hätte, würde ich einen Kurs machen."
+  ],
+  "example_zh": [
+   "换作是我，我会马上拒绝。",
+   "如果我有更多时间，我会去上一门课。"
+  ],
+  "focus": [
+   "würde"
+  ],
+  "zh": "虚拟式 II：非现实假设与礼貌请求",
+  "level": "B1",
+  "formation": "würde + Infinitiv / hätte + Infinitiv / wäre + Infinitiv",
+  "notes": "hätte/wäre/könnte 用动词过去式加 -te；其他动词多用 würde + 原形。",
+  "example_en": [
+   "If I were you, I would cancel right away.",
+   "If I had more time, I would take a course."
+  ]
+ },
+ {
+  "key": "dgm_Relativsatzmitwelch__a72fac",
+  "name": "Relativsatz mit welch-",
+  "slug": "Relativsatz mit welch-",
+  "meaning": "relative clauses with welch- and preposition + -r",
+  "type": "composite",
+  "examples": [
+   "Die Nachbarin, die dort wohnt, ist freundlich.",
+   "Die Kollegin, die hier wohnt, ist freundlich."
+  ],
+  "example_zh": [
+   "住在那里的女邻居很和善。",
+   "住在这里的女同事很和善。"
+  ],
+  "focus": [
+   "wohnt",
+   "ist"
+  ],
+  "zh": "关系从句：关系代词承担被修饰名词的格",
+  "level": "B2",
+  "formation": "der/die/das/welcher/welche/welches + 谓语动词（句尾）",
+  "notes": "介词 +关系代词要加尾附音 -r：der/die/das（关系到介词后时）→ dem/denen/deren。",
+  "example_en": [
+   "The neighbour who lives there is friendly.",
+   "The colleague who lives here is friendly."
+  ]
+ },
+ {
+  "key": "dgm_VerbenmitWechselpräpositionwartenauf__b444d1",
+  "name": "Verben mit Wechselpräposition (warten auf)",
+  "slug": "Verben mit Wechselpräposition (warten auf)",
+  "meaning": "separable verbs with their prefix at the clause end",
+  "type": "composite",
+  "examples": [
+   "Ich warte seit einer Stunde auf den Bus.",
+   "Wir freuen uns auf deinen Besuch."
+  ],
+  "example_zh": [
+   "我等公交车已经一个小时了。",
+   "我们很期待你的来访。"
+  ],
+  "focus": [
+   "warten"
+  ],
+  "zh": "可分动词的前缀后置到句尾",
+  "level": "A2",
+  "formation": "warten auf / sich freuen auf / denken an / sich interessieren für",
+  "notes": "前缀在句末，时态与情态动词仍变位在第二位：Ich warte auf dich。",
+  "example_en": [
+   "I have been waiting for the bus for an hour.",
+   "We are looking forward to your visit."
+  ]
+ },
+ {
+  "key": "dgm_ReflexivesVerbsichfreuen__337920",
+  "name": "Reflexives Verb (sich freuen)",
+  "slug": "Reflexives Verb (sich freuen)",
+  "meaning": "reflexive verbs with sich",
+  "type": "composite",
+  "examples": [
+   "Ich freue mich über deine Einladung.",
+   "Wir interessieren uns für alte Möbel."
+  ],
+  "example_zh": [
+   "我很高兴收到你的邀请。",
+   "我们对旧家具感兴趣。"
+  ],
+  "focus": [
+   "sich"
+  ],
+  "zh": "德语大量动词是反身动词，须带 sich",
+  "level": "A2",
+  "formation": "sich + Verb（sich freuen / sich beeilen / sich interessieren）",
+  "notes": "反身代词随格变化：ich freue mich（第四格）、ich freue mich über ihn（第三格）。",
+  "example_en": [
+   "I am delighted about your invitation.",
+   "We are interested in old furniture."
+  ]
+ },
+ {
+  "key": "dgm_Ordinalzahlenderdritte__97ec68",
+  "name": "Ordinalzahlen (der dritte)",
+  "slug": "Ordinalzahlen (der dritte)",
+  "meaning": "ordinal numbers and ordinal adverbs",
+  "type": "composite",
+  "examples": [
+   "Der dritte Mai ist ein Feiertag.",
+   "Wir treffen uns am zwanzigsten Mai."
+  ],
+  "example_zh": [
+   "五月三日是假日。",
+   "我们五月二十日见面。"
+  ],
+  "focus": [
+   "dritte"
+  ],
+  "zh": "序数词：1-19 加 -te，20 以上加 -ste",
+  "level": "A2",
+  "formation": "der/die/das + 序数词（zweiter/dritte/vierte ... zwanzigste）",
+  "notes": "1-3 的序数词不规则：erste/zweite/dritte（缩写 1./2./3.）；20 以上以 -zig 结尾的加 -ste。",
+  "example_en": [
+   "The third of May is a public holiday.",
+   "We are meeting on the twentieth of May."
+  ]
+ },
+ {
+  "key": "dgm_UhrzeitumneunUhr__331724",
+  "name": "Uhrzeit (um neun Uhr)",
+  "slug": "Uhrzeit (um neun Uhr)",
+  "meaning": "telling the time with Uhr",
+  "type": "composite",
+  "examples": [
+   "Der Zug fährt um neun Uhr ab.",
+   "Der Film beginnt um neun Uhr."
+  ],
+  "example_zh": [
+   "火车九点发车。",
+   "电影九点开始。"
+  ],
+  "focus": [
+   "neun",
+   "Uhr"
+  ],
+  "zh": "钟点用 Uhr，点钟用 vor/nach",
+  "level": "A1",
+  "formation": "um + 时间 + Uhr（缩写）/ vor halb / nach halb",
+  "notes": "整点直接用数字（um neun Uhr）；半点用 vor/nach + halb：halb neun = 8:30。",
+  "example_en": [
+   "The train leaves at nine o'clock.",
+   "The film starts at nine o'clock."
+  ]
+ },
+ {
+  "key": "dgm_VerneinungmitkeinkeineZeit__dba616",
+  "name": "Verneinung mit kein (keine Zeit)",
+  "slug": "Verneinung mit kein (keine Zeit)",
+  "meaning": "negating a noun with kein",
+  "type": "composite",
+  "examples": [
+   "Ich habe keine Zeit für dich.",
+   "Wir haben am Freitag keine Prüfung."
+  ],
+  "example_zh": [
+   "我没有时间陪你。",
+   "我们周五没有考试。"
+  ],
+  "focus": [
+   "keine"
+  ],
+  "zh": "否定名词用 kein / keine，不用 nicht",
+  "level": "A1",
+  "formation": "kein（阴性 keine / 第四格 keinen / 第三格 keinem）",
+  "notes": "nicht 否定动词、形容词和整句；kein 否定带冠词或零冠词的名词。",
+  "example_en": [
+   "I have no time for you.",
+   "We have no exam on Friday."
+  ]
+ },
+ {
+  "key": "dgm_BestimmterArtikelmaskulinesNomenderLehrer__e19eba",
+  "name": "Bestimmter Artikel + maskulines Nomen (der Lehrer)",
+  "slug": "Bestimmter Artikel + maskulines Nomen (der Lehrer)",
+  "meaning": "definite article with a masculine noun",
+  "type": "composite",
+  "examples": [
+   "Der Lehrer ist jung.",
+   "Der Mann ist krank."
+  ],
+  "example_zh": [
+   "这位老师很年轻。",
+   "那个男人病了。"
+  ],
+  "focus": [
+   "der",
+   "lehrer"
+  ],
+  "zh": "定冠词 der 标记阳性名词",
+  "level": "A1",
+  "formation": "der + 阳性名词（der Mann / der Lehrer / der Vater）",
+  "notes": "德语名词都有语法性别；der 是阳性名词的定冠词，须与名词一起记住。",
+  "example_en": [
+   "The teacher is young.",
+   "The man is ill."
+  ]
+ },
+ {
+  "key": "dgm_BestimmterArtikelfemininesNomendieFrau__504ee6",
+  "name": "Bestimmter Artikel + feminines Nomen (die Frau)",
+  "slug": "Bestimmter Artikel + feminines Nomen (die Frau)",
+  "meaning": "definite article with a feminine noun",
+  "type": "composite",
+  "examples": [
+   "Die Frau singt.",
+   "Die Dame ist freundlich."
+  ],
+  "example_zh": [
+   "这位女士在唱歌。",
+   "这位女士很友善。"
+  ],
+  "focus": [
+   "die",
+   "frau"
+  ],
+  "zh": "定冠词 die 标记阴性名词",
+  "level": "A1",
+  "formation": "die + 阴性名词（die Frau / die Tochter / die Dame）",
+  "notes": "die 是阴性名词的定冠词；指女性的名词通常为阴性。",
+  "example_en": [
+   "The woman is singing.",
+   "The lady is friendly."
+  ]
+ },
+ {
+  "key": "dgm_BestimmterArtikelneutralesNomendasKind__bb9b83",
+  "name": "Bestimmter Artikel + neutrales Nomen (das Kind)",
+  "slug": "Bestimmter Artikel + neutrales Nomen (das Kind)",
+  "meaning": "definite article with a neuter noun",
+  "type": "composite",
+  "examples": [
+   "Das Kind hat nichts genommen.",
+   "Das Mädchen ist klein."
+  ],
+  "example_zh": [
+   "这孩子什么都没拿。",
+   "这个小女孩很小。"
+  ],
+  "focus": [
+   "das",
+   "kind"
+  ],
+  "zh": "定冠词 das 标记中性名词",
+  "level": "A1",
+  "formation": "das + 中性名词（das Kind / das Haus / das Mädchen）",
+  "notes": "das 是中性名词的定冠词；指小孩和幼兽的名词通常为中性。",
+  "example_en": [
+   "The child did not take anything.",
+   "The girl is small."
+  ]
+ },
+ {
+  "key": "dgm_MaskulineEndungenerenellingderMantel__e416a3",
+  "name": "Maskuline Endungen -er/-en/-el/-ling (der Mantel)",
+  "slug": "Maskuline Endungen -er/-en/-el/-ling (der Mantel)",
+  "meaning": "masculine noun endings -er/-en/-el/-ling",
+  "type": "composite",
+  "examples": [
+   "Der Mantel hängt hier.",
+   "Der Wagen der Herren steht dort."
+  ],
+  "example_zh": [
+   "外套挂在这里。",
+   "先生们的车停在那里。"
+  ],
+  "focus": [
+   "der",
+   "mantel"
+  ],
+  "zh": "以 -er/-en/-el/-ling 结尾的名词多为阳性",
+  "level": "A2",
+  "formation": "der + 名词（-er/-en/-el/-ling：der Mantel / der Wagen / der Lehrling）",
+  "notes": "词尾 -er/-en/-el/-ling/-ich/-ig 常提示阳性，但 die Butter、die Mutter 是例外。",
+  "example_en": [
+   "The coat is hanging here.",
+   "The gentlemen's car is parked over there."
+  ]
+ },
+ {
+  "key": "dgm_MaskulineFremdendungenistentorderStudent__0357a3",
+  "name": "Maskuline Fremdendungen -ist/-ent/-or (der Student)",
+  "slug": "Maskuline Fremdendungen -ist/-ent/-or (der Student)",
+  "meaning": "masculine foreign suffixes -ist/-ent/-ant/-or/-är",
+  "type": "composite",
+  "examples": [
+   "Der Student kommt aus Berlin.",
+   "Der Professor ist sehr beliebt."
+  ],
+  "example_zh": [
+   "这名学生来自柏林。",
+   "这位教授很受欢迎。"
+  ],
+  "focus": [
+   "der",
+   "student"
+  ],
+  "zh": "外来词尾 -ist/-ent/-ant/-or/-är 多为阳性",
+  "level": "B1",
+  "formation": "der + 名词（-ist/-ent/-ant/-or/-är：der Student / der Pianist / der Professor）",
+  "notes": "表人的外来词多以这些词尾结尾，一律为阳性。",
+  "example_en": [
+   "The student comes from Berlin.",
+   "The professor is very popular."
+  ]
+ },
+ {
+  "key": "dgm_FeminineEndungenungheitkeitschaftiondieWohnung__3d6134",
+  "name": "Feminine Endungen -ung/-heit/-keit/-schaft/-ion (die Wohnung)",
+  "slug": "Feminine Endungen -ung/-heit/-keit/-schaft/-ion (die Wohnung)",
+  "meaning": "feminine noun endings -ung/-heit/-keit/-schaft/-ion",
+  "type": "composite",
+  "examples": [
+   "Die Wohnung ist modern.",
+   "Die Krankheit ist gefährlich."
+  ],
+  "example_zh": [
+   "这套公寓很现代。",
+   "这种病很危险。"
+  ],
+  "focus": [
+   "die",
+   "wohnung"
+  ],
+  "zh": "以 -ung/-heit/-keit/-schaft/-ion 结尾的名词为阴性",
+  "level": "A2",
+  "formation": "die + 名词（-ung/-heit/-keit/-schaft/-ion/-tät：die Wohnung / die Krankheit / die Nation）",
+  "notes": "这些抽象名词词尾几乎总是阴性，是判断性别最可靠的线索之一。",
+  "example_en": [
+   "The flat is modern.",
+   "The illness is dangerous."
+  ]
+ },
+ {
+  "key": "dgm_FemininePersonenbezeichnungaufindieLehrerin__c92516",
+  "name": "Feminine Personenbezeichnung auf -in (die Lehrerin)",
+  "slug": "Feminine Personenbezeichnung auf -in (die Lehrerin)",
+  "meaning": "feminine -in for female persons",
+  "type": "composite",
+  "examples": [
+   "Die Lehrerin ist intelligent.",
+   "Die Köchin kocht gut."
+  ],
+  "example_zh": [
+   "这位女教师很聪明。",
+   "这位女厨师做饭很好。"
+  ],
+  "focus": [
+   "die",
+   "lehrerin"
+  ],
+  "zh": "阳性名词加 -in 构成女性称谓",
+  "level": "A2",
+  "formation": "阳性名词 + -in → 阴性（der Lehrer → die Lehrerin）",
+  "notes": "复数加 -nen（die Lehrerinnen）；用于明确指称女性。",
+  "example_en": [
+   "The teacher is intelligent.",
+   "The cook cooks well."
+  ]
+ },
+ {
+  "key": "dgm_NeutraleVerkleinerungchenleindasMädchen__67699b",
+  "name": "Neutrale Verkleinerung -chen/-lein (das Mädchen)",
+  "slug": "Neutrale Verkleinerung -chen/-lein (das Mädchen)",
+  "meaning": "neuter diminutives in -chen/-lein",
+  "type": "composite",
+  "examples": [
+   "Das Mädchen fährt nicht heim.",
+   "Das Büchlein liegt hier."
+  ],
+  "example_zh": [
+   "这个小女孩不回家。",
+   "这本小书放在这里。"
+  ],
+  "focus": [
+   "das",
+   "mädchen"
+  ],
+  "zh": "指小词尾 -chen/-lein 一律为中性",
+  "level": "A2",
+  "formation": "das + 名词（-chen/-lein：das Mädchen / das Büchlein）",
+  "notes": "无论词干原性如何，加 -chen 或 -lein 后都变成中性（das Mädchen 指女孩却为中性）。",
+  "example_en": [
+   "The girl is not going home.",
+   "The little book is lying here."
+  ]
+ },
+ {
+  "key": "dgm_NeutraleFremdendungenmentumtumdasMuseum__1afbde",
+  "name": "Neutrale Fremdendungen -ment/-um/-tum (das Museum)",
+  "slug": "Neutrale Fremdendungen -ment/-um/-tum (das Museum)",
+  "meaning": "neuter foreign suffixes -ment/-um/-tum/-nis",
+  "type": "composite",
+  "examples": [
+   "Das Museum wurde von der Klasse besucht.",
+   "Das Medikament hat ihm geholfen."
+  ],
+  "example_zh": [
+   "博物馆被全班参观了。",
+   "这药对他有帮助。"
+  ],
+  "focus": [
+   "das",
+   "museum"
+  ],
+  "zh": "外来词尾 -ment/-um/-tum 多为中性",
+  "level": "A2",
+  "formation": "das + 名词（-ment/-um/-tum/-nis：das Museum / das Medikament / das Datum）",
+  "notes": "这类外来名词几乎都是中性。",
+  "example_en": [
+   "The museum was visited by the class.",
+   "The medicine helped him."
+  ]
+ },
+ {
+  "key": "dgm_NominalisierterInfinitivistneutrumdasLesen__1a9bed",
+  "name": "Nominalisierter Infinitiv ist neutrum (das Lesen)",
+  "slug": "Nominalisierter Infinitiv ist neutrum (das Lesen)",
+  "meaning": "nominalised infinitives are neuter",
+  "type": "composite",
+  "examples": [
+   "Das Lesen und Schreiben lernte er zu Hause.",
+   "Das Lachen des Kindes ist ansteckend."
+  ],
+  "example_zh": [
+   "读书写字他是在家学的。",
+   "孩子的笑声很有感染力。"
+  ],
+  "focus": [
+   "das",
+   "lesen"
+  ],
+  "zh": "动词不定式名词化后为中性",
+  "level": "B1",
+  "formation": "das + 不定式（das Lesen / das Schreiben / das Lachen）",
+  "notes": "不定式直接当名词用时一律中性且首字母大写。",
+  "example_en": [
+   "He learned to read and write at home.",
+   "The child's laughter is contagious."
+  ]
+ },
+ {
+  "key": "dgm_TageMonateJahreszeitenHimmelsrichtungenmaskulinderSommer__91e4b9",
+  "name": "Tage/Monate/Jahreszeiten/Himmelsrichtungen maskulin (der Sommer)",
+  "slug": "Tage/Monate/Jahreszeiten/Himmelsrichtungen maskulin (der Sommer)",
+  "meaning": "days, months, seasons and cardinal directions are masculine",
+  "type": "composite",
+  "examples": [
+   "Der Sommer ist eine warme Jahreszeit.",
+   "Der Montag ist der erste Wochentag."
+  ],
+  "example_zh": [
+   "夏天是一个温暖的季节。",
+   "星期一是一周的第一天。"
+  ],
+  "focus": [
+   "der",
+   "sommer"
+  ],
+  "zh": "星期、月份、季节、方位名词都是阳性",
+  "level": "A1",
+  "formation": "der + 名词（der Montag / der Juli / der Sommer / der Norden）",
+  "notes": "这些时间与方位名词固定为阳性，光凭意思无法判断，须记住。",
+  "example_en": [
+   "Summer is a warm season.",
+   "Monday is the first day of the week."
+  ]
+ },
+ {
+  "key": "dgm_PluralIunverändertoderUmlautdieMäntel__66e7ae",
+  "name": "Plural I: unverändert oder Umlaut (die Mäntel)",
+  "slug": "Plural I: unverändert oder Umlaut (die Mäntel)",
+  "meaning": "plural group I: no ending, or umlaut only",
+  "type": "composite",
+  "examples": [
+   "Die Mäntel sind neu.",
+   "Die Mädchen sind hübsch."
+  ],
+  "example_zh": [
+   "这些外套是新的。",
+   "这些女孩很漂亮。"
+  ],
+  "focus": [
+   "die",
+   "mäntel"
+  ],
+  "zh": "复数第一类：不加词尾，或只变音",
+  "level": "A2",
+  "formation": "单数 → 复数（-el/-en/-er/-chen/-lein：der Mantel → die Mäntel）",
+  "notes": "阳性中性名词以 -el/-en/-er/-chen/-lein 结尾多属此类；die Mutter/die Tochter 只变音。",
+  "example_en": [
+   "The coats are new.",
+   "The girls are pretty."
+  ]
+ },
+ {
+  "key": "dgm_PluralIIEndungedieNächte__fe4a62",
+  "name": "Plural II: Endung -e (die Nächte)",
+  "slug": "Plural II: Endung -e (die Nächte)",
+  "meaning": "plural group II: ending -e (often with umlaut)",
+  "type": "composite",
+  "examples": [
+   "Die Nächte sind kalt.",
+   "Die Tage sind kurz."
+  ],
+  "example_zh": [
+   "夜晚很冷。",
+   "白天很短。"
+  ],
+  "focus": [
+   "die",
+   "nächte"
+  ],
+  "zh": "复数第二类：加词尾 -e",
+  "level": "A2",
+  "formation": "单数 + -e（der Tag → die Tage；die Nacht → die Nächte）",
+  "notes": "多用于单音节名词，部分同时变音。",
+  "example_en": [
+   "The nights are cold.",
+   "The days are short."
+  ]
+ },
+ {
+  "key": "dgm_PluralIIIEndungerdieKinder__529b25",
+  "name": "Plural III: Endung -er (die Kinder)",
+  "slug": "Plural III: Endung -er (die Kinder)",
+  "meaning": "plural group III: ending -er (with umlaut)",
+  "type": "composite",
+  "examples": [
+   "Die Kinder jener Frauen sind krank.",
+   "Die Häuser sind teuer."
+  ],
+  "example_zh": [
+   "那些女人的孩子病了。",
+   "这些房子很贵。"
+  ],
+  "focus": [
+   "die",
+   "kinder"
+  ],
+  "zh": "复数第三类：加词尾 -er",
+  "level": "A2",
+  "formation": "单数 + -er（das Kind → die Kinder；das Haus → die Häuser）",
+  "notes": "含 a/o/u/au 的名词同时变音；这类名词多为中性，少数阳性，无阴性。",
+  "example_en": [
+   "Those women's children are ill.",
+   "The houses are expensive."
+  ]
+ },
+ {
+  "key": "dgm_PluralIVEndungnendieWohnungen__93d704",
+  "name": "Plural IV: Endung -n/-en (die Wohnungen)",
+  "slug": "Plural IV: Endung -n/-en (die Wohnungen)",
+  "meaning": "plural group IV: ending -n/-en",
+  "type": "composite",
+  "examples": [
+   "Die Wohnungen sind kalt.",
+   "Die Frauen arbeiten hier."
+  ],
+  "example_zh": [
+   "这些公寓很冷。",
+   "这些女人在这里工作。"
+  ],
+  "focus": [
+   "die",
+   "wohnungen"
+  ],
+  "zh": "复数第四类：加词尾 -n/-en",
+  "level": "A2",
+  "formation": "单数 + -n/-en（die Wohnung → die Wohnungen；die Lehrerin → die Lehrerinnen）",
+  "notes": "这类多为阴性名词且不加变音；-in 结尾变为 -nen。",
+  "example_en": [
+   "The flats are cold.",
+   "The women work here."
+  ]
+ },
+ {
+  "key": "dgm_PluralVEndungsdieAutos__63671f",
+  "name": "Plural V: Endung -s (die Autos)",
+  "slug": "Plural V: Endung -s (die Autos)",
+  "meaning": "plural group V: ending -s",
+  "type": "composite",
+  "examples": [
+   "Die Autos sind neu.",
+   "Die Hotels sind teuer."
+  ],
+  "example_zh": [
+   "这些车是新的。",
+   "这些旅馆很贵。"
+  ],
+  "focus": [
+   "die",
+   "autos"
+  ],
+  "zh": "复数第五类：加词尾 -s",
+  "level": "A2",
+  "formation": "单数 + -s（das Auto → die Autos；das Hotel → die Hotels）",
+  "notes": "主要是外来词，尤其以元音结尾者，也包括部分德语词和缩写。",
+  "example_en": [
+   "The cars are new.",
+   "The hotels are expensive."
+  ]
+ },
+ {
+  "key": "dgm_SchwacheNomennDeklinationdenStudenten__0b036e",
+  "name": "Schwache Nomen (n-Deklination): den Studenten",
+  "slug": "Schwache Nomen (n-Deklination): den Studenten",
+  "meaning": "weak (n-declension) masculine nouns",
+  "type": "composite",
+  "examples": [
+   "Wir sehen den Studenten.",
+   "Das Wort wurde von dem Studenten buchstabiert."
+  ],
+  "example_zh": [
+   "我们看到那位学生。",
+   "这个词是由那位学生拼出来的。"
+  ],
+  "focus": [
+   "den",
+   "studenten"
+  ],
+  "zh": "弱变化名词（n-变格）：除第一格外加 -(e)n",
+  "level": "B1",
+  "formation": "der Student → den / dem / des Studenten",
+  "notes": "多为表人的阳性名词（-ent/-ist 结尾或由形容词、分词转来），第四、三、二格单数加 -en。",
+  "example_en": [
+   "We see the student.",
+   "The word was spelled out by the student."
+  ]
+ },
+ {
+  "key": "dgm_DativPluralaufnmitdenKindern__106905",
+  "name": "Dativ Plural auf -n (mit den Kindern)",
+  "slug": "Dativ Plural auf -n (mit den Kindern)",
+  "meaning": "dative plural adds -n",
+  "type": "composite",
+  "examples": [
+   "Wir haben den Kindern geholfen.",
+   "Sie spielt mit den Kindern."
+  ],
+  "example_zh": [
+   "我们帮助了这些孩子。",
+   "她和孩子们一起玩。"
+  ],
+  "focus": [
+   "den",
+   "kindern"
+  ],
+  "zh": "第三格复数在复数形式后加 -n",
+  "level": "B1",
+  "formation": "die Kinder → mit den Kindern（复数已以 -n 结尾则不加）",
+  "notes": "第三格复数一般给复数形式再加 -n；复数以 -n 结尾或以 -s 构成时不加。",
+  "example_en": [
+   "We helped the children.",
+   "She is playing with the children."
+  ]
+ },
+ {
+  "key": "dgm_GenitivNomenEndungsesdesDoktors__d50f3d",
+  "name": "Genitiv: Nomen-Endung -s/-es (des Doktors)",
+  "slug": "Genitiv: Nomen-Endung -s/-es (des Doktors)",
+  "meaning": "genitive -s/-es ending on the noun",
+  "type": "composite",
+  "examples": [
+   "Das Auto des Doktors ist kaputt.",
+   "Die Farbe des Himmels ist blau."
+  ],
+  "example_zh": [
+   "医生的车坏了。",
+   "天空的颜色是蓝色。"
+  ],
+  "focus": [
+   "des",
+   "doktors"
+  ],
+  "zh": "第二格：阳性/中性名词加 -s/-es",
+  "level": "B1",
+  "formation": "des + 阳性/中性名词 + -s/-es（des Doktors / des Hauses）",
+  "notes": "阴性名词不加词尾；以 -s/-ss/-ß 结尾的名词必须用 -es。",
+  "example_en": [
+   "The doctor's car is broken.",
+   "The colour of the sky is blue."
+  ]
+ },
+ {
+  "key": "dgm_derWörterdieserjederwelcherdieserMann__d1b33a",
+  "name": "der-Wörter: dieser/jeder/welcher (dieser Mann)",
+  "slug": "der-Wörter: dieser/jeder/welcher (dieser Mann)",
+  "meaning": "der-words take the definite-article endings",
+  "type": "composite",
+  "examples": [
+   "Dieser Mann ist alt.",
+   "Welcher Junge ist dein Bruder?"
+  ],
+  "example_zh": [
+   "这个男人老了。",
+   "哪个男孩是你弟弟？"
+  ],
+  "focus": [
+   "dieser",
+   "mann"
+  ],
+  "zh": "der-词（dieser/jeder/jener/welcher）用定冠词词尾",
+  "level": "A2",
+  "formation": "dieser/jeder/jener/mancher/solcher/welcher + 名词（同 der/die/das 词尾）",
+  "notes": "der-词按 der/die/das 的词尾变化，用于指示或限定名词。",
+  "example_en": [
+   "This man is old.",
+   "Which boy is your brother?"
+  ]
+ },
+ {
+  "key": "dgm_KörperteileKleidungmitbestimmtemArtikelsichdieHändewaschen__55aa96",
+  "name": "Körperteile/Kleidung mit bestimmtem Artikel (sich die Hände waschen)",
+  "slug": "Körperteile/Kleidung mit bestimmtem Artikel (sich die Hände waschen)",
+  "meaning": "body parts and clothing take the definite article, not the possessive",
+  "type": "composite",
+  "examples": [
+   "Sie wäscht sich die Hände.",
+   "Er zieht sich den Mantel an."
+  ],
+  "example_zh": [
+   "她在洗手。",
+   "他穿上外套。"
+  ],
+  "focus": [
+   "sich",
+   "die",
+   "hände"
+  ],
+  "zh": "身体部位、衣物用定冠词而非物主冠词",
+  "level": "B1",
+  "formation": "sich + 定冠词 + 身体部位/衣物（sich die Hände waschen）",
+  "notes": "德语用定冠词指自己的器官或衣物（她洗手 = Sie wäscht sich die Hände），不用物主冠词。",
+  "example_en": [
+   "She is washing her hands.",
+   "He is putting on his coat."
+  ]
+ },
+ {
+  "key": "dgm_BerufNationalitätohneArtikelnachseinSieistEngländerin__6f46d5",
+  "name": "Beruf/Nationalität ohne Artikel nach sein (Sie ist Engländerin)",
+  "slug": "Beruf/Nationalität ohne Artikel nach sein (Sie ist Engländerin)",
+  "meaning": "no article before a predicate nominative of profession or nationality",
+  "type": "composite",
+  "examples": [
+   "Sie ist Engländerin.",
+   "Er ist Lehrer."
+  ],
+  "example_zh": [
+   "她是英国人。",
+   "他是老师。"
+  ],
+  "focus": [
+   "ist",
+   "engländerin"
+  ],
+  "zh": "表语为国籍/职业时省略冠词",
+  "level": "A1",
+  "formation": "sein + 国籍/职业（Sie ist Engländerin；Er ist Lehrer）",
+  "notes": "名词表语前一般省略冠词；但名词若带修饰语则要加冠词（Er ist ein reicher Amerikaner）。",
+  "example_en": [
+   "She is English.",
+   "He is a teacher."
+  ]
+ },
+ {
+  "key": "dgm_PräpositionenmitAkkusativdurchfürgegenohneum__b70f4c",
+  "name": "Präpositionen mit Akkusativ (durch / für / gegen / ohne / um)",
+  "slug": "Präpositionen mit Akkusativ (durch / für / gegen / ohne / um)",
+  "meaning": "prepositions that always govern the accusative",
+  "type": "composite",
+  "examples": [
+   "Wir wandern durch die Stadt.",
+   "Das Auto fährt durch die Stadt."
+  ],
+  "example_zh": [
+   "我们步行穿过这座城市。",
+   "汽车穿过城市行驶。"
+  ],
+  "focus": [
+   "durch",
+   "die"
+  ],
+  "zh": "只接第四格的介词：durch/für/gegen/ohne/um 等",
+  "level": "A2",
+  "formation": "durch / für / gegen / ohne / um / bis + Akkusativ",
+  "notes": "这一组介词后面的名词永远用第四格，与动作方向无关（durch die Stadt 穿过城市）。",
+  "example_en": [
+   "We are hiking through the town.",
+   "The car drives through the town."
+  ]
+ },
+ {
+  "key": "dgm_PräpositionenmitDativausbeimitnachseitvonzu__7090ac",
+  "name": "Präpositionen mit Dativ (aus / bei / mit / nach / seit / von / zu)",
+  "slug": "Präpositionen mit Dativ (aus / bei / mit / nach / seit / von / zu)",
+  "meaning": "prepositions that always govern the dative",
+  "type": "composite",
+  "examples": [
+   "Ich fahre mit dem Zug nach Berlin.",
+   "Er kommt mit dem Bus."
+  ],
+  "example_zh": [
+   "我坐火车去柏林。",
+   "他坐公交车来。"
+  ],
+  "focus": [
+   "mit",
+   "dem"
+  ],
+  "zh": "只接第三格的介词：aus/bei/mit/nach/seit/von/zu 等",
+  "level": "A2",
+  "formation": "aus / bei / mit / nach / seit / von / zu + Dativ",
+  "notes": "这一组介词后面的名词一律用第三格：mit dem Zug（乘火车）、nach dem Essen（饭后）。",
+  "example_en": [
+   "I am going to Berlin by train.",
+   "He is coming by bus."
+  ]
+ },
+ {
+  "key": "dgm_WechselpräpositionDativwo__556fd6",
+  "name": "Wechselpräposition + Dativ（位置：wo?）",
+  "slug": "Wechselpräposition + Dativ（位置：wo?）",
+  "meaning": "two-way prepositions with the dative for location",
+  "type": "composite",
+  "examples": [
+   "Die Bücher liegen auf dem Tisch.",
+   "Die Katze sitzt auf dem Sofa."
+  ],
+  "example_zh": [
+   "书放在桌子上。",
+   "猫坐在沙发上。"
+  ],
+  "focus": [
+   "auf",
+   "dem"
+  ],
+  "zh": "双向介词接第三格，表示静止的位置（在……里/上）",
+  "level": "A2",
+  "formation": "in / an / auf / über / unter / vor / zwischen + Dativ（静态）",
+  "notes": "表示位置时用第三格：auf dem Tisch（在桌上）、in der Stadt（在城里）；提问用 wo。",
+  "example_en": [
+   "The books are lying on the table.",
+   "The cat is sitting on the sofa."
+  ]
+ },
+ {
+  "key": "dgm_WechselpräpositionAkkusativwohin__8adefb",
+  "name": "Wechselpräposition + Akkusativ（方向：wohin?）",
+  "slug": "Wechselpräposition + Akkusativ（方向：wohin?）",
+  "meaning": "two-way prepositions with the accusative for direction",
+  "type": "composite",
+  "examples": [
+   "Ich lege das Buch auf den Tisch.",
+   "Er stellt die Flasche auf den Tisch."
+  ],
+  "example_zh": [
+   "我把书放到桌子上。",
+   "他把瓶子放到桌子上。"
+  ],
+  "focus": [
+   "auf",
+   "den"
+  ],
+  "zh": "双向介词接第四格，表示移动的方向（到……里/上）",
+  "level": "A2",
+  "formation": "in / an / auf / über / unter / vor / zwischen + Akkusativ（移动）",
+  "notes": "表示方向或位置变化时用第四格：auf den Tisch（放到桌上）；提问用 wohin。",
+  "example_en": [
+   "I put the book on the table.",
+   "He puts the bottle on the table."
+  ]
+ },
+ {
+  "key": "dgm_währendstattGenitiv__139366",
+  "name": "während / statt + Genitiv",
+  "slug": "während / statt + Genitiv",
+  "meaning": "during / instead of + genitive",
+  "type": "composite",
+  "examples": [
+   "Während des Regens bleiben wir zu Hause.",
+   "Während des Unterrichts darf man nicht sprechen."
+  ],
+  "example_zh": [
+   "下雨期间我们待在家里。",
+   "上课期间不许讲话。"
+  ],
+  "focus": [
+   "während",
+   "des"
+  ],
+  "zh": "während / statt（anstatt）+ 第二格（表示时间、替代）",
+  "level": "B1",
+  "formation": "während / statt / anstatt / wegen / trotz + Genitiv",
+  "notes": "während 表“在……期间”，statt 表“代替……”，后面名词都用第二格（während des Regens）。",
+  "example_en": [
+   "During the rain we stay at home.",
+   "You must not talk during the lesson."
+  ]
+ },
+ {
+  "key": "dgm_Verschmelzungzumzurzudemder__81882a",
+  "name": "Verschmelzung zum / zur（zu + dem / der）",
+  "slug": "Verschmelzung zum / zur（zu + dem / der）",
+  "meaning": "contracted zu + article: zum / zur",
+  "type": "composite",
+  "examples": [
+   "Ich gehe zum Arzt.",
+   "Sie geht zur Schule."
+  ],
+  "example_zh": [
+   "我去看医生。",
+   "她去上学。"
+  ],
+  "focus": [
+   "zum/zur"
+  ],
+  "zh": "介词与冠词缩合：zu dem→zum，zu der→zur",
+  "level": "A1",
+  "formation": "zu + dem → zum；zu + der → zur",
+  "notes": "口语与书面语都常用缩合形式；但冠词若作指示词或名词带定语从句时则不缩合。",
+  "example_en": [
+   "I am going to the doctor.",
+   "She is going to school."
+  ]
+ },
+ {
+  "key": "dgm_Verschmelzungimaminsvombeim__60edf6",
+  "name": "Verschmelzung im / am / ins / vom / beim",
+  "slug": "Verschmelzung im / am / ins / vom / beim",
+  "meaning": "contracted in + article: im / am / ins / vom / beim",
+  "type": "composite",
+  "examples": [
+   "Im Winter ist es kalt.",
+   "Am Wochenende schlafe ich lange."
+  ],
+  "example_zh": [
+   "冬天很冷。",
+   "周末我睡很久。"
+  ],
+  "focus": [
+   "im/am"
+  ],
+  "zh": "介词与冠词缩合：in dem→im，an dem→am，in das→ins，von dem→vom，bei dem→beim",
+  "level": "A1",
+  "formation": "in + dem → im；an + dem → am；in + das → ins；von + dem → vom；bei + dem → beim",
+  "notes": "这些缩合形式在日常德语中几乎总是使用，完整形式只在冠词被强调时出现。",
+  "example_en": [
+   "In winter it is cold.",
+   "At the weekend I sleep late."
+  ]
+ },
+ {
+  "key": "dgm_wowovonwovonfragtnacheinerSache__094564",
+  "name": "wo-复合词（wovon / wovon fragt nach einer Sache）",
+  "slug": "wo-复合词（wovon / wovon fragt nach einer Sache）",
+  "meaning": "wo-compounds in questions about things",
+  "type": "composite",
+  "examples": [
+   "Wovon sprichst du?",
+   "Wovon träumst du?"
+  ],
+  "example_zh": [
+   "你在说什么？",
+   "你梦到什么？"
+  ],
+  "focus": [
+   "wovon"
+  ],
+  "zh": "wo-复合词用于对事物提问：wovon / womit / worauf",
+  "level": "A2",
+  "formation": "wo(r)- + 介词 → wovon / womit / worauf（问事物）",
+  "notes": "疑问代词指事物而非人时，用 wo(r)- + 介词：Wovon sprichst du?（你在说什么？）。",
+  "example_en": [
+   "What are you talking about?",
+   "What are you dreaming about?"
+  ]
+ },
+ {
+  "key": "dgm_PräpositionPersonalpronomenmitihmfürsie__3530ae",
+  "name": "Präposition + Personalpronomen (mit ihm / für sie)",
+  "slug": "Präposition + Personalpronomen (mit ihm / für sie)",
+  "meaning": "preposition followed by a personal pronoun",
+  "type": "composite",
+  "examples": [
+   "Ich fahre mit ihm in die Stadt.",
+   "Ich spiele mit ihm Schach."
+  ],
+  "example_zh": [
+   "我和他一起进城。",
+   "我和他下棋。"
+  ],
+  "focus": [
+   "mit",
+   "ihm"
+  ],
+  "zh": "介词 + 人称代词，代词用第三格或第四格",
+  "level": "A2",
+  "formation": "Präposition + Pronomen（第三格或第四格）",
+  "notes": "介词后的代词按该介词要求的格变化：mit ihm（第三格）、für ihn（第四格）。",
+  "example_en": [
+   "I am going into town with him.",
+   "I am playing chess with him."
+  ]
+ },
+ {
+  "key": "dgm_nachgestelltePräpositiondieStraßeentlang__43dd79",
+  "name": "nachgestellte Präposition (die Straße entlang)",
+  "slug": "nachgestellte Präposition (die Straße entlang)",
+  "meaning": "the postposition entlang (following its object)",
+  "type": "composite",
+  "examples": [
+   "Das Auto fährt die Straße entlang.",
+   "Wir gehen die Straße entlang."
+  ],
+  "example_zh": [
+   "汽车沿着街道行驶。",
+   "我们沿着街道走。"
+  ],
+  "focus": [
+   "Straße",
+   "entlang"
+  ],
+  "zh": "后置介词 entlang（沿着……）：位于第四格宾语之后",
+  "level": "B1",
+  "formation": "Akkusativ + entlang（后置）",
+  "notes": "entlang 通常放在名词之后并支配第四格（die Straße entlang）；若前置则支配第三格。",
+  "example_en": [
+   "The car drives along the street.",
+   "We walk along the street."
+  ]
+ },
+ {
+  "key": "dgm_PersonalpronomenimAkkusativmichdichihn__ca33cb",
+  "name": "Personalpronomen im Akkusativ (mich / dich / ihn)",
+  "slug": "Personalpronomen im Akkusativ (mich / dich / ihn)",
+  "meaning": "personal pronouns in the accusative",
+  "type": "composite",
+  "examples": [
+   "Er kennt mich und dich.",
+   "Sie besucht mich und dich."
+  ],
+  "example_zh": [
+   "他认识我和你。",
+   "她来看望我和你。"
+  ],
+  "focus": [
+   "mich",
+   "...",
+   "dich"
+  ],
+  "zh": "人称代词第四格：mich/dich/ihn/sie/es/uns/euch/sie",
+  "level": "A1",
+  "formation": "mich / dich / ihn / sie / es / uns / euch / sie",
+  "notes": "第四格代词作直接宾语，形式与第一格不同（ich→mich、er→ihn、sie→sie）。",
+  "example_en": [
+   "He knows me and you.",
+   "She visits me and you."
+  ]
+ },
+ {
+  "key": "dgm_PersonalpronomenimDativmirdirihm__778dfd",
+  "name": "Personalpronomen im Dativ (mir / dir / ihm)",
+  "slug": "Personalpronomen im Dativ (mir / dir / ihm)",
+  "meaning": "personal pronouns in the dative",
+  "type": "composite",
+  "examples": [
+   "Er hilft mir und dir.",
+   "Das Buch gehört mir und dir."
+  ],
+  "example_zh": [
+   "他帮助我和你。",
+   "这本书属于我和你。"
+  ],
+  "focus": [
+   "mir",
+   "...",
+   "dir"
+  ],
+  "zh": "人称代词第三格：mir/dir/ihm/ihr/uns/euch/ihnen",
+  "level": "A1",
+  "formation": "mir / dir / ihm / ihr / uns / euch / ihnen",
+  "notes": "第三格代词作间接宾语，常用于 helfen、geben、gefallen 等动词（Er hilft mir）。",
+  "example_en": [
+   "He helps me and you.",
+   "The book belongs to me and you."
+  ]
+ },
+ {
+  "key": "dgm_StellungderPronomenobjekteesihm__22707b",
+  "name": "Stellung der Pronomenobjekte (es ihm)",
+  "slug": "Stellung der Pronomenobjekte (es ihm)",
+  "meaning": "position of pronoun objects before nouns",
+  "type": "composite",
+  "examples": [
+   "Ich gebe es ihm.",
+   "Sie schickt es ihm."
+  ],
+  "example_zh": [
+   "我把它给他。",
+   "她把它寄给他。"
+  ],
+  "focus": [
+   "es",
+   "ihm"
+  ],
+  "zh": "代词宾语的位置：代词置于名词宾语之前，第四格代词在第三格代词之前",
+  "level": "A2",
+  "formation": "第四格代词 + 第三格代词（es ihm）；代词在名词之前",
+  "notes": "若两个宾语都是代词，则第四格在前、第三格在后：Ich gebe es ihm。",
+  "example_en": [
+   "I give it to him.",
+   "She sends it to him."
+  ]
+ },
+ {
+  "key": "dgm_VerbPräpositionsichinteressierenfür__0bc7b4",
+  "name": "Verb + Präposition (sich interessieren für)",
+  "slug": "Verb + Präposition (sich interessieren für)",
+  "meaning": "fixed verb + preposition combinations",
+  "type": "composite",
+  "examples": [
+   "Er interessiert sich für Musik.",
+   "Sie interessiert sich für alte Möbel."
+  ],
+  "example_zh": [
+   "他对音乐感兴趣。",
+   "她对旧家具感兴趣。"
+  ],
+  "focus": [
+   "interessiert",
+   "sich"
+  ],
+  "zh": "动词与介词的固定搭配（sich interessieren für / warten auf / denken an）",
+  "level": "A2",
+  "formation": "Verb + Präposition（介词固定，不能随意更换）",
+  "notes": "许多动词要求固定的介词搭配，介词宾语按该介词变格：sich interessieren für + 第四格。",
+  "example_en": [
+   "He is interested in music.",
+   "She is interested in old furniture."
+  ]
+ },
+ {
+  "key": "dgm_dadaraufdarandavon__6b5e80",
+  "name": "da-复合词 (darauf / daran / davon)",
+  "slug": "da-复合词 (darauf / daran / davon)",
+  "meaning": "da-compounds standing for a preposition plus a thing",
+  "type": "composite",
+  "examples": [
+   "Ich warte darauf und denke daran.",
+   "Sie freut sich darauf, aber denkt auch daran."
+  ],
+  "example_zh": [
+   "我在等它，也在想着它。",
+   "她期待它，但也想着它。"
+  ],
+  "focus": [
+   "darauf",
+   "...",
+   "daran"
+  ],
+  "zh": "da-复合词代替“介词 + 事物代词”：darauf / daran / davon",
+  "level": "A2",
+  "formation": "da(r)- + 介词 → darauf / daran / davon / damit",
+  "notes": "指代前文提到的“事物”时用 da-复合词，介词以元音开头时加 -r：daran、darauf。",
+  "example_en": [
+   "I am waiting for it and thinking about it.",
+   "She is looking forward to it, but she is also thinking about it."
+  ]
+ },
+ {
+  "key": "dgm_ReflexivpronomenimDativsichdieHändewaschen__5186b5",
+  "name": "Reflexivpronomen im Dativ (sich die Hände waschen)",
+  "slug": "Reflexivpronomen im Dativ (sich die Hände waschen)",
+  "meaning": "reflexive pronouns in the dative",
+  "type": "composite",
+  "examples": [
+   "Ich wasche mir die Hände.",
+   "Er wäscht mir die Hände."
+  ],
+  "example_zh": [
+   "我洗手。",
+   "他给我洗手。"
+  ],
+  "focus": [
+   "mir",
+   "...",
+   "Hände"
+  ],
+  "zh": "反身代词第三格：mir/dir/sich/uns/euch（已有第四格宾语时）",
+  "level": "A2",
+  "formation": "Verb + 第三格反身代词 + 第四格名词（sich die Hände waschen）",
+  "notes": "句中已有第四格宾语时，反身代词用第三格：Ich wasche mir die Hände。",
+  "example_en": [
+   "I wash my hands.",
+   "He washes my hands."
+  ]
+ },
+ {
+  "key": "dgm_Possessivpronomendasistmeins__459047",
+  "name": "Possessivpronomen (das ist meins)",
+  "slug": "Possessivpronomen (das ist meins)",
+  "meaning": "possessive pronouns standing alone",
+  "type": "composite",
+  "examples": [
+   "Das ist meins.",
+   "Dieses Auto ist meins."
+  ],
+  "example_zh": [
+   "这是我的。",
+   "这辆车是我的。"
+  ],
+  "focus": [
+   "ist",
+   "meins"
+  ],
+  "zh": "物主代词独立使用（meins / deins / seins），不修饰名词",
+  "level": "A2",
+  "formation": "mein- / dein- / sein- + 名词性词尾（meiner / meine / meins）",
+  "notes": "物主代词单独使用时不带名词，词尾按性、数、格变化（Das ist meins）。",
+  "example_en": [
+   "That is mine.",
+   "This car is mine."
+  ]
+ },
+ {
+  "key": "dgm_Demonstrativpronomendieserdiese__42ef5c",
+  "name": "Demonstrativpronomen (dieser / diese)",
+  "slug": "Demonstrativpronomen (dieser / diese)",
+  "meaning": "demonstrative pronouns standing alone",
+  "type": "composite",
+  "examples": [
+   "Dieser ist zu teuer.",
+   "Diese gefällt mir nicht."
+  ],
+  "example_zh": [
+   "这个太贵了。",
+   "这个我不喜欢。"
+  ],
+  "focus": [
+   "dieser/diese"
+  ],
+  "zh": "指示代词独立使用：dieser / diese / dieses",
+  "level": "A2",
+  "formation": "dieser / diese / dieses（可独立充当主语或宾语）",
+  "notes": "指示代词可以不带名词单独使用，指代上文提到的人或物。",
+  "example_en": [
+   "This one is too expensive.",
+   "I do not like this one."
+  ]
+ },
+ {
+  "key": "dgm_Indefinitpronomenmanjemandniemand__e882f1",
+  "name": "Indefinitpronomen (man / jemand / niemand)",
+  "slug": "Indefinitpronomen (man / jemand / niemand)",
+  "meaning": "indefinite pronouns man / jemand / niemand",
+  "type": "composite",
+  "examples": [
+   "Man sagt, jemand hat gelogen.",
+   "Man fragte jemand nach dem Weg."
+  ],
+  "example_zh": [
+   "据说有人撒了谎。",
+   "有人被问了路。"
+  ],
+  "focus": [
+   "man",
+   "...",
+   "jemand"
+  ],
+  "zh": "不定代词 man / jemand / niemand",
+  "level": "A2",
+  "formation": "man（泛指人，动词用第三人称单数）/ jemand / niemand",
+  "notes": "man 泛指“人们”，动词照第三人称单数变位；jemand 指“某人”。",
+  "example_en": [
+   "They say someone lied.",
+   "Someone was asked for directions."
+  ]
+ },
+ {
+  "key": "dgm_Indefinitpronomenjederjederweißdas__1c0860",
+  "name": "Indefinitpronomen jeder (jeder weiß das)",
+  "slug": "Indefinitpronomen jeder (jeder weiß das)",
+  "meaning": "the indefinite pronoun jeder",
+  "type": "composite",
+  "examples": [
+   "Jeder weiß das.",
+   "Jeder kann das lernen."
+  ],
+  "example_zh": [
+   "大家都知道这件事。",
+   "每个人都能学会这个。"
+  ],
+  "focus": [
+   "jeder"
+  ],
+  "zh": "不定代词 jeder（每个/人人）",
+  "level": "A1",
+  "formation": "jeder / jede / jedes（单数，动词第三人称单数）",
+  "notes": "jeder 表示“每一个/人人”，单独作主语时动词用第三人称单数。",
+  "example_en": [
+   "Everyone knows that.",
+   "Everyone can learn that."
+  ]
+ },
+ {
+  "key": "dgm_Relativpronomenwoworaufdusitzt__1a7f9a",
+  "name": "Relativpronomen wo-复合词 (worauf du sitzt)",
+  "slug": "Relativpronomen wo-复合词 (worauf du sitzt)",
+  "meaning": "wo-compounds as relative pronouns",
+  "type": "composite",
+  "examples": [
+   "Der Stuhl, worauf du sitzt, ist alt.",
+   "Die Bank, worauf du sitzt, ist neu."
+  ],
+  "example_zh": [
+   "你坐的那把椅子很旧。",
+   "你坐的那条长凳是新的。"
+  ],
+  "focus": [
+   "worauf",
+   "du",
+   "sitzt"
+  ],
+  "zh": "关系从句中的 wo-复合词（worauf / wovon 作关系代词）",
+  "level": "B2",
+  "formation": "wo(r)- + 介词 作关系代词，动词置于从句句尾",
+  "notes": "指代事物时，关系代词可用 wo(r)- + 介词：der Stuhl, worauf du sitzt。",
+  "example_en": [
+   "The chair you are sitting on is old.",
+   "The bench you are sitting on is new."
+  ]
+ },
+ {
+  "key": "dgm_Reziprokpronomeneinander__fde3f9",
+  "name": "Reziprokpronomen (einander)",
+  "slug": "Reziprokpronomen (einander)",
+  "meaning": "the reciprocal pronoun einander",
+  "type": "composite",
+  "examples": [
+   "Sie helfen einander.",
+   "Wir kennen einander gut."
+  ],
+  "example_zh": [
+   "他们互相帮助。",
+   "我们彼此很了解。"
+  ],
+  "focus": [
+   "einander"
+  ],
+  "zh": "相互代词 einander（彼此）",
+  "level": "B1",
+  "formation": "einander（= 相互），可与介词组合：miteinander",
+  "notes": "einander 表示“互相”，常与介词缩合：miteinander、voneinander。",
+  "example_en": [
+   "They help each other.",
+   "We know each other well."
+  ]
+ },
+ {
+  "key": "dgm_DemonstrativadjektivdiesenManndieseFrauen__4a26ee",
+  "name": "Demonstrativadjektiv (diesen Mann / diese Frauen)",
+  "slug": "Demonstrativadjektiv (diesen Mann / diese Frauen)",
+  "meaning": "demonstrative adjectives preceding a noun",
+  "type": "composite",
+  "examples": [
+   "Kennst du diesen Mann?",
+   "Wir haben diesen Mann gesehen."
+  ],
+  "example_zh": [
+   "你认识这位男人吗？",
+   "我们见过这位男人。"
+  ],
+  "focus": [
+   "diesen",
+   "Mann"
+  ],
+  "zh": "指示形容词修饰名词：dieser / diese / dieses / jener",
+  "level": "A2",
+  "formation": "dieser / diese / dieses + 名词（按性数格变词尾）",
+  "notes": "指示形容词与定冠词变格相同，放在名词前起指定作用（diesen Mann 这/那位男人）。",
+  "example_en": [
+   "Do you know this man?",
+   "We saw this man."
+  ]
+ },
+ {
+  "key": "dgm_AdjektivdeklinationnachbestimmtemArtikeldaskleineKind__5fdb74",
+  "name": "Adjektivdeklination nach bestimmtem Artikel (das kleine Kind)",
+  "slug": "Adjektivdeklination nach bestimmtem Artikel (das kleine Kind)",
+  "meaning": "weak adjective endings after the definite article",
+  "type": "composite",
+  "examples": [
+   "Das kleine Kind spielt im Garten.",
+   "Das kleine Kind schläft."
+  ],
+  "example_zh": [
+   "那个小孩在花园里玩。",
+   "那个小孩在睡觉。"
+  ],
+  "focus": [
+   "das",
+   "kleine",
+   "Kind"
+  ],
+  "zh": "定冠词后的形容词弱变化词尾（-e / -en）",
+  "level": "A1",
+  "formation": "der/die/das + 形容词 + -e（单数主格）/ -en（其余） + 名词",
+  "notes": "定冠词已表明性数格，形容词只取弱变化词尾：das kleine Kind、die kleinen Kinder。",
+  "example_en": [
+   "The small child is playing in the garden.",
+   "The small child is asleep."
+  ]
+ },
+ {
+  "key": "dgm_AdjektivdeklinationnachunbestimmtemArtikeleinkleinesKind__a8b139",
+  "name": "Adjektivdeklination nach unbestimmtem Artikel (ein kleines Kind)",
+  "slug": "Adjektivdeklination nach unbestimmtem Artikel (ein kleines Kind)",
+  "meaning": "mixed adjective endings after the indefinite article",
+  "type": "composite",
+  "examples": [
+   "Ein kleines Kind spielt dort.",
+   "Ein kleines Kind lacht."
+  ],
+  "example_zh": [
+   "一个小孩在那儿玩。",
+   "一个小孩在笑。"
+  ],
+  "focus": [
+   "ein",
+   "kleines",
+   "Kind"
+  ],
+  "zh": "不定冠词后的形容词混合变化词尾",
+  "level": "A1",
+  "formation": "ein/eine + 形容词（-er / -es / -e / -en） + 名词",
+  "notes": "不定冠词不总是显示性数格，形容词需补上相应词尾：ein kleines Kind、eine alte Frau。",
+  "example_en": [
+   "A small child is playing over there.",
+   "A small child is laughing."
+  ]
+ },
+ {
+  "key": "dgm_AdjektivdeklinationohneArtikelkleineKinder__628357",
+  "name": "Adjektivdeklination ohne Artikel (kleine Kinder)",
+  "slug": "Adjektivdeklination ohne Artikel (kleine Kinder)",
+  "meaning": "strong adjective endings with no article",
+  "type": "composite",
+  "examples": [
+   "Kleine Kinder spielen gern.",
+   "Kleine Kinder lernen schnell."
+  ],
+  "example_zh": [
+   "小孩子喜欢玩耍。",
+   "小孩子学得快。"
+  ],
+  "focus": [
+   "kleine",
+   "Kinder"
+  ],
+  "zh": "无冠词时形容词的强变化词尾",
+  "level": "A2",
+  "formation": "形容词（强变化词尾，承接冠词的功能） + 名词",
+  "notes": "名词前没有冠词时，形容词要自己承担性数格标记：kleine Kinder、altes Brot。",
+  "example_en": [
+   "Small children like playing.",
+   "Small children learn quickly."
+  ]
+ },
+ {
+  "key": "dgm_PartizipPräsensalsAdjektivdasschlafendeKind__c414a2",
+  "name": "Partizip Präsens als Adjektiv (das schlafende Kind)",
+  "slug": "Partizip Präsens als Adjektiv (das schlafende Kind)",
+  "meaning": "present participles used as adjectives",
+  "type": "composite",
+  "examples": [
+   "Das schlafende Kind liegt im Bett.",
+   "Das schlafende Kind ist süß."
+  ],
+  "example_zh": [
+   "那个正在睡觉的孩子躺在床上。",
+   "那个正在睡觉的孩子很可爱。"
+  ],
+  "focus": [
+   "das",
+   "schlafende",
+   "Kind"
+  ],
+  "zh": "现在分词作形容词（-nd + 形容词词尾）",
+  "level": "B1",
+  "formation": "动词 + -d（现在分词）+ 形容词词尾，修饰名词",
+  "notes": "现在分词表示正在进行的动作，作定语时按形容词变格：das schlafende Kind。",
+  "example_en": [
+   "The sleeping child is lying in bed.",
+   "The sleeping child is cute."
+  ]
+ },
+ {
+  "key": "dgm_PartizipPerfektalsAdjektivdiegeschlosseneTür__2c5eb5",
+  "name": "Partizip Perfekt als Adjektiv (die geschlossene Tür)",
+  "slug": "Partizip Perfekt als Adjektiv (die geschlossene Tür)",
+  "meaning": "past participles used as adjectives",
+  "type": "composite",
+  "examples": [
+   "Die geschlossene Tür ist alt.",
+   "Ich sehe die geschlossene Tür."
+  ],
+  "example_zh": [
+   "那扇关着的门很旧。",
+   "我看见那扇关着的门。"
+  ],
+  "focus": [
+   "die",
+   "geschlossene",
+   "Tür"
+  ],
+  "zh": "过去分词作形容词（表示已完成的被动状态）",
+  "level": "B1",
+  "formation": "过去分词（ge-...-t/-en）+ 形容词词尾，修饰名词",
+  "notes": "过去分词作定语表示动作已完成或处于被动状态：die geschlossene Tür（关着的门）。",
+  "example_en": [
+   "The closed door is old.",
+   "I see the closed door."
+  ]
+ },
+ {
+  "key": "dgm_nominalisiertesAdjektivetwasNeues__f84908",
+  "name": "nominalisiertes Adjektiv (etwas Neues)",
+  "slug": "nominalisiertes Adjektiv (etwas Neues)",
+  "meaning": "adjectives used as nouns",
+  "type": "composite",
+  "examples": [
+   "Ich habe etwas Neues gelernt.",
+   "Er hat etwas Neues gekauft."
+  ],
+  "example_zh": [
+   "我学到了一些新东西。",
+   "他买了些新东西。"
+  ],
+  "focus": [
+   "etwas",
+   "Neues"
+  ],
+  "zh": "形容词名词化（etwas Neues / der Alte）",
+  "level": "B1",
+  "formation": "etwas / nichts / viel / wenig + 中性形容词名词化（-es）",
+  "notes": "形容词可名词化：etwas Neues（新东西）、der Alte（那个老人），词尾照形容词变格。",
+  "example_en": [
+   "I learned something new.",
+   "He bought something new."
+  ]
+ },
+ {
+  "key": "dgm_prädikativesAdjektivistgroß__fc4961",
+  "name": "prädikatives Adjektiv (ist groß)",
+  "slug": "prädikatives Adjektiv (ist groß)",
+  "meaning": "predicate adjectives take no ending",
+  "type": "composite",
+  "examples": [
+   "Das Haus ist groß.",
+   "Der Baum ist groß."
+  ],
+  "example_zh": [
+   "这栋房子很大。",
+   "这棵树很大。"
+  ],
+  "focus": [
+   "ist",
+   "groß"
+  ],
+  "zh": "表语形容词：作表语时不加词尾",
+  "level": "A1",
+  "formation": "sein / werden / bleiben + 形容词（无词尾）",
+  "notes": "形容词作表语（与 sein、werden 连用）时不加任何词尾：Das Haus ist groß。",
+  "example_en": [
+   "The house is big.",
+   "The tree is big."
+  ]
+ },
+ {
+  "key": "dgm_unregelmäßigeSteigerunggutbesserambesten__bba551",
+  "name": "unregelmäßige Steigerung (gut – besser – am besten)",
+  "slug": "unregelmäßige Steigerung (gut – besser – am besten)",
+  "meaning": "irregular comparative and superlative forms",
+  "type": "composite",
+  "examples": [
+   "Der Kuchen schmeckt besser als das Brot.",
+   "Sie spielt besser als ich."
+  ],
+  "example_zh": [
+   "蛋糕比面包好吃。",
+   "她打得比我好。"
+  ],
+  "focus": [
+   "besser",
+   "als"
+  ],
+  "zh": "形容词不规则比较级与最高级（gut/besser/am besten 等）",
+  "level": "A2",
+  "formation": "gut→besser→am besten；viel→mehr→am meisten；gern→lieber→am liebsten",
+  "notes": "常用形容词的比较级常不规则：gut/besser/am besten、viel/mehr/am meisten。",
+  "example_en": [
+   "The cake tastes better than the bread.",
+   "She plays better than I do."
+  ]
+ },
+ {
+  "key": "dgm_AdverbdesOrteshierdort__25e09f",
+  "name": "Adverb des Ortes (hier / dort)",
+  "slug": "Adverb des Ortes (hier / dort)",
+  "meaning": "adverbs of place",
+  "type": "composite",
+  "examples": [
+   "Meine Bücher liegen hier, deine liegen dort.",
+   "Die Wagen stehen hier, die Teller stehen dort."
+  ],
+  "example_zh": [
+   "我的书在这儿，你的在那儿。",
+   "车停在这儿，盘子放在那儿。"
+  ],
+  "focus": [
+   "hier",
+   "...",
+   "dort"
+  ],
+  "zh": "地点副词：hier / dort / überall / draußen",
+  "level": "A1",
+  "formation": "hier / dort / da / überall / draußen（不变词形）",
+  "notes": "地点副词不作词形变化，直接修饰动词，表示动作发生的地点。",
+  "example_en": [
+   "My books are here, yours are there.",
+   "The cars are here, the plates are there."
+  ]
+ },
+ {
+  "key": "dgm_AdverbderZeitmanchmaloft__3a1464",
+  "name": "Adverb der Zeit (manchmal / oft)",
+  "slug": "Adverb der Zeit (manchmal / oft)",
+  "meaning": "adverbs of time",
+  "type": "composite",
+  "examples": [
+   "Wir gehen manchmal ins Kino.",
+   "Er kommt manchmal zu spät."
+  ],
+  "example_zh": [
+   "我们有时去看电影。",
+   "他有时来得太晚。"
+  ],
+  "focus": [
+   "manchmal"
+  ],
+  "zh": "时间副词：manchmal / oft / immer / nie",
+  "level": "A1",
+  "formation": "manchmal / oft / immer / selten（不变词形）",
+  "notes": "时间副词表示频率或时间，位置较灵活，常靠近动词。",
+  "example_en": [
+   "We sometimes go to the cinema.",
+   "He sometimes comes too late."
+  ]
+ },
+ {
+  "key": "dgm_PositiondesAdverbsZeitvorOrt__92b35f",
+  "name": "Position des Adverbs (Zeit vor Ort)",
+  "slug": "Position des Adverbs (Zeit vor Ort)",
+  "meaning": "adverb order: time before place",
+  "type": "composite",
+  "examples": [
+   "Ich gehe heute nach Hause.",
+   "Wir fahren heute nach Berlin."
+  ],
+  "example_zh": [
+   "我今天回家。",
+   "我们今天去柏林。"
+  ],
+  "focus": [
+   "heute",
+   "nach"
+  ],
+  "zh": "副词顺序：时间副词在地点副词之前（TeKaMoLo）",
+  "level": "A2",
+  "formation": "时间 + 方式 + 地点（Temporal vor Lokal）",
+  "notes": "多个状语连用时通常按时间、方式、地点的顺序排列：heute nach Berlin。",
+  "example_en": [
+   "I am going home today.",
+   "We are going to Berlin today."
+  ]
+ },
+ {
+  "key": "dgm_ZahlenübereineMillionalsNomeneineMillion__930f1f",
+  "name": "Zahlen über eine Million als Nomen (eine Million)",
+  "slug": "Zahlen über eine Million als Nomen (eine Million)",
+  "meaning": "million and up are capitalised nouns in German",
+  "type": "composite",
+  "examples": [
+   "Eine Million Menschen leben in dieser Stadt.",
+   "Das kostet eine Milliarde Euro."
+  ],
+  "example_zh": [
+   "这座城市住着一百万人。",
+   "这要花费十亿欧元。"
+  ],
+  "focus": [
+   "eine",
+   "million"
+  ],
+  "zh": "百万以上的数词是名词，大写并可变复数",
+  "level": "A2",
+  "formation": "eine Million / eine Milliarde / eine Billion（复数 Millionen 等）",
+  "notes": "Million、Milliarde、Billion 是名词，故大写；德语 Billion 等于英语的 trillion。",
+  "example_en": [
+   "A million people live in this city.",
+   "That costs a billion euros."
+  ]
+ },
+ {
+  "key": "dgm_BruchzahlenaufeleinViertel__13e4ab",
+  "name": "Bruchzahlen auf -el (ein Viertel)",
+  "slug": "Bruchzahlen auf -el (ein Viertel)",
+  "meaning": "fractions add -el to the ordinal",
+  "type": "composite",
+  "examples": [
+   "Ein Viertel der Klasse fehlt heute.",
+   "Ich habe ein Drittel gegessen."
+  ],
+  "example_zh": [
+   "今天四分之一的学生缺席。",
+   "我吃了三分之一。"
+  ],
+  "focus": [
+   "ein",
+   "viertel"
+  ],
+  "zh": "分数由序数词加 -el 构成",
+  "level": "A2",
+  "formation": "序数词 + -el（ein Viertel / ein Drittel / ein Achtel）",
+  "notes": "分数可作中性名词或形容词；作形容词时分子与分母分开写。",
+  "example_en": [
+   "A quarter of the class is absent today.",
+   "I ate a third of it."
+  ]
+ },
+ {
+  "key": "dgm_amWochentagTageszeitamMontag__7e248c",
+  "name": "am + Wochentag/Tageszeit (am Montag)",
+  "slug": "am + Wochentag/Tageszeit (am Montag)",
+  "meaning": "am (an dem) with days of the week and periods of the day",
+  "type": "composite",
+  "examples": [
+   "Kommst du am Montag an?",
+   "Meistens ist er am Abend müde."
+  ],
+  "example_zh": [
+   "你周一到吗？",
+   "他通常在晚上很累。"
+  ],
+  "focus": [
+   "am",
+   "montag"
+  ],
+  "zh": "星期几和时段前用 am（= an dem）",
+  "level": "A1",
+  "formation": "am + 星期/时段（am Montag / am Morgen / am Abend）",
+  "notes": "am 表示“在……（某天/某时段）”；若要强调某一个具体日子则用 an dem。",
+  "example_en": [
+   "Are you arriving on Monday?",
+   "He is usually tired in the evening."
+  ]
+ },
+ {
+  "key": "dgm_imMonatJahreszeitimJuli__3a17d6",
+  "name": "im + Monat/Jahreszeit (im Juli)",
+  "slug": "im + Monat/Jahreszeit (im Juli)",
+  "meaning": "im (in dem) with months and seasons",
+  "type": "composite",
+  "examples": [
+   "Ich fliege im Juli nach Frankfurt.",
+   "Im Sommer fahren wir ans Meer."
+  ],
+  "example_zh": [
+   "我七月飞法兰克福。",
+   "夏天我们去海边。"
+  ],
+  "focus": [
+   "im",
+   "juli"
+  ],
+  "zh": "月份和季节前用 im（= in dem）",
+  "level": "A1",
+  "formation": "im + 月份/季节（im Juli / im Sommer / im Winter）",
+  "notes": "im 表示“在……（某月/某季）”；强调某一个月份时用 in dem。",
+  "example_en": [
+   "I am flying to Frankfurt in July.",
+   "In summer we go to the sea."
+  ]
+ },
+ {
+  "key": "dgm_vorDativZeitvordemJetztvoreinerWoche__a9fb1f",
+  "name": "vor + Dativ: Zeit vor dem Jetzt (vor einer Woche)",
+  "slug": "vor + Dativ: Zeit vor dem Jetzt (vor einer Woche)",
+  "meaning": "vor + dative expresses time ago",
+  "type": "composite",
+  "examples": [
+   "Vor einer Woche war er in Kanada.",
+   "Sie besuchte uns vor vierzehn Tagen."
+  ],
+  "example_zh": [
+   "一周前他在加拿大。",
+   "她两周前来看我们。"
+  ],
+  "focus": [
+   "vor",
+   "einer",
+   "woche"
+  ],
+  "zh": "vor + 第三格表示“……之前/以前”",
+  "level": "A2",
+  "formation": "vor + 第三格（vor einer Woche / vor zwei Jahren）",
+  "notes": "德语 vor 表“以前”时置于时间表达之前，与英语语序相反。",
+  "example_en": [
+   "A week ago he was in Canada.",
+   "She visited us a fortnight ago."
+  ]
+ },
+ {
+  "key": "dgm_nachDativnachdemEssen__97efda",
+  "name": "nach + Dativ (nach dem Essen)",
+  "slug": "nach + Dativ (nach dem Essen)",
+  "meaning": "nach + dative for time after an event",
+  "type": "composite",
+  "examples": [
+   "Nach dem Essen gehen wir spazieren.",
+   "Nach dem Unterricht fahre ich nach Hause."
+  ],
+  "example_zh": [
+   "饭后我们去散步。",
+   "下课后我回家。"
+  ],
+  "focus": [
+   "nach",
+   "dem",
+   "essen"
+  ],
+  "zh": "nach + 第三格表示“……之后”",
+  "level": "A2",
+  "formation": "nach + 第三格（nach dem Essen / nach dem Unterricht）",
+  "notes": "nach 表时间后接第三格；钟点也可说 Viertel nach sechs（六点一刻）。",
+  "example_en": [
+   "After the meal we go for a walk.",
+   "After the lesson I go home."
+  ]
+ },
+ {
+  "key": "dgm_ZeitdauerimAkkusativeinenTag__0ba3fa",
+  "name": "Zeitdauer im Akkusativ (einen Tag)",
+  "slug": "Zeitdauer im Akkusativ (einen Tag)",
+  "meaning": "definite time and duration take the accusative",
+  "type": "composite",
+  "examples": [
+   "Ich bleibe einen Tag dort.",
+   "Er arbeitet den ganzen Abend."
+  ],
+  "example_zh": [
+   "我在那儿待一天。",
+   "他整个晚上都在工作。"
+  ],
+  "focus": [
+   "einen",
+   "tag"
+  ],
+  "zh": "表示确定时间或持续时段用第四格",
+  "level": "B1",
+  "formation": "第四格 + 时间（einen Tag bleiben / den ganzen Abend arbeiten）",
+  "notes": "时间名词在句中作状语时用第四格，不需要介词。",
+  "example_en": [
+   "I am staying there for a day.",
+   "He works all evening."
+  ]
+ },
+ {
+  "key": "dgm_UnbestimmteZeitimGenitiveinesTages__993c94",
+  "name": "Unbestimmte Zeit im Genitiv (eines Tages)",
+  "slug": "Unbestimmte Zeit im Genitiv (eines Tages)",
+  "meaning": "indefinite time expressions take the genitive",
+  "type": "composite",
+  "examples": [
+   "Eines Tages kaufte er ein Auto.",
+   "Eines Abends wurde er krank."
+  ],
+  "example_zh": [
+   "有一天他买了一辆车。",
+   "一天晚上他病了。"
+  ],
+  "focus": [
+   "eines",
+   "tages"
+  ],
+  "zh": "表示不确定时间的短语用第二格",
+  "level": "B1",
+  "formation": "第二格（eines Tages / eines Abends / eines Nachts）",
+  "notes": "该结构可指过去或未来的不确定时间；阴性名词 Nacht 也仿照加 -s（nachts）。",
+  "example_en": [
+   "One day he bought a car.",
+   "One evening he fell ill."
+  ]
+ },
+ {
+  "key": "dgm_Personalendungenichedustert__d393fd",
+  "name": "Personalendungen (ich -e, du -st, er -t)",
+  "slug": "Personalendungen (ich -e, du -st, er -t)",
+  "meaning": "present-tense personal endings",
+  "type": "composite",
+  "examples": [
+   "Du lernst Deutsch, und ich lerne Englisch.",
+   "Er spielt Fußball, und wir spielen Tennis."
+  ],
+  "example_zh": [
+   "你学德语，我学英语。",
+   "他踢足球，我们打网球。"
+  ],
+  "focus": [
+   "du",
+   "lernst"
+  ],
+  "zh": "现在时人称词尾：ich -e / du -st / er -t / wir -en / ihr -t",
+  "level": "A1",
+  "formation": "词干 + -e / -st / -t / -en / -t / -en",
+  "notes": "规则动词现在时按人称加固定词尾，只有单数第二、三人称出现 -st / -t。",
+  "example_en": [
+   "You are learning German, and I am learning English.",
+   "He plays football, and we play tennis."
+  ]
+ },
+ {
+  "key": "dgm_AnrededuSieformellundinformell__00940e",
+  "name": "Anrede du / Sie (formell und informell)",
+  "slug": "Anrede du / Sie (formell und informell)",
+  "meaning": "formal versus informal address",
+  "type": "composite",
+  "examples": [
+   "Wie heißen Sie, Frau Müller?",
+   "Wie heißt du, mein Junge?"
+  ],
+  "example_zh": [
+   "米勒女士，您叫什么名字？",
+   "小伙子，你叫什么名字？"
+  ],
+  "focus": [
+   "heißen",
+   "sie"
+  ],
+  "zh": "尊称 Sie 与亲称 du 的用法区别",
+  "level": "A1",
+  "formation": "du + 动词 -st（亲称）/ Sie + 动词 -en（尊称，动词随 Sie 用复数形式）",
+  "notes": "对陌生人、长辈用 Sie 并把动词变位成复数形式；对亲友用 du。写信时尊称 Ihr 要大写。",
+  "example_en": [
+   "What is your name, Mrs Müller?",
+   "What is your name, my boy?"
+  ]
+ },
+ {
+  "key": "dgm_VokalwechselimPräsensduliesterfährt__b0fdde",
+  "name": "Vokalwechsel im Präsens (du liest / er fährt)",
+  "slug": "Vokalwechsel im Präsens (du liest / er fährt)",
+  "meaning": "stem-vowel change in the present tense",
+  "type": "composite",
+  "examples": [
+   "Du liest die Zeitung, und er liest ein Buch.",
+   "Du fährst nach Berlin, und sie fährt nach Bonn."
+  ],
+  "example_zh": [
+   "你在看报纸，他在看书。",
+   "你去柏林，她去波恩。"
+  ],
+  "focus": [
+   "du",
+   "liest"
+  ],
+  "zh": "强变化动词现在时的词干元音变化（e→i/ie, a→ä, au→äu）",
+  "level": "A2",
+  "formation": "强变化动词只在 du / er 人称换音：lesen → du liest, fahren → du fährst",
+  "notes": "这类动词在单数第二、三人称换音但不加词尾变化之外的东西；ihr 与复数人称不换音。",
+  "example_en": [
+   "You are reading the newspaper, and he is reading a book.",
+   "You are going to Berlin, and she is going to Bonn."
+  ]
+ },
+ {
+  "key": "dgm_PräsensmitZukunftsbedeutungMorgenfahreich__36c469",
+  "name": "Präsens mit Zukunftsbedeutung (Morgen fahre ich)",
+  "slug": "Präsens mit Zukunftsbedeutung (Morgen fahre ich)",
+  "meaning": "present tense used for the future",
+  "type": "composite",
+  "examples": [
+   "Morgen fahre ich nach Berlin.",
+   "Nächste Woche beginnt der Kurs."
+  ],
+  "example_zh": [
+   "明天我坐车去柏林。",
+   "下周课程开始。"
+  ],
+  "focus": [
+   "morgen",
+   "fahre"
+  ],
+  "zh": "用现在时表达将来（多有时间副词）",
+  "level": "A2",
+  "formation": "时间副词 + 现在时动词（Morgen fahre ich nach Berlin）",
+  "notes": "德语日常口语常用现在时加时间词表示将来，Futur I 多用于强调或推测。",
+  "example_en": [
+   "Tomorrow I am going to Berlin.",
+   "The course starts next week."
+  ]
+ },
+ {
+  "key": "dgm_PartizipIIgearbeitetgelaufen__083c68",
+  "name": "Partizip II (gearbeitet / gelaufen)",
+  "slug": "Partizip II (gearbeitet / gelaufen)",
+  "meaning": "formation of the past participle",
+  "type": "composite",
+  "examples": [
+   "Ich habe gearbeitet.",
+   "Er ist schnell gelaufen."
+  ],
+  "example_zh": [
+   "我工作过了。",
+   "他跑得很快。"
+  ],
+  "focus": [
+   "habe",
+   "gearbeitet"
+  ],
+  "zh": "过去分词的构成：规则 -t、不规则 -en，多带 ge-",
+  "level": "A2",
+  "formation": "ge- + 词干 + -t（弱变化）/ ge- + 词干 + -en（强变化）",
+  "notes": "可分动词的 ge- 加在前缀与词干之间（aufgemacht）；不可分前缀动词不加 ge-（besucht）。",
+  "example_en": [
+   "I have worked.",
+   "He ran fast."
+  ]
+ },
+ {
+  "key": "dgm_Plusquamperfekthattegegessenwargegangen__f68e97",
+  "name": "Plusquamperfekt (hatte gegessen / war gegangen)",
+  "slug": "Plusquamperfekt (hatte gegessen / war gegangen)",
+  "meaning": "past perfect",
+  "type": "composite",
+  "examples": [
+   "Nachdem er gegessen hatte, ging er spazieren.",
+   "Sie war schon abgefahren, als ich ankam."
+  ],
+  "example_zh": [
+   "他吃完饭以后去散步了。",
+   "我到的时候她已经出发了。"
+  ],
+  "focus": [
+   "gegessen",
+   "hatte"
+  ],
+  "zh": "过去完成时：hatte / war + 过去分词，表示更早的过去",
+  "level": "A2",
+  "formation": "hatte / war + Partizip II",
+  "notes": "过去完成时表示发生在另一个过去动作之前的动作，常与 als / nachdem 从句连用。",
+  "example_en": [
+   "After he had eaten, he went for a walk.",
+   "She had already left when I arrived."
+  ]
+ },
+ {
+  "key": "dgm_FuturIIwerdenPartiziphaben__919b7e",
+  "name": "Futur II (werden + Partizip + haben)",
+  "slug": "Futur II (werden + Partizip + haben)",
+  "meaning": "future perfect",
+  "type": "composite",
+  "examples": [
+   "Wir werden es wohl gehört haben.",
+   "Bis morgen werde ich die Arbeit gemacht haben."
+  ],
+  "example_zh": [
+   "我们大概已经听说了。",
+   "到明天我应该已经把活儿干完了。"
+  ],
+  "focus": [
+   "werden",
+   "...",
+   "haben"
+  ],
+  "zh": "将来完成时：werden + 过去分词 + haben/sein，表将来某时前已完成或推测",
+  "level": "B2",
+  "formation": "werden + Partizip II + haben / sein（都在句尾）",
+  "notes": "常用来对过去作推测（Sie werden wohl gekommen sein）或表示将来某时前完成。",
+  "example_en": [
+   "We will probably have heard about it.",
+   "By tomorrow I will have finished the work."
+  ]
+ },
+ {
+  "key": "dgm_UntrennbarePräfixeverbeer__d8df4b",
+  "name": "Untrennbare Präfixe (ver- / be- / er-)",
+  "slug": "Untrennbare Präfixe (ver- / be- / er-)",
+  "meaning": "verbs with inseparable prefixes",
+  "type": "composite",
+  "examples": [
+   "Er versteht die Frage nicht.",
+   "Sie besucht ihre Großmutter jeden Sonntag."
+  ],
+  "example_zh": [
+   "他听不懂这个问题。",
+   "她每个星期天去看望祖母。"
+  ],
+  "focus": [
+   "versteht",
+   "die",
+   "Frage"
+  ],
+  "zh": "带不可分前缀的动词（ver-/be-/er-/ent-）",
+  "level": "A2",
+  "formation": "ver- / be- / er- / ent- / ge- / miss- + 词干（前缀固定不动）",
+  "notes": "不可分前缀永远留在动词前，且过去分词不加 ge-（verstanden, besucht）。",
+  "example_en": [
+   "He does not understand the question.",
+   "She visits her grandmother every Sunday."
+  ]
+ },
+ {
+  "key": "dgm_TrennbarePräfixeaufanausamSatzende__27af4b",
+  "name": "Trennbare Präfixe (auf- / an- / aus- am Satzende)",
+  "slug": "Trennbare Präfixe (auf- / an- / aus- am Satzende)",
+  "meaning": "separable-prefix verbs put the prefix at the clause end",
+  "type": "composite",
+  "examples": [
+   "Er steht jeden Morgen früh auf.",
+   "Die Züge kommen pünktlich an."
+  ],
+  "example_zh": [
+   "他每天早上都早起。",
+   "火车准点到站。"
+  ],
+  "focus": [
+   "steht",
+   "...",
+   "auf"
+  ],
+  "zh": "可分前缀动词：前缀在陈述句里移到句尾",
+  "level": "A2",
+  "formation": "变位词干在第二位，前缀（auf/an/aus/mit/zu...）移到句末",
+  "notes": "在 zu 不定式里写成 an-zufangen；在从句里前缀与词干重新合写（... weil er aufsteht）。",
+  "example_en": [
+   "He gets up early every morning.",
+   "The trains arrive on time."
+  ]
+ },
+ {
+  "key": "dgm_VerbenmitDativhelfendankengefallen__e6ab4e",
+  "name": "Verben mit Dativ (helfen / danken / gefallen)",
+  "slug": "Verben mit Dativ (helfen / danken / gefallen)",
+  "meaning": "verbs that take a dative object only",
+  "type": "composite",
+  "examples": [
+   "Ich helfe meinem Bruder bei den Hausaufgaben.",
+   "Das Buch gefällt mir sehr gut."
+  ],
+  "example_zh": [
+   "我帮弟弟做作业。",
+   "这本书我很喜欢。"
+  ],
+  "focus": [
+   "helfe",
+   "meinem"
+  ],
+  "zh": "只接第三格宾语的动词（helfen/danken/gefallen/folgen）",
+  "level": "A2",
+  "formation": "helfen / danken / gefallen / folgen / gratulieren + Dativ",
+  "notes": "这类动词的宾语用第三格，不能用第四格（Ich helfe ihm 而非 *ihn）。",
+  "example_en": [
+   "I help my brother with his homework.",
+   "I like the book very much."
+  ]
+ },
+ {
+  "key": "dgm_Präpositionalobjektdenkenansprechenüber__90eab8",
+  "name": "Präpositionalobjekt (denken an / sprechen über)",
+  "slug": "Präpositionalobjekt (denken an / sprechen über)",
+  "meaning": "verbs with a fixed prepositional object",
+  "type": "composite",
+  "examples": [
+   "Ich denke oft an dich.",
+   "Wir sprechen über das Problem."
+  ],
+  "example_zh": [
+   "我常常想起你。",
+   "我们在谈论这个问题。"
+  ],
+  "focus": [
+   "denke",
+   "...",
+   "an"
+  ],
+  "zh": "固定介词宾语（denken an / warten auf / sprechen über）",
+  "level": "B1",
+  "formation": "动词 + 固定介词 + 格位（an + Akk / von + Dat / über + Akk）",
+  "notes": "介词和它要求的格位必须与动词一起记；代词宾语用 da- 复合词（daran, davon）。",
+  "example_en": [
+   "I often think of you.",
+   "We are talking about the problem."
+  ]
+ },
+ {
+  "key": "dgm_ModalverbenimPräteritumkonntemusste__c1dcdd",
+  "name": "Modalverben im Präteritum (konnte / musste)",
+  "slug": "Modalverben im Präteritum (konnte / musste)",
+  "meaning": "modal verbs in the simple past",
+  "type": "composite",
+  "examples": [
+   "Ich konnte gestern nicht kommen.",
+   "Er musste lange warten."
+  ],
+  "example_zh": [
+   "我昨天来不了。",
+   "他不得不等很久。"
+  ],
+  "focus": [
+   "konnte",
+   "...",
+   "nicht"
+  ],
+  "zh": "情态动词的过去时（konnte/musste/wollte/durfte）",
+  "level": "A2",
+  "formation": "können→konnte, müssen→musste, wollen→wollte, dürfen→durfte, sollen→sollte, mögen→mochte",
+  "notes": "情态动词的过去时用弱变化词尾，且第一、三人称不加 -e（ich konnte, er konnte）。",
+  "example_en": [
+   "I could not come yesterday.",
+   "He had to wait a long time."
+  ]
+ },
+ {
+  "key": "dgm_InfinitivalsNomendasLesen__d55cdb",
+  "name": "Infinitiv als Nomen (das Lesen)",
+  "slug": "Infinitiv als Nomen (das Lesen)",
+  "meaning": "infinitives used as nouns",
+  "type": "composite",
+  "examples": [
+   "Das Lesen macht ihm Freude.",
+   "Beim Essen sprechen wir nicht."
+  ],
+  "example_zh": [
+   "阅读给他带来乐趣。",
+   "吃饭时我们不说话。"
+  ],
+  "focus": [
+   "das",
+   "Lesen"
+  ],
+  "zh": "不定式作名词（das Lesen / das Essen），中性可大写",
+  "level": "B1",
+  "formation": "das + 大写的不定式（das Lesen, beim Essen, zum Schwimmen）",
+  "notes": "不定式名词化为中性名词，可加冠词和介词：beim Lesen、zum Essen。",
+  "example_en": [
+   "Reading gives him pleasure.",
+   "We do not talk while eating."
+  ]
+ },
+ {
+  "key": "dgm_PartizipienalsAdjektivedergekaufteWagen__a75843",
+  "name": "Partizipien als Adjektive (der gekaufte Wagen)",
+  "slug": "Partizipien als Adjektive (der gekaufte Wagen)",
+  "meaning": "participles used as adjectives",
+  "type": "composite",
+  "examples": [
+   "Der gekaufte Wagen ist sehr alt.",
+   "Die singenden Kinder sind glücklich."
+  ],
+  "example_zh": [
+   "买来的那辆车很旧了。",
+   "唱歌的孩子们很开心。"
+  ],
+  "focus": [
+   "gekaufte",
+   "Wagen"
+  ],
+  "zh": "分词作形容词（现在分词/过去分词加形容詞词尾）",
+  "level": "B1",
+  "formation": "Partizip I / II + 形容詞词尾 + 名词（der gekaufte Wagen, die singenden Kinder）",
+  "notes": "过去分词作定语多为被动义（der gekaufte Wagen = 被买来的车）；现在分词为主动义。",
+  "example_en": [
+   "The car that was bought is very old.",
+   "The singing children are happy."
+  ]
+ },
+ {
+  "key": "dgm_ImperativKommKommenSie__33e686",
+  "name": "Imperativ (Komm! / Kommen Sie!)",
+  "slug": "Imperativ (Komm! / Kommen Sie!)",
+  "meaning": "the imperative",
+  "type": "composite",
+  "examples": [
+   "Kommen Sie bitte morgen wieder!",
+   "Mach die Tür zu!"
+  ],
+  "example_zh": [
+   "请您明天再来！",
+   "把门关上！"
+  ],
+  "focus": [
+   "kommen",
+   "sie"
+  ],
+  "zh": "命令式：亲称 du/ihr 与尊称 Sie 三种形式",
+  "level": "A2",
+  "formation": "du: 词干（+e）/ ihr: 动词复数形 / Sie: 动词 + Sie（Kommen Sie!）",
+  "notes": "对 Sie 的命令式动词在后、Sie 在后；对 du 通常省略 -e 和 du 本身。",
+  "example_en": [
+   "Please come back tomorrow!",
+   "Close the door!"
+  ]
+ },
+ {
+  "key": "dgm_PassivimPerfektistworden__c4fbf7",
+  "name": "Passiv im Perfekt (ist ... worden)",
+  "slug": "Passiv im Perfekt (ist ... worden)",
+  "meaning": "passive in the perfect tenses",
+  "type": "composite",
+  "examples": [
+   "Das Haus ist gebaut worden.",
+   "Die Rechnung ist gestern bezahlt worden."
+  ],
+  "example_zh": [
+   "这栋房子已经建好了。",
+   "账单昨天已经付了。"
+  ],
+  "focus": [
+   "ist",
+   "...",
+   "worden"
+  ],
+  "zh": "被动语态的完成时：ist + 过去分词 + worden",
+  "level": "B2",
+  "formation": "sein + Partizip II + worden（完成时被动）",
+  "notes": "被动完成时用 worden（不是 geworden）；过去完成则用 war ... worden。",
+  "example_en": [
+   "The house has been built.",
+   "The bill was paid yesterday."
+  ]
+ },
+ {
+  "key": "dgm_Passiversatzmitmanmankann__2e75f8",
+  "name": "Passiversatz mit man (man kann ...)",
+  "slug": "Passiversatz mit man (man kann ...)",
+  "meaning": "man as a substitute for the passive",
+  "type": "composite",
+  "examples": [
+   "Man kann das Problem leicht lösen.",
+   "Man baut hier ein neues Krankenhaus."
+  ],
+  "example_zh": [
+   "这个问题很容易解决。",
+   "这里正在建一所新医院。"
+  ],
+  "focus": [
+   "man",
+   "kann"
+  ],
+  "zh": "用 man 代替被动语态（主动形式、被动意义）",
+  "level": "B2",
+  "formation": "man + 动词第三位（man kann das leicht lösen = das kann leicht gelöst werden）",
+  "notes": "不愿或不必指出施事时，德语常用 man 代替被动。",
+  "example_en": [
+   "The problem can be solved easily.",
+   "A new hospital is being built here."
+  ]
+ },
+ {
+  "key": "dgm_kennenwissenkönnenChoosingthecorrectverb__f4764b",
+  "name": "kennen / wissen / können (Choosing the correct verb)",
+  "slug": "kennen / wissen / können (Choosing the correct verb)",
+  "meaning": "distinguishing kennen, wissen and können",
+  "type": "composite",
+  "examples": [
+   "Ich weiß nicht, wo er wohnt.",
+   "Kennst du meinen Bruder?"
+  ],
+  "example_zh": [
+   "我不知道他住在哪儿。",
+   "你认识我弟弟吗？"
+  ],
+  "focus": [
+   "weiß",
+   "...",
+   "nicht"
+  ],
+  "zh": "易混动词 kennen（熟悉）/ wissen（知道事实）/ können（会）",
+  "level": "B1",
+  "formation": "kennen + 第四格人/物；wissen + dass/疑问从句；können + 原形动词",
+  "notes": "kennen 指认识、熟悉人事物；wissen 指知道某事实；können 指具备能力或可能性。",
+  "example_en": [
+   "I do not know where he lives.",
+   "Do you know my brother?"
+  ]
+ },
+ {
+  "key": "dgm_liegenlegenLageundBewegung__41e2ca",
+  "name": "liegen / legen (Lage und Bewegung)",
+  "slug": "liegen / legen (Lage und Bewegung)",
+  "meaning": "distinguishing liegen (state) and legen (motion)",
+  "type": "composite",
+  "examples": [
+   "Das Buch liegt auf dem Tisch.",
+   "Ich lege das Buch auf den Tisch."
+  ],
+  "example_zh": [
+   "书放在桌子上。",
+   "我把书放到桌子上。"
+  ],
+  "focus": [
+   "liegt",
+   "auf"
+  ],
+  "zh": "易混动词 liegen（某物躺着）/ legen（把某物放下）",
+  "level": "A2",
+  "formation": "liegen / sitzen / stehen（状态，不及物）vs. legen / setzen / stellen（动作，及物）",
+  "notes": "前者表示静止状态（带第三格），后者表示放置动作（带第四格）。",
+  "example_en": [
+   "The book is lying on the table.",
+   "I put the book on the table."
+  ]
+ },
+ {
+  "key": "dgm_lassensichlassenInfinitiv__bb26ca",
+  "name": "lassen / sich lassen + Infinitiv",
+  "slug": "lassen / sich lassen + Infinitiv",
+  "meaning": "lassen (have something done) and sich lassen (passive substitute)",
+  "type": "composite",
+  "examples": [
+   "Das lässt sich leicht erklären.",
+   "Ich lasse das Auto reparieren."
+  ],
+  "example_zh": [
+   "这很容易解释。",
+   "我让人修这辆车。"
+  ],
+  "focus": [
+   "lässt",
+   "sich"
+  ],
+  "zh": "lassen（让人做某事）与 sich lassen（被动替代）",
+  "level": "B2",
+  "formation": "lassen + Infinitiv / sich lassen + Infinitiv（被动态替代：das lässt sich machen）",
+  "notes": "lassen 表示让人代做（Ich lasse das Auto reparieren）；sich lassen 表可能（Das lässt sich erklären）。",
+  "example_en": [
+   "That can be explained easily.",
+   "I am having the car repaired."
+  ]
+ },
+ {
+  "key": "dgm_nichtamSatzendeIchverstehedasnicht__5043ac",
+  "name": "nicht am Satzende (Ich verstehe das nicht.)",
+  "slug": "nicht am Satzende (Ich verstehe das nicht.)",
+  "meaning": "nicht in final position",
+  "type": "composite",
+  "examples": [
+   "Ich verstehe das nicht.",
+   "Er kommt heute nicht."
+  ],
+  "example_zh": [
+   "我不明白这个。",
+   "他今天不来。"
+  ],
+  "focus": [
+   "verstehe",
+   "das",
+   "nicht"
+  ],
+  "zh": "nicht 置于句末否定整个谓语",
+  "level": "A1",
+  "formation": "句子 + nicht（否定动词时通常放句末）",
+  "notes": "否定整个句子时 nicht 常放句尾；否定特定成分时 nicht 放在该成分前。",
+  "example_en": [
+   "I do not understand that.",
+   "He is not coming today."
+  ]
+ },
+ {
+  "key": "dgm_nichtsondernKorrektur__f37c91",
+  "name": "nicht ... sondern (Korrektur)",
+  "slug": "nicht ... sondern (Korrektur)",
+  "meaning": "nicht ... sondern (not ... but)",
+  "type": "composite",
+  "examples": [
+   "Er ist nicht mein Bruder, sondern mein Cousin.",
+   "Wir sind nicht in Deutschland, sondern wir sind in Spanien."
+  ],
+  "example_zh": [
+   "他不是我哥哥，而是我表弟。",
+   "我们不在德国，而是在西班牙。"
+  ],
+  "focus": [
+   "nicht",
+   "...",
+   "sondern"
+  ],
+  "zh": "nicht … sondern：不是……而是……",
+  "level": "A2",
+  "formation": "nicht + 成分 A, sondern + 成分 B（可接从句或短语）",
+  "notes": "sondern 用来纠正被否定的内容，与并列的 aber 不同；被否定的成分紧跟在 nicht 后。",
+  "example_en": [
+   "He is not my brother but my cousin.",
+   "We are not in Germany, we are in Spain."
+  ]
+ },
+ {
+  "key": "dgm_jadochAntwortaufeineNegativfrage__9a560b",
+  "name": "ja / doch (Antwort auf eine Negativfrage)",
+  "slug": "ja / doch (Antwort auf eine Negativfrage)",
+  "meaning": "ja and doch answering negative questions",
+  "type": "composite",
+  "examples": [
+   "Kommst du nicht mit? Doch, ich komme mit.",
+   "Hast du keinen Hunger? Doch, ich habe Hunger."
+  ],
+  "example_zh": [
+   "你不一起来吗？不，我来。",
+   "你不饿吗？不，我饿。"
+  ],
+  "focus": [
+   "doch",
+   "ich"
+  ],
+  "zh": "ja / doch：回答否定问句时用 doch 表示肯定反驳",
+  "level": "A2",
+  "formation": "肯定回答否定问句用 doch；肯定回答肯定问句用 ja；否定一律用 nein。",
+  "notes": "对否定疑问句（Kommst du nicht?）要表达“我确实来”时用 doch，不能用 ja。",
+  "example_en": [
+   "Are you not coming along? Yes, I am coming along.",
+   "Are you not hungry? Yes, I am hungry."
+  ]
+ },
+ {
+  "key": "dgm_brauchennichtzuInfinitiv__6c479e",
+  "name": "brauchen nicht zu + Infinitiv",
+  "slug": "brauchen nicht zu + Infinitiv",
+  "meaning": "negative brauchen with zu",
+  "type": "composite",
+  "examples": [
+   "Du brauchst den Roman nicht zu lesen.",
+   "Du brauchst Herbert nicht zu helfen."
+  ],
+  "example_zh": [
+   "你不必读这本小说。",
+   "你不必帮赫伯特。"
+  ],
+  "focus": [
+   "brauchst",
+   "...",
+   "zu"
+  ],
+  "zh": "brauchen 的否定式：nicht brauchen zu + 不定式（不必……）",
+  "level": "B1",
+  "formation": "brauchen + nicht + zu + Infinitiv",
+  "notes": "brauchen 在否定或 nur 后作情态动词用，要加 zu；肯定陈述里一般不用。",
+  "example_en": [
+   "You do not need to read the novel.",
+   "You do not need to help Herbert."
+  ]
+ },
+ {
+  "key": "dgm_keinNegationsartikelvorNomen__8772bf",
+  "name": "kein- (Negationsartikel vor Nomen)",
+  "slug": "kein- (Negationsartikel vor Nomen)",
+  "meaning": "the negative article kein-",
+  "type": "composite",
+  "examples": [
+   "Ich habe keinen Freund.",
+   "Die Kinder tranken keinen Wein."
+  ],
+  "example_zh": [
+   "我没有朋友。",
+   "孩子们没喝葡萄酒。"
+  ],
+  "focus": [
+   "keinen",
+   "Freund"
+  ],
+  "zh": "否定冠词 kein-：否定带不定冠词或零冠词的名词",
+  "level": "A1",
+  "formation": "kein + 名词（按性数格变化：keine / keinen / keinem / keiner）",
+  "notes": "否定名词用 kein-，其词尾与 ein- 相同；否定动词、形容词用 nicht。",
+  "example_en": [
+   "I have no friend.",
+   "The children drank no wine."
+  ]
+ },
+ {
+  "key": "dgm_nichtsniemandNegativpronomen__644be0",
+  "name": "nichts / niemand (Negativpronomen)",
+  "slug": "nichts / niemand (Negativpronomen)",
+  "meaning": "the negative pronouns nichts and niemand",
+  "type": "composite",
+  "examples": [
+   "Ich habe nichts gesagt.",
+   "Niemand hat das gewusst."
+  ],
+  "example_zh": [
+   "我什么都没说。",
+   "没有人知道这件事。"
+  ],
+  "focus": [
+   "habe",
+   "nichts"
+  ],
+  "zh": "否定代词 nichts（什么都没有）/ niemand（没有人）",
+  "level": "A2",
+  "formation": "nichts / niemand + 动词（niemand 可加词尾 -s/-en）",
+  "notes": "nichts 指物、niemand 指人，都无须再加 nicht；另一否定词是 nie（从不）。",
+  "example_en": [
+   "I said nothing.",
+   "Nobody knew that."
+  ]
+ },
+ {
+  "key": "dgm_JaNeinFrageInversionKommstdumit__f0b48a",
+  "name": "Ja/Nein-Frage (Inversion: Kommst du mit?)",
+  "slug": "Ja/Nein-Frage (Inversion: Kommst du mit?)",
+  "meaning": "yes/no questions by inversion",
+  "type": "composite",
+  "examples": [
+   "Kommst du heute mit?",
+   "Hast du Zeit?"
+  ],
+  "example_zh": [
+   "你今天一起来吗？",
+   "你有时间吗？"
+  ],
+  "focus": [
+   "kommst",
+   "du"
+  ],
+  "zh": "一般疑问句：动词提到句首（倒装）",
+  "level": "A1",
+  "formation": "动词 + 主语 + ...?（Kommst du heute mit?）",
+  "notes": "无疑问词时把变位动词放在第一位构成疑问句，句末用问号。",
+  "example_en": [
+   "Are you coming along today?",
+   "Do you have time?"
+  ]
+ },
+ {
+  "key": "dgm_WFragemitPräpositionWoraufWomit__d14f00",
+  "name": "W-Frage mit Präposition (Worauf / Womit)",
+  "slug": "W-Frage mit Präposition (Worauf / Womit)",
+  "meaning": "wh-questions with a preposition (wo-compounds)",
+  "type": "composite",
+  "examples": [
+   "Worauf sollen die Bücher liegen?",
+   "Womit fährst du in die Stadt?"
+  ],
+  "example_zh": [
+   "书要放在什么上面？",
+   "你乘什么去城里？"
+  ],
+  "focus": [
+   "worauf",
+   "sollen"
+  ],
+  "zh": "带介词的疑问：wo(r)- + 介词（Worauf / Womit / Woran）",
+  "level": "B1",
+  "formation": "wo(r)- + 介词 + 动词第二位（Worauf wartest du?）",
+  "notes": "询问介词宾语时用 wo(r)- 复合词，元音前加 r：worauf、woran、womit。",
+  "example_en": [
+   "What should the books lie on?",
+   "How are you getting into town?"
+  ]
+ },
+ {
+  "key": "dgm_Frageadverbienwohinwoherwo__cb48f0",
+  "name": "Frageadverbien (wohin / woher / wo)",
+  "slug": "Frageadverbien (wohin / woher / wo)",
+  "meaning": "interrogative adverbs of place",
+  "type": "composite",
+  "examples": [
+   "Woher kommen die Kinder?",
+   "Wohin gehst du?"
+  ],
+  "example_zh": [
+   "孩子们从哪里来？",
+   "你去哪儿？"
+  ],
+  "focus": [
+   "woher",
+   "kommen"
+  ],
+  "zh": "地点疑问副词 wohin（去哪儿）/ woher（从哪儿来）/ wo（在哪儿）",
+  "level": "A2",
+  "formation": "wohin + 方向（第四格）/ woher + 来源（第三格）/ wo + 位置（第三格）",
+  "notes": "三者分别问方向、来源和位置，格位随之变化。",
+  "example_en": [
+   "Where do the children come from?",
+   "Where are you going?"
+  ]
+ },
+ {
+  "key": "dgm_Interrogativpronomenwerwenwem__99f704",
+  "name": "Interrogativpronomen (wer / wen / wem)",
+  "slug": "Interrogativpronomen (wer / wen / wem)",
+  "meaning": "interrogative pronouns wer, wen, wem",
+  "type": "composite",
+  "examples": [
+   "Wen hast du gesehen?",
+   "Wem gehört diese Tasche?"
+  ],
+  "example_zh": [
+   "你看见谁了？",
+   "这个包是谁的？"
+  ],
+  "focus": [
+   "wen",
+   "hast"
+  ],
+  "zh": "疑问代词 wer / wen / wem（按格变化）",
+  "level": "A2",
+  "formation": "wer（主格）/ wen（第四格）/ wem（第三格）/ wessen（第二格）",
+  "notes": "询问人时疑问代词随格变化；询问物常用 was 及其格位形式。",
+  "example_en": [
+   "Whom did you see?",
+   "Whose bag is this?"
+  ]
+ },
+ {
+  "key": "dgm_welchwasfüreinFrageadjektiv__27dad5",
+  "name": "welch- / was für ein (Frageadjektiv)",
+  "slug": "welch- / was für ein (Frageadjektiv)",
+  "meaning": "interrogative adjectives welch- and was für ein",
+  "type": "composite",
+  "examples": [
+   "Welches Buch möchtest du lesen?",
+   "Was für ein Auto ist das?"
+  ],
+  "example_zh": [
+   "你想读哪本书？",
+   "这是一辆什么样的车？"
+  ],
+  "focus": [
+   "welches",
+   "buch"
+  ],
+  "zh": "疑问形容词 welcher/welche/welches 与 was für ein",
+  "level": "A2",
+  "formation": "welch- + 名词（随性数格变化）/ was für ein + 名词",
+  "notes": "welch- 问“哪一个”（有确定范围）；was für ein 问“什么样的”（性质种类）。",
+  "example_en": [
+   "Which book would you like to read?",
+   "What kind of car is that?"
+  ]
+ },
+ {
+  "key": "dgm_WortstellungVerbanzweiterStelleHeutegeheich__3db598",
+  "name": "Wortstellung: Verb an zweiter Stelle (Heute gehe ich)",
+  "slug": "Wortstellung: Verb an zweiter Stelle (Heute gehe ich)",
+  "meaning": "verb-second order in statements",
+  "type": "composite",
+  "examples": [
+   "Heute gehe ich ins Kino.",
+   "Am Montag fährt mein Bruder nach Hamburg."
+  ],
+  "example_zh": [
+   "今天我去看电影。",
+   "星期一我哥哥去汉堡。"
+  ],
+  "focus": [
+   "heute",
+   "gehe"
+  ],
+  "zh": "陈述句语序：变位动词固定第二位，主语可随首成分后移",
+  "level": "A1",
+  "formation": "首成分 + 变位动词（第二位）+ 其他成分",
+  "notes": "只要某成分提到句首，动词仍在第二位，主语移到动词后（Heute gehe ich...）。",
+  "example_en": [
+   "Today I am going to the cinema.",
+   "On Monday my brother is going to Hamburg."
+  ]
+ },
+ {
+  "key": "dgm_nebenordnendeKonjunktionenaberdennsondern__636532",
+  "name": "nebenordnende Konjunktionen (aber / denn / sondern)",
+  "slug": "nebenordnende Konjunktionen (aber / denn / sondern)",
+  "meaning": "coordinating conjunctions",
+  "type": "composite",
+  "examples": [
+   "Ich möchte kommen, aber ich habe keine Zeit.",
+   "Sie ist nicht müde, sondern sie ist krank."
+  ],
+  "example_zh": [
+   "我想来，但是我没有时间。",
+   "她不累，而是生病了。"
+  ],
+  "focus": [
+   "aber",
+   "ich"
+  ],
+  "zh": "并列连词 aber/denn/sondern：连接两个主句，语序不变",
+  "level": "A2",
+  "formation": "主句, + aber / denn / oder / sondern + 主句（动词仍第二位）",
+  "notes": "并列连词不改变后面主句的语序；其前通常加逗号。",
+  "example_en": [
+   "I would like to come, but I have no time.",
+   "She is not tired, she is ill."
+  ]
+ },
+ {
+  "key": "dgm_alswennwanntemporaleKonjunktionen__4fcf9b",
+  "name": "als / wenn / wann (temporale Konjunktionen)",
+  "slug": "als / wenn / wann (temporale Konjunktionen)",
+  "meaning": "als, wenn and wann",
+  "type": "composite",
+  "examples": [
+   "Als ihre Mutter ins Zimmer kam, las sie ein Buch.",
+   "Wenn ich Zeit habe, besuche ich meine Tante."
+  ],
+  "example_zh": [
+   "她母亲进屋时，她在看书。",
+   "我有时间就去看姑姑。"
+  ],
+  "focus": [
+   "als",
+   "ihre"
+  ],
+  "zh": "时间连词 als（过去一次）/ wenn（每逢、现在将来）/ wann（疑问）",
+  "level": "B1",
+  "formation": "als / wenn 引导从句，动词移到从句末（Als ich Kind war, ...）",
+  "notes": "als 用于过去的一次性事件；wenn 用于重复发生或现在、将来的情况。",
+  "example_en": [
+   "When her mother came into the room, she was reading a book.",
+   "When I have time, I visit my aunt."
+  ]
+ },
+ {
+  "key": "dgm_KonditionalsatzmitdannWenndann__465ab3",
+  "name": "Konditionalsatz mit dann (Wenn ..., dann ...)",
+  "slug": "Konditionalsatz mit dann (Wenn ..., dann ...)",
+  "meaning": "conditional sentences with wenn ... dann",
+  "type": "composite",
+  "examples": [
+   "Wenn du kommst, dann bringe ich einen Kuchen mit.",
+   "Wenn es morgen regnet, bleiben wir zu Hause."
+  ],
+  "example_zh": [
+   "你要来的话，我就带个蛋糕来。",
+   "明天下雨的话，我们就待在家里。"
+  ],
+  "focus": [
+   "dann",
+   "bringe"
+  ],
+  "zh": "条件句：wenn 从句（动词末位）+ 主句，主句可用 dann 起头",
+  "level": "B1",
+  "formation": "Wenn + ... + 从句动词末位, (dann) + 变位动词 + 主语 ...",
+  "notes": "主句用 dann 承接时动词仍第二位；也可不用 dann、直接以动词起首。",
+  "example_en": [
+   "If you come, I will bring a cake.",
+   "If it rains tomorrow, we will stay at home."
+  ]
+ },
+ {
+  "key": "dgm_HauptsatznachNebensatzVerbanersterStelle__0f6123",
+  "name": "Hauptsatz nach Nebensatz (Verb an erster Stelle)",
+  "slug": "Hauptsatz nach Nebensatz (Verb an erster Stelle)",
+  "meaning": "main clause after a dependent clause starts with the verb",
+  "type": "composite",
+  "examples": [
+   "Wenn es morgen regnet, bleiben wir zu Hause.",
+   "Obwohl es kalt war, gingen wir spazieren."
+  ],
+  "example_zh": [
+   "明天下雨的话，我们就待在家里。",
+   "尽管很冷，我们还是去散步了。"
+  ],
+  "focus": [
+   "regnet",
+   "...",
+   "bleiben"
+  ],
+  "zh": "从句在前时，主句以变位动词起首",
+  "level": "B2",
+  "formation": "Nebensatz（动词末位）, + 变位动词 + 主语 ...（Wenn ..., bleiben wir ...）",
+  "notes": "从句占据句首位置，主句的变位动词因此紧跟在从句逗号之后。",
+  "example_en": [
+   "If it rains tomorrow, we will stay at home.",
+   "Although it was cold, we went for a walk."
+  ]
+ },
+ {
+  "key": "dgm_StellungderObjektePronomenvorNomen__3d43c3",
+  "name": "Stellung der Objekte (Pronomen vor Nomen)",
+  "slug": "Stellung der Objekte (Pronomen vor Nomen)",
+  "meaning": "order of objects: pronoun before noun",
+  "type": "composite",
+  "examples": [
+   "Ich gebe es dem Mann.",
+   "Ich gebe ihm das Buch."
+  ],
+  "example_zh": [
+   "我把这个给那个男人。",
+   "我把书给他。"
+  ],
+  "focus": [
+   "gebe",
+   "es",
+   "dem"
+  ],
+  "zh": "宾语顺序：代词宾语在人称前、名词宾语在后",
+  "level": "B2",
+  "formation": "代词宾语 + 名词宾语（Ich gebe es dem Mann.）",
+  "notes": "两个宾语都是名词时第三格在前；出现代词时，代词宾语一律排在名词宾语之前。",
+  "example_en": [
+   "I give it to the man.",
+   "I give him the book."
+  ]
+ }
+]

@@ -4,7 +4,7 @@ Book entity.
 
 import json
 import sqlite3
-from contextlib import closing
+import threading
 from lute.db import db
 
 booktags = db.Table(
@@ -79,6 +79,13 @@ class Book(
     # pdf_path is the relative path under the static folder of the
     #   imported PDF file, e.g. "pdf/<uuid>/file.pdf".
     pdf_path = db.Column("BkPdfPath", db.String)
+
+    # EPUB reader-mode book fields (see migration 20261019_add_book_epub_field.sql).
+    # epub_path is the relative path under the static folder of the
+    #   chapter's reader-ready HTML, e.g. "epub/<uuid>/ch/003.html".
+    #   Like manga/pdf, the page text is not what gets displayed: the
+    #   reading screen injects word spans into this markup.
+    epub_path = db.Column("BkEpubPath", db.String)
 
     language = db.relationship("Language")
     texts = db.relationship(
@@ -340,6 +347,25 @@ class WordsRead(db.Model):
         self.word_count = word_count
 
 
+# One shared :memory: connection per thread for _sql_lower(): it runs
+# once per sentence while sentences are being loaded (first page reads,
+# data cleanup), and opening a fresh in-memory database for every
+# sentence was a measurable cost on long books.  sqlite3 connections
+# default to check_same_thread=True, so each thread gets its own.
+_sql_lower_tls = threading.local()
+
+
+def _sql_lower(input_string):
+    "SQLite's LOWER() of input_string, via the per-thread connection."
+    if input_string is None:
+        return None
+    conn = getattr(_sql_lower_tls, "conn", None)
+    if conn is None:
+        conn = sqlite3.connect(":memory:")
+        _sql_lower_tls.conn = conn
+    return conn.execute("SELECT LOWER(?)", (input_string,)).fetchone()[0]
+
+
 class Sentence(db.Model):
     """
     Parsed sentences for a given Text.
@@ -370,18 +396,8 @@ class Sentence(db.Model):
 
         This method is public for use in the data_cleanup module.
         """
-
-        def _get_sql_lower(input_string):
-            "Returns result of sqlite LOWER call of input_string."
-            if input_string is None:
-                return None
-            with sqlite3.connect(":memory:") as conn, closing(conn.cursor()) as cur:
-                cur.execute("SELECT LOWER(?)", (input_string,))
-                result = cur.fetchone()
-                return result[0]
-
         lcased = parser.get_lowercase(self.text_content)
-        if lcased == _get_sql_lower(self.text_content):
+        if lcased == _sql_lower(self.text_content):
             lcased = "*"
         self.textlc_content = lcased
 
@@ -440,3 +456,34 @@ class BookStats(db.Model):
     status_distribution = db.Column(db.String, nullable=True)
     manga_word_count = db.Column(db.Integer, nullable=True)
     stale = db.Column("BkStatsStale", db.Boolean, nullable=False, default=False)
+
+
+# The whole-book grammar analysis cache (see
+# lute/db/schema/migrations/20261024_create_bookgrammar.sql).  One row per
+# book, written by the background worker in
+# lute/read/grammar_precompute.py and read by the reader's grammar panel.
+#
+# BgResults is the engine's raw JSON array *before* the language's
+# hidden_grammar_levels filter: hiding a level is a display choice, and
+# must never cost a recompute.  Shape: the same list the
+# /read/grammar_analysis route returns --
+#   [{"key", "name", "level", "desc", "examples": [{"sentence", "matches"}]}]
+GRAMMAR_STATUS_PENDING = "pending"
+GRAMMAR_STATUS_RUNNING = "running"
+GRAMMAR_STATUS_READY = "ready"
+GRAMMAR_STATUS_ERROR = "error"
+GRAMMAR_STATUS_SKIPPED = "skipped"
+
+
+class BookGrammar(db.Model):
+    "Cached whole-book grammar analysis."
+    __tablename__ = "bookgrammar"
+
+    BkID = db.Column("BgBkID", db.Integer, db.ForeignKey("books.BkID", ondelete="CASCADE"), primary_key=True)
+    status = db.Column("BgStatus", db.String, nullable=False, default=GRAMMAR_STATUS_PENDING)
+    text_hash = db.Column("BgTextHash", db.String, nullable=True)
+    display = db.Column("BgDisplay", db.String, nullable=True)
+    rules = db.Column("BgRules", db.String, nullable=True)
+    results = db.Column("BgResults", db.String, nullable=True)
+    error = db.Column("BgError", db.String, nullable=True)
+    updated = db.Column("BgUpdated", db.DateTime, nullable=True)

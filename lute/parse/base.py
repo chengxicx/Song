@@ -27,10 +27,22 @@ class ParsedToken:
         ParsedToken.cls_sentence_number = 0
         ParsedToken.cls_order = 0
 
-    def __init__(self, token: str, is_word: bool, is_end_of_sentence: bool = False):
+    def __init__(
+        self, token: str, is_word: bool, is_end_of_sentence: bool = False, pos=None
+    ):
         self.token = token
         self.is_word = is_word
         self.is_end_of_sentence = is_end_of_sentence
+
+        # The parser's part-of-speech tuple for this token, or None when
+        # the parser has no POS to offer (MeCab exposes only a numeric
+        # id).  It is carried on the token so that a term created from
+        # an already-parsed page can be tagged later without re-parsing
+        # the word on its own -- which would give a different answer,
+        # because POS is context sensitive (出そう is 五段-サ行 /
+        # 意志推量形 in 「声を出そうとしましたが」 but 下一段-ダ行 /
+        # 連用形-一般 on its own).
+        self.pos = pos
 
         ParsedToken.cls_order += 1
         self.order = ParsedToken.cls_order
@@ -55,6 +67,24 @@ class ParsedToken:
         ]
         attrs = ", ".join(attrs)
         return f'<"{self.token}" ({attrs})>'
+
+
+def character_substitution_pairs(language):
+    """
+    Parse `language.character_substitutions` ("´='|’='|...=…") into
+    [(from, to), ...].
+
+    This is the list a parser applies before tokenizing, so that a curved
+    apostrophe in the book and a straight one in the dictionary are the
+    same word.  It is shared here because every parser that uses the
+    setting must report the same pairs through text_substitutions().
+    """
+    pairs = []
+    for replacement in (language.character_substitutions or "").split("|"):
+        fromto = replacement.strip().split("=")
+        if len(fromto) >= 2:
+            pairs.append((fromto[0].strip(), fromto[1].strip()))
+    return pairs
 
 
 class AbstractParser(ABC):
@@ -118,6 +148,21 @@ class AbstractParser(ABC):
         Get an array of ParsedTokens from the input text for the given language.
         """
 
+    def text_substitutions(self, language):  # pylint: disable=unused-argument
+        """
+        Literal replacements applied to the text before it is tokenized,
+        in the order they are applied.
+
+        The token stream is what the reader renders, so for most books
+        this never surfaces: the tokens are the text.  Reader-mode EPUB
+        renders the chapter's own HTML instead, and the two only line up
+        if the chapter's text nodes have had the same replacements
+        applied -- so the parser has to be able to say what it did.
+        Returns [(from, to), ...], empty for a parser that tokenizes the
+        text as given.
+        """
+        return []
+
     def get_reading(self, text: str):  # pylint: disable=unused-argument
         """
         Get the pronunciation for the given text.  For most
@@ -140,6 +185,35 @@ class AbstractParser(ABC):
         """
         Get the dictionary/lemma form of the given text.
         For most languages, this returns the text as-is.
+        """
+        return None
+
+    def get_normalized_form(self, text: str):  # pylint: disable=unused-argument
+        """
+        The dictionary's orthography-normalized form of the given text.
+
+        Unlike get_lemma (which keeps the reading: わたし stays わたし),
+        this is the spelling the dictionary files a word under, so it
+        collapses kana spellings onto their usual kanji (わたし ->
+        私, ぼく -> 僕) without merging words that merely sound alike
+        (はし stays はし; 箸, 橋 and 端 stay themselves).  Callers use it
+        to ask "same word?", never "same pronunciation?".
+
+        For most languages, this returns None: there is no such
+        normalization to apply.
+        """
+        return None
+
+    def get_pos_tag(self, pos):  # pylint: disable=unused-argument
+        """
+        The term tag to derive from a parsed token's POS, or None.
+
+        None means "this parser has no opinion", and the term simply
+        never gets an automatic tag: most languages have no POS here,
+        and MeCab exposes only a numeric id.  Parsers that can answer
+        also decide what is worth tagging -- see
+        JapaneseSudachiParser.get_pos_tag, which skips particles,
+        auxiliaries and affixes.
         """
         return None
 

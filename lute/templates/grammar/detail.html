@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ entry.name }} — {{ t('Grammar library') }}{% endblock %}
+{% block header %}{{ t('Grammar library') }}{% endblock %}
+
+{% block body %}
+
+{# One grammar point's full card: everything the compact index row hides
+   (formation, examples, the reference sentence, notes, cross-links).
+   Prev/next walk the point's own level, matching the list it came from. #}
+<div class="grammar-detail grammar-group--{{ level_class(entry.level) }}"
+     data-language-id="{{ language.id }}">
+
+  <div class="grammar-detail__bar">
+    <a class="grammar-detail__back"
+       href="{{ url_for('grammar.library', langid=language.id) }}">← {{ t('Back to the list') }}</a>
+    <span class="grammar-detail__position">{{ entry.level }} · {{ position }}/{{ level_total }}</span>
+  </div>
+
+  <article class="grammar-item grammar-item--{{ level_class(entry.level) }}{% if entry.skipped %} grammar-item--reference{% endif %}"
+           id="{{ entry.key }}">
+    <div class="grammar-item__head">
+      <span class="grammar-item__level">{{ entry.level }}</span>
+      <span class="grammar-item__name">{{ entry.name }}</span>
+      {% if entry.formality %}
+      <span class="grammar-item__formality">{{ t(entry.formality) }}</span>
+      {% endif %}
+      {% if entry.skipped %}
+      <span class="grammar-item__reference-tag">{{ t('reference only') }}</span>
+      {% endif %}
+    </div>
+
+    {% if entry.formation %}<div class="grammar-item__formation">{{ entry.formation }}</div>{% endif %}
+    <div class="grammar-item__desc">{{ entry.desc }}</div>
+    {% if entry.meaning_detailed %}<div class="grammar-item__detail">{{ entry.meaning_detailed }}</div>{% endif %}
+
+    {% if entry.examples %}
+    <div class="grammar-item__examples">
+      {% for ex in entry.examples %}
+      {#  A row is {"text", "tr"} where the corpus carries a translation
+          (every language except Cantonese / English / Italian / Portuguese
+          / Arabic, whose rule sets were written without examples).  The
+          gloss goes on its own line. #}
+      {% set text = ex.text if ex is mapping else ex %}
+      {% set tr = ex.tr if ex is mapping else '' %}
+      <div class="grammar-item__example">{{ text }}{% if tr %}<span class="grammar-item__example-tr">{{ tr }}</span>{% endif %}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if entry.reference or entry.notes %}
+    {# The detail page is the full card and has room, so the reference
+       block starts expanded; the reader can still fold it away. #}
+    <details class="grammar-item__more" open>
+      <summary>{{ t('Reference · notes') }}</summary>
+      {% if entry.reference %}
+      <div class="grammar-item__refex">
+        {{ entry.reference.japanese }}
+        <div class="grammar-item__reftr">{{ entry.reference.text }}</div>
+      </div>
+      {% endif %}
+      {% if entry.notes %}<div class="grammar-item__notes">{{ entry.notes }}</div>{% endif %}
+    </details>
+    {% endif %}
+
+    {% if entry.related %}
+    <div class="grammar-item__related">
+      <span class="grammar-item__related-label">{{ t('Related grammar') }}</span>
+      {% for rel in entry.related %}
+      <a class="grammar-item__related-link"
+         href="{{ url_for('grammar.detail', langid=language.id, key=rel.key) }}">{{ rel.name }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </article>
+
+  <nav class="grammar-detail__nav">
+    {% if prev_entry %}
+    <a class="grammar-detail__prev" rel="prev"
+       title="{{ t('Previous grammar point') }}"
+       href="{{ url_for('grammar.detail', langid=language.id, key=prev_entry.key) }}">← {{ prev_entry.name }}</a>
+    {% endif %}
+    {% if next_entry %}
+    <a class="grammar-detail__next" rel="next"
+       title="{{ t('Next grammar point') }}"
+       href="{{ url_for('grammar.detail', langid=language.id, key=next_entry.key) }}">{{ next_entry.name }} →</a>
+    {% endif %}
+  </nav>
+
+  <p class="grammar-library__foot">
+    <a href="{{ url_for('grammar.library', langid=language.id) }}">{{ t('All levels') }}</a>
+  </p>
+</div>
+
+{% endblock %}

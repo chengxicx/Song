@@ -14,6 +14,7 @@ from datetime import datetime, time, timezone
 from lute.ankiexport.field_mapping import SentenceLookup
 from lute.models.repositories import UserSettingRepository
 from lute.models.review import ReviewCard, ReviewLog
+from lute.read import shadowing
 from lute.term.model import ReferencesRepository
 from lute.review import enqueue, scheduler
 from lute.tts.routes import get_lang_code_for
@@ -41,9 +42,17 @@ def _settings(session):
         max_new = int(repo.get_value("review_max_new_per_day") or 20)
     except (TypeError, ValueError):
         max_new = 20
+    try:
+        max_shadowing = int(repo.get_value("review_max_shadowing_per_day") or 10)
+    except (TypeError, ValueError):
+        max_shadowing = 10
     return {
         "desired_retention": repo.get_value("review_desired_retention"),
         "max_new_per_day": max(max_new, 0),
+        # Shadowing takes run 20-30s each -- an order of magnitude slower
+        # than a recognition card -- so they get their own daily cap on
+        # top of the global new-card limit.
+        "max_shadowing_per_day": max(max_shadowing, 0),
     }
 
 
@@ -54,6 +63,20 @@ def _new_shown_today(session, today_start):
         .filter(
             ReviewLog.review_time >= today_start,
             ReviewLog.reps_before == 0,
+        )
+        .count()
+    )
+
+
+def _shadowing_shown_today(session, today_start):
+    "New shadowing cards already presented today."
+    return (
+        session.query(ReviewLog)
+        .join(ReviewCard, ReviewCard.id == ReviewLog.card_id)
+        .filter(
+            ReviewLog.review_time >= today_start,
+            ReviewLog.reps_before == 0,
+            ReviewCard.card_type == "shadowing",
         )
         .count()
     )
@@ -84,6 +107,9 @@ def start_session(session):
     Cards are auto-admitted first, so learning terms are always in the
     queue when a session starts.
 
+    Shadowing cards are capped per day (they take tens of seconds each,
+    not seconds); the cap applies to due and new shadowing cards alike.
+
     Raises SchedulerUnavailableError when the fsrs package is missing.
     """
     enqueue.auto_admit(session)
@@ -93,23 +119,73 @@ def start_session(session):
 
     c = counts(session)
     now = _utcnow_naive()
+    today_start = datetime.combine(now.date(), time.min)
+    shadow_room = max(
+        0, st["max_shadowing_per_day"] - _shadowing_shown_today(session, today_start)
+    )
 
-    due_cards = (
+    due_regular = (
         session.query(ReviewCard)
-        .filter(ReviewCard.reps > 0, ReviewCard.due <= now)
+        .filter(
+            ReviewCard.reps > 0,
+            ReviewCard.due <= now,
+            ReviewCard.card_type != "shadowing",
+        )
         .order_by(ReviewCard.due)
         .limit(_MAX_DUE_CARDS)
         .all()
     )
+    due_shadowing = []
+    if shadow_room > 0:
+        due_shadowing = (
+            session.query(ReviewCard)
+            .filter(
+                ReviewCard.reps > 0,
+                ReviewCard.due <= now,
+                ReviewCard.card_type == "shadowing",
+            )
+            .order_by(ReviewCard.due)
+            .limit(shadow_room)
+            .all()
+        )
+    # One session, one due-date order, whatever the card type.
+    due_cards = sorted(
+        due_regular + due_shadowing,
+        key=lambda card: (card.due or now, card.id),
+    )[:_MAX_DUE_CARDS]
+
     new_cards = []
     if c["new_allowed_today"] > 0:
-        new_cards = (
+        new_regular = (
             session.query(ReviewCard)
-            .filter(ReviewCard.reps == 0, ReviewCard.due <= now)
+            .filter(
+                ReviewCard.reps == 0,
+                ReviewCard.due <= now,
+                ReviewCard.card_type != "shadowing",
+            )
             .order_by(ReviewCard.created, ReviewCard.id)
             .limit(c["new_allowed_today"])
             .all()
         )
+        new_shadowing = []
+        if shadow_room > 0:
+            new_shadowing = (
+                session.query(ReviewCard)
+                .filter(
+                    ReviewCard.reps == 0,
+                    ReviewCard.due <= now,
+                    ReviewCard.card_type == "shadowing",
+                )
+                .order_by(ReviewCard.created, ReviewCard.id)
+                .limit(min(c["new_allowed_today"], shadow_room))
+                .all()
+            )
+        # The global daily-new cap still rules the mix; the shadowing
+        # subset is already bounded by shadow_room.
+        new_cards = sorted(
+            new_regular + new_shadowing,
+            key=lambda card: (card.created or now, card.id),
+        )[: c["new_allowed_today"]]
 
     lookup = SentenceLookup({}, ReferencesRepository(session))
     now_aware = _utcnow_aware()
@@ -137,13 +213,29 @@ def _card_view(dbcard, lookup, sched, now_aware):
         # holds the terms of every language the user studies, and
         # tts.js's own detection is for the reader's single book.
         "lang_code": get_lang_code_for(term.language),
+        "language_id": term.language_id,
         "reps": dbcard.reps,
     }
     if dbcard.card_type == "cloze":
         view["sentence_blank"] = _cloze_front(sentence, term)
+    if dbcard.card_type == "shadowing":
+        # The shadowing card has no reading page to collect word spans
+        # from, so the server tokenizes the sentence into the same token
+        # space the diff scores (and the client renders it as spans).
+        plain = _plain_text(sentence)
+        view["sentence_plain"] = plain
+        view["sentence_tokens"] = shadowing.tokenize_for_diff(plain, term.language)
+        # SenseVoice first, whisper as the fallback: when neither can
+        # run, the card degrades to read-and-self-grade.
+        view["transcribe_available"] = shadowing.transcription_available(term.language)
     fcard = scheduler.load_card(dbcard)
     view["intervals"] = scheduler.preview_intervals(sched, fcard, now_aware)
     return view
+
+
+def _plain_text(sentence_html):
+    "The sentence without its <b></b> markup, for speaking and scoring."
+    return re.sub(r"<[^>]+>", "", sentence_html or "").strip()
 
 
 def _image_src(term):
@@ -178,13 +270,16 @@ def _normalize_answer(s):
     return re.sub(r"\s+", " ", s).strip().casefold()
 
 
-def grade(session, card_id, rating_int, typed_answer=None):
+def grade(session, card_id, rating_int, typed_answer=None, shadowing_score=None):
     """
     Grade one card: check typed answers (recall/cloze), run FSRS,
     persist the new state and a review log.
 
-    A wrong typed answer forces rating 1 (Again).  Returns a result
-    dict; raises SchedulerUnavailableError when fsrs is missing.
+    A wrong typed answer forces rating 1 (Again).  shadowing_score (the
+    take's 0-100, when the client scored one) is recorded on the log
+    for the stats page; it only reports, it never overrides the user's
+    rating -- an ASR mishear must not punish the schedule.  Returns a
+    result dict; raises SchedulerUnavailableError when fsrs is missing.
     """
     card = session.get(ReviewCard, card_id)
     if card is None:
@@ -199,6 +294,15 @@ def grade(session, card_id, rating_int, typed_answer=None):
         )
         if not correct:
             rating_int = 1
+
+    extra = {}
+    if shadowing_score is not None:
+        try:
+            sval = int(shadowing_score)
+            if 0 <= sval <= 100:
+                extra["shadowing_score"] = sval
+        except (TypeError, ValueError):
+            pass
 
     st = _settings(session)
     sched = scheduler.load_scheduler(st["desired_retention"])
@@ -221,7 +325,7 @@ def grade(session, card_id, rating_int, typed_answer=None):
             rating=rating_int,
             reps_before=reps_before,
             data=json.dumps(
-                {"before": state_before, "log": scheduler.log_snapshot(flog)}
+                {"before": state_before, "log": scheduler.log_snapshot(flog), **extra}
             ),
         )
     )

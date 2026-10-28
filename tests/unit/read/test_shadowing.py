@@ -15,7 +15,10 @@ from unittest.mock import patch
 import pytest
 
 from lute.book import sensevoice
+from lute.db import db
 from lute.read import shadowing
+
+from tests.utils import add_terms
 
 
 @pytest.fixture(autouse=True)
@@ -57,13 +60,22 @@ class _FakeParsedToken:
 class _FakeParser:
     "Duck-typed parser: fixed readings + plain lowercase."
 
-    def __init__(self, readings=None, multi_readings=None, context_readings=None):
+    def __init__(
+        self,
+        readings=None,
+        multi_readings=None,
+        context_readings=None,
+        normalized_forms=None,
+    ):
         self.readings = readings or {}
         self.multi_readings = multi_readings or {}
         # [(surface, reading-or-None)] a get_context_readings call answers,
         # or None to simulate a parser without contextual readings.
         self.context_readings = context_readings
         self.context_calls = []
+        # surface -> dictionary's normalized spelling, or None to
+        # simulate a parser with no such normalization.
+        self.normalized_forms = normalized_forms
 
     def get_reading(self, text):
         return self.readings.get(text)
@@ -74,6 +86,11 @@ class _FakeParser:
     def get_context_readings(self, text):
         self.context_calls.append(text)
         return self.context_readings
+
+    def get_normalized_form(self, text):
+        if self.normalized_forms is None:
+            return None
+        return self.normalized_forms.get(text)
 
     def get_lowercase(self, text):
         return text.lower()
@@ -89,10 +106,13 @@ class _FakeLanguage:
         readings=None,
         multi_readings=None,
         context_readings=None,
+        normalized_forms=None,
     ):
         self.parser_type = parser_type
         self.spoken_tokens = spoken_tokens
-        self._parser = _FakeParser(readings, multi_readings, context_readings)
+        self._parser = _FakeParser(
+            readings, multi_readings, context_readings, normalized_forms
+        )
 
     @property
     def parser(self):
@@ -258,6 +278,40 @@ def test_voicing_swap_never_rescues_unrelated_words():
     assert res["score"] == 0
 
 
+def test_hangul_to_romaja():
+    "Unicode composes each syllable from jamo indices; no dictionary needed."
+    assert shadowing._hangul_to_romaja("선배") == "seonbae"
+    assert shadowing._hangul_to_romaja("한국") == "hanguk"
+    assert shadowing._hangul_to_romaja("です") == "です"
+    assert shadowing._hangul_to_romaja("선배べ") == "seonbaeべ"
+
+
+def test_japanese_korean_cognate_leakage_is_fuzzy():
+    """
+    SenseVoice trains Japanese and Korean on one model, and a Japanese
+    word with a Korean cognate can come back in hangul (先輩 せんぱい ->
+    선배).  Romaja against the reading's romaji makes it the near-miss it
+    sounds like, with the hangul shown as what was heard.
+    """
+    lang = _FakeLanguage(
+        ["上田", "선배", "です"],
+        parser_type="japanese",
+        readings={"先輩": "せんぱい"},
+    )
+    res = shadowing.compare_tokens(["上田", "先輩", "です"], "上田 선배 です", lang)
+    assert res["statuses"] == [2, 1, 2]
+    assert res["spoken_for_fuzzy"] == {1: "선배"}
+    assert res["score"] == 83
+
+
+def test_japanese_korean_leakage_with_a_different_sound_stays_a_miss():
+    "The romaja rescue must not paper over genuinely different sounds."
+    lang = _FakeLanguage(["방"], parser_type="japanese", readings={"犬": "いぬ"})
+    res = shadowing.compare_tokens(["犬"], "방", lang)
+    assert res["statuses"] == [0]
+    assert res["score"] == 0
+
+
 def test_chinese_misread_by_sound_is_fuzzy_not_miss():
     """
     A Chinese misread is a different character, so the surface forms
@@ -290,6 +344,101 @@ def test_pinyin_tone_marks_count_for_the_sound_rescue():
     assert res["spoken_for_fuzzy"] == {0: "骂"}
 
 
+def test_han_numeral_run_values():
+    "Digits concatenate, units multiply and add; no digits before a unit means one."
+    f = shadowing._han_numeral_run_value
+    assert f("二十") == 20
+    assert f("二千") == 2000
+    assert f("两千零二十五") == 2025
+    assert f("二〇二五") == 2025
+    assert f("十九") == 19
+    assert f("一千万") == 10000000
+    assert f("二万五千") == 25000
+
+
+def test_chinese_arabic_numerals_match_han_numerals():
+    """
+    SenseVoice's ITN writes numbers as digits: 二千/二十 come back as
+    2000/20.  The diff keys fold Han numeral runs to their value, so the
+    鲁迅 sentence's 二千馀里 matches the transcribed 2000余里, variant
+    馀 included.
+    """
+    lang = _FakeLanguage(["我", "冒", "了", "严寒", "回到", "相隔", "2000", "余", "里"])
+    lang.tts_lang = "zh"
+    res = shadowing.compare_tokens(
+        ["我", "冒", "了", "严寒", "回到", "相隔", "二千", "馀", "里"],
+        "我冒了严寒回到相隔2000余里",
+        lang,
+    )
+    assert res["statuses"] == [2] * 9
+    assert res["score"] == 100
+
+
+def test_chinese_digit_by_digit_year_folds_to_the_same_value():
+    "The digit-by-digit year reading and the cardinal share the value."
+    lang = _FakeLanguage(["2025"])
+    lang.tts_lang = "zh"
+    res = shadowing.compare_tokens(["二〇二五"], "2025", lang)
+    assert res["statuses"] == [2]
+
+
+def test_chinese_homophone_heard_is_a_match():
+    """
+    The engine cannot tell homophones apart: 观潮 (guāncháo) answered as
+    官潮 is the sound said exactly, so a full match -- not the near-miss
+    the romanization rescue used to cap at.
+    """
+    lang = _FakeLanguage(["官潮"], readings={"观潮": "guān cháo", "官潮": "guān cháo"})
+    lang.tts_lang = "zh"
+    res = shadowing.compare_tokens(["观潮"], "官潮", lang)
+    assert res["statuses"] == [2]
+    assert res["spoken_for_fuzzy"] == {}
+
+
+def test_chinese_variant_yu_is_a_match_not_a_near_miss():
+    """
+    馀 is the simplified variant of 餘 (余) that opencc's t2s table
+    misses: the book's 馀 against the engine's 余 is the same word, a
+    full match -- not the same-pinyin near-miss the sound rescue gave.
+    """
+    lang = _FakeLanguage(["余"])
+    lang.tts_lang = "zh"
+    res = shadowing.compare_tokens(["馀"], "余", lang)
+    assert res["statuses"] == [2]
+    assert res["spoken_for_fuzzy"] == {}
+
+
+def test_chinese_single_chars_glued_into_a_heard_chunk_match():
+    """
+    The engine answers 馀 + 里 with the parser's single token 余里: each
+    Han character is a whole word, so its verbatim occurrence inside the
+    glued chunk is the word said -- matches, not syllable half-credit.
+    """
+    lang = _FakeLanguage(["相隔", "二", "0", "余里"])
+    lang.tts_lang = "zh"
+    res = shadowing.compare_tokens(["相隔", "二千", "馀", "里"], "相隔 二 0 余里", lang)
+    # 二千 was only partially captured (二 0): an attempted number.
+    assert res["statuses"] == [2, 1, 2, 2]
+    assert res["spoken_for_fuzzy"] == {1: "二"}
+
+
+def test_chinese_partial_numeric_capture_is_fuzzy():
+    "The engine's 二 0 for 二千 lands some digits: attempted, half credit."
+    lang = _FakeLanguage(["二"])
+    lang.tts_lang = "zh"
+    res = shadowing.compare_tokens(["二千"], "二", lang)
+    assert res["statuses"] == [1]
+    assert res["spoken_for_fuzzy"] == {0: "二"}
+
+
+def test_chinese_unrelated_digit_stays_a_miss():
+    "A digit that is no prefix of the target's value is still a miss."
+    lang = _FakeLanguage(["0"])
+    lang.tts_lang = "zh"
+    res = shadowing.compare_tokens(["二千"], "0", lang)
+    assert res["statuses"] == [0]
+
+
 def test_word_left_inside_a_glued_spoken_token_is_a_match():
     """
     The engines can glue adjacent words into one chunk that is not the
@@ -319,18 +468,18 @@ def test_word_left_inside_a_glued_spoken_token_is_a_match():
 
 def test_leftover_word_rescued_by_syllables_inside_a_merged_token():
     """
-    A left-behind word need not be verbatim in the chunk to count:
-    夠 + 喇 heard as the single token 夠啦.  夠 pairs with the chunk on
-    its surface form; 喇 has no counterpart left, but its syllable is
-    in the chunk's reading (gau3 laa1), so it is the near-miss it
-    sounds like instead of a skip.
+    A left-behind word need not appear in the chunk to count: 夠 + 喇
+    heard as the single token 夠剌.  夠 is verbatim in the chunk, so it
+    is a match; 喇 is not, but its syllable is in the chunk's reading
+    (gau3 laa1), so it is the near-miss it sounds like instead of a
+    skip.
     """
-    lang = _FakeLanguage(["夠啦"], readings={"夠": "gau3", "喇": "laa3", "夠啦": "gau3 laa1"})
+    lang = _FakeLanguage(["夠剌"], readings={"夠": "gau3", "喇": "laa3", "夠剌": "gau3 laa1"})
     lang.tts_lang = "zh-HK"
-    res = shadowing.compare_tokens(["夠", "喇"], "夠啦", lang)
-    assert res["statuses"] == [1, 1]
-    assert res["spoken_for_fuzzy"] == {0: "夠啦", 1: "夠啦"}
-    assert res["score"] == 50
+    res = shadowing.compare_tokens(["夠", "喇"], "夠剌", lang)
+    assert res["statuses"] == [2, 1]
+    assert res["spoken_for_fuzzy"] == {1: "夠剌"}
+    assert res["score"] == 75
 
 
 def test_chinese_rescue_judges_on_every_reading_the_parser_offers():
@@ -500,6 +649,115 @@ def test_japanese_heard_side_also_reads_in_context():
     res = shadowing.compare_tokens(["私", "は"], "私は", lang, original_full_text="私は")
     assert res["statuses"] == [2, 2]
     assert res["score"] == 100
+
+
+def test_japanese_kana_word_written_as_kanji_by_the_engine_is_a_match():
+    """
+    The sentence prints わたし in kana and SenseVoice answers 私.
+
+    A kanji's reading is a fixed dictionary field and 私 is filed at
+    わたくし, which sits 0.857 from わたし: a half-credit misread that no
+    amount of correct reading can avoid, because the kana is what the
+    learner was told to say.  Both spellings normalize to 私, so the
+    word was said right.
+    """
+    lang = _FakeLanguage(
+        ["私", "は"],
+        parser_type="japanese",
+        readings={"私": "わたくし", "わたし": "わたし"},
+        normalized_forms={"わたし": "私"},
+    )
+    res = shadowing.compare_tokens(
+        ["わたし", "は"], "私は", lang, original_full_text="わたしは"
+    )
+    assert res["statuses"] == [2, 2]
+    assert res["spoken_for_fuzzy"] == {}
+    # The panel annotates the heard word with this, not with 私's own
+    # dictionary reading (わたくし).
+    assert res["spoken_kana"] == {0: "わたし"}
+    assert res["score"] == 100
+
+
+def test_japanese_two_kanji_forms_are_still_judged_on_their_readings():
+    """
+    The rescue covers a kana sentence word only.
+
+    A kanji the book printed must still be read the way the book's
+    sentence reads it, so 一日 read as ついたち stays a misread even
+    though both sides normalize to 一日.
+    """
+    lang = _FakeLanguage(
+        ["ついたち"],
+        parser_type="japanese",
+        readings={"一日": "いちにち", "ついたち": "ついたち"},
+        normalized_forms={"一日": "一日"},
+    )
+    res = shadowing.compare_tokens(["一日"], "ついたち", lang, original_full_text="一日")
+    assert res["statuses"] == [1]
+    assert res["spoken_for_fuzzy"] == {0: "ついたち"}
+
+
+def test_japanese_kana_transcription_is_judged_by_sound():
+    """
+    A kana transcription is a transcript of the sound itself.
+
+    わたし heard as わたくし is a different word form the learner really
+    said, not the engine's choice of spelling, so normalizing both to 私
+    must not turn it into a match.
+    """
+    lang = _FakeLanguage(
+        ["わたくし"],
+        parser_type="japanese",
+        readings={"わたし": "わたし", "わたくし": "わたくし"},
+        normalized_forms={"わたし": "私", "わたくし": "私"},
+    )
+    res = shadowing.compare_tokens(
+        ["わたし"], "わたくし", lang, original_full_text="わたし"
+    )
+    assert res["statuses"] == [1]
+    assert res["spoken_for_fuzzy"] == {0: "わたくし"}
+
+
+def test_japanese_word_the_engine_cut_into_morphemes_is_a_match():
+    """
+    One word on the page, several morphemes in the transcription.
+
+    The page's term としました comes back from the parser as と + し +
+    まし + た, and because the engine's 向こう (the tail of a misheard
+    振り向こう) sat in front of them, the positional pairing handed
+    向こう to としました and pushed the four morphemes that spell it
+    into "also heard" -- a correctly said word scored as a miss, with a
+    readout claiming the learner said 向こう instead.
+    """
+    lang = _FakeLanguage(
+        ["私", "は", "振い", "向こう", "と", "し", "まし", "た"],
+        parser_type="japanese",
+        readings={
+            "私": "わたし",
+            "は": "は",
+            "振り向こう": "ふりむこう",
+            "振い": "ふるい",
+            "向こう": "むこう",
+            "としました": "としました",
+            "と": "と",
+            "し": "し",
+            "まし": "まし",
+            "た": "た",
+        },
+    )
+    res = shadowing.compare_tokens(
+        ["わたし", "は", "振り向こう", "としました"],
+        "私は振い向こうとしました",
+        lang,
+        original_full_text="わたしは振り向こうとしました",
+    )
+    assert res["statuses"] == [2, 2, 0, 2]
+    # The word's positional counterpart was the engine's extra, not the
+    # word: it moves to "also heard" rather than reporting that the
+    # learner said 向こう in place of としました.
+    assert res["spoken_for_miss"] == {2: "振い"}
+    assert res["extras"] == ["向こう"]
+    assert res["score"] == 75
 
 
 def test_japanese_word_inside_glued_heard_chunk_is_a_match():
@@ -774,6 +1032,115 @@ def test_annotate_tokens_non_japanese_ignores_full_text():
     assert lang.parser.context_calls == []
 
 
+def test_supports_readings_by_parser_type():
+    "Only parsers with a readings source count (Japanese, Mandarin, Cantonese, Thai)."
+    assert shadowing.supports_readings(_FakeLanguage([], parser_type="japanese"))
+    assert shadowing.supports_readings(
+        _FakeLanguage([], parser_type="japanese_sudachi")
+    )
+    assert shadowing.supports_readings(_FakeLanguage([], parser_type="lute_mandarin"))
+    assert shadowing.supports_readings(_FakeLanguage([], parser_type="lute_cantonese"))
+    assert shadowing.supports_readings(_FakeLanguage([], parser_type="thai"))
+    assert shadowing.supports_readings(_FakeLanguage([], parser_type="lute_thai"))
+    assert not shadowing.supports_readings(_FakeLanguage([], parser_type="spacedel"))
+    assert not shadowing.supports_readings(_FakeLanguage([], parser_type="korean"))
+    assert not shadowing.supports_readings(None)
+
+
+def test_supports_readings_classical_chinese_excluded():
+    "文言文 uses no plugin parser, so name-based matching must not claim it."
+    lang = _FakeLanguage([], parser_type="spacedel", readings={"學": "xué"})
+    lang.name = "Classical Chinese"
+    assert not shadowing.supports_readings(lang)
+
+
+def test_annotate_tokens_mandarin_pinyin_readings():
+    "The lute-mandarin plugin's pinyin answers become furigana readings."
+    lang = _FakeLanguage(
+        [], parser_type="lute_mandarin", readings={"银行": "yín háng", "吗": "ma"}
+    )
+    annotated = shadowing.annotate_tokens(["银行", "吗"], lang)
+    assert annotated == [
+        {"text": "银行", "reading": "yín háng"},
+        {"text": "吗", "reading": "ma"},
+    ]
+
+
+def test_annotate_tokens_cantonese_jyutping_readings():
+    "The lute-cantonese plugin's jyutping answers become furigana readings."
+    lang = _FakeLanguage([], parser_type="lute_cantonese", readings={"你好": "nei5 hou2"})
+    annotated = shadowing.annotate_tokens(["你好"], lang)
+    assert annotated == [{"text": "你好", "reading": "nei5 hou2"}]
+
+
+def test_annotate_tokens_thai_rtgs_readings():
+    "The lute-thai plugin's RTGS romanization answers become furigana readings."
+    lang = _FakeLanguage([], parser_type="lute_thai", readings={"สวัสดี": "sàwàtdi"})
+    annotated = shadowing.annotate_tokens(["สวัสดี"], lang)
+    assert annotated == [{"text": "สวัสดี", "reading": "sàwàtdi"}]
+
+
+class _FakeThaiParser(_FakeParser):
+    "Duck-typed Thai parser: RTGS readings plus digit-toned sound keys."
+
+    def __init__(self, keys):
+        super().__init__()
+        self.keys = keys
+
+    def get_reading_key(self, text):
+        return self.keys.get(text)
+
+
+def test_make_sound_fn_thai_uses_reading_key():
+    """
+    Thai now gets the sound rescue: a misread is judged on the parser's
+    digit-toned RTGS key (ครับ -> khrap4), not on the surface spelling.
+    """
+    lang = _FakeLanguage([], parser_type="lute_thai")
+    lang._parser = _FakeThaiParser(
+        {"\u0e04\u0e23\u0e31\u0e1a": "khrap4", "\u0e04\u0e31\u0e1a": "krap4"}
+    )
+    sound = shadowing._make_sound_fn(lang)
+    assert sound is not None, "thai gets a sound fn"
+    assert sound("\u0e04\u0e23\u0e31\u0e1a") == ["khrap4"]
+    assert sound("\u0e04\u0e31\u0e1a") == ["krap4"]
+
+
+def test_make_sound_fn_thai_without_key_returns_empty():
+    """
+    An old Thai plugin without get_reading_key gets no rescue: the key
+    path answers [] and the surface diff is unchanged, exactly as
+    before the enhancement.
+    """
+    lang = _FakeLanguage([], parser_type="lute_thai")
+    sound = shadowing._make_sound_fn(lang)
+    assert sound is not None, "thai gets a sound fn"
+    assert sound("\u0e04\u0e23\u0e31\u0e1a") == []
+
+
+def test_annotate_tokens_chinese_has_no_context_parse():
+    "Chinese parsers answer per token; full_text never triggers a context parse."
+    lang = _FakeLanguage(
+        [],
+        parser_type="lute_mandarin",
+        readings={"天氣": "tiān qì"},
+        context_readings=[("天氣", "完全不同")],
+    )
+    annotated = shadowing.annotate_tokens(["天氣"], lang, full_text="天氣")
+    assert annotated == [{"text": "天氣", "reading": "tiān qì"}]
+    assert lang.parser.context_calls == []
+
+
+def test_annotate_tokens_chinese_missing_reading_is_none():
+    "Tokens the parser has no reading for show plain."
+    lang = _FakeLanguage([], parser_type="lute_mandarin", readings={"天氣": "tiān qì"})
+    annotated = shadowing.annotate_tokens(["天氣", "很好"], lang)
+    assert annotated == [
+        {"text": "天氣", "reading": "tiān qì"},
+        {"text": "很好", "reading": None},
+    ]
+
+
 # ---------------------------------------------------------------------
 # transcribe_clip (fake model; faster-whisper is never imported)
 # ---------------------------------------------------------------------
@@ -813,11 +1180,31 @@ def test_transcribe_clip_uses_greedy_decoding_without_word_timestamps():
 # ---------------------------------------------------------------------
 
 
-def test_route_requires_whisper(app, client, english):
-    with patch.object(shadowing, "whisper_status", return_value={"installed": False}):
-        resp = client.post("/read/shadowing/transcribe", data={})
+def test_route_requires_an_engine(app, client, english):
+    "No engine at all: SenseVoice unavailable AND whisper not installed."
+    with patch.object(sensevoice, "lang_code_for", return_value="en"), patch.object(
+        sensevoice, "available", return_value=False
+    ), patch.object(shadowing, "whisper_status", return_value={"installed": False}):
+        resp = client.post(
+            "/read/shadowing/transcribe",
+            data={"language_id": str(english.id), "tokens": "[]"},
+        )
     assert resp.status_code == 400
-    assert "not installed" in resp.get_json()["error"]
+    assert "No transcription engine" in resp.get_json()["error"]
+
+
+def test_route_sensevoice_counts_as_an_engine(app, client, english):
+    "SenseVoice primary: available() alone satisfies the pre-check."
+    with patch.object(sensevoice, "lang_code_for", return_value="en"), patch.object(
+        sensevoice, "available", return_value=True
+    ), patch.object(shadowing, "whisper_status", return_value={"installed": False}):
+        resp = client.post(
+            "/read/shadowing/transcribe",
+            data={"language_id": str(english.id), "tokens": "[]"},
+        )
+    assert resp.status_code == 400
+    # Past the engine gate, into the next validation.
+    assert "no audio" in resp.get_json()["error"]
 
 
 def test_route_requires_audio(app, client, english):
@@ -1081,6 +1468,63 @@ def test_route_hears_kana_in_the_book_script(app, app_context, client, japanese)
     assert body["score"] == 100
 
 
+def test_route_reads_the_heard_kanji_as_the_sentence_s_kana(
+    app, app_context, client, japanese
+):
+    """
+    Regression from a real Japanese take.  The sentence prints わたし in
+    kana; SenseVoice answered 私, and the "heard" line annotated it with
+    私's dictionary reading わたくし -- a reading the learner never
+    produced, on a word that now scores as said.  The furigana (and the
+    reading the panel speaks) must be the kana from the sentence.
+    """
+    from lute.settings.current import current_settings
+
+    if not shadowing.is_japanese_language(japanese):
+        pytest.skip("the test database's Japanese language is unavailable")
+    if japanese.parser.get_normalized_form("わたし") is None:
+        pytest.skip("Japanese parser is not Sudachi; no normalized form")
+
+    current_settings()["japanese_reading"] = "hiragana"
+
+    def _fake_sv(audio_path, lang_code):
+        assert lang_code == "ja"
+        return "私は学生です", 4.0
+
+    with patch.object(
+        shadowing, "whisper_status", return_value={"installed": True}
+    ), patch.object(sensevoice, "available", return_value=True), patch.object(
+        sensevoice, "ensure_model_downloaded"
+    ), patch.object(
+        sensevoice, "transcribe_clip", side_effect=_fake_sv
+    ):
+        resp = client.post(
+            "/read/shadowing/transcribe",
+            data={
+                "language_id": str(japanese.id),
+                "tokens": json.dumps(["わたし", "は", "学生", "です"]),
+                "full_text": "わたしは学生です",
+                "audio": (io.BytesIO(b"fake webm bytes"), "clip.webm"),
+            },
+            content_type="multipart/form-data",
+        )
+        assert resp.status_code == 200
+        status = _wait_for_task(resp.get_json()["task_id"])
+
+    assert status["state"] == "finished"
+    body = status["result"]
+    # The transcription stays what the engine returned ...
+    assert body["transcription"] == "私は学生です"
+    # ... the word is the one that was said ...
+    assert body["statuses"] == [2, 2, 2, 2]
+    assert body["score"] == 100
+    # ... and its furigana is the sentence's kana, not 私's わたくし.
+    heard = {t["text"]: t["reading"] for t in body["transcription_tokens"]}
+    assert heard["私"] == "わたし"
+    # Words the sentence prints in kanji keep their own readings.
+    assert heard["学生"] == "がくせい"
+
+
 def test_route_chinese_matches_across_simplified_traditional(app, app_context, client):
     """
     SenseVoice emits simplified Han even for Cantonese; the diff folds
@@ -1124,8 +1568,9 @@ def test_cantonese_traditional_matches_sensevoice_simplified():
     Regression from a real Cantonese take.  The sentence 呢個係阿樂佢嘅...
     is traditional; SenseVoice answers in simplified with its own token
     boundaries (呢个 系阿乐 ... 剪了).  With the t2s fold plus the
-    multi-token drift runs, everything actually heard matches; only the
-    garbled 頭髮好長 (heard as 道法口层) and the unheard 喇 stay misses.
+    multi-token drift runs, everything actually heard matches -- 剪
+    verbatim inside the glued 剪了 included; only the garbled 頭髮好長
+    (heard as 道法口层) and the unheard 喇 stay misses.
     """
     try:
         from opencc import OpenCC  # noqa: F401
@@ -1142,9 +1587,9 @@ def test_cantonese_traditional_matches_sensevoice_simplified():
         "呢个系阿乐佢嘅道法口层要剪了",
         lang,
     )
-    assert res["statuses"] == [2, 2, 2, 2, 2, 2, 0, 0, 2, 1, 0]
-    assert res["spoken_for_fuzzy"] == {9: "剪了"}
-    assert res["score"] == 68
+    assert res["statuses"] == [2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 0]
+    assert res["spoken_for_fuzzy"] == {}
+    assert res["score"] == 73
 
 
 def test_match_book_script_converts_simplified_heard_to_traditional():
@@ -1313,6 +1758,25 @@ def test_readings_route_japanese_reads_in_context(app, client, japanese):
     assert by_text["一つ"] == "ひとつ"
 
 
+def test_sudachi_normalized_form_folds_kana_onto_kanji(app_context, japanese):
+    """
+    The cross-script rescue rests on the dictionary's normalized
+    spelling, which must collapse a kana word onto the kanji it is filed
+    under without merging words that only sound alike.
+    """
+    parser = japanese.parser
+    if parser.get_normalized_form("わたし") is None:
+        pytest.skip("Japanese parser is not Sudachi; no normalized form")
+
+    assert parser.get_normalized_form("わたし") == "私"
+    assert parser.get_normalized_form("あたし") == "私"
+    # Already its normalized form: nothing to report.
+    assert parser.get_normalized_form("私") is None
+    # Homophones keep their own spellings, so they can never be confused.
+    assert parser.get_normalized_form("箸") is None
+    assert parser.get_normalized_form("橋") is None
+
+
 def test_route_unknown_model_falls_back_to_default(app, app_context, client, english):
     sizes = []
 
@@ -1397,3 +1861,136 @@ def test_route_transcription_error_fails_the_task_and_cleans_temp(
     assert "model exploded" in status["error"]
     leftovers = [f for f in os.listdir(tempdir) if f.startswith("shadowing_")]
     assert leftovers == []
+
+
+# ---------------------------------------------------------------------
+# Attempt persistence, word marking and availability
+# (real db: these run against empty_db with the demo languages)
+# ---------------------------------------------------------------------
+
+
+def test_persist_attempt_stores_the_take(empty_db, spanish):
+    "A finished take lands in shadowattempts with its verdicts."
+    shadowing.persist_attempt(
+        spanish.id,
+        87,
+        source="review",
+        sentence="Tengo un gato.",
+        duration=3.2,
+        tokens_per_min=42.0,
+        engine="sensevoice",
+        tokens_statuses=[
+            {"text": "Tengo", "status": 2},
+            {"text": "un", "status": 0},
+            {"text": "gato", "status": 1},
+        ],
+    )
+
+    from lute.models.shadowing import ShadowAttempt
+
+    row = db.session.query(ShadowAttempt).one()
+    assert row.language_id == spanish.id
+    assert row.source == "review"
+    assert row.score == 87
+    assert row.engine == "sensevoice"
+    stored = json.loads(row.tokens)
+    assert [t["status"] for t in stored] == [2, 0, 1]
+
+
+def test_persist_attempt_rejects_a_bogus_source(empty_db, spanish):
+    "An unknown source falls back to 'read' rather than failing."
+    shadowing.persist_attempt(spanish.id, 50, source="somewhere-else")
+
+    from lute.models.shadowing import ShadowAttempt
+
+    row = db.session.query(ShadowAttempt).one()
+    assert row.source == "read"
+
+
+def test_mark_word_creates_a_learning_term(empty_db, spanish):
+    "A stumble on a word nobody has seen creates it as learning (1)."
+    res = shadowing.mark_word_for_review(db.session, spanish, "perro")
+
+    assert res["outcome"] == "created"
+    from lute.models.term import Term
+
+    term = db.session.query(Term).filter_by(text_lc="perro").one()
+    assert term.status == 1
+
+
+def test_mark_word_promotes_an_unknown_term(empty_db, spanish):
+    "An unknown (0) term is promoted to learning; 1-5 words are left alone."
+    terms = add_terms(spanish, ["gato", "perro"])
+    terms[0].status = 0
+    terms[1].status = 4
+    db.session.add_all(terms)
+    db.session.commit()
+
+    assert shadowing.mark_word_for_review(db.session, spanish, "gato")["outcome"] == (
+        "promoted"
+    )
+    assert shadowing.mark_word_for_review(db.session, spanish, "perro")["outcome"] == (
+        "learning"
+    )
+    db.session.refresh(terms[0])
+    db.session.refresh(terms[1])
+    assert terms[0].status == 1
+    assert terms[1].status == 4
+
+
+def test_mark_word_never_demotes_known_words(empty_db, spanish):
+    "Well-known and ignored words are reported, not rewritten."
+    terms = add_terms(spanish, ["casa", "mesa"])
+    terms[0].status = 99
+    terms[1].status = 98
+    db.session.add_all(terms)
+    db.session.commit()
+
+    res = shadowing.mark_word_for_review(db.session, spanish, "casa")
+    assert res["outcome"] == "known"
+    db.session.refresh(terms[0])
+    assert terms[0].status == 99
+
+
+def test_mark_word_ignores_junk(empty_db, spanish):
+    "Punctuation-only or empty clicks are reported as invalid."
+    res = shadowing.mark_word_for_review(db.session, spanish, "。")
+    assert res["outcome"] == "invalid"
+
+
+def test_mark_word_endpoint(app, client, empty_db, spanish):
+    "The route answers with the outcome payload."
+    resp = client.post(
+        "/read/shadowing/mark_unknown",
+        json={"language_id": spanish.id, "text": "perro"},
+    )
+    assert resp.status_code == 200
+    assert resp.get_json()["outcome"] == "created"
+
+
+def test_tokenize_for_diff_uses_the_language_parser(empty_db, spanish):
+    "The review-side tokens come out in the same space the diff scores."
+    toks = shadowing.tokenize_for_diff("Tengo un gato. El gato es negro.", spanish)
+    assert "gato" in toks
+    # Punctuation never becomes a token of its own.
+    assert all(t not in (".", ",") for t in toks)
+
+
+def test_transcription_available_needs_sensevoice_or_whisper(
+    empty_db, spanish, monkeypatch
+):
+    "SenseVoice-first: available SenseVoice says yes; else whisper decides."
+    monkeypatch.setattr(
+        sensevoice,
+        "lang_code_for",
+        lambda lang: "es" if lang is spanish else None,
+    )
+    monkeypatch.setattr(sensevoice, "available", lambda: True)
+    assert shadowing.transcription_available(spanish) is True
+
+    monkeypatch.setattr(sensevoice, "available", lambda: False)
+    monkeypatch.setattr(shadowing, "whisper_status", lambda: {"installed": True})
+    assert shadowing.transcription_available(spanish) is True
+
+    monkeypatch.setattr(shadowing, "whisper_status", lambda: {"installed": False})
+    assert shadowing.transcription_available(spanish) is False

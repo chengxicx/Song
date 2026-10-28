@@ -63,6 +63,7 @@ from lute.term.lemma_parents import (
     select_links,
     would_cycle,
 )
+from lute.term.lemma_provider import LemmaProvider, lemma_provider_for
 
 
 class TermParentBackfillError(Exception):
@@ -73,7 +74,7 @@ REASON_LABELS = {
     REASON_HAS_PARENT: "already has a parent (left alone)",
     REASON_MULTI_TOKEN: "multi-token term (contains a zero-width space)",
     REASON_KANA: "all hiragana: no dictionary form",
-    REASON_NO_LEMMA: "parser returned no dictionary form",
+    REASON_NO_LEMMA: "no dictionary form (the term is already its own lemma)",
     REASON_CONCATENATED: "lemma is a concatenation of several words",
     REASON_SYNC_FLAG: "child has WoSyncStatus = 1",
     REASON_SELF: "lemma is the term itself",
@@ -87,6 +88,8 @@ class BackfillResult:  # pylint: disable=too-many-instance-attributes
 
     language: str = ""
     language_id: int = 0
+    # Which engine supplied the dictionary forms (see lute/term/lemma_provider.py).
+    lemma_source: str = ""
     total_terms: int = 0
     terms_with_parent_before: int = 0
     limit: Optional[int] = None
@@ -121,6 +124,7 @@ def run_backfill(  # pylint: disable=too-many-arguments,too-many-locals,too-many
     new_parent_status: str = "inherit",
     audit_path: Optional[str] = None,
     multi_token_policy: str = POLICY_SKIP_MULTI_TOKEN,
+    provider: Optional[LemmaProvider] = None,
 ) -> BackfillResult:
     """
     Scan a language's terms, then (when commit) create the links.
@@ -128,6 +132,10 @@ def run_backfill(  # pylint: disable=too-many-arguments,too-many-locals,too-many
     new_parent_status is "inherit" (the parent is created with the status
     of the first child that points at it, matching what the manual paths
     do) or "zero" (created as unknown).
+
+    provider defaults to lemma_provider_for(language); it is a parameter
+    so tests can inject a stub without the language's grammar engine
+    installed.
     """
     if new_parent_status not in ("inherit", "zero"):
         raise TermParentBackfillError(
@@ -143,19 +151,21 @@ def run_backfill(  # pylint: disable=too-many-arguments,too-many-locals,too-many
     if lang is None:
         raise TermParentBackfillError(f"No language named '{language_name}'.")
 
-    parser = lang.parser
-    content_token_count = getattr(parser, "content_token_count", None)
-    if content_token_count is None or not callable(content_token_count):
+    provider = provider or lemma_provider_for(lang)
+    if provider is None:
         raise TermParentBackfillError(
-            f"Parser type '{lang.parser_type}' has no content_token_count(), so the "
-            "'lemma is a concatenation' filter cannot run.  Nothing was written."
-        )
-    if parser.get_lemma("日本語") is None and parser.get_lemma("食べた") is None:
-        raise TermParentBackfillError(
-            f"Parser type '{lang.parser_type}' returns no lemmas; nothing to backfill."
+            f"No dictionary-form source for '{lang.name}' (parser type "
+            f"'{lang.parser_type}').  Japanese needs sudachipy; the spaCy "
+            "languages need their grammar-engine extra installed.  "
+            "Nothing was written."
         )
 
-    res = BackfillResult(language=lang.name, language_id=lang.id, limit=limit)
+    res = BackfillResult(
+        language=lang.name,
+        language_id=lang.id,
+        limit=limit,
+        lemma_source=provider.label,
+    )
 
     words = Term.__table__
     rows = db.session.execute(
@@ -178,12 +188,12 @@ def run_backfill(  # pylint: disable=too-many-arguments,too-many-locals,too-many
 
     def lemma_of(s):
         if s not in lemma_cache:
-            lemma_cache[s] = parser.get_lemma(s)
+            lemma_cache[s] = provider.lemma_of(s)
         return lemma_cache[s]
 
     def content_words_of(s):
         if s not in count_cache:
-            count_cache[s] = content_token_count(s)
+            count_cache[s] = provider.content_token_count(s)
         return count_cache[s]
 
     plan = select_links(
@@ -442,6 +452,7 @@ def format_report(res: BackfillResult) -> str:
     )
     lines = [
         "Language            : %s (id %d)" % (res.language, res.language_id),
+        "Lemma source        : %s" % (res.lemma_source or "(unknown)"),
         "Terms               : %d" % res.total_terms,
         "Have a parent today : %d (%s)"
         % (res.terms_with_parent_before, pct(res.terms_with_parent_before)),
@@ -532,6 +543,7 @@ def plan_as_dict(res: BackfillResult) -> dict:
     return {
         "language": res.language,
         "language_id": res.language_id,
+        "lemma_source": res.lemma_source,
         "total_terms": res.total_terms,
         "terms_with_parent_before": res.terms_with_parent_before,
         "limit": res.limit,

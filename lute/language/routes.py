@@ -5,6 +5,7 @@
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from flask import Blueprint, current_app, render_template, redirect, url_for, flash
+from lute.dict import service as dict_service
 from lute.models.language import Language
 from lute.models.repositories import UserSettingRepository
 from lute.language.service import Service
@@ -112,6 +113,41 @@ def _set_hidden_grammar_choices(form, language):
     form.hidden_grammar_levels.choices = choices
 
 
+def _dict_pool_files():
+    """
+    The file names installed in the server's local-dictionary pool, for
+    the Local dictionary rows' datalist.  Empty when the pool folder
+    does not exist (nothing imported yet).
+    """
+    return [info["filename"] for info in dict_service.list_installed()]
+
+
+def _dict_pool_details():
+    """
+    The same pool, with what is in each dictionary (title, entry count,
+    size).  A Local dictionary row's URL control is a dropdown built
+    from this, so the option labels can name the dictionary a human
+    recognises instead of the pool file name -- which for an .mdx with
+    a non-ASCII name is a mangled ASCII stand-in.
+
+    Each entry carries a ready-made ``label``; the template stays dumb.
+    """
+    details = []
+    for info in dict_service.list_installed():
+        entry = dict(info)
+        label = info.get("title") or info["filename"]
+        facts = []
+        if info.get("entries") is not None:
+            facts.append(f"{info['entries']:,} entries")
+        if info.get("size_mb") is not None:
+            facts.append(f"{info['size_mb']} MB")
+        if facts:
+            label = f"{label} · {' · '.join(facts)}"
+        entry["label"] = label
+        details.append(entry)
+    return details
+
+
 def _add_hidden_dictionary_template_entry(form):
     "Add a dummy placeholder dictionary to be used as a template."
     # Add a dummy dictionary entry with dicturi __TEMPLATE__.
@@ -202,6 +238,8 @@ def edit(langid):
         language=language,
         engine_status=grammar_analysis.grammar_engine_status(language),
         engine_note=grammar_analysis.grammar_engine_note(language),
+        dict_pool_files=_dict_pool_files(),
+        dict_pool=_dict_pool_details(),
     )
 
 
@@ -253,7 +291,12 @@ def new(langname):
     _add_hidden_dictionary_template_entry(form)
 
     return render_template(
-        "language/new.html", form=form, language=language, predefined=predefined
+        "language/new.html",
+        form=form,
+        language=language,
+        predefined=predefined,
+        dict_pool_files=_dict_pool_files(),
+        dict_pool=_dict_pool_details(),
     )
 
 
@@ -272,6 +315,18 @@ def toggle_active(langid):
     if language.is_active:
         flash(f"Language '{language.name}' activated.", "success")
     else:
+        # Freezing means "I'm done with this language for now", so give
+        # back its grammar engine's memory instead of leaving a spaCy
+        # pipeline resident until the process restarts.  Thawing does
+        # NOT preload: the model comes back on the first grammar
+        # analysis, so un-freezing five languages costs nothing.
+        # The model is process-wide, so in multi-user mode this can also
+        # drop one another reader is using -- harmless, they simply pay
+        # the reload on their next panel.
+        if grammar_analysis.release_grammar_engine(language):
+            current_app.logger.info(
+                "Froze '%s'; released its grammar engine model.", language.name
+            )
         flash(f"Language '{language.name}' frozen.", "info")
     return redirect(url_for("language.index"))
 

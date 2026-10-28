@@ -31,6 +31,8 @@
  *   {"set_sentence": [p, s]}             the TTS player's call
  *   {"set_sentence": [p, s], "detached": true}   ...on a span a page turn dropped
  *   {"clear": true}
+ *   {"page_of_cue": idx}                 which page holds that cue, given
+ *                                        "cue_page_starts" in the payload
  *
  * and the state of the mark after every step on stdout.
  */
@@ -41,6 +43,12 @@ const input = JSON.parse(fs.readFileSync(0, "utf8"));
 const modPath = process.argv[2];
 
 /* ---------- a very small DOM ---------- */
+
+
+/* The reading page injects window.I18N via base.html; the harness runs
+   the module bare in Node, so provide the identity fallback it uses. */
+globalThis.LUTE_I18N = {};
+globalThis.I18N = { t: (k) => k };
 
 class FakeEl {
   constructor(tag) {
@@ -88,8 +96,17 @@ class FakeEl {
     return c;
   }
   querySelectorAll(sel) {
-    const direct = sel.match(/^:scope\s*>\s*(.*)$/);
+    // Enough selector grammar for the module: ":scope > p", ".class" and
+    // bare tag names, comma-separated ("rt, rp" -- what stripping the
+    // furigana readings out of a clone needs).
+    return sel
+      .split(",")
+      .map((s) => s.trim())
+      .flatMap((s) => this._selectOne(s));
+  }
+  _selectOne(sel) {
     const out = [];
+    const direct = sel.match(/^:scope\s*>\s*(.*)$/);
     if (direct) {
       const tag = direct[1].toUpperCase();
       this.children.forEach((c) => {
@@ -97,10 +114,11 @@ class FakeEl {
       });
       return out;
     }
-    const cls = sel.replace(/^\./, "");
+    const cls = sel.startsWith(".") ? sel.slice(1) : null;
+    const tag = cls ? null : sel.toUpperCase();
     const walk = (n) => {
       n.children.forEach((c) => {
-        if (c.classes.has(cls)) out.push(c);
+        if (cls ? c.classes.has(cls) : c.tagName === tag) out.push(c);
         walk(c);
       });
     };
@@ -116,14 +134,40 @@ function span(cls, text) {
   return el;
 }
 
+// <ruby>base<rt>reading</rt></ruby> inside a .word span, as furigana
+// leaves it (lute-furigana.js).
+function rubyWord(base, reading) {
+  const word = span("word");
+  const ruby = new FakeEl("ruby");
+  ruby.appendChild(span(null, base));
+  const rt = new FakeEl("rt");
+  rt.textContent = reading;
+  ruby.appendChild(rt);
+  word.appendChild(ruby);
+  return word;
+}
+
+// A sentence is either a string (one plain span) or a list of tokens,
+// where a string is plain text and {base, reading} is a furigana'd word.
+function buildSentence(sentence) {
+  const sentenceEl = span("textsentence");
+  sentenceEl.appendChild(span("lute-sentence-play-btn", "\uD83D\uDD0A"));
+  if (typeof sentence === "string") {
+    sentenceEl.appendChild(span(null, sentence));
+  } else {
+    sentence.forEach((tok) => {
+      if (typeof tok === "string") sentenceEl.appendChild(span(null, tok));
+      else sentenceEl.appendChild(rubyWord(tok.base, tok.reading));
+    });
+  }
+  return sentenceEl;
+}
+
 // <p><span class="textsentence">🔊…</span>…<span class="textitem">\u200b</span></p>
 function buildParagraph(sentences) {
   const p = new FakeEl("p");
-  sentences.forEach((text) => {
-    const sentence = span("textsentence");
-    sentence.appendChild(span("lute-sentence-play-btn", "\uD83D\uDD0A"));
-    sentence.appendChild(span(null, text));
-    p.appendChild(sentence);
+  sentences.forEach((sentence) => {
+    p.appendChild(buildSentence(sentence));
   });
   p.appendChild(span("textitem", "\u200b"));
   return p;
@@ -145,12 +189,14 @@ const CLASS = "lute-playing-line";
 
 // What the reader sees, without the UI the page injects into the text:
 // the 🔊 button is markup, not text (the module strips it too, and this
-// is how a test can tell the two apart).
+// is how a test can tell the two apart), and a furigana <rt> reading is
+// not part of the line either.
 function visibleText(el) {
   const clone = el.cloneNode(true);
   const strip = (n) => {
     n.children.slice().forEach((c) => {
       if (c.classes.has("lute-sentence-play-btn")) n.removeChild(c);
+      else if (c.tagName === "RT" || c.tagName === "RP") n.removeChild(c);
       else strip(c);
     });
   };
@@ -180,6 +226,8 @@ const results = [];
 (input.steps || []).forEach((s, i) => {
   if (s.cue_map !== undefined) {
     global.window.LUTE_PAGE_CUE_MAP = s.cue_map;
+    results.push({ step: i, marked: marked() });
+    return;
   } else if (s.set_cue_index !== undefined) {
     helper.setCueIndex(s.set_cue_index[0], s.set_cue_index[1]);
   } else if (s.set_sentence !== undefined) {
@@ -189,6 +237,16 @@ const results = [];
     helper.setElement(el);
   } else if (s.clear) {
     helper.clear();
+  } else if (s.page_of_cue !== undefined) {
+    // Which page holds a cue, from the first-cue index of every page that
+    // the server ships (window.LUTE_CUE_PAGE_STARTS).  The page turn a
+    // player does when the playhead leaves the page being read is
+    // resolved here, so an off-by-one is a reader sent to the wrong page.
+    results.push({
+      step: i,
+      page: helper.pageOfCue(input.cue_page_starts, s.page_of_cue),
+    });
+    return;
   } else {
     throw new Error(`unknown step ${JSON.stringify(s)}`);
   }

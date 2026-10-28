@@ -181,19 +181,43 @@ function getWordFrameHeightPercentage() {
   // return parseFloat(elementComputedStyle.width);
 }
 
+// The narrow layout (@media max-width: 980px) owns both pane widths: the
+// left pane fills the viewport and the right pane is a full-width bottom
+// sheet.  So getTextWidthPercentage() reads 100 there, and writing that
+// back inline bakes "left 100% / right 0%" into the document.  Inline
+// styles outrank the desktop rules, so the first time the viewport is wide
+// again -- un-maximising the window, or the reader dropping a flash notice
+// and with it the document scrollbar, which moves the 980px breakpoint --
+// the left pane stays full width and the dictionary pane collapses to zero
+// width at the right edge: the divider jumps to the far right and the pane
+// is unusable.  Leave the widths to the media query while narrow, and
+// re-apply them when the breakpoint is crossed in either direction.
 function applyInitialPaneSizes() {
-  widthDefault = getTextWidthPercentage();
   trHeightDefault = getWordFrameHeightPercentage();
 
-  const width = getFromLocalStorage("textWidth", widthDefault);
-  const height = getFromLocalStorage("trHeight", trHeightDefault);
-  const ratio = getReadPaneWidthRatio();
-  const pane_right_width = (100 - width) * ratio;
+  if (mediaTablet.matches) {
+    widthDefault = 50; // the desktop split the CSS asks for
+    readPaneLeft.style.removeProperty("width");
+    readPaneRight.style.removeProperty("width");
+  } else {
+    widthDefault = getTextWidthPercentage();
+    // Same 25..95 range resizeCol stores: a bogus remembered value must not
+    // be able to collapse a pane to nothing.
+    const width = clamp(getFromLocalStorage("textWidth", widthDefault), 25, 95);
+    const ratio = getReadPaneWidthRatio();
+    readPaneLeft.style.width = `${width}%`;
+    readPaneRight.style.width = `${(100 - width) * ratio}%`;
+  }
 
-  readPaneLeft.style.width = `${width}%`;
-  readPaneRight.style.width = `${pane_right_width}%`;
+  const height = getFromLocalStorage("trHeight", trHeightDefault);
   readPaneRight.style.gridTemplateRows = `${height}% 1fr`;
 }
+
+// Crossing the breakpoint changes which layout owns the widths, so start
+// over: entering the narrow layout drops the desktop split, leaving it
+// restores the reader's stored one.  Without this a split measured in one
+// layout survives into the other.
+mediaTablet.addEventListener("change", applyInitialPaneSizes);
 
 function getFromLocalStorage(item, defaultVal) {
   // return Number(localStorage.getItem(item) ?? defaultVal);

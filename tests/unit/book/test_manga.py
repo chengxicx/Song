@@ -26,11 +26,11 @@ PNG_1PX = base64.b64decode(
     "YPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
 )
 
-# Minimal but realistic mokuro JSON, modelled on hanabira_manga_01.mokuro.
+# Minimal but realistic mokuro JSON, modelled on a real manga scan.
 SAMPLE_PAGES = [
     {
         "version": "0.2.1",
-        "img_path": "hanabira_manga_01.jpg",
+        "img_path": "manga_sample_01.jpg",
         "img_width": 848,
         "img_height": 1264,
         "blocks": [
@@ -50,7 +50,7 @@ SAMPLE_PAGES = [
     },
     {
         "version": "0.2.1",
-        "img_path": "hanabira_manga_02.jpg",
+        "img_path": "manga_sample_02.jpg",
         "img_width": 848,
         "img_height": 1264,
         "blocks": [
@@ -65,7 +65,7 @@ SAMPLE_PAGES = [
     # A third page, so re-importing a bigger archive can be tested.
     {
         "version": "0.2.1",
-        "img_path": "hanabira_manga_03.jpg",
+        "img_path": "manga_sample_03.jpg",
         "img_width": 848,
         "img_height": 1264,
         "blocks": [
@@ -98,7 +98,7 @@ def make_archive(ext=".cbz", num_pages=2):
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
         mokuro = make_mokuro(num_pages)
-        zf.writestr("hanabira_manga_01.mokuro", json.dumps(mokuro, ensure_ascii=False))
+        zf.writestr("manga_sample_01.mokuro", json.dumps(mokuro, ensure_ascii=False))
         for page in mokuro["pages"]:
             zf.writestr(page["img_path"], PNG_1PX)
     buf.seek(0)
@@ -113,7 +113,7 @@ def _import_manga(client, language_id, ext=".cbz", num_pages=2, **extra):
         "language_id": str(language_id),
         "manga_title": "Test Manga",
         "manga_tag": extra.get("manga_tag", ""),
-        "manga_file": (stream, f"hanabira_manga_01{ext}"),
+        "manga_file": (stream, f"manga_sample_01{ext}"),
     }
     resp = client.post(
         "/book/import_webpage",
@@ -141,8 +141,8 @@ def test_extract_manga_zip(app_context):
 
     target = os.path.join(current_app.static_folder, manga_path)
     assert os.path.isdir(target)
-    assert os.path.exists(os.path.join(target, "hanabira_manga_01.jpg"))
-    assert os.path.exists(os.path.join(target, "hanabira_manga_02.jpg"))
+    assert os.path.exists(os.path.join(target, "manga_sample_01.jpg"))
+    assert os.path.exists(os.path.join(target, "manga_sample_02.jpg"))
 
 
 def test_extract_manga_cbz(app_context):
@@ -443,14 +443,14 @@ def test_extract_manga_zip_slip_protection(app_context):
 
 def test_real_sample_mokuro_import_and_render(app_context, japanese):
     """
-    End-to-end check against the real hanabira_manga_01.mokuro sample:
+    End-to-end check against a real mokuro sample file:
     extract -> import -> build the reading context for a page.  Covers
     multi-line blocks, vertical text, and real font boxes.  Skipped if
     the sample file has not been downloaded into ~/Documents/lutedev.
     """
-    sample = os.path.expanduser("~/Documents/lutedev/hanabira_manga_01.mokuro")
+    sample = os.path.expanduser("~/Documents/lutedev/manga_sample_01.mokuro")
     if not os.path.isfile(sample):
-        pytest.skip("hanabira_manga_01.mokuro sample not available")
+        pytest.skip("manga_sample_01.mokuro sample not available")
 
     with open(sample, "r", encoding="utf-8") as f:
         mokuro = json.load(f)
@@ -462,7 +462,7 @@ def test_real_sample_mokuro_import_and_render(app_context, japanese):
             zf.writestr(page["img_path"], PNG_1PX)
     buf.seek(0)
 
-    manga_path, parsed = BookService().extract_manga("hanabira.zip", buf)
+    manga_path, parsed = BookService().extract_manga("manga_sample.zip", buf)
     assert len(parsed["pages"]) == len(mokuro["pages"])
 
     # Import through the book model so we can render the context.
@@ -618,7 +618,7 @@ def test_start_reading_renders_manga_page(app, app_context, japanese, client):
 
     assert "manga-page" in content
     # Image points into the extracted manga directory.
-    assert f'src="/static/{book.manga_path}/hanabira_manga_01.jpg"' in content
+    assert f'src="/static/{book.manga_path}/manga_sample_01.jpg"' in content
 
     # Blocks are absolutely positioned % of the page image.
     assert "manga-text-block" in content
@@ -786,7 +786,7 @@ def _post_manga_edit(client, book_id, **extra):
     }
     archive = extra.get("archive")
     if archive is not None:
-        filename = extra.get("archive_name", "hanabira_manga_01.cbz")
+        filename = extra.get("archive_name", "manga_sample_01.cbz")
         data["manga_file"] = (archive[0], filename)
     return client.post(
         f"/book/edit/{book_id}",
@@ -810,7 +810,7 @@ def test_manga_edit_page_is_manga_specific(app, app_context, japanese, client):
     assert "Edit manga book" in content
     assert 'name="manga_file"' in content
     assert 'accept=".zip,.cbz"' in content
-    assert "hanabira_manga_01.cbz" in content, "the current archive is shown"
+    assert "manga_sample_01.cbz" in content, "the current archive is shown"
     assert "2 pages" in content
 
     # None of the generic (meaningless) text-editing controls.
@@ -912,7 +912,7 @@ def test_manga_edit_reimports_archive_over_the_book(app, app_context, japanese, 
 
     new_dir = os.path.join(current_app.static_folder, reloaded.manga_path)
     assert os.path.isdir(new_dir)
-    assert os.path.exists(os.path.join(new_dir, "hanabira_manga_03.jpg"))
+    assert os.path.exists(os.path.join(new_dir, "manga_sample_03.jpg"))
     # The previous folder is deliberately kept on disk, so restoring an
     # older DB backup still finds the images it refers to.
     assert os.path.isdir(os.path.join(current_app.static_folder, old_path))
@@ -921,7 +921,7 @@ def test_manga_edit_reimports_archive_over_the_book(app, app_context, japanese, 
     resp = client.get(f"/read/start_reading/{book.id}/1")
     assert resp.status_code == 200
     content = resp.get_data(as_text=True)
-    assert f'src="/static/{reloaded.manga_path}/hanabira_manga_01.jpg"' in content
+    assert f'src="/static/{reloaded.manga_path}/manga_sample_01.jpg"' in content
 
 
 def test_manga_reimport_notice_is_shown_once(app, app_context, japanese, client):

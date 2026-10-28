@@ -1,0 +1,1580 @@
+[
+ {
+  "pattern": "estar + gerundio",
+  "name_es": "estar + gerundio",
+  "meaning_en": "progressive: an action in progress",
+  "meaning_zh": "estar + 副动词：正在进行",
+  "level": "A1",
+  "focus": [
+   "estoy/estás/está/estamos/estáis/están",
+   "§ger"
+  ],
+  "formation": "estar 变位 + 副动词（-ando / -iendo）",
+  "notes": "强调『此刻正在进行』：Estoy tomando un curso。与简单现在时（陈述习惯）相对。",
+  "examples": [
+   {
+    "spanish": "Estoy tomando un curso sobre Egipto.",
+    "chinese": "我正在上一个关于埃及的课程。"
+   },
+   {
+    "spanish": "Está lloviendo a cántaros y vengo hecho una sopa.",
+    "chinese": "正下着倾盆大雨，我来的时候浑身湿透了。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "hay que + infinitivo",
+  "name_es": "hay que + infinitivo",
+  "meaning_en": "impersonal obligation: one must",
+  "meaning_zh": "hay que + 原形动词：必须、应该（无人称）",
+  "level": "A1",
+  "focus": [
+   "hay",
+   "que",
+   "§inf"
+  ],
+  "formation": "hay que + 原形动词（无主语）",
+  "notes": "只用于无人称的『该做某事』，不指向具体的人；指具体人时用 tener que。",
+  "examples": [
+   {
+    "spanish": "Hay que superar las dificultades.",
+    "chinese": "必须克服困难。"
+   },
+   {
+    "spanish": "Hay que prestar atención a este problema.",
+    "chinese": "要注意这个问题。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "también / tampoco",
+  "name_es": "también / tampoco",
+  "meaning_en": "also / neither",
+  "meaning_zh": "也 / 也不",
+  "level": "A1",
+  "focus": [
+   "también/tampoco"
+  ],
+  "formation": "también 用于肯定句；tampoco 用于否定句",
+  "notes": "tampoco 本身已含否定，句子里不要再加 no。",
+  "examples": [
+   {
+    "spanish": "Yo tampoco puedo venir.",
+    "chinese": "我也不能来。"
+   },
+   {
+    "spanish": "También yo lo sé hacer.",
+    "chinese": "我也会做。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "porque",
+  "name_es": "porque (causa)",
+  "meaning_en": "because",
+  "meaning_zh": "因为",
+  "level": "A1",
+  "focus": [
+   "porque"
+  ],
+  "formation": "主句 + porque + 原因从句",
+  "notes": "回答 ¿por qué?（为什么）。别与 por qué / por que / porqué 混用。",
+  "examples": [
+   {
+    "spanish": "No podemos esperar porque tenemos poco tiempo.",
+    "chinese": "我们不能等了，因为时间不多。"
+   },
+   {
+    "spanish": "Está contento porque ha pasado examen.",
+    "chinese": "他考完试了，所以很开心。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "mucho + sustantivo",
+  "name_es": "mucho / mucha / muchos / muchas + sustantivo",
+  "meaning_en": "much / many + noun (agrees in gender and number)",
+  "meaning_zh": "mucho/a/os/as + 名词：很多",
+  "level": "A1",
+  "focus": [
+   "mucho/mucha/muchos/muchas",
+   "§noun"
+  ],
+  "formation": "mucho 随名词变性数 + 名词",
+  "notes": "修饰名词时与名词一致（mucha agua / muchos libros）；修饰动词用 mucho 不变（trabaja mucho）。",
+  "examples": [
+   {
+    "spanish": "Muchos países europeos son democracias.",
+    "chinese": "许多欧洲国家是民主国家。"
+   },
+   {
+    "spanish": "No gasté mucho dinero.",
+    "chinese": "我没花多少钱。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "muy + adjetivo",
+  "name_es": "muy + adjetivo",
+  "meaning_en": "very + adjective",
+  "meaning_zh": "muy + 形容词：很、非常",
+  "level": "A1",
+  "focus": [
+   "muy",
+   "§adj"
+  ],
+  "formation": "muy + 形容词 / 副词",
+  "notes": "muy 只修饰形容词或副词，不修饰动词；修饰动词用 mucho（trabaja mucho，不是 trabaja muy）。",
+  "examples": [
+   {
+    "spanish": "Mi amigo es un profesor muy trabajador.",
+    "chinese": "我朋友是一位非常勤奋的老师。"
+   },
+   {
+    "spanish": "Las elecciones han sido muy reñidas.",
+    "chinese": "这次选举竞争非常激烈。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "querer + infinitivo",
+  "name_es": "querer + infinitivo",
+  "meaning_en": "to want (to do something)",
+  "meaning_zh": "querer + 原形动词：想要做某事",
+  "level": "A1",
+  "focus": [
+   "quiero/quieres/quiere/queremos/quieren",
+   "§inf"
+  ],
+  "formation": "querer 变位 + 原形动词",
+  "notes": "词干变音 e→ie（quiero / quieres / quiere）；nosotros 形式不变音（queremos）。",
+  "examples": [
+   {
+    "spanish": "No quiere sacrificar su libertad de acción.",
+    "chinese": "他不想牺牲自己的行动自由。"
+   },
+   {
+    "spanish": "Sí, quiere aceptar.",
+    "chinese": "是的，他愿意接受。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "poder + infinitivo",
+  "name_es": "poder + infinitivo",
+  "meaning_en": "can / to be able to",
+  "meaning_zh": "poder + 原形动词：能够、可以",
+  "level": "A1",
+  "focus": [
+   "puedo/puedes/puede/podemos/pueden",
+   "§inf"
+  ],
+  "formation": "poder 变位 + 原形动词",
+  "notes": "o→ue 变音（puedo / puedes / puede）；否定 no poder + 原形动词表示『不能』。",
+  "examples": [
+   {
+    "spanish": "Sin la permisión del superior no puedo abandonar el puesto de trabajo.",
+    "chinese": "没有上级允许，我不能离开工作岗位。"
+   },
+   {
+    "spanish": "No puedo fumar.",
+    "chinese": "我不能抽烟。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "dejar de + infinitivo",
+  "name_es": "dejar de + infinitivo",
+  "meaning_en": "to stop doing something",
+  "meaning_zh": "dejar de + 原形动词：停止、不再",
+  "level": "A2",
+  "focus": [
+   "dejar/dejo/deja/dejamos/dejan",
+   "de",
+   "§inf"
+  ],
+  "formation": "dejar de + 原形动词",
+  "notes": "与 dejar（留下、让）区分：dejar de 是『中断某动作』，dejar 单独用是『留下/允许』。",
+  "examples": [
+   {
+    "spanish": "Deja de trabajar.",
+    "chinese": "他停止工作了。"
+   },
+   {
+    "spanish": "Tan pronto como deja de trabajar empieza a cantar.",
+    "chinese": "他一下班就开始唱歌。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "empezar a + infinitivo",
+  "name_es": "empezar a + infinitivo",
+  "meaning_en": "to begin to do something",
+  "meaning_zh": "empezar a + 原形动词：开始做某事",
+  "level": "A2",
+  "focus": [
+   "empezar/empiezo/empieza/empezamos/empiezan",
+   "a",
+   "§inf"
+  ],
+  "formation": "empezar a + 原形动词（e→ie 变音）",
+  "notes": "与 comenzar a 同义；介词固定用 a。",
+  "examples": [
+   {
+    "spanish": "Empiezan a dudar del cajero.",
+    "chinese": "他们开始怀疑那个出纳。"
+   },
+   {
+    "spanish": "Empieza a pasear de un lado otro.",
+    "chinese": "他开始来回踱步。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "soler + infinitivo",
+  "name_es": "soler + infinitivo",
+  "meaning_en": "to usually do something (habitual)",
+  "meaning_zh": "soler + 原形动词：惯常、通常",
+  "level": "A2",
+  "focus": [
+   "soler/suelo/suele/solíamos/suelen",
+   "§inf"
+  ],
+  "formation": "soler 变位（o→ue）+ 原形动词",
+  "notes": "表示习惯性动作，相当于『通常/往往』；只有现在时与未完成过去时常用。",
+  "examples": [
+   {
+    "spanish": "Suele venir por la tarde.",
+    "chinese": "他通常下午来。"
+   },
+   {
+    "spanish": "Los comerciantes suelen ser trabajadores por cuenta propia.",
+    "chinese": "商人通常是自营业者。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "seguir + gerundio",
+  "name_es": "seguir + gerundio",
+  "meaning_en": "to keep on doing something",
+  "meaning_zh": "seguir + 副动词：继续做某事",
+  "level": "A2",
+  "focus": [
+   "seguir/sigo/sigue/seguimos/siguen",
+   "§ger"
+  ],
+  "formation": "seguir 变位（e→i）+ 副动词",
+  "notes": "与 continuar + 副动词同义。seguir 的副动词形式不变，只变助动词。",
+  "examples": [
+   {
+    "spanish": "Sigo trabajando en el banco.",
+    "chinese": "我还在银行工作。"
+   },
+   {
+    "spanish": "Siguen viviendo en el campo.",
+    "chinese": "他们仍然住在乡下。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "deber + infinitivo",
+  "name_es": "deber + infinitivo",
+  "meaning_en": "must / should (moral obligation)",
+  "meaning_zh": "deber + 原形动词：应该、必须",
+  "level": "A2",
+  "focus": [
+   "deber/debo/debe/debemos/deben",
+   "§inf"
+  ],
+  "formation": "deber + 原形动词",
+  "notes": "deber + 原形动词＝应该；deber de + 原形动词＝推测（大概）。别把两者混用。",
+  "examples": [
+   {
+    "spanish": "La honestidad debe ser una virtud esencial en una persona.",
+    "chinese": "诚实应当是人的一项基本美德。"
+   },
+   {
+    "spanish": "Se lo debe comunicar cuanto antes.",
+    "chinese": "他应该尽快把这件事通知他。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "tener ganas de + infinitivo",
+  "name_es": "tener ganas de + infinitivo",
+  "meaning_en": "to feel like doing something",
+  "meaning_zh": "tener ganas de + 原形动词：很想做某事",
+  "level": "A2",
+  "focus": [
+   "tengo/tienes/tiene/tenemos/tienen",
+   "ganas",
+   "de",
+   "§inf"
+  ],
+  "formation": "tener ganas de + 原形动词",
+  "notes": "ganas 用复数；否定 no tener ganas de 表示『没心情做』。",
+  "examples": [
+   {
+    "spanish": "Tengo ganas de dormir.",
+    "chinese": "我很想睡觉。"
+   },
+   {
+    "spanish": "José quiere ser gerente, no tiene ganas de trabajar.",
+    "chinese": "何塞想当经理，却不想干活。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "se lo / se la (pronombre doble)",
+  "name_es": "se lo / se la / se los / se las",
+  "meaning_en": "double object pronouns: to give it to him",
+  "meaning_zh": "se + lo/la/los/las：双宾语代词",
+  "level": "A2",
+  "focus": [
+   "se",
+   "lo/la/los/las",
+   "§verb"
+  ],
+  "formation": "间接宾语 le/les + 直接宾语 lo/la/los/las → le/les 变 se",
+  "notes": "两个第三人称代词相遇时，间接宾语 le/les 一律变 se：se lo doy（我把它给他）。",
+  "examples": [
+   {
+    "spanish": "Se lo quiero decir yo mismo.",
+    "chinese": "我想亲口把这件事告诉他。"
+   },
+   {
+    "spanish": "Se la explico.",
+    "chinese": "我给他解释这件事。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "me lo / te lo / nos lo",
+  "name_es": "me lo / te lo / nos lo",
+  "meaning_en": "double object pronouns with a first/second person indirect object",
+  "meaning_zh": "me/te/nos + lo/la/los/las：第一、二人称双代词",
+  "level": "A2",
+  "focus": [
+   "me/te/nos",
+   "lo/la/los/las",
+   "§verb"
+  ],
+  "formation": "me/te/nos + lo/la/los/las + 动词",
+  "notes": "顺序固定：间接宾语在前、直接宾语在后，紧贴动词（可置于变位动词前或原形动词后）。",
+  "examples": [
+   {
+    "spanish": "Me lo agradeció con sonrisa.",
+    "chinese": "他笑着向我道谢。"
+   },
+   {
+    "spanish": "No te lo dije, por ahorrarte disgusto.",
+    "chinese": "我没告诉你，是为了免得你不高兴。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "al + infinitivo",
+  "name_es": "al + infinitivo",
+  "meaning_en": "on doing something (simultaneous / immediate past)",
+  "meaning_zh": "al + 原形动词：一……就、在……的时候",
+  "level": "A2",
+  "focus": [
+   "al",
+   "§inf"
+  ],
+  "formation": "al + 原形动词（= a + el + 原形动词）",
+  "notes": "主语与主句一致：Al llegar a casa, me llamó（到家时他给我打了电话）。",
+  "examples": [
+   {
+    "spanish": "Al llegar al despacho, leí fax del día anterior.",
+    "chinese": "一到办公室，我就读了前一天的传真。"
+   },
+   {
+    "spanish": "Al pasar la lista saltó mi nombre.",
+    "chinese": "点名时叫到了我的名字。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "antes de + infinitivo",
+  "name_es": "antes de + infinitivo",
+  "meaning_en": "before doing something",
+  "meaning_zh": "antes de + 原形动词：在……之前",
+  "level": "A2",
+  "focus": [
+   "antes",
+   "de",
+   "§inf"
+  ],
+  "formation": "antes de + 原形动词（主语一致时）",
+  "notes": "主语不同时必须用 antes de que + 虚拟式。",
+  "examples": [
+   {
+    "spanish": "Antes de hacer nada, debes lavarte las manos.",
+    "chinese": "做什么之前，你得先洗手。"
+   },
+   {
+    "spanish": "Le estoy diciendo a usted que antes de hacer nada lo piense dos veces.",
+    "chinese": "我是在跟您说，做什么之前都要三思。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "después de + infinitivo",
+  "name_es": "después de + infinitivo",
+  "meaning_en": "after doing something",
+  "meaning_zh": "después de + 原形动词：在……之后",
+  "level": "A2",
+  "focus": [
+   "después",
+   "de",
+   "§inf"
+  ],
+  "formation": "después de + 原形动词（主语一致时）",
+  "notes": "主语不一致时用 después de que + 陈述式（或虚拟式指将来）。",
+  "examples": [
+   {
+    "spanish": "¿Se ducha usted alguna vez después de comer?",
+    "chinese": "您有时候饭后洗澡吗？"
+   },
+   {
+    "spanish": "Después de comer, fuimos a París.",
+    "chinese": "吃完饭我们就去了巴黎。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "sin + infinitivo",
+  "name_es": "sin + infinitivo",
+  "meaning_en": "without doing something",
+  "meaning_zh": "sin + 原形动词：不……、没有……就",
+  "level": "A2",
+  "focus": [
+   "sin",
+   "§inf"
+  ],
+  "formation": "sin + 原形动词（主语一致时）",
+  "notes": "主语不同时用 sin que + 虚拟式；sin 后也可接名词（sin dinero）。",
+  "examples": [
+   {
+    "spanish": "Nos entendemos sin hablar.",
+    "chinese": "我们不用说话就能互相理解。"
+   },
+   {
+    "spanish": "La cigarra canta sin cesar.",
+    "chinese": "蝉不停地叫。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "por + infinitivo (causa)",
+  "name_es": "por + infinitivo",
+  "meaning_en": "for / because of doing something",
+  "meaning_zh": "por + 原形动词：因为、为了（原因或努力）",
+  "level": "A2",
+  "focus": [
+   "!acabar/estar",
+   "por",
+   "§inf"
+  ],
+  "formation": "por + 原形动词",
+  "notes": "表示原因或『努力去做』：se esfuerza por agradar。表目的用 para + 原形动词。",
+  "examples": [
+   {
+    "spanish": "Se esfuerza por agradar a todo el mundo.",
+    "chinese": "他努力让所有人都满意。"
+   },
+   {
+    "spanish": "No te lo dije, por ahorrarte disgusto.",
+    "chinese": "我没告诉你，是不想让你难受。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "durante",
+  "name_es": "durante",
+  "meaning_en": "during / for (a period)",
+  "meaning_zh": "durante：在……期间",
+  "level": "A2",
+  "focus": [
+   "durante"
+  ],
+  "formation": "durante + 名词 / 时间段",
+  "notes": "后接时间段表示持续多久；不能与 hace（……以前）混用。",
+  "examples": [
+   {
+    "spanish": "Durante la huelga pararon todas las máquinas de la fábrica.",
+    "chinese": "罢工期间工厂所有机器都停了。"
+   },
+   {
+    "spanish": "Durante varios días estuvo enfermo.",
+    "chinese": "他病了好几天。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "según",
+  "name_es": "según",
+  "meaning_en": "according to / depending on",
+  "meaning_zh": "según：根据、按照",
+  "level": "A2",
+  "focus": [
+   "según"
+  ],
+  "formation": "según + 名词 / 从句",
+  "notes": "según 后接人称代词时用主格（según tú，不用 según ti）。",
+  "examples": [
+   {
+    "spanish": "Según el periódico, ayer hubo tres accidentes en la ciudad.",
+    "chinese": "据报纸说，昨天城里发生了三起事故。"
+   },
+   {
+    "spanish": "Te pagaremos según lo que trabajes.",
+    "chinese": "我们按你的工作量付钱。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "contra",
+  "name_es": "contra",
+  "meaning_en": "against",
+  "meaning_zh": "contra：反对、对着、抵御",
+  "level": "A2",
+  "focus": [
+   "contra"
+  ],
+  "formation": "contra + 名词 / 代词",
+  "notes": "表对抗、抵御或方向相反；与 en contra de 同义，后者更强调『持反对立场』。",
+  "examples": [
+   {
+    "spanish": "Aseguró su casa contra el incendio.",
+    "chinese": "他给房子保了火灾险。"
+   },
+   {
+    "spanish": "El alcanfor defiende las ropas contra la polilla.",
+    "chinese": "樟脑能防止衣物被虫蛀。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "hacia",
+  "name_es": "hacia",
+  "meaning_en": "towards",
+  "meaning_zh": "hacia：朝向、对于",
+  "level": "A2",
+  "focus": [
+   "hacia"
+  ],
+  "formation": "hacia + 名词 / 代词",
+  "notes": "表方向（hacia el centro）或态度对象（odio hacia ella）；方向更笼统，不像 a 那样强调终点。",
+  "examples": [
+   {
+    "spanish": "Tiene mucho odio hacia ella.",
+    "chinese": "他对她怀有深深的恨意。"
+   },
+   {
+    "spanish": "Yendo hacia tu casa me encontré con un amigo.",
+    "chinese": "去你家的路上我碰到了一个朋友。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "desde ... hasta",
+  "name_es": "desde ... hasta",
+  "meaning_en": "from ... to (time or place)",
+  "meaning_zh": "desde … hasta …：从……到……",
+  "level": "A2",
+  "focus": [
+   "desde",
+   "...",
+   "hasta"
+  ],
+  "formation": "desde + 起点 + hasta + 终点",
+  "notes": "时间和空间都可用；口语里常用 de ... a ... 替代。",
+  "examples": [
+   {
+    "spanish": "Anduvimos desde el amanecer hasta bien entrada la noche.",
+    "chinese": "我们从黎明一直走到深夜。"
+   },
+   {
+    "spanish": "Desde 1955 hasta 1973 viví en Beijing.",
+    "chinese": "从 1955 年到 1973 年我住在北京。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "tanto ... como",
+  "name_es": "tanto ... como",
+  "meaning_en": "as much as (equal comparison)",
+  "meaning_zh": "tanto … como …：和……一样多",
+  "level": "A2",
+  "focus": [
+   "=tanto/tanta/tantos/tantas",
+   "...",
+   "como"
+  ],
+  "formation": "tanto/a/os/as + 名词 + como；动词后用 tanto como",
+  "notes": "修饰名词时 tanto 随名词变性数（tantos hermanos como）；修饰动词或形容词时用 tanto como。",
+  "examples": [
+   {
+    "spanish": "Yo no tengo tantos hermanos como Pepe.",
+    "chinese": "我没有佩佩那么多兄弟。"
+   },
+   {
+    "spanish": "Me divierto tanto como Luisa.",
+    "chinese": "我玩得和路易莎一样开心。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "el / la más + adjetivo",
+  "name_es": "el / la / los / las más + adjetivo (superlativo)",
+  "meaning_en": "the most ... (superlative)",
+  "meaning_zh": "el/la/los/las más + 形容词：最……",
+  "level": "A2",
+  "focus": [
+   "el/la/los/las",
+   "más",
+   "§adj"
+  ],
+  "formation": "定冠词 + más + 形容词（+ de / entre）",
+  "notes": "最高级要带定冠词且与名词一致；范围用 de 或 entre 引出。",
+  "examples": [
+   {
+    "spanish": "José es el más aplicado estudiante de su grupo.",
+    "chinese": "何塞是他小组里最用功的学生。"
+   },
+   {
+    "spanish": "Luis es el más alto entre los alumnos de su clase.",
+    "chinese": "路易斯是班里学生中最高的。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "aunque",
+  "name_es": "aunque (concesiva)",
+  "meaning_en": "although / even if",
+  "meaning_zh": "aunque：虽然、即使",
+  "level": "B1",
+  "focus": [
+   "aunque"
+  ],
+  "formation": "aunque + 陈述式（已知事实）/ 虚拟式（假设）",
+  "notes": "陈述式指已知事实（aunque llueve），虚拟式指假设或『即使』（aunque llueva）。",
+  "examples": [
+   {
+    "spanish": "Trabajaremos aunque haga mucho frío.",
+    "chinese": "即使天很冷，我们也照干。"
+   },
+   {
+    "spanish": "Aunque tiene frío, no se pone el abrigo.",
+    "chinese": "他明明很冷，却不穿大衣。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "tan pronto como",
+  "name_es": "tan pronto como",
+  "meaning_en": "as soon as",
+  "meaning_zh": "tan pronto como：一……就",
+  "level": "B1",
+  "focus": [
+   "tan",
+   "pronto",
+   "como"
+  ],
+  "formation": "tan pronto como + 陈述式（过去/现在）/ 虚拟式（将来）",
+  "notes": "指将来未发生的事时用虚拟式（tan pronto como llegue）。",
+  "examples": [
+   {
+    "spanish": "Tan pronto como amaneció, fuimos a trabajar al campo.",
+    "chinese": "天一亮我们就下地干活了。"
+   },
+   {
+    "spanish": "Tan pronto como llega a casa se pone la bata.",
+    "chinese": "他一到家就换上便袍。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "puesto que",
+  "name_es": "puesto que",
+  "meaning_en": "since / given that (cause)",
+  "meaning_zh": "puesto que：既然、因为",
+  "level": "B1",
+  "focus": [
+   "puesto",
+   "que"
+  ],
+  "formation": "puesto que + 陈述式",
+  "notes": "书面语色彩强于 porque，多用于已知或显而易见的原因。",
+  "examples": [
+   {
+    "spanish": "No hace falta que te lo diga puesto que ya lo sabes.",
+    "chinese": "既然你都已经知道了，我就不必说了。"
+   },
+   {
+    "spanish": "Puesto que es tu gusto, hazlo así.",
+    "chinese": "既然你喜欢，就这么做吧。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "a pesar de",
+  "name_es": "a pesar de (+ que)",
+  "meaning_en": "in spite of / despite",
+  "meaning_zh": "a pesar de：尽管",
+  "level": "B1",
+  "focus": [
+   "a",
+   "pesar",
+   "de"
+  ],
+  "formation": "a pesar de + 名词 / 原形动词；a pesar de que + 陈述式（或虚拟式指将来）",
+  "notes": "后接从句时必须加 que；a pesar de 后不能直接跟句子。",
+  "examples": [
+   {
+    "spanish": "Saldremos, a pesar de que llueva.",
+    "chinese": "即使下雨我们也要出门。"
+   },
+   {
+    "spanish": "A pesar de lo avanzado de la hora, seguía despierto.",
+    "chinese": "尽管时间已经很晚，他仍然醒着。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "sin embargo",
+  "name_es": "sin embargo",
+  "meaning_en": "however / nevertheless",
+  "meaning_zh": "sin embargo：然而、尽管如此",
+  "level": "B1",
+  "focus": [
+   "sin",
+   "embargo"
+  ],
+  "formation": "sin embargo（可置于句首、句中，逗号隔开）",
+  "notes": "转折连词，语气比 pero 正式；后面不能直接接 pero。",
+  "examples": [
+   {
+    "spanish": "Tengo mucho trabajo, sin embargo, te dedicaré un rato.",
+    "chinese": "我工作很多，不过还是会抽点时间给你。"
+   },
+   {
+    "spanish": "Nos dieron, sin embargo, unas buenas entradas.",
+    "chinese": "不过他们给了我们几张好票。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "por lo tanto",
+  "name_es": "por lo tanto",
+  "meaning_en": "therefore",
+  "meaning_zh": "por lo tanto：因此、所以",
+  "level": "B1",
+  "focus": [
+   "por",
+   "lo",
+   "tanto"
+  ],
+  "formation": "por lo tanto（句首或句中，逗号隔开）",
+  "notes": "表结论，与 por consiguiente 同义；与 por tanto 可互换（后者更简短）。",
+  "examples": [
+   {
+    "spanish": "La cosa está decidida, por lo tanto, es inútil que insistas.",
+    "chinese": "事情已经定了，所以你再坚持也没用。"
+   },
+   {
+    "spanish": "No estudió; por lo tanto, suspendió el examen.",
+    "chinese": "他没学习，因此考试没及格。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "por eso",
+  "name_es": "por eso",
+  "meaning_en": "that is why / so",
+  "meaning_zh": "por eso：所以、因此",
+  "level": "B1",
+  "focus": [
+   "por",
+   "eso"
+  ],
+  "formation": "por eso + 结果",
+  "notes": "口语最常用的因果连接；指代前文整件事（= por esa razón）。",
+  "examples": [
+   {
+    "spanish": "No te disgustes por eso.",
+    "chinese": "别为这个不高兴。"
+   },
+   {
+    "spanish": "Llegó tarde, por eso perdió el tren.",
+    "chinese": "他迟到了，所以没赶上火车。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "además",
+  "name_es": "además (de)",
+  "meaning_en": "besides / moreover",
+  "meaning_zh": "además：而且、此外；además de：除……之外",
+  "level": "B1",
+  "focus": [
+   "además"
+  ],
+  "formation": "además（独立使用）；además de + 名词/原形动词",
+  "notes": "递进连接；además de 后接名词或原形动词，接从句要加 que。",
+  "examples": [
+   {
+    "spanish": "Además de ponerle una multa, le quitaron el carné.",
+    "chinese": "除了罚款，他们还吊销了他的驾照。"
+   },
+   {
+    "spanish": "Estudia, levántate temprano, haz la casa y, además, trabaja.",
+    "chinese": "他要学习、早起、做家务，而且还要上班。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "así que",
+  "name_es": "así que",
+  "meaning_en": "so / therefore (result)",
+  "meaning_zh": "así que：所以、于是",
+  "level": "B1",
+  "focus": [
+   "así",
+   "que"
+  ],
+  "formation": "así que + 结果从句",
+  "notes": "口语化的结果连接词，与 de modo que 近似但更随便。",
+  "examples": [
+   {
+    "spanish": "Esta tarde no habrá trabajo, así que no vengas.",
+    "chinese": "今天下午没活儿了，所以你别来了。"
+   },
+   {
+    "spanish": "No había nadie, así que me fui.",
+    "chinese": "一个人也没有，于是我就走了。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "de modo que",
+  "name_es": "de modo que",
+  "meaning_en": "so that / in such a way that",
+  "meaning_zh": "de modo que：因此；以便",
+  "level": "B1",
+  "focus": [
+   "de",
+   "modo",
+   "que"
+  ],
+  "formation": "de modo que + 陈述式（结果）/ 虚拟式（目的）",
+  "notes": "表结果用陈述式（debe de haber alguien），表目的用虚拟式，与 de manera que 同义。",
+  "examples": [
+   {
+    "spanish": "Se oye ruido dentro de la casa, de modo que debe de haber alguien.",
+    "chinese": "屋里传来声响，所以肯定有人在。"
+   },
+   {
+    "spanish": "Habló claro, de modo que todos le entendieron.",
+    "chinese": "他讲得很清楚，所以大家都听懂了。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "para que + subjuntivo",
+  "name_es": "para que + subjuntivo",
+  "meaning_en": "so that (purpose, different subjects)",
+  "meaning_zh": "para que + 虚拟式：为了（让）……",
+  "level": "B1",
+  "focus": [
+   "para",
+   "que",
+   "§subj"
+  ],
+  "formation": "para que + 虚拟式（主从句主语不同）",
+  "notes": "主语一致时用 para + 原形动词；主语不同才用 para que + 虚拟式。",
+  "examples": [
+   {
+    "spanish": "Abrí la ventana para que entrase el aire fresco.",
+    "chinese": "我打开窗户，好让新鲜空气进来。"
+   },
+   {
+    "spanish": "Te he comprado un reloj para que sepas la hora.",
+    "chinese": "我给你买了块表，好让你知道时间。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "antes de que + subjuntivo",
+  "name_es": "antes de que + subjuntivo",
+  "meaning_en": "before (something happens), with a different subject",
+  "meaning_zh": "antes de que + 虚拟式：在……之前（主语不同）",
+  "level": "B1",
+  "focus": [
+   "antes",
+   "de",
+   "que",
+   "§subj"
+  ],
+  "formation": "antes de que + 虚拟式（必须用虚拟式）",
+  "notes": "无论指现在还是过去，antes de que 后面一律用虚拟式。",
+  "examples": [
+   {
+    "spanish": "Vámonos antes de que empiece a llover.",
+    "chinese": "趁还没下雨，我们走吧。"
+   },
+   {
+    "spanish": "Me marcho antes de que llegue.",
+    "chinese": "我趁他还没到就先走了。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "después de que",
+  "name_es": "después de que",
+  "meaning_en": "after (something happens)",
+  "meaning_zh": "después de que：在……之后",
+  "level": "B1",
+  "focus": [
+   "después",
+   "de",
+   "que"
+  ],
+  "formation": "después de que + 陈述式（已发生）/ 虚拟式（将来）",
+  "notes": "主语一致时更常用 después de + 原形动词；指将来未发生的事可用虚拟式。",
+  "examples": [
+   {
+    "spanish": "Después de que mi esposa regrese del viaje, te invitaremos a comer.",
+    "chinese": "等我妻子旅行回来，我们请你吃饭。"
+   },
+   {
+    "spanish": "Después de que llegó, nos pusimos a trabajar.",
+    "chinese": "他到了之后，我们就开始干活。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "cuando + subjuntivo",
+  "name_es": "cuando + subjuntivo (futuro)",
+  "meaning_en": "when (referring to a future event)",
+  "meaning_zh": "cuando + 虚拟式：指将来发生时",
+  "level": "B1",
+  "focus": [
+   "cuando",
+   "§subj"
+  ],
+  "formation": "cuando + 虚拟式（指将来/未发生）",
+  "notes": "西班牙语不用 cuando + 将来时；指将来的事一律用虚拟式现在时。",
+  "examples": [
+   {
+    "spanish": "Cuando llegue la demás gente, nos iremos.",
+    "chinese": "等其他人到了，我们就走。"
+   },
+   {
+    "spanish": "Cuando tenga tiempo, iré al cine.",
+    "chinese": "等我有时间就去看电影。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "ojalá",
+  "name_es": "ojalá (+ subjuntivo)",
+  "meaning_en": "I wish / if only",
+  "meaning_zh": "ojalá：但愿、希望",
+  "level": "B1",
+  "focus": [
+   "ojalá"
+  ],
+  "formation": "ojalá + 虚拟式现在时（将来愿望）/ 虚拟式过去时（不可能的愿望）",
+  "notes": "来自阿拉伯语『愿真主愿意』，后面必须用虚拟式。",
+  "examples": [
+   {
+    "spanish": "Ojalá llegue hoy.",
+    "chinese": "但愿他今天能到。"
+   },
+   {
+    "spanish": "¡Ojalá lo consiga!",
+    "chinese": "但愿他能办成！"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "quizá / quizás",
+  "name_es": "quizá / quizás (+ subjuntivo)",
+  "meaning_en": "perhaps / maybe",
+  "meaning_zh": "quizá / quizás：也许",
+  "level": "B1",
+  "focus": [
+   "quizá/quizás"
+  ],
+  "formation": "quizá(s) + 虚拟式（更常见）/ 陈述式（较确定）",
+  "notes": "置于句首时多接虚拟式；置于句末或表示较大把握时可用陈述式。",
+  "examples": [
+   {
+    "spanish": "Quizá llueva mañana.",
+    "chinese": "明天也许会下雨。"
+   },
+   {
+    "spanish": "Quizá llegue tu padre esta tarde.",
+    "chinese": "你父亲今天下午也许到。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "tal vez",
+  "name_es": "tal vez (+ subjuntivo)",
+  "meaning_en": "maybe / perhaps",
+  "meaning_zh": "tal vez：或许",
+  "level": "B1",
+  "focus": [
+   "tal",
+   "vez"
+  ],
+  "formation": "tal vez + 虚拟式（不确定）/ 陈述式（较确定）",
+  "notes": "与 quizá 用法相同，后置时更倾向陈述式（lo conozcas / lo conoces 都可）。",
+  "examples": [
+   {
+    "spanish": "Tal vez lo sepa.",
+    "chinese": "他也许知道这事。"
+   },
+   {
+    "spanish": "Tal vez lo conozcas.",
+    "chinese": "你也许认识他。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "es posible que + subjuntivo",
+  "name_es": "es posible que + subjuntivo",
+  "meaning_en": "it is possible that",
+  "meaning_zh": "es posible que + 虚拟式：有可能……",
+  "level": "B1",
+  "focus": [
+   "es",
+   "posible",
+   "que"
+  ],
+  "formation": "es posible que + 虚拟式",
+  "notes": "同类触发语：es probable que、puede que、es difícil que，后面都用虚拟式。",
+  "examples": [
+   {
+    "spanish": "Es posible que funcione bien.",
+    "chinese": "这也许能行得通。"
+   },
+   {
+    "spanish": "Es posible que consiga el empleo.",
+    "chinese": "他有可能拿到那份工作。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "es necesario que + subjuntivo",
+  "name_es": "es necesario que + subjuntivo",
+  "meaning_en": "it is necessary that",
+  "meaning_zh": "es necesario que + 虚拟式：有必要……",
+  "level": "B1",
+  "focus": [
+   "es",
+   "necesario",
+   "que"
+  ],
+  "formation": "es necesario que + 虚拟式",
+  "notes": "必要性/评价类无人称表达（es importante / es mejor / hace falta que）都用虚拟式。",
+  "examples": [
+   {
+    "spanish": "Es necesario que estudien más.",
+    "chinese": "他们需要多学习。"
+   },
+   {
+    "spanish": "Es necesario que estudies la gramática.",
+    "chinese": "你必须学语法。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "me alegro de que + subjuntivo",
+  "name_es": "me alegro de que + subjuntivo",
+  "meaning_en": "I am glad that (emotion trigger)",
+  "meaning_zh": "me alegro de que + 虚拟式：我很高兴……",
+  "level": "B1",
+  "focus": [
+   "alegro",
+   "de",
+   "que"
+  ],
+  "formation": "情感动词 + de que + 虚拟式",
+  "notes": "情感类触发（me alegro / siento / me molesta / me extraña）后面用虚拟式。",
+  "examples": [
+   {
+    "spanish": "Me alegro de que no llueva.",
+    "chinese": "我很高兴没下雨。"
+   },
+   {
+    "spanish": "Me alegro de que estéis bien.",
+    "chinese": "我很高兴你们都好好的。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "no creo que + subjuntivo",
+  "name_es": "no creo que + subjuntivo",
+  "meaning_en": "I don't think that (negated opinion)",
+  "meaning_zh": "no creo que + 虚拟式：我认为……不",
+  "level": "B1",
+  "focus": [
+   "no",
+   "creo",
+   "que"
+  ],
+  "formation": "否定意见动词 + que + 虚拟式",
+  "notes": "creo que 用陈述式，但 no creo que 用虚拟式；同类：no pienso que、no me parece que。",
+  "examples": [
+   {
+    "spanish": "No creo que lo hagas.",
+    "chinese": "我不信你会这么做。"
+   },
+   {
+    "spanish": "No creo que lo logres.",
+    "chinese": "我觉得你办不到。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "dudo que + subjuntivo",
+  "name_es": "dudo que + subjuntivo",
+  "meaning_en": "I doubt that",
+  "meaning_zh": "dudo que + 虚拟式：我怀疑……",
+  "level": "B1",
+  "focus": [
+   "dudo",
+   "que"
+  ],
+  "formation": "dudar que + 虚拟式",
+  "notes": "肯定形式 dudo que 用虚拟式；no dudo que 表确信时用陈述式。",
+  "examples": [
+   {
+    "spanish": "Dudo que pueda a esta hora.",
+    "chinese": "我怀疑这个点他能来。"
+   },
+   {
+    "spanish": "Dudo que venga.",
+    "chinese": "我不太相信他会来。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "quien / quienes (relativo)",
+  "name_es": "quien / quienes (relativo)",
+  "meaning_en": "who / whom (relative pronoun, people only)",
+  "meaning_zh": "quien / quienes：关系代词（指人）",
+  "level": "B1",
+  "focus": [
+   "quien/quienes"
+  ],
+  "formation": "先行词（人）+ quien/quienes + 从句；或句首指『谁……』",
+  "notes": "只能指人；介词后用 quien（con quien hablo）；句首 quien 常含『凡是……的人』。",
+  "examples": [
+   {
+    "spanish": "Habla con quien quieras.",
+    "chinese": "你想跟谁说话就跟谁说。"
+   },
+   {
+    "spanish": "No es de ti de quien me quejo, de tu cuñado.",
+    "chinese": "我抱怨的不是你，是你姐夫。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "cuyo / cuya",
+  "name_es": "cuyo / cuya / cuyos / cuyas",
+  "meaning_en": "whose (possessive relative)",
+  "meaning_zh": "cuyo/a/os/as：……的（关系形容词）",
+  "level": "B1",
+  "focus": [
+   "cuyo/cuya/cuyos/cuyas"
+  ],
+  "formation": "先行词 + cuyo/a/os/as + 名词",
+  "notes": "与后面的名词性数一致，而不是与先行词一致；cuyo 前不再加冠词。",
+  "examples": [
+   {
+    "spanish": "Estoy leyendo una novela cuyo autor es mexicano.",
+    "chinese": "我正在读一本作者是墨西哥人的小说。"
+   },
+   {
+    "spanish": "Allá está el abogado cuyas señas te di.",
+    "chinese": "那位就是我给过你地址的律师。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "el cual / la cual",
+  "name_es": "el cual / la cual / los cuales / las cuales",
+  "meaning_en": "which / who (formal relative pronoun)",
+  "meaning_zh": "el cual / la cual：关系代词（较正式）",
+  "level": "B1",
+  "focus": [
+   "el/la",
+   "cual"
+  ],
+  "formation": "先行词 + 定冠词 + cual（+ 前置介词）",
+  "notes": "冠词与先行词性数一致；介词后或隔得远时用它比 que 清楚。",
+  "examples": [
+   {
+    "spanish": "La mesa a la cual diste barniz está en la sala.",
+    "chinese": "你上过漆的那张桌子在客厅里。"
+   },
+   {
+    "spanish": "Vi una mesa vieja debajo de la cual encontré una llave.",
+    "chinese": "我看见一张旧桌子，在它下面找到了一把钥匙。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "ser + participio (pasiva)",
+  "name_es": "ser + participio (voz pasiva)",
+  "meaning_en": "passive voice with ser",
+  "meaning_zh": "ser + 过去分词：被动语态",
+  "level": "B1",
+  "focus": [
+   "fue/fueron",
+   "§part"
+  ],
+  "formation": "ser 变位 + 过去分词（+ por + 施事者）",
+  "notes": "过去分词与主语性数一致（La casa fue destruida）；口语中更常用 se 被动。",
+  "examples": [
+   {
+    "spanish": "La casa fue destruida por el fuego.",
+    "chinese": "那栋房子被大火烧毁了。"
+   },
+   {
+    "spanish": "La carta no fue recibida por el interesado.",
+    "chinese": "当事人没有收到那封信。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "estar + participio",
+  "name_es": "estar + participio (estado resultante)",
+  "meaning_en": "resultant state after an action",
+  "meaning_zh": "estar + 过去分词：表示结果状态",
+  "level": "B1",
+  "focus": [
+   "está/están/estaba/estaban",
+   "§part"
+  ],
+  "formation": "estar 变位 + 过去分词（与主语性数一致）",
+  "notes": "ser + 分词讲动作（被……），estar + 分词讲结果状态（已经……了）：La puerta fue cerrada / La puerta está cerrada。",
+  "examples": [
+   {
+    "spanish": "Las aceras están destrozadas.",
+    "chinese": "人行道被弄得破烂不堪。"
+   },
+   {
+    "spanish": "Está agotado porque madruga una bestiada.",
+    "chinese": "他累坏了，因为他起得太早。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "ir + gerundio",
+  "name_es": "ir + gerundio (progreso gradual)",
+  "meaning_en": "to be gradually doing something",
+  "meaning_zh": "ir + 副动词：渐渐、逐步地",
+  "level": "B1",
+  "focus": [
+   "voy/vas/va/vamos/van/iba/iban",
+   "§ger"
+  ],
+  "formation": "ir 变位 + 副动词",
+  "notes": "强调逐渐推进（va mejorando 越来越好），区别于 estar + 副动词（正在做）。",
+  "examples": [
+   {
+    "spanish": "Va mejorando de aspecto.",
+    "chinese": "他的气色渐渐好起来了。"
+   },
+   {
+    "spanish": "Iban entrando uno por uno.",
+    "chinese": "他们一个接一个地走进来。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "siempre que",
+  "name_es": "siempre que (+ subjuntivo)",
+  "meaning_en": "as long as / whenever",
+  "meaning_zh": "siempre que：只要；每当",
+  "level": "B2",
+  "focus": [
+   "siempre",
+   "que"
+  ],
+  "formation": "siempre que + 虚拟式（条件）/ 陈述式（每当）",
+  "notes": "表条件时用虚拟式（siempre que estés conforme），表习惯性『每当』可用陈述式。",
+  "examples": [
+   {
+    "spanish": "Siempre que tú también estés conforme, acepto la propuesta.",
+    "chinese": "只要你也没意见，我就接受这个提议。"
+   },
+   {
+    "spanish": "Los dos trataban ese asunto siempre que se veían.",
+    "chinese": "两人每次见面都谈这件事。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "a fin de que + subjuntivo",
+  "name_es": "a fin de que + subjuntivo",
+  "meaning_en": "so that / in order that (formal)",
+  "meaning_zh": "a fin de que + 虚拟式：为了（让）……",
+  "level": "B2",
+  "focus": [
+   "a",
+   "fin",
+   "de",
+   "que"
+  ],
+  "formation": "a fin de que + 虚拟式（主语不同）",
+  "notes": "书面语，比 para que 正式；主语一致时用 a fin de + 原形动词。",
+  "examples": [
+   {
+    "spanish": "He venido a fin de que me informes de lo ocurrido.",
+    "chinese": "我来是为了让你把发生的事告诉我。"
+   },
+   {
+    "spanish": "Los técnicos trabajarán a fin de que el oleoducto funcione pronto.",
+    "chinese": "技术人员会努力让输油管道尽快投入使用。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "en cambio",
+  "name_es": "en cambio",
+  "meaning_en": "on the other hand / by contrast",
+  "meaning_zh": "en cambio：相反、另一方面",
+  "level": "B2",
+  "focus": [
+   "en",
+   "cambio"
+  ],
+  "formation": "en cambio（逗号隔开，置于对比句前）",
+  "notes": "表对照，而非单纯转折；与 por el contrario 近义。",
+  "examples": [
+   {
+    "spanish": "Es muy prudente; en cambio, su hermano es un alocado.",
+    "chinese": "他很谨慎；相反，他弟弟却是个莽撞鬼。"
+   },
+   {
+    "spanish": "A mí me gusta el cine; en cambio, ella prefiere el teatro.",
+    "chinese": "我喜欢电影，而她却更喜欢戏剧。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "dado que",
+  "name_es": "dado que",
+  "meaning_en": "given that / since",
+  "meaning_zh": "dado que：鉴于、既然",
+  "level": "B2",
+  "focus": [
+   "dado",
+   "que"
+  ],
+  "formation": "dado que + 陈述式",
+  "notes": "书面语因果连接，语气客观；常出现在论说文里。",
+  "examples": [
+   {
+    "spanish": "Dado que te interesa la colocación, ven a verme el martes.",
+    "chinese": "既然你对这个职位感兴趣，周二来找我。"
+   },
+   {
+    "spanish": "Dado que no había plazas, tuvimos que esperar.",
+    "chinese": "鉴于没有名额，我们只好等。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "si bien",
+  "name_es": "si bien",
+  "meaning_en": "although / while (formal concession)",
+  "meaning_zh": "si bien：虽然、尽管（书面）",
+  "level": "B2",
+  "focus": [
+   "si",
+   "bien"
+  ],
+  "formation": "si bien + 陈述式",
+  "notes": "书面让步，相当于 aunque 的正式版；别与 si = 如果 混淆。",
+  "examples": [
+   {
+    "spanish": "Si bien no es todo lo que esperaba, me doy por contento.",
+    "chinese": "虽然这不是我期待的全部，我也满意了。"
+   },
+   {
+    "spanish": "Si bien es caro, merece la pena.",
+    "chinese": "虽然贵，但值得。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "en cuanto a",
+  "name_es": "en cuanto a",
+  "meaning_en": "as for / regarding",
+  "meaning_zh": "en cuanto a：至于、关于",
+  "level": "B2",
+  "focus": [
+   "en",
+   "cuanto",
+   "a"
+  ],
+  "formation": "en cuanto a + 名词 / 代词",
+  "notes": "话题转换用语，与『as soon as』的 en cuanto 不是一回事。",
+  "examples": [
+   {
+    "spanish": "En cuanto a Juan, me parece buen chico.",
+    "chinese": "至于胡安，我觉得他是个好小伙。"
+   },
+   {
+    "spanish": "En cuanto a los precios, no hay ningún problema.",
+    "chinese": "至于价格，没有任何问题。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "en vez de",
+  "name_es": "en vez de",
+  "meaning_en": "instead of",
+  "meaning_zh": "en vez de：而不是、代替",
+  "level": "B2",
+  "focus": [
+   "en",
+   "vez",
+   "de"
+  ],
+  "formation": "en vez de + 名词 / 原形动词",
+  "notes": "与 en lugar de 同义；后接从句要改成 en vez de que + 虚拟式（少用）。",
+  "examples": [
+   {
+    "spanish": "No me he dado cuenta y he comprado sal gorda en vez de sal fina.",
+    "chinese": "我没注意，买成了粗盐而不是细盐。"
+   },
+   {
+    "spanish": "Prefiero tomar té en vez de café.",
+    "chinese": "我宁愿喝茶而不是咖啡。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "así como",
+  "name_es": "así como",
+  "meaning_en": "as well as / just as",
+  "meaning_zh": "así como：以及；正如",
+  "level": "B2",
+  "focus": [
+   "así",
+   "como"
+  ],
+  "formation": "A, así como B（并列）；Así como + 从句, 主句（对比）",
+  "notes": "连接并列成分时相当于 y también；句首时表『正如……』的对照。",
+  "examples": [
+   {
+    "spanish": "Así como yo no me meto en tus asuntos, tampoco quiero que tú te metas en los míos.",
+    "chinese": "正如我不插手你的事，我也不希望你插手我的。"
+   },
+   {
+    "spanish": "Ha visitado España, así como Francia e Italia.",
+    "chinese": "他去过西班牙，以及法国和意大利。"
+   }
+  ],
+  "source": "core"
+ },
+ {
+  "pattern": "ni ... ni",
+  "name_es": "ni ... ni",
+  "meaning_en": "neither ... nor",
+  "meaning_zh": "ni … ni …：既不……也不……",
+  "level": "B2",
+  "focus": [
+   "ni",
+   "...",
+   "ni"
+  ],
+  "formation": "ni + A + ni + B（可叠加多项）",
+  "notes": "句首用 Ni…ni 时不再加 no；句中已否定时用 ni 代替 y no。",
+  "examples": [
+   {
+    "spanish": "Ni mi mujer ni mi hija lo deben saber.",
+    "chinese": "这件事我妻子和女儿都不该知道。"
+   },
+   {
+    "spanish": "Ni la amistad, ni las dádivas, ni las promesas pudieron vencerle.",
+    "chinese": "无论是友情、馈赠还是承诺，都没能打动他。"
+   }
+  ],
+  "source": "core"
+ }
+]

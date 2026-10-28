@@ -137,6 +137,21 @@ let clear_newmultiterm_elements = function() {
   selection_start_shift_held = false;
 }
 
+/**
+ * A manga word can straddle two OCR columns (mokuro cuts its rows
+ * wherever the balloon ran out of room, which is often mid-word), and
+ * then renders as one span per column -- all carrying the whole word's
+ * data-wid, so hovering or clicking any piece shows the right word.
+ *
+ * What the pieces must not do is join a multi-word selection: the drag
+ * would splice the tail of one word to the head of the next ("プ" +
+ * "ゼン" -> "プゼン") and offer it as a new term.  So
+ * get_selected_in_range() skips spans marked data-split-piece (the
+ * template stamps it on these, see manga_columns.py).  A plain click on
+ * a piece is untouched: it opens the whole word's edit form via its
+ * data-wid, like any other word.
+ */
+
 function handle_select_started(e) {
   // Immediate "pressed" answer on mouse-down / touch-down.  Not in
   // select_started() itself: that is also called by the mobile
@@ -173,6 +188,11 @@ let get_selected_in_range = function(start_el, end_el) {
   const container = start_el.closest('#thetext, #yt-scrolling-subtitle-inner, #tts-scrolling-subtitle-inner');
   const search_root = container.length ? container : $(document);
   const selected = search_root.find('span.textitem').filter(function() {
+    // Split pieces are excluded: they are halves of words that the
+    // manga renderer split across columns, so including them would
+    // splice unrelated fragments into the new term.  See
+    // _is_split_piece.
+    if ($(this).is('[data-split-piece]')) return false;
     const ord = _get_order($(this));
     return ord >= startord && ord <= endord;
   });

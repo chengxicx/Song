@@ -7,16 +7,22 @@ import re
 from collections import defaultdict
 from datetime import datetime
 import functools
-from flask import current_app
+from flask import current_app, url_for
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import StaleDataError
 from lute.models.term import Term, Status
 from lute.models.book import Text, WordsRead
 from lute.models.repositories import BookRepository, UserSettingRepository
 from lute.book.stats import Service as StatsService
+from lute.dict import service as dict_service
+from lute.dict import gloss_format
 from lute.read.render.service import Service as RenderService
 from lute.read.render.calculate_textitems import get_string_indexes
+from lute.read import manga_columns
+from lute.book.epub_extract import css_path_for, orig_css_path_for, ensure_orig_css
+from lute.book import epub_paths
 from lute.term.model import Repository
+from lute.term import pos_tags
 from lute.utils.manga_images import image_path_for_page
 
 # from lute.utils.debug_helpers import DebugTimer
@@ -238,13 +244,87 @@ def _pdf_page_items(word_contexts):
 
 
 def _manga_page_items(blocks):
-    "The TextItems of a tokenized manga page (see Service._manga_page_blocks)."
+    """
+    The TextItems of a tokenized manga page (see Service._manga_page_blocks).
+
+    Includes the split pieces: a word the OCR cut across two columns is
+    rendered as one item per column, and every piece carries the whole
+    word's Term, so the pieces are what "the words on this page" means
+    here.  Both consumers de-duplicate by term text, so the extra
+    entries cost nothing.
+    """
     return [
         ti
         for block in blocks
         for line_items in block["line_items"]
         for ti in line_items
     ]
+
+
+def _epub_token(ti):
+    """
+    One token of a reader-mode EPUB chapter, as the front end needs it.
+
+    A compact array instead of a dict: a chapter can hold thousands of
+    tokens and the whole list is embedded in the page.
+
+    [display_text, wo_id, status, sentence_number, paragraph_number]
+
+    wo_id is 0 and status -1 for non-word items (punctuation, spaces).
+    display_text is exactly what a text page would render, so the front
+    end can concatenate the list and match it against the chapter's
+    text nodes character by character.
+    """
+    if ti.is_word:
+        status = -1 if ti.wo_status is None else ti.wo_status
+        return [
+            ti.html_display_text,
+            ti.wo_id or 0,
+            status,
+            ti.sentence_number,
+            ti.paragraph_number,
+        ]
+    return [ti.html_display_text, 0, -1, ti.sentence_number, ti.paragraph_number]
+
+
+# A converted dictionary entry is the headword, the part of speech,
+# the senses and then a long tail of example sentences -- dozens of
+# lines for a common word.  The popup is a glance, not a reading
+# pane, and the full entry is one click away in the dictionary
+# strip, so the popup's copy is capped here, at display time: the
+# stored definition, and every other reader of it, is untouched.
+DICT_GLOSS_POPUP_MAX_LINES = 5
+
+
+def _popup_first_lines(text, max_lines=DICT_GLOSS_POPUP_MAX_LINES):
+    """
+    A long block as the popup shows it: its first ``max_lines`` lines,
+    with a trailing "…" when more was cut.  Falsy input passes through
+    unchanged.
+    """
+    if not text:
+        return text
+    lines = text.split("\n")
+    if len(lines) <= max_lines:
+        return text
+    return "\n".join([*lines[:max_lines], "…"])
+
+
+def _translation_carries(gloss, translation):
+    """
+    True when the term's translation already contains the dictionary
+    gloss -- the form's auto-fill copied the entry into it.  Compared
+    with all whitespace (and the zero-width token separators) removed,
+    so the fill's headword line and any rewrapping do not matter.
+    """
+    if not gloss or not translation:
+        return False
+    zws = "\u200b"
+
+    def norm(s):
+        return "".join(s.split()).replace(zws, "")
+
+    return norm(gloss) in norm(translation)
 
 
 class TermPopup:
@@ -255,7 +335,10 @@ class TermPopup:
         self.term = term
         self.term_text = self._clean(term.text)
         self.parents_text = ", ".join([self._clean(p.text) for p in term.parents])
-        self.translation = self._clean(term.translation)
+        # A many-line translation (the form's auto-fill once copied the
+        # dictionary's whole card into it) is capped like the dictionary
+        # gloss is -- the popup is a glance, the form holds the full text.
+        self.translation = self._clean(_popup_first_lines(term.translation))
         self.romanization = self._clean(term.romanization)
         self.tags = [tt.text for tt in term.term_tags]
         self.flash = self._clean(term.get_flash_message())
@@ -265,10 +348,13 @@ class TermPopup:
         # Final data to include in popup.
         self.parents = []
         self.components = []
+        # The local dictionary's definition, filled in by get_popup_data
+        # when a dictionary is installed (see lute/dict).
+        self.dict_gloss = None
 
     def _clean(self, t):
         "Clean text for popup usage."
-        zws = "\u200B"
+        zws = "\u200b"
         ret = (t or "").strip()
         ret = ret.replace(zws, "")
         ret = ret.replace("\n", "<br />")
@@ -596,9 +682,10 @@ class Service:
 
         # Plain data captured up front: after a rollback the unsaved
         # Term objects are detached, so the recovery path must not read
-        # anything off them.
+        # anything off them.  pos comes along so a rebuilt term keeps
+        # the POS the page parse gave it.
         sources = {
-            key: (tis[0].term.language, tis[0].term.text)
+            key: (tis[0].term.language, tis[0].term.text, tis[0].term.pos)
             for key, tis in pending.items()
         }
 
@@ -610,7 +697,7 @@ class Service:
             except IntegrityError:
                 self.session.rollback()
                 for key, tis in pending.items():
-                    language, text = sources[key]
+                    language, text, pos_text = sources[key]
                     existing = (
                         self.session.query(Term)
                         .filter(
@@ -623,7 +710,9 @@ class Service:
                         for ti in tis:
                             ti.term = existing
                     else:
-                        rebuilt = Term.create_term_no_parsing(language, text)
+                        rebuilt = Term.create_term_no_parsing(
+                            language, text, pos_tags.text_to_pos(pos_text)
+                        )
                         rebuilt.status = 0
                         for ti in tis:
                             ti.term = rebuilt
@@ -846,28 +935,26 @@ class Service:
         order = 0
         for bi, block in enumerate(page.get("blocks") or []):
             box = block.get("box") or [0, 0, 0, 0]
+            # Tokenize the block as the single run of text it is, then cut
+            # the result back at the row boundaries.  OCR splits rows
+            # mid-word often enough that tokenizing them one by one
+            # ("プレゼン" + "トです。") left the reader hovering a word
+            # that matched nothing in the database -- an empty card -- and
+            # TTS pronouncing half a word.  See manga_columns.
+            per_row = manga_columns.tokenize_block(rs, block, lang, mw)
             line_items = []
-            for li, line in enumerate(block.get("lines") or []):
-                # A mokuro "line" can hold several physical text rows
-                # joined by newlines or the "¶" paragraph marker; split
-                # them so each row renders on its own line in the box
-                # instead of a single unbroken row.
-                for phys in re.split(r"[¶\r\n]+", line):
-                    if not phys.strip():
-                        continue
-                    items = rs.get_textitems(phys, lang, mw)
-                    kept = []
-                    for it in items:
-                        # Guard against paragraph markers leaking through
-                        # from the parser.
-                        if it.text == "¶":
-                            continue
-                        it.paragraph_number = bi + 1
-                        it.sentence_number = li + 1
-                        it.index = order
-                        order += 1
-                        kept.append(it)
-                    line_items.append(kept)
+            for kept in per_row:
+                for it in kept:
+                    it.paragraph_number = bi + 1
+                    # One sentence per block (a speech balloon), not per
+                    # OCR row: sentence_number drives "copy sentence" /
+                    # "translate sentence" and the reading-line highlight,
+                    # and a word split across two rows would otherwise
+                    # read back as two half-sentences.
+                    it.sentence_number = bi + 1
+                    it.index = order
+                    order += 1
+                line_items.append(kept)
             blocks.append(
                 {
                     "box": box,
@@ -959,6 +1046,13 @@ class Service:
         mw = rs.get_multiword_indexer(lang)
         word_contexts = []
         order = 0
+        # Right edge and line of the last word that produced a box, so the
+        # next word can tell whether a space separated them on the page.
+        # The reading screen renders each word as its own absolutely
+        # positioned box, so -- unlike text books -- no space token exists
+        # anywhere in the DOM; the hidden space span this drives (see
+        # pdf_page.html) is what sentence extraction copies with.
+        prev_geom = None
         for word in words:
             items = rs.get_textitems(word["text"], lang, mw)
             kept = []
@@ -974,6 +1068,14 @@ class Service:
                 kept.append(it)
             if not kept:
                 continue
+            # A gap wider than a hairline kern on the same line means the
+            # extraction saw a space between the two words (a space glyph
+            # is 2-4pt in most fonts).
+            space_before = (
+                prev_geom is not None
+                and prev_geom["line"] == word["line"]
+                and word["x"] - prev_geom["right"] > 1.25
+            )
             # Estimated box in % of the page.  JavaScript refines this
             # against pdf.js geometry after rendering; without it the
             # words are still usable in roughly the right places.
@@ -988,8 +1090,13 @@ class Service:
                     "box": box,
                     "items": kept,
                     "char_lens": [len(it.text) for it in kept],
+                    "space_before": space_before,
                 }
             )
+            prev_geom = {
+                "line": word["line"],
+                "right": word["x"] + word["width"],
+            }
 
         return page_width, page_height, word_contexts
 
@@ -1008,6 +1115,69 @@ class Service:
         items = _pdf_page_items(word_contexts)
         self._save_new_rendered_terms(items)
         return self._mark_rendered_page_unknowns_known(dbbook, items, finalize)
+
+    def epub_page_context(self, dbbook, pagenum, track_page_open=False):
+        """
+        Build the render context for one reader-mode EPUB page: the
+        page's sanitised HTML, its scoped stylesheets (theme-following
+        and keep-colours), and the token stream the front end aligns to
+        the page's text nodes.
+
+        A page is a whole chapter, or one split of a chapter that was too
+        long to be one page (epub_extract).  Either way the markup and
+        the token stream describe the same characters.
+
+        Returns None if the book has no extracted chapter at that page.
+        """
+        epub_path = (dbbook.epub_path or "").strip("/")
+        if not epub_path or not 1 <= pagenum <= dbbook.page_count:
+            return None
+        chapter_file = epub_paths.chapter_file(current_app, epub_path, pagenum)
+        if chapter_file is None:
+            return None
+
+        # Same bookkeeping as a text page: page-open tracking, sentence
+        # loading (word counts), and saving new status-0 terms so every
+        # rendered word already has its data-wid.
+        paragraphs = self._get_reading_data(dbbook, pagenum, track_page_open)
+
+        with open(chapter_file, encoding="utf-8") as f:
+            chapter_html = f.read()
+
+        tokens = [
+            _epub_token(ti)
+            for para in paragraphs
+            for sentence in para
+            for ti in sentence
+        ]
+
+        # The tokens come from the text *after* the parser's character
+        # substitutions (`’` -> `'`, `...` -> `…`, ZWSP dropped, ...),
+        # while the chapter's markup still has the book's originals.
+        # The front end applies these to the chapter before aligning, so
+        # the two streams are comparable; a word's term text is then the
+        # same one every other Lute book produces.
+        lang = dbbook.language
+        subs = [list(pair) for pair in lang.parser.text_substitutions(lang)]
+
+        # The original-look variant of the scoped stylesheet: produced at
+        # import for new packages, regenerated from the extracted
+        # originals on demand for old ones.  None (theme URL reused)
+        # when the package is gone or the rebuild is impossible.
+        orig_rel = ensure_orig_css(current_app, epub_path)
+
+        return {
+            "page_num": pagenum,
+            "chapter_html": chapter_html,
+            "css_url": url_for("static", filename=css_path_for(epub_path)),
+            "orig_css_url": (
+                url_for("static", filename=orig_rel)
+                if orig_rel
+                else url_for("static", filename=css_path_for(epub_path))
+            ),
+            "tokens": tokens,
+            "substitutions": subs,
+        }
 
     def _save_new_rendered_terms(self, items):
         """
@@ -1070,9 +1240,41 @@ class Service:
             ]
 
         t = TermPopup(term)
+
+        # The local dictionary gloss.  A word you have never studied has
+        # no translation, no tags and no romanization yet, so the
+        # dictionary is often the only thing the popup has to show --
+        # which is why it counts towards "is there anything to show"
+        # below, not just towards the popup body.
+        #
+        # Both the switch and the dictionaries are the *term's
+        # language's* (see lute/models/language.py): one user reads
+        # several languages, and a Korean popup has no business showing
+        # the Japanese dictionary.  The language's local dictionaries
+        # are tried in tab order; the first entry wins.
+        lang = term.language
+        if lang.term_popup_show_dict_gloss:
+            for filename in lang.local_dict_files():
+                gloss = dict_service.lookup(term.text, term.romanization, filename)
+                if gloss:
+                    # The entry's own headword line repeats the term
+                    # and reading already shown above it, and the
+                    # example-sentence tail is for the strip.
+                    stripped = dict_service.strip_duplicate_headword(gloss, term.text)
+                    # A translation copied out of this same entry (the
+                    # form's auto-fill used to save the whole card) is
+                    # shown above already; the bordered copy below would
+                    # repeat it and double the card's height.
+                    if not _translation_carries(stripped, term.translation):
+                        t.dict_gloss = _popup_first_lines(
+                            gloss_format.popup_gloss(stripped)
+                        )
+                    break
+
         if (
             t.show is False
             and t.image is None
+            and t.dict_gloss is None
             and len(term.parents) == 0
             and len(components) == 0
         ):

@@ -5,7 +5,7 @@
 import json
 import os
 import urllib.parse
-import uuid
+from io import BytesIO
 from flask import (
     Blueprint,
     request,
@@ -45,7 +45,9 @@ from lute.book.epub_import import (
     import_epub_chapters,
     language_id_from,
     selected_chapter_indices,
+    read_ebook_bytes,
 )
+from lute.book.kindle_parser import KINDLE_EXTENSIONS
 from lute.book.forms import (
     NewBookForm,
     EditBookForm,
@@ -60,9 +62,10 @@ from lute.book.forms import (
 from lute.book.types import import_type_choices
 from lute.book.stats import Service as StatsService
 from lute.book.stats import get_difficulty_label
-from lute.book import sensevoice, whisper_transcribe
+from lute.book import sensevoice
 from lute.multiuser.context import get_current_user
 from lute.multiuser.permissions import admin_only_if_multiuser_json
+from lute.i18n import t
 import lute.utils.formutils
 from lute.utils.formutils import book_tag_choices
 from lute.db import db
@@ -145,7 +148,7 @@ def book_settings():
         tags = ",".join(form.book_series_tags.data or [])
         repo.set_dynamic_value("book_series_tags", tags)
         db.session.commit()
-        flash("Group into Set updated", "success")
+        flash(t("Group into Set updated"), "success")
         return redirect("/", 302)
 
     current = repo.get_dynamic_value("book_series_tags") or ""
@@ -158,7 +161,7 @@ def series(tagtext):
     "Series overview: all books carrying the given tag."
     data = get_series_overview(db.session, tagtext)
     if data is None:
-        flash(f"No books found with tag '{tagtext}'", "notice")
+        flash(t("No books found with tag") + f" '{tagtext}'", "notice")
         return redirect("/", 302)
     return render_template("book/series.html", **data)
 
@@ -455,11 +458,11 @@ def _import_youtube_video():
     srt_file = request.files.get("srt_file")
 
     if youtube_video_id(url) is None:
-        flash("Please enter a valid YouTube video URL.", "notice")
+        flash(t("Please enter a valid YouTube video URL."), "notice")
         return redirect("/book/import_webpage", 302)
 
     if srt_file is None or srt_file.filename == "":
-        flash("Please upload an SRT or VTT subtitle file.", "notice")
+        flash(t("Please upload an SRT or VTT subtitle file."), "notice")
         return redirect("/book/import_webpage", 302)
 
     try:
@@ -473,7 +476,7 @@ def _import_youtube_video():
         return redirect("/book/import_webpage", 302)
 
     if text.strip() == "":
-        flash("The subtitle file contains no text.", "notice")
+        flash(t("The subtitle file contains no text."), "notice")
         return redirect("/book/import_webpage", 302)
 
     b = Book()
@@ -505,11 +508,11 @@ def _import_bilibili_video():
 
     bvid, aid = bilibili_video_id(url)
     if bvid is None and aid is None:
-        flash("Please enter a valid Bilibili video URL.", "notice")
+        flash(t("Please enter a valid Bilibili video URL."), "notice")
         return redirect("/book/import_webpage", 302)
 
     if srt_file is None or srt_file.filename == "":
-        flash("Please upload an SRT or VTT subtitle file.", "notice")
+        flash(t("Please upload an SRT or VTT subtitle file."), "notice")
         return redirect("/book/import_webpage", 302)
 
     try:
@@ -523,7 +526,7 @@ def _import_bilibili_video():
         return redirect("/book/import_webpage", 302)
 
     if text.strip() == "":
-        flash("The subtitle file contains no text.", "notice")
+        flash(t("The subtitle file contains no text."), "notice")
         return redirect("/book/import_webpage", 302)
 
     b = Book()
@@ -603,7 +606,7 @@ def _import_mp3_audio():
             title = base or "MP3 audio"
     else:
         return _import_form_failure(
-            "Please provide an audio file (upload or an online URL)."
+            t("Please provide an audio file (upload or an online URL).")
         )
 
     # --- Subtitles: an uploaded file OR an online subtitle URL. ---
@@ -617,12 +620,16 @@ def _import_mp3_audio():
     except BookImportException as e:
         return _import_form_failure(e.message)
     except Exception as e:  # pylint: disable=broad-except
-        return _import_form_failure(f"Could not parse subtitle (error: {str(e)})")
+        return _import_form_failure(
+            t("Could not parse subtitle") + f" (error: {str(e)})"
+        )
 
     if not (text and text.strip()):
         return _import_form_failure(
-            "Please provide subtitles (upload a file or an online URL), or tick "
-            "Auto-transcribe to generate them from the audio."
+            t(
+                "Please provide subtitles (upload a file or an online URL), or tick "
+                "Auto-transcribe to generate them from the audio."
+            )
         )
 
     title = title[:200]
@@ -653,369 +660,6 @@ def _import_mp3_audio():
     return _import_form_success(book.id)
 
 
-@bp.route("/whisper/available", methods=["GET"])
-def whisper_available():
-    "Whether the optional faster-whisper dependency is installed."
-    return jsonify(whisper_transcribe.whisper_status())
-
-
-@bp.route("/whisper/install", methods=["POST"])
-@admin_only_if_multiuser_json
-def whisper_install():
-    """
-    pip-install faster-whisper on demand.
-
-    Answers JSON (not flash+redirect) so the import page keeps the
-    files the user has already chosen.
-    """
-    ok, message = whisper_transcribe.install_whisper()
-    return jsonify({"ok": ok, "message": message})
-
-
-def _engine_error(model_size, language):
-    """
-    Why the picked transcription engine can't run for this language, or
-    None when it can.  SenseVoice (sherpa-onnx) and faster-whisper are
-    independent optional installs, so the availability gate follows the
-    engine the form actually picked.  SenseVoice only covers
-    zh/yue/en/ja/ko.
-    """
-    if model_size == "sensevoice":
-        from lute.book import sensevoice
-
-        if not sensevoice.installed():
-            return (
-                "SenseVoice isn't installed on this server yet "
-                "-- set it up under Settings -> Whisper (auto-subtitles)."
-            )
-        if sensevoice.lang_code_for(language) is None:
-            return (
-                "SenseVoice transcribes Chinese, Cantonese, "
-                "English, Japanese and Korean only -- pick a whisper "
-                "model for this language."
-            )
-    elif not whisper_transcribe.whisper_status()["installed"]:
-        return "faster-whisper is not installed yet."
-    return None
-
-
-# The media import forms that can hand their file/URL to the
-# transcription queue.  The field names and the extension whitelist
-# differ per type, so both the create-time auto-transcribe
-# (/whisper/prepare) and the import page's JS read them from here.
-TRANSCRIBE_IMPORT_TYPES = {
-    "mp3": {
-        "file": "mp3_file",
-        "url": "mp3_url",
-        "title": "mp3_title",
-        "tag": "mp3_tag",
-        "extensions": ALLOWED_AUDIO_EXTENSIONS,
-        "extension_error": AUDIO_VALIDATION_MSG,
-        "source_label": "audio",
-        "fallback_title": "MP3 audio",
-    },
-    "video": {
-        "file": "video_file",
-        "url": "video_url",
-        "title": "video_title",
-        "tag": "video_tag",
-        "extensions": ALLOWED_VIDEO_EXTENSIONS,
-        "extension_error": VIDEO_VALIDATION_MSG,
-        "source_label": "video",
-        "fallback_title": "Online video",
-    },
-}
-
-# Book types that may be re-transcribed from the edit page.
-RETRANSCRIBE_BOOK_TYPES = tuple(TRANSCRIBE_IMPORT_TYPES.keys())
-
-
-def _transcribe_import_spec(import_type):
-    "Field names and extension rules for the media form being transcribed."
-    return TRANSCRIBE_IMPORT_TYPES.get(import_type) or TRANSCRIBE_IMPORT_TYPES["mp3"]
-
-
-@bp.route("/whisper/prepare", methods=["POST"])
-def whisper_prepare():
-    """
-    Start a background transcription that creates an mp3 or video book.
-
-    Takes the media form's fields (import_type, language_id, file or
-    URL, title, tags) plus whisper_model ("sensevoice", or a whisper
-    size).  The media is saved to a temp file within this request (the
-    upload stream cannot outlive it), and a daemon thread transcribes it
-    and imports the book; the page polls /whisper/status/<task_id> until
-    the book id comes back.  import_type picks which form's field names
-    are read and which book type is created ("mp3" -> HTML5 audio,
-    "video" -> HTML5 video); it defaults to mp3.
-    """
-    if whisper_transcribe.has_running_task():
-        return (
-            jsonify(
-                {
-                    "error": "A transcription or model download is already "
-                    "running -- please wait for it to finish."
-                }
-            ),
-            409,
-        )
-    whisper_transcribe.purge_finished_tasks()
-
-    language_id = request.form.get("language_id")
-    if not language_id:
-        return jsonify({"error": "Please choose a language."}), 400
-    language = db.session.get(Language, int(language_id))
-    if language is None:
-        return jsonify({"error": "Please choose a valid language."}), 400
-
-    import_type = (request.form.get("import_type") or "mp3").strip()
-    spec = _transcribe_import_spec(import_type)
-    book_type = "video" if import_type == "video" else "mp3"
-
-    media_file = request.files.get(spec["file"])
-    media_url_in = (request.form.get(spec["url"]) or "").strip()
-    model_size = (request.form.get("whisper_model") or "").strip()
-    if (
-        model_size != "sensevoice"
-        and model_size not in whisper_transcribe.ALLOWED_MODEL_SIZES
-    ):
-        model_size = whisper_transcribe.DEFAULT_MODEL_SIZE
-
-    engine_error = _engine_error(model_size, language)
-    if engine_error:
-        return jsonify({"error": engine_error}), 400
-
-    temppath = current_app.env_config.temppath
-    os.makedirs(temppath, exist_ok=True)
-
-    audio_temp_path = None
-    media_url = None
-    source_uri = None
-    title = (request.form.get(spec["title"]) or "").strip()
-
-    if media_file and media_file.filename:
-        fname = (media_file.filename or "").lower()
-        ext = os.path.splitext(fname)[1].lstrip(".")
-        if ext not in spec["extensions"]:
-            return jsonify({"error": spec["extension_error"]}), 400
-        task_ref = uuid.uuid4().hex
-        audio_temp_path = os.path.join(temppath, f"whisper_{task_ref}.{ext}")
-        media_file.save(audio_temp_path)
-        source_uri = media_file.filename
-        if not title:
-            base = media_file.filename or spec["fallback_title"]
-            title = ".".join(base.split(".")[:-1]) or base
-    elif media_url_in:
-        # Transcription needs a local file, so the media is downloaded
-        # regardless of size (capped); files beyond the local-storage
-        # cutoff stream from the URL once the book exists.
-        try:
-            size = _url_content_length(media_url_in)
-            fname = download_url_to_file(
-                media_url_in,
-                temppath,
-                max_bytes=whisper_transcribe.WHISPER_MAX_DOWNLOAD_BYTES,
-            )
-        except BookImportException as e:
-            return jsonify({"error": e.message}), 400
-        audio_temp_path = os.path.join(temppath, fname)
-        if size is not None and size > MEDIA_LOCAL_MAX_BYTES:
-            media_url = media_url_in
-        source_uri = media_url_in
-        if not title:
-            base = os.path.basename(urllib.parse.urlparse(media_url_in).path)
-            title = base or spec["fallback_title"]
-    else:
-        return (
-            jsonify(
-                {
-                    "error": f"Please provide a {spec['source_label']} file "
-                    "(upload or an online URL)."
-                }
-            ),
-            400,
-        )
-
-    task_id = whisper_transcribe.start_task(
-        current_app._get_current_object(),  # pylint: disable=protected-access
-        audio_temp_path,
-        language,
-        model_size,
-        {
-            "language_id": int(language_id),
-            "title": title[:200],
-            "tags": _parse_tagify_tags(request.form.get(spec["tag"], "")),
-            "source_uri": source_uri,
-            "book_type": book_type,
-        },
-        media_url=media_url,
-        username=get_current_user(),
-    )
-    return jsonify({"task_id": task_id})
-
-
-@bp.route("/whisper/retranscribe/<int:bookid>", methods=["POST"])
-def whisper_retranscribe(bookid):
-    """
-    Re-run transcription on an existing mp3 / video book's media,
-    replacing the book's text and subtitle cues in place (edit page
-    button).
-
-    The book's own stored media file is never touched; only a
-    remote-URL book downloads a disposable temp copy for the
-    transcription.  The page polls /whisper/status/<task_id>; the task
-    updates the book (same flow as saving the edit form) instead of
-    creating a new one.
-    """
-    if whisper_transcribe.has_running_task():
-        return (
-            jsonify(
-                {
-                    "error": "A transcription or model download is already "
-                    "running -- please wait for it to finish."
-                }
-            ),
-            409,
-        )
-    whisper_transcribe.purge_finished_tasks()
-
-    dbbook = _find_book(bookid)
-    if dbbook is None:
-        return jsonify({"error": "Book not found."}), 404
-    if (dbbook.book_type or "") not in RETRANSCRIBE_BOOK_TYPES:
-        return (
-            jsonify({"error": "Only mp3 and video books can be re-transcribed."}),
-            400,
-        )
-
-    language = db.session.get(Language, dbbook.language_id)
-    if language is None:
-        return jsonify({"error": "The book's language is missing."}), 400
-
-    model_size = (request.form.get("whisper_model") or "").strip()
-    if model_size not in whisper_transcribe.ALLOWED_MODEL_SIZES + ["sensevoice"]:
-        model_size = whisper_transcribe.DEFAULT_MODEL_SIZE
-    engine_error = _engine_error(model_size, language)
-    if engine_error:
-        return jsonify({"error": engine_error}), 400
-
-    temppath = current_app.env_config.temppath
-    os.makedirs(temppath, exist_ok=True)
-
-    temp_audio = False
-    if dbbook.audio_filename:
-        audio_path = os.path.join(
-            current_app.env_config.useraudiopath, dbbook.audio_filename
-        )
-        if not os.path.exists(audio_path):
-            return (
-                jsonify({"error": "The book's media file is missing on disk."}),
-                400,
-            )
-    elif dbbook.media_url:
-        # Transcription needs a local file: stream a disposable copy.
-        try:
-            fname = download_url_to_file(
-                dbbook.media_url,
-                temppath,
-                max_bytes=whisper_transcribe.WHISPER_MAX_DOWNLOAD_BYTES,
-            )
-        except BookImportException as e:
-            return jsonify({"error": e.message}), 400
-        audio_path = os.path.join(temppath, fname)
-        temp_audio = True
-    else:
-        return jsonify({"error": "This book has no media to transcribe."}), 400
-
-    task_id = whisper_transcribe.start_task(
-        current_app._get_current_object(),  # pylint: disable=protected-access
-        audio_path,
-        language,
-        model_size,
-        None,  # book_params: unused, the book already exists
-        username=get_current_user(),
-        retranscribe_book_id=bookid,
-        temp_audio=temp_audio,
-    )
-    return jsonify({"task_id": task_id})
-
-
-@bp.route("/whisper/status/<task_id>", methods=["GET"])
-def whisper_task_status(task_id):
-    "Poller payload for a transcription task."
-    return jsonify(whisper_transcribe.task_status(task_id))
-
-
-@bp.route("/whisper/download_model", methods=["POST"])
-@admin_only_if_multiuser_json
-def whisper_download_model():
-    """
-    Pre-download the selected model so the first transcription starts
-    fast.  Runs on the same background machinery and mutex as
-    transcriptions; poll /whisper/status/<task_id> for completion.
-    """
-    if whisper_transcribe.has_running_task():
-        return (
-            jsonify(
-                {
-                    "error": "A transcription or model download is already "
-                    "running -- please wait for it to finish."
-                }
-            ),
-            409,
-        )
-    whisper_transcribe.purge_finished_tasks()
-
-    model_size = (request.form.get("whisper_model") or "").strip()
-    if model_size == "sensevoice":
-        # The SenseVoice model files are independent of faster-whisper.
-        task_id = whisper_transcribe.start_model_download(
-            current_app._get_current_object(),  # pylint: disable=protected-access
-            model_size,
-        )
-        return jsonify({"task_id": task_id})
-    if not whisper_transcribe.whisper_status()["installed"]:
-        return jsonify({"error": "faster-whisper is not installed yet."}), 400
-    if model_size not in whisper_transcribe.ALLOWED_MODEL_SIZES:
-        return (
-            jsonify(
-                {
-                    "error": "Unknown model size.  Pick one of: "
-                    + ", ".join(whisper_transcribe.ALLOWED_MODEL_SIZES + ["sensevoice"])
-                }
-            ),
-            400,
-        )
-
-    task_id = whisper_transcribe.start_model_download(
-        current_app._get_current_object(),  # pylint: disable=protected-access
-        model_size,
-    )
-    return jsonify({"task_id": task_id})
-
-
-@bp.route("/whisper/models", methods=["GET"])
-def whisper_models():
-    "Install state + per-size model cache status, for the Settings page."
-    return jsonify(
-        {
-            "installed": whisper_transcribe.whisper_status()["installed"],
-            "models": whisper_transcribe.model_cache_info(),
-            "sensevoice": _sensevoice_status(),
-        }
-    )
-
-
-def _sensevoice_status():
-    "SenseVoice engine state for the Settings page; None when unknown."
-    try:
-        from lute.book import sensevoice
-
-        return sensevoice.status()
-    except Exception:  # pylint: disable=broad-except
-        return None
-
-
 def _sensevoice_language_ids():
     """
     IDs of the active selectable languages SenseVoice can transcribe
@@ -1035,26 +679,6 @@ def _sensevoice_language_ids():
         return []
 
 
-@bp.route("/whisper/delete_model", methods=["POST"])
-@admin_only_if_multiuser_json
-def whisper_delete_model():
-    "Remove a downloaded model from the server's cache."
-    if whisper_transcribe.has_running_task():
-        return (
-            jsonify(
-                {
-                    "error": "A transcription or model download is already "
-                    "running -- please wait for it to finish."
-                }
-            ),
-            409,
-        )
-    ok, message = whisper_transcribe.delete_model(
-        request.form.get("whisper_model") or ""
-    )
-    return jsonify({"ok": ok, "message": message}), (200 if ok else 400)
-
-
 def _import_netease_music():
     """
     Create a NetEase Cloud Music book from a song URL.
@@ -1068,11 +692,11 @@ def _import_netease_music():
 
     song_id = netease_song_id(url)
     if song_id is None:
-        flash("Please enter a valid NetEase Cloud Music song URL.", "notice")
+        flash(t("Please enter a valid NetEase Cloud Music song URL."), "notice")
         return redirect("/book/import_webpage", 302)
 
     if not language_id:
-        flash("Please choose a language.", "notice")
+        flash(t("Please choose a language."), "notice")
         return redirect("/book/import_webpage", 302)
 
     try:
@@ -1085,7 +709,7 @@ def _import_netease_music():
         return redirect("/book/import_webpage", 302)
 
     if not (text and text.strip()):
-        flash("The song's lyrics contain no text.", "notice")
+        flash(t("The song's lyrics contain no text."), "notice")
         return redirect("/book/import_webpage", 302)
 
     try:
@@ -1096,8 +720,12 @@ def _import_netease_music():
         )
     except BookImportException as e:
         flash(
-            f"{e.message}  The song's audio could not be stored -- try "
-            "downloading it manually and importing it as an MP3 book.",
+            e.message
+            + "  "
+            + t(
+                "The song's audio could not be stored -- try "
+                "downloading it manually and importing it as an MP3 book."
+            ),
             "notice",
         )
         return redirect("/book/import_webpage", 302)
@@ -1152,12 +780,16 @@ def _import_online_video():
     except BookImportException as e:
         return _import_form_failure(e.message)
     except Exception as e:  # pylint: disable=broad-except
-        return _import_form_failure(f"Could not parse subtitle (error: {str(e)})")
+        return _import_form_failure(
+            t("Could not parse subtitle") + f" (error: {str(e)})"
+        )
 
     if not (text and text.strip()):
         return _import_form_failure(
-            "Please provide subtitles (upload a file or an online URL), or tick "
-            "Auto-transcribe to generate them from the video."
+            t(
+                "Please provide subtitles (upload a file or an online URL), or tick "
+                "Auto-transcribe to generate them from the video."
+            )
         )
 
     # --- Media: uploaded video file OR online video URL. ---
@@ -1182,7 +814,7 @@ def _import_online_video():
             title = base or "Online video"
     else:
         return _import_form_failure(
-            "Please provide a video (upload a file or an online URL)."
+            t("Please provide a video (upload a file or an online URL).")
         )
 
     title = title[:200]
@@ -1223,13 +855,15 @@ def _import_mokuro_manga():
     title = (request.form.get("manga_title") or "").strip()
 
     if manga_file is None or manga_file.filename == "":
-        flash("Please upload a Mokuro manga archive (.zip or .cbz).", "notice")
-        return redirect("/book/import_webpage", 302)
+        return _import_form_failure(
+            t("Please upload a Mokuro manga archive (.zip or .cbz).")
+        )
 
     fname = (manga_file.filename or "").lower()
     if not fname.endswith((".zip", ".cbz")):
-        flash("Please upload a valid Mokuro manga archive (.zip or .cbz).", "notice")
-        return redirect("/book/import_webpage", 302)
+        return _import_form_failure(
+            t("Please upload a valid Mokuro manga archive (.zip or .cbz).")
+        )
 
     if not title:
         base = manga_file.filename or "Mokuro manga"
@@ -1251,9 +885,8 @@ def _import_mokuro_manga():
         b.manga_stream_filename = manga_file.filename
         book = svc.import_book(b, db.session)
     except BookImportException as e:
-        flash(e.message, "notice")
-        return redirect("/book/import_webpage", 302)
-    return redirect(f"/read/{book.id}/page/1", 302)
+        return _import_form_failure(e.message)
+    return _import_form_success(book.id)
 
 
 def _import_pdf():
@@ -1264,12 +897,12 @@ def _import_pdf():
     title = (request.form.get("pdf_title") or "").strip()
 
     if pdf_file is None or pdf_file.filename == "":
-        flash("Please upload a PDF file.", "notice")
+        flash(t("Please upload a PDF file."), "notice")
         return redirect("/book/import_webpage", 302)
 
     fname = (pdf_file.filename or "").lower()
     if not fname.endswith(".pdf"):
-        flash("Please upload a valid PDF file (.pdf).", "notice")
+        flash(t("Please upload a valid PDF file (.pdf)."), "notice")
         return redirect("/book/import_webpage", 302)
 
     if not title:
@@ -1300,18 +933,17 @@ def _import_pdf():
 @bp.route("/import/epub/preview", methods=["POST"])
 def import_epub_preview():
     """
-    Parse an uploaded EPUB and return its metadata and chapter titles.
+    Parse an uploaded EPUB / Kindle e-book and return metadata and chapter titles.
 
     This is the "preview and confirm" step: nothing is written to the
     database; the client re-uploads the file on confirmation.
     """
-    epub_file = _epub_file_from_request()
-    if epub_file is None:
-        return jsonify(
-            {"success": False, "error": "Please upload a valid EPUB file (.epub)."}
-        )
+    ebook_file = _ebook_file_from_request()
+    if ebook_file is None:
+        return jsonify({"success": False, "error": t(_EBOOK_UPLOAD_ERROR)})
     try:
-        data = parse_epub(epub_file.stream)
+        raw = read_ebook_bytes(ebook_file.filename, ebook_file.stream)
+        data = parse_epub(BytesIO(raw))
     except BookImportException as e:
         return jsonify({"success": False, "error": e.message})
     return jsonify(
@@ -1327,32 +959,31 @@ def import_epub_preview():
 @bp.route("/import/epub", methods=["POST"])
 def import_epub():
     """
-    Create one book per chapter from the uploaded EPUB.
+    Create one book per chapter from the uploaded EPUB / Kindle e-book.
 
     Used by the preview flow (JSON response); the client re-uploads the
     file along with the selected chapter indices.
     """
-    epub_file = _epub_file_from_request()
-    if epub_file is None:
-        return jsonify(
-            {"success": False, "error": "Please upload a valid EPUB file (.epub)."}
-        )
+    ebook_file = _ebook_file_from_request()
+    if ebook_file is None:
+        return jsonify({"success": False, "error": t(_EBOOK_UPLOAD_ERROR)})
     language_id = language_id_from(request.form.get("language_id"))
     if language_id is None:
-        return jsonify({"success": False, "error": "Please select a language."})
+        return jsonify({"success": False, "error": t("Please select a language.")})
     tags = _parse_tagify_tags(request.form.get("epub_tag", ""))
     title = (request.form.get("epub_title") or "").strip()
     selected = selected_chapter_indices(request.form.get("chapters"))
+    reader_mode = _truthy_form_value(request.form.get("epub_reader_mode"))
     try:
         imported, failed, book_title, last_error = import_epub_chapters(
-            epub_file, title, language_id, tags, selected
+            ebook_file, title, language_id, tags, selected, reader_mode
         )
     except BookImportException as e:
         return jsonify({"success": False, "error": e.message})
     if imported == 0:
-        msg = "No chapters were imported."
+        msg = t("No chapters were imported.")
         if last_error:
-            msg += f" Last error: {last_error}"
+            msg += " " + t("Last error") + f": {last_error}"
         return jsonify({"success": False, "error": msg})
     return jsonify(
         {
@@ -1365,28 +996,29 @@ def import_epub():
 
 
 def _import_epub_direct():
-    "Form-post EPUB import: create books for all chapters, then redirect."
-    epub_file = _epub_file_from_request()
-    if epub_file is None:
-        flash("Please upload a valid EPUB file (.epub).", "notice")
+    "Form-post EPUB / Kindle import: create books for all chapters, then redirect."
+    ebook_file = _ebook_file_from_request()
+    if ebook_file is None:
+        flash(t(_EBOOK_UPLOAD_ERROR), "notice")
         return redirect("/book/import_webpage", 302)
     language_id = language_id_from(request.form.get("language_id"))
     if language_id is None:
-        flash("Please select a language.", "notice")
+        flash(t("Please select a language."), "notice")
         return redirect("/book/import_webpage", 302)
     tags = _parse_tagify_tags(request.form.get("epub_tag", ""))
     title = (request.form.get("epub_title") or "").strip()
+    reader_mode = _truthy_form_value(request.form.get("epub_reader_mode"))
     try:
         imported, failed, book_title, last_error = import_epub_chapters(
-            epub_file, title, language_id, tags, None
+            ebook_file, title, language_id, tags, None, reader_mode
         )
     except BookImportException as e:
         flash(e.message, "notice")
         return redirect("/book/import_webpage", 302)
     if imported == 0:
-        msg = "No chapters were imported."
+        msg = t("No chapters were imported.")
         if last_error:
-            msg += f" Last error: {last_error}"
+            msg += " " + t("Last error") + f": {last_error}"
         flash(msg, "notice")
         return redirect("/book/import_webpage", 302)
     if failed:
@@ -1394,14 +1026,24 @@ def _import_epub_direct():
     return redirect(f"/book/series/{urllib.parse.quote(book_title)}", 302)
 
 
-def _epub_file_from_request():
-    "Get the uploaded EPUB file field, or None when missing/invalid."
+_EBOOK_EXTENSIONS = (".epub",) + KINDLE_EXTENSIONS
+_EBOOK_UPLOAD_ERROR = "Please upload a valid EPUB, MOBI or AZW3 file."
+
+
+def _ebook_file_from_request():
+    "Get the uploaded e-book file field, or None when missing/invalid."
     f = request.files.get("epub_file")
     if f is None or f.filename == "":
         return None
-    if not (f.filename or "").lower().endswith(".epub"):
+    name = (f.filename or "").lower()
+    if not name.endswith(_EBOOK_EXTENSIONS):
         return None
     return f
+
+
+def _truthy_form_value(raw):
+    "True for the values an HTML checkbox submits when it is checked."
+    return (raw or "").strip().lower() in ("1", "on", "true", "yes")
 
 
 @bp.route("/archive/<int:bookid>", methods=["POST"])

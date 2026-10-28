@@ -10,7 +10,7 @@
     {# Dark / light mode toggle. Same id / markup / style as the home
        menu-bar button, so base.html's shared script handles the icon
        flip, pop animation and toggle_dark_theme() call. #}
-    <button id="theme-mode-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode"
+    <button id="theme-mode-toggle" type="button" aria-label="{{ t('Toggle dark mode') }}" title="{{ t('Toggle dark mode') }}"
             data-is-dark="{% if current_theme == 'Default.css' %}1{% else %}0{% endif %}">
       <span class="theme-mode-icon theme-mode-icon--sun">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -37,27 +37,29 @@
 </div>
 
 <div id="focus-container">
-  <label for="focus">Focus mode</label>
+  <label for="focus">{{ t('Focus mode') }}</label>
   <input type="checkbox" name="focus" id="focus" x-model="focusMode">
 </div>
 
-<div id="tts-toggle-container">
-  <label for="tts-player-toggle">TTS Player</label>
-  <input type="checkbox" name="tts-player-toggle" id="tts-player-toggle">
+{# Master on/off for every player bar on the page -- the audio / video
+   track and TTS read-aloud alike (see tts-ui.js). #}
+<div id="player-toggle-container">
+  <label for="player-toggle">{{ t('Player') }}</label>
+  <input type="checkbox" name="player-toggle" id="player-toggle">
 </div>
 
 <div id="tts-sentence-buttons-toggle-container">
-  <label for="tts-sentence-buttons-toggle">Sentence 🔊</label>
+  <label for="tts-sentence-buttons-toggle">{{ t('Sentence 🔊') }}</label>
   <input type="checkbox" name="tts-sentence-buttons-toggle" id="tts-sentence-buttons-toggle">
 </div>
 
 <div id="tap_sets_status-container">
-  <label for="tap_sets_status">Quick Set Status Mode</label>
+  <label for="tap_sets_status">{{ t('Quick Set Status Mode') }}</label>
   <input type="checkbox" name="tap_sets_status" id="tap_sets_status" x-model="tapSetsStatus">
 </div>
 
 <div id="arrow_marks_known-container">
-  <label for="arrow_marks_known">Mark rest known</label>
+  <label for="arrow_marks_known">{{ t('Mark rest known') }}</label>
   <input type="checkbox" name="arrow_marks_known" id="arrow_marks_known" x-model="arrowMarksKnown">
 </div>
 
@@ -65,81 +67,119 @@
    hide the toggle on devices with no touch screen.  style="display:none"
    keeps it from flashing before Alpine boots. #}
 <div id="tap_haptics-container" x-show="isTouch" style="display: none;">
-  <label for="tap_haptics">Tap vibration</label>
+  <label for="tap_haptics">{{ t('Tap vibration') }}</label>
   <input type="checkbox" name="tap_haptics" id="tap_haptics" x-model="tapHaptics">
 </div>
 
 <div class="text-options-container">
   <div class="text-options-btn-container">
-    <button class="text-options-button font-minus" title="Decrease font size"></button>
-    <button class="text-options-button font-plus" title="Increase font size"></button>
+    <button class="text-options-button font-minus" title="{{ t('Decrease font size') }}"></button>
+    <button class="text-options-button font-plus" title="{{ t('Increase font size') }}"></button>
   </div>
   <div class="text-options-btn-container">
-    <button class="text-options-button lh-minus" title="Decrease line height"></button>
-    <button class="text-options-button lh-plus" title="Increase line height"></button>
+    <button class="text-options-button lh-minus" title="{{ t('Decrease line height') }}"></button>
+    <button class="text-options-button lh-plus" title="{{ t('Increase line height') }}"></button>
   </div>
   <div class="text-options-btn-container">
-    <button class="text-options-button width-minus" title="Decrease content width"></button>
-    <button class="text-options-button width-plus" title="Increase content width"></button>
+    <button class="text-options-button width-minus" title="{{ t('Decrease content width') }}"></button>
+    <button class="text-options-button width-plus" title="{{ t('Increase content width') }}"></button>
   </div>
   <div class="text-options-btn-container">
-    <button class="text-options-button column-one" title="One column text"></button>
-    <button class="text-options-button column-two" title="Two column text"></button>
+    <button class="text-options-button column-one" title="{{ t('One column text') }}"></button>
+    <button class="text-options-button column-two" title="{{ t('Two column text') }}"></button>
   </div>
   <div class="text-options-btn-container manga-zoom-btn-container">
-    <button class="text-options-button manga-zoom-out" title="Zoom out page"></button>
-    <button class="text-options-button manga-zoom-in" title="Zoom in page"></button>
-    <button class="text-options-button manga-zoom-fit" title="Fit page to screen"></button>
+    <button class="text-options-button manga-zoom-out" title="{{ t('Zoom out page') }}"></button>
+    <button class="text-options-button manga-zoom-in" title="{{ t('Zoom in page') }}"></button>
+    <button class="text-options-button manga-zoom-fit" title="{{ t('Fit page to screen') }}"></button>
+  </div>
+  {# Reader-mode EPUB look: paper surface with the book's own palette
+     (default), inverted night paper, or Lute's theme.  Only meaningful
+     for epub books; hidden via #reading_menu.not-epub (styles.css).
+     State is kept in localStorage by lute-epub-reader.js. #}
+  <div class="text-options-btn-container epub-look-btn-container">
+    <button class="text-options-button epub-look-original" title="{{ t('Original book look') }}"></button>
+    <button class="text-options-button epub-look-night" title="{{ t('Night mode') }}"></button>
+    <button class="text-options-button epub-look-theme" title="{{ t('Follow theme') }}"></button>
   </div>
 </div>
+
+{# Reader font.  The theme stylesheets hard-code the reading text's
+   font-family, so a pick here is applied as an override on #thetext
+   (see "Reader font choice" in styles.css) rather than by inheritance.
+   The choices are per language -- see read/reader_fonts.py -- and each
+   option carries its full CSS stack in data-stack, which
+   text-options.js applies and remembers.  Manga/PDF text is positioned
+   over an image and cannot reflow, so those books get no picker. #}
+{% if book_type not in ('manga', 'pdf') %}
+<div id="reader-font-container" class="reader-font-container">
+  <label for="reader-font">{{ t('Font') }}</label>
+  <select id="reader-font" data-lang="{{ lang_code }}">
+    {% for choice in reader_fonts or [] %}
+    <option value="{{ choice.key }}"
+            data-stack="{{ choice.stack }}"
+            {% if choice.stack %}style="font-family: {{ choice.stack | safe }}"{% endif %}>{{ t(choice.label) }}</option>
+    {% endfor %}
+  </select>
+</div>
+{# System fonts.  A page cannot list the fonts installed on the
+   machine without asking -- it is a fingerprinting vector -- and only
+   Chromium's Local Font Access API has an asking mechanism at all
+   (Safari, Firefox and every mobile browser refuse).  The button starts
+   hidden and text-options.js reveals it only where queryLocalFonts
+   exists; everywhere else the preset list is the whole picker. #}
+<button id="reader-font-system" class="reader-font-system-btn" type="button" hidden>
+  {{ t('Browse system fonts') }}
+</button>
+{% endif %}
 
 <ul>
   {% if book.source_uri %}
   <li>
     <a class="reading-menu-item" href="{{ book.source_uri }}" target="_blank" tabindex="-1">
-      <span>Show source URL</span>
+      <span>{{ t('Show source URL') }}</span>
     </a>
   </li>
   {% endif %}
   <li id="page-operations-li" class="reading-menu-item reading-menu-top-level-li">
-    <span id="page-operations-title" class="reading-menu-top-level">Edit</span>
+    <span id="page-operations-title" class="reading-menu-top-level">{{ t('Edit') }}</span>
     <div id="page-operations-menu" class="reading-menu-sublist">
       <ul>
         <li>
-          <a id="editText" class="reading-menu-item" href="" onclick="edit_current_page(); return false;" title="Edit current page content">
-            Edit current page
+          <a id="editText" class="reading-menu-item" href="" onclick="edit_current_page(); return false;" title="{{ t('Edit current page content') }}">
+            {{ t('Edit current page') }}
           </a>
         </li>
         <li>
-          <a id="readmenu_add_page_after" class="reading-menu-item" href="" onclick="add_page_after(); return false;" title="Add page after current page">
-            Add page after
+          <a id="readmenu_add_page_after" class="reading-menu-item" href="" onclick="add_page_after(); return false;" title="{{ t('Add page after current page') }}">
+            {{ t('Add page after') }}
           </a>
         </li>
         <li>
-          <a id="readmenu_add_page_before" class="reading-menu-item" href="" onclick="add_page_before(); return false;" title="Add page before current page">
-            Add page before
+          <a id="readmenu_add_page_before" class="reading-menu-item" href="" onclick="add_page_before(); return false;" title="{{ t('Add page before current page') }}">
+            {{ t('Add page before') }}
           </a>
         </li>
         <li>
-          <a id="readmenu_delete_page" class="reading-menu-item" href="" onclick="delete_current_page(); return false;" title="Delete current page">
-            Delete current page
+          <a id="readmenu_delete_page" class="reading-menu-item" href="" onclick="delete_current_page(); return false;" title="{{ t('Delete current page') }}">
+            {{ t('Delete current page') }}
           </a>
         </li>
       </ul>
     </div>
   </li>
   <li id="bookmark-operations-li" class="reading-menu-item reading-menu-top-level-li">
-    <span id="bookmark-operations-title" class="reading-menu-top-level">Bookmarks</span>
+    <span id="bookmark-operations-title" class="reading-menu-top-level">{{ t('Bookmarks') }}</span>
     <div id="bookmark-operations-menu" class="reading-menu-sublist">
       <ul>
         <li>
-          <a id="readmenu_bookmark_index" class="reading-menu-item" href="/bookmarks/{{ book.id }}" title="Index">
-            List bookmarks
+          <a id="readmenu_bookmark_index" class="reading-menu-item" href="/bookmarks/{{ book.id }}" title="{{ t('Index') }}">
+            {{ t('List bookmarks') }}
           </a>
         </li>
         <li>
-          <a id="readmenu_add_bookmark" class="reading-menu-item" href="" onclick="add_bookmark(); return false;" title="Add bookmark">
-            Add bookmark
+          <a id="readmenu_add_bookmark" class="reading-menu-item" href="" onclick="add_bookmark(); return false;" title="{{ t('Add bookmark') }}">
+            {{ t('Add bookmark') }}
           </a>
         </li>
       </ul>
@@ -147,65 +187,71 @@
   </li>
   <li>
     <a id="sendTermsToAnki" class="reading-menu-item" href="" onclick="send_selected_terms_to_anki(); return false;">
-      Create Anki cards
+      {{ t('Create Anki cards') }}
     </a>
   </li>
   <li>
     <a id="listTermsOnCurrentPage" class="reading-menu-item" href="" onclick="open_term_list_for_current_page(); return false;">
-      Term list
+      {{ t('Term list') }}
     </a>
   </li>
   <li>
     <!-- mobile users need this link, since they don't have keyboard shortcuts. -->
     <a id="translateSentence" class="reading-menu-item" href="" onclick="handle_translate('sentence-id'); return false;">
-      Translate sentence
+      {{ t('Translate sentence') }}
     </a>
   </li>
   <li>
     <a id="translateText" class="reading-menu-item" href="" onclick="handle_translate(null); return false;">
-      Translate page
+      {{ t('Translate page') }}
     </a>
   </li>
   <li>
     <!-- 可行性原型：分析当前页涉及哪些语法点，列出例句。 -->
     <a id="grammarAnalysis" class="reading-menu-item" href="" onclick="open_grammar_analysis(); return false;">
-      Analyze grammar
+      {{ t('Analyze grammar') }}
     </a>
   </li>
   <li>
-    <a id="next_theme" class="reading-menu-item" onclick="next_theme(); return false;" title="Next theme">
-      Next theme
+    <!-- 语法库：按级别浏览本语言收录的全部语法点，不限于当前页。 -->
+    <a id="grammarLibrary" class="reading-menu-item" href="/grammar/{{ lang_id }}">
+      {{ t('Grammar library') }}
     </a>
   </li>
   <li>
-    <a id="toggle_highlights" class="reading-menu-item" onclick="toggle_highlight(); return false;" title="Toggle highlights">
-      Toggle highlights
+    <a id="next_theme" class="reading-menu-item" onclick="next_theme(); return false;" title="{{ t('Next theme') }}">
+      {{ t('Next theme') }}
     </a>
   </li>
   <li>
-    <a id="keyboard_shortcuts" class="reading-menu-item" title="Keyboard shortcuts"
+    <a id="toggle_highlights" class="reading-menu-item" onclick="toggle_highlight(); return false;" title="{{ t('Toggle highlights') }}">
+      {{ t('Toggle highlights') }}
+    </a>
+  </li>
+  <li>
+    <a id="keyboard_shortcuts" class="reading-menu-item" title="{{ t('Keyboard shortcuts') }}"
        href="/settings/shortcuts"
        target="_blank">
-      Keyboard shortcuts
+      {{ t('Keyboard shortcuts') }}
     </a>
   </li>
   <li id="screen-interactions-li" class="reading-menu-item reading-menu-top-level-li">
-    <span id="screen-interactions-title" class="reading-menu-top-level">Screen interactions</span>
+    <span id="screen-interactions-title" class="reading-menu-top-level">{{ t('Screen interactions') }}</span>
     <div id="screen-interactions-menu" class="reading-menu-sublist">
       <ul>
         <li>
           <a id="screen-mobile" class="reading-menu-item" href="" onclick="set_screen_type('mobile'); return false;">
-            Mobile
+            {{ t('Mobile') }}
           </a>
         </li>
         <li>
           <a id="screen-desktop" class="reading-menu-item" href="" onclick="set_screen_type('desktop'); return false;">
-            Desktop
+            {{ t('Desktop') }}
           </a>
         </li>
         <li>
           <a id="screen-auto" class="reading-menu-item" href="" onclick="set_screen_type('auto'); return false;">
-            Auto
+            {{ t('Auto') }}
           </a>
         </li>
       </ul>
@@ -261,5 +307,18 @@
     if (LUTE_USER_SETTINGS["use_ankiconnect"] == false) {
       $("#sendTermsToAnki").css('display', 'none');
     }
+    // Look-mode buttons (reader-mode EPUB only): the mode, its classes
+    // on #thetext and the active stylesheet are all managed by
+    // lute-epub-reader.js; the buttons only carry the click and their
+    // own active state.  syncLookButtons is called again on every
+    // setLook so the highlight follows.
+    ["original", "night", "theme"].forEach(function (mode) {
+      const btn = document.querySelector(".epub-look-" + mode);
+      if (!btn) return;
+      btn.addEventListener("click", function () {
+        if (window.EpubReader) window.EpubReader.setLook(mode);
+      });
+    });
+    if (window.EpubReader) window.EpubReader.syncLookButtons();
   });
 </script>

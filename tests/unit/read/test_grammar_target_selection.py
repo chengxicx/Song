@@ -118,18 +118,165 @@ def test_the_auto_selection_is_pinned_and_scrolled_to(commands):
     rings are pinned, and a collapsed aggregate row is opened first (its
     hidden examples have no client rects, so the rings would be invisible).
     """
-    # The per-card loop records what the selection needs...
-    binding = _after(commands, "var boundItems = [];", 900)
+    # The per-card loop records what the selection needs.  The window has to
+    # clear the loop's own bookkeeping above the push -- the header control's
+    # card registry (and its comment) sits between the marker and the push,
+    # which is what a 900-char window stopped reaching.
+    binding = _after(commands, "var boundItems = [];", 1600)
     assert "boundItems.push(rec)" in binding
     assert "rec.examples.push({ runs: runs, nodes: nodes })" in commands
 
-    # ...and the selection runs after every card is bound.
-    body = _after(commands, "if (targetWordEl && targetWordEl.isConnected) {", 800)
-    assert "grammarTargetSentence(targetWordEl)" in body
-    assert "grammarPickTarget(boundItems, targetSentence, targetWordEl)" in body
+    # The sentence is resolved before the header is built -- that is what
+    # puts the "This sentence" button on the first render -- and the pick
+    # itself runs after every card is bound.
+    resolved = _after(commands, "var targetSentence = null;", 500)
+    assert "narrowToTarget" in resolved
+    assert "grammarTargetSentence(targetWordEl)" in resolved
+
+    body = _after(commands, "var picked = ", 900)
+    assert "grammarPickTarget(" in body
+    assert "boundItems" in body
+    assert "targetSentence" in body
     assert 'classList.remove("grammar-item--collapsed")' in body
     assert "setPinned(picked.runs, picked.itemEl)" in body
     assert "scrollIntoView" in body
+
+
+def test_the_page_control_narrows_the_panel_to_one_sentence(commands):
+    """
+    The panel opens narrowed to the sentence the term form came from, and the
+    header's page control widens it back to every point on the screen.  Both
+    act on the cards already in the DOM -- switching is instant and must not
+    re-run the backend analysis -- so losing the narrowing leaves a control
+    that silently does nothing.
+    """
+    # The card registry the control filters has to be filled from the same
+    # loop that binds the cards, after every card is in it.
+    assert "renderedCards = cards;" in commands
+    assert "card.rec = rec;" in commands
+
+    body = _after(commands, "function filterToSentence(sentence) {", 700)
+    # Membership is decided on the resolved sentence element, exactly as the
+    # jump's own pick does, so a phrase split across nodes still counts.
+    assert "ex.nodes.indexOf(sentence) !== -1" in body
+    assert 'card.el.classList.toggle("grammar-item--filtered-out", !keep);' in body
+
+    # A three-way scope switch: the sentence scope narrows, the page scope
+    # widens, and neither re-runs the backend analysis (only the book scope
+    # does, because it is a different text).
+    click = _after(commands, 'panel.find(".grammar-analysis-panel__scope").on("click"', 1400)
+    assert 'if (next === "sentence")' in click
+    assert "filterToSentence(filterableSentence)" in click
+    assert 'if (next === "page")' in click
+    assert "showPageGrammar()" in click
+
+    # ...and the narrowing is actually applied on open, from the same
+    # sentence the jump resolved.  The sentence is remembered even when it
+    # carries no known grammar, so the control can still toggle back.
+    opened = _after(commands, "var targetSentence = null;", 900)
+    assert "narrowToTarget" in opened
+    assert "filterableSentence = targetSentence;" in opened
+    # Claiming the sentence scope is what makes the "This page" control live
+    # from the first render: it used to stay "page" while the panel was
+    # already narrowed, so clicking it returned early and did nothing.
+    assert 'scope = "sentence";' in opened
+
+    # The filter itself needs the cards, so it lands after they are bound.
+    narrowed = _after(commands, "var picked = ", 600)
+    assert "filterToSentence(targetSentence)" in narrowed
+
+    # No request anywhere in the switch: it is pure DOM work.
+    switch = commands[
+        commands.index("function refreshPanelVisibility() {") : commands.index(
+            "bindPanelControls();"
+        )
+    ]
+    assert "getJSON" not in switch
+    # ...and the count badge follows the narrowing rather than the payload.
+    assert 'panel.find("#grammar-count").text(' in switch
+
+
+def test_a_wider_scope_render_does_not_re_narrow_to_the_old_sentence(commands):
+    """
+    Only the render that opens the panel narrows to the clicked word's
+    sentence.  The word stays in the closure, and the book scope's examples
+    come from every other page -- they have no nodes on this screen, so
+    narrowing there filtered nearly every card away while the level headers
+    still counted the payload (the reported "This book: 1 point", N5: 10).
+    """
+    assert "function renderResults(data, narrowToTarget) {" in commands
+    # One flag, and the opening request is the only caller that passes it.
+    assert commands.count("renderResults(data, true)") == 1
+
+    # The book's own rows, and the page rows re-rendered on the way back,
+    # render without the flag.
+    book = _after(commands, "function fetchBookScope() {", 3000)
+    assert "renderResults(data);" in book
+    back = _after(commands, "if (pageResults) {", 300)
+    assert "renderResults(lastResults);" in back
+
+    # The old render-time test on the word alone is gone: the sentence is
+    # resolved only under the flag.
+    assert "if (targetWordEl && targetWordEl.isConnected) {" not in commands
+
+
+def test_the_book_scope_polls_while_the_background_analysis_runs(commands):
+    """
+    A whole-book analysis is precomputed in the background, so the request
+    answers "computing" instead of blocking for half a minute.  The panel
+    has to wait visibly and poll, and every way out of the panel has to stop
+    the poll: a timer left running re-renders a panel that is gone.
+    """
+    body = _after(commands, "function fetchBookScope() {", 3000)
+    assert 'data.state === "computing"' in body
+    assert "pollBookScope()" in body
+    assert 'data.state === "error"' in body
+
+    poll = _after(commands, "function pollBookScope() {", 500)
+    assert "setTimeout" in poll
+    assert 'scope !== "book"' in poll
+    assert "bookPollDeadline" in poll
+
+    close_body = _after(commands, "function closeGrammarAnalysis() {", 400)
+    assert "stopBookPolling()" in close_body
+
+
+def test_the_scope_control_is_wired_in_every_panel_state(commands):
+    """
+    The header is re-rendered three times -- the initial "Analyzing…" one, the
+    rendered panel, and the failure state -- and the control is re-bound with
+    it each time.  Binding it in only some of them leaves a dead button that
+    errors nowhere, which is the same silent shape as the close button's own
+    three call sites.
+
+    The control used to be one "Current page grammar" button; it is now a
+    group of scope buttons (sentence / page / book), so the assertion names
+    the group and its handler rather than the old single class.
+    """
+    header_body = _after(commands, "function header() {", 2600)
+    assert "grammar-analysis-panel__scope" in header_body
+    assert "grammar-analysis-panel__scopes" in header_body
+    # The three scope words, without a redundant "grammar" on each.
+    for scope in ("This sentence", "This page", "This book"):
+        assert f'I18N.t("{scope}")' in header_body, scope
+
+    assert commands.count("bindPanelControls();") == 3
+    bind_body = _after(commands, "function bindPanelControls() {", 900)
+    assert 'panel.find(".grammar-analysis-panel__scope").on("click"' in bind_body
+    assert 'panel.find(".grammar-analysis-panel__close").on(' in bind_body
+
+
+def test_an_empty_narrowing_explains_itself(commands):
+    """
+    A sentence can carry no known grammar point, and a narrowed panel then has
+    nothing to show.  An empty body reads as a broken panel, so the empty
+    state is rendered up front and un-hidden only for that case -- and the
+    level groups that lost every card go with it, so no bare header is left
+    standing over nothing.
+    """
+    assert 'classList.toggle("grammar-group--filtered-out", !any)' in commands
+    assert "empty.hidden = !(sentenceFilter && visible === 0)" in commands
+    assert "I18N.t('No known grammar points for this sentence.')" in commands
 
 
 def test_hover_out_restores_the_pin_instead_of_clearing_it(commands):
@@ -168,14 +315,18 @@ def test_a_closed_panel_is_never_painted_into(commands):
     once it has rendered.  The ring layer is appended to document.body, so
     an unguarded callback paints rings for a panel that no longer exists:
     stray boxes with no panel to hover and no way to clear them.
+
+    Two requests can now be in flight (the page's and the book's), so the
+    guard has to appear on both success and failure paths of each: four
+    call sites rather than the original two.
     """
     assert "return !panel[0].isConnected;" in commands
-    assert commands.count("if (panelIsGone()) return;") == 2
+    assert commands.count("if (panelIsGone()) return;") == 4
 
 
 def test_every_card_carries_a_stable_key(commands):
     "The active card must be nameable without depending on group order."
-    body = _after(commands, "function itemHtml(g, withLevelChip) {", 3000)
+    body = _after(commands, "function itemHtml(g, withLevelChip) {", 5000)
     assert 'data-grammar-key="' in body
 
 

@@ -3,6 +3,93 @@
 
 Feature changes:
 
+* English (Latin-script) dictionary entries render structured on the
+  reading page's Local tab, instead of every line -- phonetics, part of
+  speech, examples and definitions alike -- degrading to one numbered
+  list.  The gloss parser (gloss_format.parse_gloss, whose rules were
+  tuned on the pool's Japanese-Chinese dictionaries) now also reads the
+  conventions of English dictionaries: a /wɜːd/ ; NAmE /wɜːrd/ line is a
+  phonetic line shown quiet under the term, n. / vt., vi. / verb [T]
+  lines are POS badges (a POS prefix on a definition line, "n. 词；话语",
+  splits into badge + definition), "1." sense numbers the dictionary
+  itself printed are kept rather than renumbered ("1.5 million" is not a
+  number), See also:/参见 lines become cross-reference links without a
+  reading part, an English sentence followed by a Chinese line is an
+  example pair, and in a bilingual (英汉双解) entry the English line
+  under a numbered Chinese sense rides under it muted instead of taking
+  its own number.  Unmatched lines keep today's rendering, so a
+  dictionary with other conventions degrades no worse than before.
+  compact_gloss benefits in step (definitions only, no phonetics or
+  examples), which is what the term form's auto-fill saves.
+* LuteForMobile no longer answers an English (or any non-Japanese) word
+  with a Japanese entry from the pre-pool shared dictionaries.  A
+  language with no selected dictionary used to fall back to the old
+  active.db / ja_zh_shogakukan_v2.db files -- Japanese-Chinese
+  dictionaries -- so looking up "take" showed テイク【take】⇒テーク; the
+  fallback now serves Japanese books only (the book's language name is
+  passed down from the reader), and other languages report "dictionary
+  not installed" instead.
+* Sentence extraction keeps the spaces between words in the EPUB reader
+  and on PDF pages.  Translate-sentence, copy-sentence and the Anki
+  export all read the sentence from the marked word's spans -- joined
+  with '' -- but the EPUB reader gives only non-whitespace tokens a
+  span (the spaces stay raw text nodes in the chapter markup) and PDF
+  pages render each word as its own positioned box with nothing between
+  them, so an English sentence came out as "Hereisacat.".  The
+  paragraph's text is now read from the DOM between its first and last
+  span (a cloned range, furigana rt/rp and the per-sentence 🔊 button
+  dropped from the clone), which is identical on classic text pages and
+  picks the spaces back up in the reader; PDF pages carry a hidden
+  space span between word boxes the server saw a gap on.  Verified in
+  the browser: "The cat sat on the mat." reaches the sentence
+  dictionaries intact.
+* The grammar match ring is legible in the day themes.  Hovering a grammar
+  entry rings the words that entry matched inside the reading text, and
+  that ring was a fixed translucent amber (#ffd65a at 90%) -- loud on the
+  dark themes it was drawn for, but about 1.2:1 against the paper
+  backgrounds, i.e. a 2px line that vanished at the very moment the
+  learner was looking at it.  The colour is now a token
+  (--grammar-match-color): a deep amber by default, ~3.2:1 on the day
+  themes' paper and still ~5.7:1 on near-black, so a theme that never sets
+  it stays legible either way.  Default, Dark_slate, Dusk and Night
+  override it back to the bright amber, so dark-mode users see no change.
+  The mark on the matched words inside the grammar panel's example
+  sentences is derived from the same token instead of carrying its own
+  copy of the amber, so the reading-text ring and the panel mark can no
+  longer drift apart.
+* Shadowing no longer scores a correctly read word as a miss when the
+  engine re-cut it into separate morphemes.  The page's tier of words is
+  what the learner reads -- one term, としました -- while the
+  transcription is tokenized into morphemes, と + し + まし + た, and
+  when an unrelated word sat in front of them the 1:1 pairing handed
+  that word to としました and pushed the four morphemes that actually
+  spell it into "also heard": a word said exactly right scored zero,
+  with a readout claiming the learner had said the unrelated word
+  instead.  A run of still-unpaired transcribed tokens whose keys join
+  to exactly the word's key is now the word, said as-is, and the token
+  the pairing had borrowed for it moves to "also heard", where it
+  belongs.  Exact joins only: a word the engine heard differently stays
+  a miss.
+* Shadowing no longer scores a kana word half credit when the engine
+  writes it as kanji.  Japanese is judged on readings, and a kanji's
+  reading is a fixed dictionary field: a sentence printing わたし in kana
+  comes back from SenseVoice as 私, whose reading is わたくし -- 0.857
+  away from わたし, above the near-miss threshold, so a flawless reading
+  of the printed kana could never turn green, however the learner
+  pronounced it.  The two spellings are one word, so a pair is now also
+  compared on Sudachi's normalized form -- わたし/あたし/わたくし all
+  file under 私, while homophones such as 箸/橋/端 keep their own
+  spellings -- and the same word is a match.  The rescue applies only to
+  a kana sentence word against a kanji transcription: two kanji forms
+  stay judged on their readings (一日 read as ついたち is a real
+  misread), and a kana transcription is a transcript of the sound, which
+  the reading comparison already measures.  The "heard" line no longer
+  annotates such a word with the kanji's own dictionary reading either:
+  私 used to come back labelled わたくし, a reading the learner never
+  said, and now carries the kana the sentence prints (in whatever script
+  the japanese_reading setting asks for, so it matches the rest of the
+  line).  Parsers without a normalized form (MeCab) behave exactly as
+  before.
 * Grammar analysis panel for English, Spanish, Russian, French, German, Italian,
   Portuguese, Thai, Arabic, Mandarin Chinese and Cantonese, graded with CEFR
   levels (A1-C2), following the Japanese/Korean engines.  The engines need
@@ -20,14 +107,72 @@ Feature changes:
   French, German, Italian, Portuguese, Thai, Arabic, Mandarin, Cantonese)
   show authored Korean descriptions, and the Japanese engine explains
   every curated JLPT entry in Korean (ko.json, mirroring zh.json).
+* Grammar engines now give their memory back.  A language's spaCy model is
+  loaded once (two requests racing on the first click used to load two
+  copies), released immediately when the language is frozen, and released
+  after 15 minutes idle -- the read blueprint checks on each request, so
+  reading Japanese for a week no longer keeps the English model resident.
+  A released model reloads transparently on the next grammar analysis;
+  thawing a language preloads nothing.  Before this, opening the grammar
+  panel once pinned that model for the life of the process.  Freezing a
+  language whose engine rides on the reading page's own parser
+  (Japanese/Sudachi, Korean/Kiwi) releases nothing, on purpose: those
+  tokenizers are needed for ordinary reading.  Releasing drops the
+  pipeline and then hands the freed pages back to the OS (a bare
+  dereference leaves them in the process's malloc arenas: on the
+  production host that turned every freeze/reload cycle into ~50 MB of
+  growth instead of a release).  Measured there, freezing English returns
+  ~31 MB; spaCy's own imported modules (~90 MB, shared by all six
+  engines) stay resident, since unloading a thinc C extension by hand is
+  a good way to segfault.  The read page also asks the allocator to hand
+  back its free pages every five minutes: each request thread has its own
+  malloc arena, and a page-wide analysis leaves them holding memory that
+  nothing was going to release (measured: eight panel requests took the
+  process from 216 MB to 303 MB, where it then stayed).
 * Shadowing shows what was heard for a miss too, not just a near-miss: a
   word the engine heard as something unrelated now carries the same
   "→ heard" readout the orange marker already had, so a learner can see
   what they actually said.  A word that was never spoken at all has no
   counterpart and still shows no readout.
+* Local dictionary (MDX) support in the web reader, matching the mobile app.
+  An admin uploads a `.mdx` file from the Settings page; the server converts
+  it once into a small SQLite database published under `static/dict/`, and
+  the reading page then looks words up offline with no network call.
+  Several dictionaries can sit side by side in that folder, and each language
+  chooses its own on the language edit page -- a Korean book is no longer
+  offered the Japanese dictionary.  A dictionary a language is still reading
+  is not deleted without a confirmation.  Definitions show up in the term
+  popup (per language, "Show dictionary definitions in the term popup", on by
+  default; the old global "Show local dictionary definitions" setting is
+  gone) and in a "Local" tab at the head of the dictionary strip below the
+  reading page.  No file name is special: the phone app lists the same pool
+  and downloads whichever entry you tap, and the settings card badges none of
+  them.  A dictionary can also be built
+  ahead of time with `python tools/mdx_to_sqlite.py <file.mdx> <out.db>`.
+  MDict 1.2/2.0 files are supported with no block compression, zlib or LZO1X,
+  in UTF-8, UTF-16 or GB18030, including the export-locked ones
+  (`Encrypted="2"`, MDict's "Allow export to text" left unchecked -- the New
+  Century Japanese-Chinese dictionary on mdict.org is one); files locked
+  with a registration code and MDict 3.0 record sections are still not.
+  MDict redirect entries (`@@@LINK=`) are resolved to their target's entry
+  at conversion, so a dictionary that leans on them (the New Century one
+  redirects 62% of its headwords) reads normally instead of showing the raw
+  redirect text.
+* The EPUB import also takes Kindle files: MOBI, AZW and AZW3 are converted
+  to an EPUB in memory (`lute/book/kindle_parser.py`, standard library only),
+  so the chapter preview, series tagging and reader mode work exactly as they
+  do for EPUB.  All three text compressions are decoded (none, PalmDOC LZ77,
+  HUFF/CDIC), a combo file is read from its KF8 part, metadata comes from
+  EXTH, and images are carried into the converted pack.  DRM-protected books
+  are rejected with a clear message instead of failing obscurely.  The
+  single-book "Text file" upload accepts the same extensions.
 
 Bugfixes:
 
+* Local dictionary definitions no longer end with a stray NUL character:
+  the record slice runs to the next entry's start and swallowed the
+  terminator that ends the current one, which reached the term popup and
+  the dictionary tab.  Both the web converter and the phone app strip it.
 * Shadowing scores Chinese takes correctly when the ASR re-cuts word
   boundaries: SenseVoice's 呢个 + 系阿乐 now matches the sentence's
   呢 + 個 + 係 + 阿樂 instead of scoring misses, and opencc (the

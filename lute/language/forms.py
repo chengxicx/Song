@@ -45,11 +45,28 @@ class LanguageDictionaryForm(Form):
         choices=[
             ("embeddedhtml", "Embedded"),
             ("popuphtml", "Pop-up window"),
+            ("localdict", "Local"),
         ],
         render_kw={"title": "Show as"},
     )
-    dicturi = StringField("URL", validators=[DataRequired()])
+    dicturi = StringField(
+        "URL",
+        validators=[DataRequired()],
+        render_kw={
+            "list": "dict-pool-files",
+            "title": (
+                "Online dictionaries: a lookup URL with [LUTE] for the term.  "
+                "Local dictionaries: a pool file name (see Settings > Local "
+                "dictionaries)"
+            ),
+        },
+    )
     is_active = BooleanField("Is active", render_kw={"title": "Is active?"})
+    # Kept configured but no tab in the reading page's dictionary strip.
+    is_hidden = BooleanField(
+        "Hide",
+        render_kw={"title": "Keep this dictionary but hide its tab"},
+    )
     sort_order = IntegerField("Sort", render_kw={"style": "display: none"})
 
 
@@ -63,6 +80,23 @@ class LanguageForm(FlaskForm):
         FormField(LanguageDictionaryForm, default=LanguageDictionary)
     )
     show_romanization = BooleanField("Show Pronunciation field")
+    # Furigana (pronunciation readings above words) on the reading page.
+    # Only rendered for parsers that can supply readings -- Japanese
+    # (kana), Mandarin (pinyin), Cantonese (jyutping) -- see _form.html
+    # -- but the field must always exist so populate_obj round-trips
+    # cleanly.
+    show_furigana = BooleanField(
+        "Show furigana above words",
+        render_kw={
+            "title": (
+                "Draw pronunciation readings above words while reading "
+                "(kana for Japanese, pinyin for Mandarin, jyutping for "
+                "Cantonese).  Japanese readings use the Pronunciation "
+                "characters setting (Settings > Preferences) for their "
+                "script."
+            )
+        },
+    )
     right_to_left = BooleanField("Right-to-left")
 
     # Note!  The choices have to be set in the routes!
@@ -99,6 +133,40 @@ class LanguageForm(FlaskForm):
         choices=[("en", "English"), ("zh", "中文"), ("ko", "한국어")],
         default="en",
     )
+    # --- Local (MDX) dictionaries.
+    # Local dictionaries are ordinary rows in the dictionary list above
+    # (type "Local"; the URL is a pool file name -- the pool is a folder
+    # on the server, managed on the settings page, see lute/dict), so
+    # there is nothing to choose here: several are allowed, and they
+    # order and hide like every other tab.
+
+    term_popup_show_dict_gloss = BooleanField(
+        "Show dictionary definitions in the term popup",
+        render_kw={
+            "title": (
+                "Add this language's dictionary definition to the popup, for "
+                "terms with no translation yet.  The reading page's dictionary "
+                "tab is unaffected."
+            )
+        },
+    )
+    # What fills a new term's translation.  'local_dict' tries the local
+    # dictionaries in tab order and falls back to online translation
+    # when none has an entry -- only meaningful when the language has
+    # dictionaries of type Local above.
+    term_translation_source = SelectField(
+        "Term translation source",
+        choices=[("online", "Online translation"), ("local_dict", "Local dictionary")],
+        default="online",
+        render_kw={
+            "title": (
+                "What auto-fills a new term's translation: online machine "
+                "translation, or this language's local dictionary first "
+                "(online as fallback)"
+            )
+        },
+    )
+
     # Grammar levels / groups to hide in the reading-page panel.  The
     # choices depend on the language's grammar taxonomy (JLPT, TOPIK,
     # CEFR) plus the Japanese aggregate rows, so they are set in the
@@ -138,6 +206,23 @@ class LanguageForm(FlaskForm):
                 for d in self.dictionaries.data
                 if d.get("usefor", "") == usefor and d.get("is_active")
             ]
+
+        # A Local row's URL is a file name in the server's dictionary
+        # pool, not a web URL: it round-trips into filesystem paths, so
+        # it is held to the pool's own name rules.
+        from lute.dict.service import (
+            is_pool_name,
+        )  # pylint: disable=import-outside-toplevel
+
+        for d in self.dictionaries.data:
+            if d.get("dicttype", "") == "localdict" and not is_pool_name(
+                (d.get("dicturi") or "").strip()
+            ):
+                raise ValidationError(
+                    f'"{d.get("dicturi")}" is not a valid Local dictionary '
+                    "name -- use a file name from Settings > Local "
+                    "dictionaries, ending in .db."
+                )
 
         term_dicts = _get_actives("terms")
         sentence_dicts = _get_actives("sentences")

@@ -6,7 +6,6 @@ import gzip
 import json
 import math
 import os
-import unicodedata
 import uuid
 from flask import (
     Blueprint,
@@ -22,43 +21,31 @@ from flask import (
 from lute.read.service import Service
 from lute.read.render.service import Service as RenderService
 from lute.read import shadowing
-from lute.read.render.grammar_analysis import (
-    analyze as analyze_grammar,
-    is_japanese_language,
-    is_korean_language,
-    is_mandarin_chinese_language,
-    is_cantonese_language,
-    is_english_language,
-    is_spanish_language,
-    is_russian_language,
-    is_french_language,
-    is_german_language,
-    is_italian_language,
-    is_portuguese_language,
-    is_thai_language,
-    is_arabic_language,
+from lute.read.render.grammar_analysis import is_thai_language
+from lute.read.render.grammar_analysis_matcher import (
+    release_idle_spacy_models,
+    trim_arenas,
 )
-from lute.read.render.grammar_analysis_ja import analyze_japanese
-from lute.read.render.grammar_analysis_ko import analyze_korean
-from lute.read.render.grammar_analysis_zh import analyze_chinese
-from lute.read.render.grammar_analysis_yue import analyze_cantonese
-from lute.read.render.grammar_analysis_en import analyze_english
-from lute.read.render.grammar_analysis_es import analyze_spanish
-from lute.read.render.grammar_analysis_ru import analyze_russian
-from lute.read.render.grammar_analysis_fr import analyze_french
-from lute.read.render.grammar_analysis_de import analyze_german
-from lute.read.render.grammar_analysis_it import analyze_italian
-from lute.read.render.grammar_analysis_pt import analyze_portuguese
-from lute.read.render.grammar_analysis_th import analyze_thai
-from lute.read.render.grammar_analysis_ar import analyze_arabic
 from lute.read.render.grammar_levels import filter_hidden_grammar
+from lute.read.grammar_analysis_service import (
+    analyze_text,
+    book_grammar_text,
+    clean_grammar_text,
+    display_lang_for,
+    text_hash,
+)
+from lute.read import grammar_precompute
 from lute.read.forms import TextForm
 from lute.read import bilibili_stream
+from lute.i18n import t
+from lute.dict import service as dict_service
+from lute.dict import gloss_format
 from lute.term.model import Repository
 from lute.term.routes import handle_term_form, serialize_term_form_data
 from lute.settings.current import current_settings
 from lute.multiuser.context import current_scope_key, get_current_user
 from lute.models.book import Text
+from lute.models.language import Language
 from lute.models.repositories import BookRepository, LanguageRepository
 from lute.models.term import Term
 from lute.book.service import (
@@ -69,12 +56,47 @@ from lute.book.service import (
     media_audio_url,
 )
 from lute.tts.routes import get_lang_code_for
-from lute.book.series import series_tag_for_book
+from lute.read.reader_fonts import font_choices as reader_font_choices
+from lute.book.series import series_neighbours, series_tag_for_book
 from lute.book.types import subtitle_book_types
 from lute.db import db
 
-
 bp = Blueprint("read", __name__, url_prefix="/read")
+
+
+@bp.before_request
+def _release_idle_grammar_models():
+    """
+    Give back grammar-engine memory that has gone unused.
+
+    A language's spaCy pipeline used to stay resident for the life of the
+    process once the grammar panel had been opened for it (see
+    grammar_analysis_matcher's lifetime note).  Freezing the language
+    releases it at once; this hook covers the case where nothing was
+    frozen -- reading Japanese for a week should not keep the English
+    model loaded.  One timestamp comparison per request.
+
+    The second call trims the malloc arenas.  Nothing was released, but
+    every request thread has its own arena and they hold the pages a
+    heavy analysis freed: measured on the production host, grammar-panel
+    requests took RSS from 216 MB to 303 MB and it stayed there.  Also
+    one timestamp comparison per request; the trim itself runs at most
+    once every five minutes.
+    """
+    release_idle_spacy_models()
+    trim_arenas()
+
+
+def _furigana_script(lang):
+    """
+    The script flag handed to the furigana front-end: "thai" for Thai
+    (every word gets a reading, the script shows no pronunciation of
+    its own), "han" for the Han-script languages (only words bearing
+    Han characters get one -- kana, hangul and Latin already show
+    their own pronunciation).
+    """
+    return "thai" if is_thai_language(lang) else "han"
+
 
 # Module-level cache for subtitle word HTML, keyed by (book id, srt_data).
 # The tokenization of all cues (parser parse + term lookup + Jinja
@@ -84,6 +106,25 @@ bp = Blueprint("read", __name__, url_prefix="/read")
 # has its own cache; that's fine — the first request per worker pays
 # the cost, the rest are instant.
 _yt_subtitle_words_cache = {}
+
+
+# Whole-book grammar analyses, keyed by (user scope, book id, text identity,
+# display language).  The database row (lute/read/grammar_precompute.py) is
+# the durable copy; this is only the last-few-books shortcut in front of it.
+# Keyed on the *text* rather than the book alone, so an edited page misses
+# instead of serving a stale analysis, and the value is the engine's raw
+# output -- the hidden-level filter is applied per request, so toggling a
+# hidden level never recomputes.  Bounded, because a big library would
+# otherwise grow it without limit; the oldest entry is dropped on overflow.
+_book_grammar_cache = {}
+_BOOK_GRAMMAR_CACHE_MAX = 8
+
+
+def _remember_book_grammar(key, results):
+    "Store one whole-book analysis, evicting the oldest entry on overflow."
+    if len(_book_grammar_cache) >= _BOOK_GRAMMAR_CACHE_MAX:
+        _book_grammar_cache.pop(next(iter(_book_grammar_cache)), None)
+    _book_grammar_cache[key] = results
 
 
 def _subtitle_cache_key(book_id, srt_data):
@@ -526,6 +567,53 @@ def _page_cue_line_map(book, pagenum):
     return line_to_cue[anchor : anchor + line_count]
 
 
+def _cue_page_starts(book):
+    """
+    First cue index of every page, in page order, or [] when the pages
+    and the cues don't line up.
+
+    The reading page follows the playhead from page to page -- when the
+    player moves past the cues a page holds, the reader turns to the page
+    that holds them (read/index.html LuteReaderFollow).  That needs the
+    inverse of _page_cue_line_map: one number per page instead of one per
+    line.  Same positional anchoring: pages are contiguous runs of the
+    cues' texts joined by newlines, so page p's first line is the
+    cumulative line count of the pages before it.
+
+    Page numbers must run 1..N with no hole (a deleted page leaves one),
+    and the cue lines must still cover them; otherwise this returns [] and
+    the reader simply doesn't follow.  Not following beats turning to the
+    wrong page, and the page text can be edited out of step with the cues.
+    """
+    if (book.book_type or "") not in _SUBTITLE_BOOK_TYPES:
+        return []
+    if not list(book.cues):
+        return []
+    line_to_cue = _cue_line_index(book)
+    if not line_to_cue:
+        return []
+
+    lines_by_page = {}
+    for t in book.texts:
+        lines_by_page[t.order] = len((t.text or "").replace("\r", "").split("\n"))
+    page_count = len(lines_by_page)
+    if page_count == 0 or set(lines_by_page) != set(range(1, page_count + 1)):
+        return []
+
+    starts = []
+    line = 0
+    for pagenum in range(1, page_count + 1):
+        # Same rule as _page_cue_line_map, applied to every page: a page
+        # whose lines run past the cues means the text and the cues have
+        # drifted, which shifts every later page's start.  No map at all
+        # is safer than a map that lands the reader a page off.
+        if line + lines_by_page[pagenum] > len(line_to_cue):
+            return []
+        starts.append(line_to_cue[line])
+        line += lines_by_page[pagenum]
+    return starts
+
+
 def _parse_cue_data(raw):
     """
     Parse the timing panel's submitted cue JSON (a list of
@@ -597,6 +685,30 @@ def _apply_media_page_cue_data(book, pagenum, new_text, cue_data):
     return "updated"
 
 
+def _term_dicts_for(lang):
+    """
+    The reading page's dictionary tabs: the language's own dictionaries
+    in their sort order.  'localdict' rows come out of
+    Language.active_dict_uris already converted -- a URL on this server,
+    the dictionary's own name for the tab, skipped when the pool file is
+    no longer installed (see lute/models/language.py).
+    """
+    return list(LanguageRepository(db.session).all_dictionaries()[lang.id]["term"])
+
+
+def _reading_for(langid, text):
+    """
+    The stored reading for a term, or None.
+
+    The dictionary strip hands over the term's text, and the reading is
+    only needed so that a kanji spelling can find a kana-keyed entry.
+    Repository.find tokenizes and lowercases the text exactly the way the
+    reader does, and -- unlike find_or_new -- never creates a term.
+    """
+    term = Repository(db.session).find(langid, text)
+    return term.romanization if term is not None else None
+
+
 def _render_book_page(book, pagenum, track_page_open=True):
     """
     Render a particular book page.
@@ -610,8 +722,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
 
     lang = book.language
     show_highlights = current_settings()["show_highlights"]
-    lang_repo = LanguageRepository(db.session)
-    term_dicts = lang_repo.all_dictionaries()[lang.id]["term"]
+    term_dicts = _term_dicts_for(lang)
 
     book_type = book.book_type or ""
     yt_video_id = None
@@ -670,6 +781,15 @@ def _render_book_page(book, pagenum, track_page_open=True):
         else ("video" if book_type == "video" else "audio")
     )
 
+    # The reading pane's font picker is per language: what counts as a
+    # serif face differs by script (see read/reader_fonts.py).
+    lang_code = get_lang_code_for(lang)
+
+    # The volumes on either side of this one in its book set: the reader's
+    # arrows run on into them at either end of the book (read/index.html,
+    # navigateNext / navigatePrev).
+    series = series_neighbours(db.session, book)
+
     return render_template(
         "read/index.html",
         hide_top_menu=True,
@@ -677,13 +797,19 @@ def _render_book_page(book, pagenum, track_page_open=True):
         html_title=book.title,
         book=book,
         series_tag=series_tag_for_book(db.session, book),
+        series_prev=series["prev"],
+        series_next=series["next"],
         sentence_dict_uris=lang.sentence_dict_uris,
         page_num=pagenum,
         page_count=book.page_count,
         show_highlights=show_highlights,
         lang_id=lang.id,
-        lang_code=get_lang_code_for(lang),
+        lang_code=lang_code,
+        reader_fonts=reader_font_choices(lang_code),
+        show_furigana=bool(lang.show_furigana) and shadowing.supports_readings(lang),
+        furigana_script=_furigana_script(lang),
         translate_target_lang=(lang.translate_target_lang or ""),
+        term_translation_source=(lang.term_translation_source or "online"),
         track_page_open=track_page_open,
         term_dicts=term_dicts,
         book_type=book_type,
@@ -696,6 +822,10 @@ def _render_book_page(book, pagenum, track_page_open=True):
         srt_cues=srt_cues,
         srt_cues_json=book.srt_data or "[]",
         srt_words_json="[]",
+        # First cue index of every page -- the reader follows the playhead
+        # across pages with it (LuteReaderFollow).  Empty when the pages
+        # and the cues don't line up, which switches the follow off.
+        cue_page_starts=_cue_page_starts(book),
         # For books that previously used the removed legacy audio player
         # the position was stored in audio_current_pos; fall back to it so
         # the unified player resumes from the same place.
@@ -718,7 +848,7 @@ def read(bookid):
     """
     book = _find_book(bookid)
     if book is None:
-        flash(f"No book matching id {bookid}")
+        flash(t("No book matching id") + f" {bookid}")
         return redirect("/", 302)
 
     page_num = 1
@@ -748,7 +878,7 @@ def read_page(bookid, pagenum):
     """
     book = _find_book(bookid)
     if book is None:
-        flash(f"No book matching id {bookid}")
+        flash(t("No book matching id") + f" {bookid}")
         return redirect("/", 302)
 
     pagenum = book.page_in_range(pagenum)
@@ -762,7 +892,7 @@ def peek_page(bookid, pagenum):
     """
     book = _find_book(bookid)
     if book is None:
-        flash(f"No book matching id {bookid}")
+        flash(t("No book matching id") + f" {bookid}")
         return redirect("/", 302)
 
     pagenum = book.page_in_range(pagenum)
@@ -805,11 +935,11 @@ def delete_page(bookid, pagenum):
     """
     book = _find_book(bookid)
     if book is None:
-        flash(f"No book matching id {bookid}")
+        flash(t("No book matching id") + f" {bookid}")
         return redirect("/", 302)
 
     if len(book.texts) == 1:
-        flash("Cannot delete only page in book.")
+        flash(t("Cannot delete only page in book."))
     else:
         book.remove_page(pagenum)
         db.session.add(book)
@@ -1068,7 +1198,7 @@ def start_reading(bookid, pagenum):
     "Called by ajax.  Update the text.start_date, and render page."
     book = _find_book(bookid)
     if book is None:
-        flash(f"No book matching id {bookid}")
+        flash(t("No book matching id") + f" {bookid}")
         return redirect("/", 302)
     service = Service(db.session)
     if (book.book_type or "") == "manga":
@@ -1085,6 +1215,13 @@ def start_reading(bookid, pagenum):
                 "read/page_content.html", paragraphs=[], page_cue_map=[]
             )
         return render_template("read/pdf_page.html", **ctx)
+    if (book.book_type or "") == "epub":
+        ctx = service.epub_page_context(book, pagenum, True)
+        if ctx is None:
+            return render_template(
+                "read/page_content.html", paragraphs=[], page_cue_map=[]
+            )
+        return render_template("read/epub_page.html", **ctx)
     paragraphs = service.start_reading(book, pagenum)
     return render_template(
         "read/page_content.html",
@@ -1109,7 +1246,7 @@ def refresh_page(bookid, pagenum):
     "Refreshes the page content, but doesn't set the text's start_date."
     book = _find_book(bookid)
     if book is None:
-        flash(f"No book matching id {bookid}")
+        flash(t("No book matching id") + f" {bookid}")
         return redirect("/", 302)
     return render_page_fragment(book, pagenum, track_page_open=False)
 
@@ -1137,11 +1274,66 @@ def render_page_fragment(book, pagenum, track_page_open=False):
                 "read/page_content.html", paragraphs=[], page_cue_map=[]
             )
         return render_template("read/pdf_page.html", **ctx)
+    if (book.book_type or "") == "epub":
+        ctx = service.epub_page_context(book, pagenum, track_page_open)
+        if ctx is None:
+            return render_template(
+                "read/page_content.html", paragraphs=[], page_cue_map=[]
+            )
+        return render_template("read/epub_page.html", **ctx)
     paragraphs = service.get_paragraphs(book, pagenum)
     return render_template(
         "read/page_content.html",
         paragraphs=paragraphs,
         page_cue_map=_page_cue_line_map(book, pagenum),
+    )
+
+
+_EPUB_LOOKS = ("original", "night", "theme")
+
+
+@bp.route("/epub_render/<int:bookid>/<int:pagenum>", methods=["GET"])
+def epub_render(bookid, pagenum):
+    """
+    Standalone reader-mode EPUB chapter page for embedded WebViews
+    (LuteForMobile).
+
+    A lean full HTML document: the chapter markup, its scoped
+    stylesheets, EpubReader.mount and a small bridge script -- no
+    reading-page chrome.  The web reader keeps using the
+    /read/start_reading fragments; this page exists so a WebView gets
+    the same original-look rendering plus a JS bridge for native
+    interactions (word taps, status updates, look mode, zoom, scroll).
+
+    track_page_open is False: reading-session bookkeeping stays with
+    the caller's /read/start_reading request.
+    """
+    book = _find_book(bookid)
+    if book is None or (book.book_type or "") != "epub":
+        return f"No epub book matching id {bookid}.", 404
+    ctx = Service(db.session).epub_page_context(book, pagenum, False)
+    if ctx is None:
+        return f"Book {bookid} has no extracted chapter at page {pagenum}.", 404
+
+    look = request.args.get("look", "original")
+    if look not in _EPUB_LOOKS:
+        look = "original"
+    lang = book.language
+    furigana_arg = request.args.get("furigana")
+    if furigana_arg is None:
+        show_furigana = bool(lang.show_furigana) and shadowing.supports_readings(lang)
+    else:
+        show_furigana = furigana_arg == "1"
+    return render_template(
+        "read/epub_render.html",
+        look=look,
+        is_rtl=lang.right_to_left,
+        html_title=book.title,
+        lang_id=lang.id,
+        show_furigana=show_furigana,
+        furigana_script=_furigana_script(lang),
+        triple=request.args.get("triple") == "1",
+        **ctx,
     )
 
 
@@ -1154,13 +1346,19 @@ def empty():
 @bp.route("/grammar_analysis/<int:bookid>/<int:pagenum>", methods=["GET"])
 def grammar_analysis(bookid, pagenum):
     """
-    Analyze the grammar points on the current reading page.
+    Analyze the grammar points on the current reading page -- or the book.
 
     Reads the page's original text and returns JSON:
       [{ "name", "level", "desc", "examples": [{"sentence", "matches"}] }]
 
     "matches" lists the exact substrings matched inside each example
     sentence, so the reader can highlight the grammar words.
+
+    ``?scope=book`` analyses every page of the book instead of the one
+    screen, which is how the panel's "whole book" control answers "what
+    grammar does this book actually use".  It is the same analysis over a
+    longer text, so the engine choice and the hidden-level filtering below
+    apply unchanged.
 
     Japanese books use the Sudachi-based POS-aware engine; other
     languages fall back to the regex-based rule library.
@@ -1173,6 +1371,46 @@ def grammar_analysis(bookid, pagenum):
     # current sub-screen when the client supplies its text, falling back to
     # the whole page otherwise.
     snippet = request.args.get("text", "")
+    scope = (request.args.get("scope", "") or "").strip().lower()
+    # Levels / groups this language hides in the panel -- an advanced
+    # reader drops N5, or just the two frequent aggregate rows ("Basic
+    # forms", "Particles").  Applied to whatever the engine returns, so
+    # every engine honours it without knowing about the setting.  It is
+    # applied at read time only: the cached whole-book analysis is stored
+    # unfiltered, so hiding a level never costs a recompute.
+    hidden = set(getattr(lang, "hidden_grammar_levels", []) or [])
+
+    if scope == "book":
+        # A whole-book pass is seconds of work, so it is precomputed in the
+        # background at import time and stored per text identity.  A fresh
+        # row answers instantly; an unanalysed book is handed to the worker
+        # instead of blocking this request, and the panel polls until it is
+        # ready (see static/js/lute-commands.js).
+        page_text = book_grammar_text(book)
+        display = display_lang_for(lang)
+        digest = text_hash(page_text)
+        # Scoped per user like the subtitle cache: book ids are per-user db.
+        cache_key = (current_scope_key(), bookid, digest, display)
+        cached = _book_grammar_cache.get(cache_key)
+        if cached is not None:
+            return jsonify(filter_hidden_grammar(cached, hidden))
+        stored = grammar_precompute.cached_results(bookid, digest, display)
+        if stored is not None:
+            _remember_book_grammar(cache_key, stored)
+            return jsonify(filter_hidden_grammar(stored, hidden))
+        state = grammar_precompute.schedule(get_current_user(), bookid, urgent=True)
+        if state in ("queued", "running"):
+            return jsonify({"state": "computing", "status": state}), 202
+        if state == "error":
+            return jsonify({"state": "error"}), 202
+        # Precompute is switched off, or this book is too long to precompute:
+        # pay for the analysis here, exactly as before, and keep the result
+        # so the next request is fast.
+        results = analyze_text(page_text, lang)
+        grammar_precompute.store_now(bookid, digest, display, results)
+        _remember_book_grammar(cache_key, results)
+        return jsonify(filter_hidden_grammar(results, hidden))
+
     if snippet.strip():
         page_text = snippet
     else:
@@ -1182,62 +1420,8 @@ def grammar_analysis(bookid, pagenum):
         page_text = (
             manga_text if manga_text is not None else book.text_at_page(pagenum).text
         )
-    # The reader renders empty paragraphs as a zero-width-space placeholder
-    # and can inject the 🔊 audio marker into the text the client sends
-    # back; both are display artifacts, not grammar.  Strip them before
-    # analysis so no tokenizer/analyzer ever sees them (the Japanese and
-    # Korean engines do the same internally).
-    page_text = page_text.replace("\u200b", "").replace("🔊", "")
-    # Same reason, one step further: an imported book may store decomposed
-    # Hangul (e.g. "지" + U+11AF where the source had the single syllable
-    # "질").  An engine that tokenises such text reports offsets that fall
-    # inside a syllable, and the client -- which slices the sentence at
-    # those offsets -- then renders a half-character.  Composing once here
-    # keeps every engine's tokens, offsets and echoed sentence consistent.
-    page_text = unicodedata.normalize("NFC", page_text)
-    display = getattr(lang, "grammar_translate_lang", "") or "en"
-    # Levels / groups this language hides in the panel -- an advanced
-    # reader drops N5, or just the two frequent aggregate rows ("Basic
-    # forms", "Particles").  Applied to whatever the engine returns, so
-    # every engine honours it without knowing about the setting.
-    hidden = set(getattr(lang, "hidden_grammar_levels", []) or [])
-    # Every engine runs on optional heavy dependencies (Sudachi, Kiwi,
-    # spaCy models, pymorphy3, pythainlp, pyarabic); when one is missing,
-    # fall back to the generic regex rule library instead of failing
-    # the panel.
-    for detector, engine, extra in (
-        (is_japanese_language, analyze_japanese, "japanese-sudachi"),
-        (is_korean_language, analyze_korean, "korean"),
-        (is_mandarin_chinese_language, analyze_chinese, "chinese"),
-        (is_cantonese_language, analyze_cantonese, "cantonese"),
-        (is_english_language, analyze_english, "english"),
-        (is_spanish_language, analyze_spanish, "spanish"),
-        (is_russian_language, analyze_russian, "russian"),
-        (is_french_language, analyze_french, "french"),
-        (is_german_language, analyze_german, "german"),
-        (is_italian_language, analyze_italian, "italian"),
-        (is_portuguese_language, analyze_portuguese, "portuguese"),
-        (is_thai_language, analyze_thai, "thai"),
-        (is_arabic_language, analyze_arabic, "arabic"),
-    ):
-        if detector(lang):
-            try:
-                results = engine(page_text, display_lang=display)
-            except (ImportError, OSError):
-                current_app.logger.warning(
-                    "%s grammar engine not installed; using the basic regex rules. "
-                    'Run: pip install -e ".[%s]"',
-                    extra.capitalize(),
-                    extra,
-                )
-                break
-            return jsonify(filter_hidden_grammar(results, hidden))
-    render_service = RenderService(db.session)
-    paragraphs = render_service.get_paragraphs(page_text, lang)
-    sentences = [
-        "".join(ti.text for ti in sentence) for para in paragraphs for sentence in para
-    ]
-    return jsonify(filter_hidden_grammar(analyze_grammar(sentences), hidden))
+    page_text = clean_grammar_text(page_text)
+    return jsonify(filter_hidden_grammar(analyze_text(page_text, lang), hidden))
 
 
 @bp.route("/shadowing/transcribe", methods=["POST"])
@@ -1249,17 +1433,36 @@ def shadowing_transcribe():
     (JSON array of the sentence's word spans' data-text, in DOM order),
     model (optional whisper size), full_text (optional sentence the
     tokens belong to; Japanese scores its keys against the contextual
-    readings the panel displays).
+    readings the panel displays), source (optional "read"/"review"),
+    book_id (optional, reading-page takes only).
 
-    Async on purpose: the first transcription loads the whisper model
+    Async on purpose: the first transcription loads the speech model
     (hundreds of MB, possibly downloaded on the spot) and CPU inference
     takes seconds more -- far beyond a reverse proxy's timeout, which
     used to surface as a 502.  Returns {"task_id"}; poll
     /read/shadowing/status/<task_id> until finished/error.
     """
-    if not shadowing.whisper_status()["installed"]:
+    try:
+        lang = LanguageRepository(db.session).find(
+            request.form.get("language_id", type=int) or 0
+        )
+    except ValueError:
+        lang = None
+    if lang is None:
+        return jsonify({"error": "language not found"}), 400
+
+    # SenseVoice first, whisper as the fallback -- the same order the
+    # task itself uses, so a take is only accepted when it can score.
+    if not shadowing.transcription_available(lang):
         return (
-            jsonify({"error": "whisper is not installed (see Settings > Whisper)."}),
+            jsonify(
+                {
+                    "error": t(
+                        "No transcription engine available "
+                        "(install SenseVoice or whisper in Settings)."
+                    )
+                }
+            ),
             400,
         )
 
@@ -1276,15 +1479,12 @@ def shadowing_transcribe():
 
     full_text = (request.form.get("full_text") or "").strip() or None
 
-    lang = LanguageRepository(db.session).find(
-        request.form.get("language_id", type=int) or 0
-    )
-    if lang is None:
-        return jsonify({"error": "language not found"}), 400
-
     model_size = (request.form.get("model") or "").strip()
     if model_size not in shadowing.ALLOWED_MODEL_SIZES:
         model_size = shadowing.DEFAULT_MODEL_SIZE
+
+    source = (request.form.get("source") or "").strip() or "read"
+    book_id = request.form.get("book_id", type=int)
 
     temppath = current_app.env_config.temppath
     os.makedirs(temppath, exist_ok=True)
@@ -1302,6 +1502,8 @@ def shadowing_transcribe():
         model_size,
         username=get_current_user(),
         full_text=full_text,
+        source=source,
+        book_id=book_id,
     )
     return jsonify({"task_id": task_id})
 
@@ -1310,6 +1512,28 @@ def shadowing_transcribe():
 def shadowing_task_status(task_id):
     "Poller payload for a shadowing scoring task."
     return jsonify(shadowing.task_status(task_id))
+
+
+@bp.route("/shadowing/mark_unknown", methods=["POST"])
+def shadowing_mark_unknown():
+    """
+    One click on a misread word: put it into the learning pile so the
+    review queue picks it up (this closes the read-aloud loop -- a word
+    you stumbled over becomes tomorrow's review card).
+
+    JSON body: {language_id, text}.  New and unknown terms become
+    learning (status 1); words already learning are left alone (they
+    are queued already); ignored and well-known words are never
+    demoted silently.  Returns {outcome, term_id, term_status}.
+    """
+    payload = request.get_json(silent=True) or {}
+    text = payload.get("text")
+    if not isinstance(text, str):
+        return jsonify({"error": "invalid payload"}), 400
+    lang = LanguageRepository(db.session).find(payload.get("language_id") or 0)
+    if lang is None:
+        return jsonify({"error": "language not found"}), 400
+    return jsonify(shadowing.mark_word_for_review(db.session, lang, text))
 
 
 @bp.route("/shadowing/readings", methods=["POST"])
@@ -1451,6 +1675,107 @@ def term_popup(termid):
     )
 
 
+def _local_gloss(lang, langid, text, reading=None):
+    """
+    The first gloss for ``text`` across the language's local
+    dictionaries, in tab order -- or None when the language has none or
+    none of them has an entry.
+
+    ``reading`` is an explicit xref reading: it outranks the term's
+    stored reading and makes the lookup prefer reading-qualified keys
+    (a homograph's See-also list must not win over its target).
+    """
+    if lang is None:
+        return None
+    use_reading = reading or _reading_for(langid, text)
+    for filename in lang.local_dict_files():
+        gloss = dict_service.lookup(
+            text, use_reading, filename, prefer_reading=bool(reading)
+        )
+        if gloss:
+            return gloss
+    return None
+
+
+@bp.route("/localdict/<int:langid>/<filename>/<text>", methods=["GET"])
+def local_dict_file(langid, filename, text):
+    """
+    One local dictionary's entry for a term, for the reading page's
+    dictionary strip.
+
+    A language can carry several local dictionaries now, so the tab's
+    URL names the pool file (see _term_dicts_for / active_dict_uris).
+    Same rules as ever: the strip hands over the term's text, the term
+    is resolved back to its reading only so that a kanji spelling can
+    find a kana-keyed entry, and nothing is created.  The file name is
+    validated before it is joined onto the pool folder.
+    """
+    lang = db.session.get(Language, langid)
+    xref_reading = request.args.get("reading")
+    gloss = None
+    if lang is not None and dict_service.is_pool_name(filename):
+        gloss = dict_service.lookup(
+            text,
+            xref_reading or _reading_for(langid, text),
+            filename,
+            prefer_reading=bool(xref_reading),
+        )
+    return render_template(
+        "read/localdict.html",
+        text=text,
+        # The card's head is the term; the definition need not open
+        # by repeating it (an entry reached through its reading keeps
+        # its own headword -- see strip_duplicate_headword).
+        gloss=dict_service.strip_duplicate_headword(gloss, text),
+        blocks=gloss_format.parse_gloss(
+            dict_service.strip_duplicate_headword(gloss, text)
+        ),
+        langid=langid,
+    )
+
+
+@bp.route("/localdict/<int:langid>/<text>", methods=["GET"])
+def local_dict(langid, text):
+    """
+    The language's local dictionary entry for a term -- the pre-multi-
+    dictionary URL, kept working: it answers from the language's local
+    dictionaries in tab order, like _local_gloss.  The xref links in
+    the rendered card come back here with ?reading= set.
+    """
+    lang = db.session.get(Language, langid)
+    gloss = _local_gloss(lang, langid, text, reading=request.args.get("reading"))
+    stripped = dict_service.strip_duplicate_headword(gloss, text)
+    return render_template(
+        "read/localdict.html",
+        text=text,
+        gloss=stripped,
+        blocks=gloss_format.parse_gloss(stripped),
+        langid=langid,
+    )
+
+
+@bp.route("/localdict_lookup/<int:langid>/<text>", methods=["GET"])
+def local_dict_lookup(langid, text):
+    """
+    The local dictionaries' entry for a term, as JSON.
+
+    The term form's auto-fill uses this when the language's
+    ``term_translation_source`` is 'local_dict': the dictionaries' own
+    definitions are often the better answer than machine translation.
+    The language's local dictionaries are tried in tab order; ``gloss``
+    is null when none has an entry -- the caller falls back to online
+    translation.  Nothing is created.
+
+    ``compact`` is the same entry reduced to its definitions (see
+    gloss_format.compact_gloss): the auto-fill saves that, not the
+    whole card -- a translation holding the entry's tail of example
+    sentences makes every popup and flashcard that shows it enormous.
+    """
+    lang = db.session.get(Language, langid)
+    gloss = _local_gloss(lang, langid, text)
+    return jsonify({"gloss": gloss, "compact": gloss_format.compact_gloss(gloss)})
+
+
 @bp.route("/flashcopied", methods=["GET"])
 def flashcopied():
     return render_template("read/flashcopied.html")
@@ -1484,11 +1809,13 @@ def edit_page(bookid, pagenum):
         db.session.commit()
         if status == "mismatch":
             flash(
-                "Saved, but the subtitles were not updated: this page no "
-                "longer has the same number of lines as the subtitle cues "
-                "it covers (a line was added, removed, merged or split), or "
-                "its text has drifted from the subtitles.  Keep one line "
-                "per subtitle line, or re-import the subtitle file.",
+                t(
+                    "Saved, but the subtitles were not updated: this page no "
+                    "longer has the same number of lines as the subtitle cues "
+                    "it covers (a line was added, removed, merged or split), or "
+                    "its text has drifted from the subtitles.  Keep one line "
+                    "per subtitle line, or re-import the subtitle file."
+                ),
                 "notice",
             )
         return redirect(f"/read/{book.id}", 302)

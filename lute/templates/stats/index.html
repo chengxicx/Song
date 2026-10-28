@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
-{% block title %}Stats{% endblock %}
+{% block title %}{{ t('Stats') }}{% endblock %}
 
-{% block header %}Stats{% endblock %}
+{% block header %}{{ t('Stats') }}{% endblock %}
 
 {% block body %}
 
@@ -284,6 +284,46 @@
   .empty-msg { color: #adb5bd; font-style: italic; font-size: 13px; padding: 20px 0; text-align: center; }
   .chart-loading { color: #adb5bd; font-style: italic; font-size: 13px; padding: 40px 0; text-align: center; }
 
+  /* Review (FSRS) statistics */
+  .review-cards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .review-card {
+    background: var(--chart-card-bg, #fff);
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 14px 10px;
+    text-align: center;
+    min-width: 0;
+  }
+  .review-card-num {
+    font-size: 26px;
+    font-weight: 600;
+    color: #228be6;
+    line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+  }
+  .review-card-num.ok { color: #2f9e44; }
+  .review-card-num.warn { color: #e8590c; }
+  .review-card-label { font-size: 12px; color: #6c757d; margin-top: 4px; }
+  .review-card-sub { font-size: 11px; color: #adb5bd; margin-top: 3px; min-height: 14px; }
+  .review-foot {
+    font-size: 12px;
+    color: #6c757d;
+    line-height: 1.6;
+    margin: -10px 0 28px 0;
+  }
+  .review-foot code { font-size: 11px; }
+  .review-empty {
+    background: var(--chart-card-bg, #fff);
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 28px;
+  }
+
   /* Words read table alignment */
   .statsWordsRead {
     width: 100%;
@@ -309,6 +349,9 @@
     .jlpt-macro {
       grid-template-columns: 1fr;
     }
+    .review-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
     .summary-levels {
       grid-template-columns: repeat(2, 1fr);
     }
@@ -333,17 +376,17 @@
 <!-- Filter controls -->
 <div class="ov-controls">
   <div>
-    <label>Period</label>
+    <label>{{ t('Period') }}</label>
     <span class="ov-period-btns" id="ov-period-btns">
-      <button data-period="today">Today</button>
-      <button data-period="7days" class="active">7 days</button>
-      <button data-period="monthly">Monthly</button>
+      <button data-period="today">{{ t('Today') }}</button>
+      <button data-period="7days" class="active">{{ t('7 days') }}</button>
+      <button data-period="monthly">{{ t('Monthly') }}</button>
     </span>
   </div>
   <div>
-    <label for="ov-lang">Language</label>
+    <label for="ov-lang">{{ t('Language') }}</label>
     <select id="ov-lang" class="ov-lang-select">
-      <option value="all">All languages</option>
+      <option value="all">{{ t('All languages') }}</option>
       {% for lang in term_languages %}
       <option value="{{ lang.id }}" {% if lang.id == default_lang_id %}selected{% endif %} data-jp="{{ '1' if lang.is_japanese else '0' }}" data-en="{{ '1' if lang.is_english else '0' }}" data-ko="{{ '1' if lang.is_korean else '0' }}" data-es="{{ '1' if lang.is_spanish else '0' }}" data-ru="{{ '1' if lang.is_russian else '0' }}" data-de="{{ '1' if lang.is_german else '0' }}" data-th="{{ '1' if lang.is_thai else '0' }}" data-fr="{{ '1' if lang.is_french else '0' }}" data-ar="{{ '1' if lang.is_arabic else '0' }}" data-zh="{{ '1' if lang.is_chinese else '0' }}">{{ lang.name }} ({{ lang.count }})</option>
       {% endfor %}
@@ -352,13 +395,13 @@
     <button type="button" id="cefr-btn" class="ov-lang-select cefr-btn" style="display:none;">CEFR</button>
     <button type="button" id="topik-btn" class="ov-lang-select topik-btn" style="display:none;">TOPIK</button>
     <button type="button" id="dele-btn" class="ov-lang-select dele-btn" style="display:none;">DELE</button>
-    <button type="button" id="rus-btn" class="ov-lang-select rus-btn" style="display:none;">Russian CEFR</button>
-    <button type="button" id="ger-btn" class="ov-lang-select ger-btn" style="display:none;">German CEFR</button>
-    <button type="button" id="th-btn" class="ov-lang-select th-btn" style="display:none;">Thai Freq</button>
-    <button type="button" id="fr-btn" class="ov-lang-select fr-btn" style="display:none;">French CEFR</button>
-    <button type="button" id="ar-btn" class="ov-lang-select ar-btn" style="display:none;">Arabic CEFR</button>
-    <button type="button" id="zh2-btn" class="ov-lang-select zh-btn" style="display:none;">HSK 2.0</button>
-    <button type="button" id="zh3-btn" class="ov-lang-select zh-btn" style="display:none;">HSK 3.0</button>
+    <button type="button" id="rus-btn" class="ov-lang-select rus-btn" style="display:none;">{{ t('Russian CEFR') }}</button>
+    <button type="button" id="ger-btn" class="ov-lang-select ger-btn" style="display:none;">{{ t('German CEFR') }}</button>
+    <button type="button" id="th-btn" class="ov-lang-select th-btn" style="display:none;">{{ t('Thai Freq') }}</button>
+    <button type="button" id="fr-btn" class="ov-lang-select fr-btn" style="display:none;">{{ t('French CEFR') }}</button>
+    <button type="button" id="ar-btn" class="ov-lang-select ar-btn" style="display:none;">{{ t('Arabic CEFR') }}</button>
+    <button type="button" id="zh2-btn" class="ov-lang-select zh-btn" style="display:none;">{{ t('HSK 2.0') }}</button>
+    <button type="button" id="zh3-btn" class="ov-lang-select zh-btn" style="display:none;">{{ t('HSK 3.0') }}</button>
   </div>
 </div>
 
@@ -366,29 +409,29 @@
 <div id="jlpt-panel" style="display:none;">
   <div class="chart-card">
     <div class="jlpt-head">
-      <h3 style="margin:0;">JLPT Progress</h3>
-      <span class="jlpt-sub">Japanese · data: OpenJLPT</span>
-      <button type="button" id="jlpt-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
+      <h3 style="margin:0;">{{ t('JLPT Progress') }}</h3>
+      <span class="jlpt-sub">{{ t('Japanese · data: OpenJLPT') }}</span>
+      <button type="button" id="jlpt-export-all" class="jlpt-export-all">{{ t('Export all levels (CSV)') }}</button>
     </div>
 
-    <h4 class="jlpt-section">Overview</h4>
+    <h4 class="jlpt-section">{{ t('Overview') }}</h4>
     <div class="jlpt-macro">
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-label">{{ t('Mastered') }}</div>
         <div class="jlpt-macro-hero"><span id="jlpt-mastered-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="jlpt-mastered-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="jlpt-mastered-detail">–</span> {{ t('terms') }}</div>
       </div>
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-label">{{ t('Seen') }}</div>
         <div class="jlpt-macro-hero"><span id="jlpt-seen-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="jlpt-seen-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="jlpt-seen-detail">–</span> {{ t('terms') }}</div>
       </div>
     </div>
 
-    <h4 class="jlpt-section">By level</h4>
+    <h4 class="jlpt-section">{{ t('By level') }}</h4>
     <div id="jlpt-levels"></div>
 
-    <div class="jlpt-foot">Hover a word for reading and meaning · Dashed cells = Not seen (from the OpenJLPT list) · Click a level bar to drill down.</div>
+    <div class="jlpt-foot">{{ t('Hover a word for reading and meaning · Dashed cells = Not seen (from the OpenJLPT list) · Click a level bar to drill down.') }}</div>
   </div>
 </div>
 
@@ -396,29 +439,29 @@
 <div id="cefr-panel" style="display:none;">
   <div class="chart-card">
     <div class="jlpt-head">
-      <h3 style="margin:0;">CEFR Progress</h3>
-      <span class="jlpt-sub">English · A1–C2 · data: katherine-welbourne CEFR word list</span>
-      <button type="button" id="cefr-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
+      <h3 style="margin:0;">{{ t('CEFR Progress') }}</h3>
+      <span class="jlpt-sub">{{ t('English · A1–C2 · data: katherine-welbourne CEFR word list') }}</span>
+      <button type="button" id="cefr-export-all" class="jlpt-export-all">{{ t('Export all levels (CSV)') }}</button>
     </div>
 
-    <h4 class="jlpt-section">Overview</h4>
+    <h4 class="jlpt-section">{{ t('Overview') }}</h4>
     <div class="jlpt-macro">
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-label">{{ t('Mastered') }}</div>
         <div class="jlpt-macro-hero"><span id="cefr-mastered-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="cefr-mastered-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="cefr-mastered-detail">–</span> {{ t('terms') }}</div>
       </div>
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-label">{{ t('Seen') }}</div>
         <div class="jlpt-macro-hero"><span id="cefr-seen-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="cefr-seen-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="cefr-seen-detail">–</span> {{ t('terms') }}</div>
       </div>
     </div>
 
-    <h4 class="jlpt-section">By level</h4>
+    <h4 class="jlpt-section">{{ t('By level') }}</h4>
     <div id="cefr-levels"></div>
 
-    <div class="jlpt-foot">Dashed cells = Not seen (from the CEFR list) · Inflected forms are matched to their base word · Click a level bar to drill down.</div>
+    <div class="jlpt-foot">{{ t('Dashed cells = Not seen (from the CEFR list) · Inflected forms are matched to their base word · Click a level bar to drill down.') }}</div>
   </div>
 </div>
 
@@ -426,29 +469,29 @@
 <div id="topik-panel" style="display:none;">
   <div class="chart-card">
     <div class="jlpt-head">
-      <h3 style="margin:0;">TOPIK Progress</h3>
-      <span class="jlpt-sub">Korean · data: julienshim combined vocabulary list</span>
-      <button type="button" id="topik-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
+      <h3 style="margin:0;">{{ t('TOPIK Progress') }}</h3>
+      <span class="jlpt-sub">{{ t('Korean · data: julienshim combined vocabulary list') }}</span>
+      <button type="button" id="topik-export-all" class="jlpt-export-all">{{ t('Export all levels (CSV)') }}</button>
     </div>
 
-    <h4 class="jlpt-section">Overview</h4>
+    <h4 class="jlpt-section">{{ t('Overview') }}</h4>
     <div class="jlpt-macro">
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-label">{{ t('Mastered') }}</div>
         <div class="jlpt-macro-hero"><span id="topik-mastered-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="topik-mastered-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="topik-mastered-detail">–</span> {{ t('terms') }}</div>
       </div>
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-label">{{ t('Seen') }}</div>
         <div class="jlpt-macro-hero"><span id="topik-seen-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="topik-seen-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="topik-seen-detail">–</span> {{ t('terms') }}</div>
       </div>
     </div>
 
-    <h4 class="jlpt-section">By level</h4>
+    <h4 class="jlpt-section">{{ t('By level') }}</h4>
     <div id="topik-levels"></div>
 
-    <div class="jlpt-foot">Hover a word for hanja and meaning · Dashed cells = Not seen (from the TOPIK list) · Click a level bar to drill down.</div>
+    <div class="jlpt-foot">{{ t('Hover a word for hanja and meaning · Dashed cells = Not seen (from the TOPIK list) · Click a level bar to drill down.') }}</div>
   </div>
 </div>
 
@@ -456,29 +499,29 @@
 <div id="dele-panel" style="display:none;">
   <div class="chart-card">
     <div class="jlpt-head">
-      <h3 style="margin:0;">DELE Progress</h3>
-      <span class="jlpt-sub">Spanish · A1–C2 · DELE vocabulary list</span>
-      <button type="button" id="dele-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
+      <h3 style="margin:0;">{{ t('DELE Progress') }}</h3>
+      <span class="jlpt-sub">{{ t('Spanish · A1–C2 · DELE vocabulary list') }}</span>
+      <button type="button" id="dele-export-all" class="jlpt-export-all">{{ t('Export all levels (CSV)') }}</button>
     </div>
 
-    <h4 class="jlpt-section">Overview</h4>
+    <h4 class="jlpt-section">{{ t('Overview') }}</h4>
     <div class="jlpt-macro">
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-label">{{ t('Mastered') }}</div>
         <div class="jlpt-macro-hero"><span id="dele-mastered-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="dele-mastered-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="dele-mastered-detail">–</span> {{ t('terms') }}</div>
       </div>
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-label">{{ t('Seen') }}</div>
         <div class="jlpt-macro-hero"><span id="dele-seen-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="dele-seen-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="dele-seen-detail">–</span> {{ t('terms') }}</div>
       </div>
     </div>
 
-    <h4 class="jlpt-section">By level</h4>
+    <h4 class="jlpt-section">{{ t('By level') }}</h4>
     <div id="dele-levels"></div>
 
-    <div class="jlpt-foot">Hover a word for meaning · Dashed cells = Not seen (from the DELE list) · Inflected forms are matched to their base word · Click a level bar to drill down.</div>
+    <div class="jlpt-foot">{{ t('Hover a word for meaning · Dashed cells = Not seen (from the DELE list) · Inflected forms are matched to their base word · Click a level bar to drill down.') }}</div>
   </div>
 </div>
 
@@ -486,29 +529,29 @@
 <div id="rus-panel" style="display:none;">
   <div class="chart-card">
     <div class="jlpt-head">
-      <h3 style="margin:0;">Russian Verbs Progress</h3>
-      <span class="jlpt-sub">Russian · A1–C2 · data: StorkST CoreRussianVerbs</span>
-      <button type="button" id="rus-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
+      <h3 style="margin:0;">{{ t('Russian Verbs Progress') }}</h3>
+      <span class="jlpt-sub">{{ t('Russian · A1–C2 · data: StorkST CoreRussianVerbs') }}</span>
+      <button type="button" id="rus-export-all" class="jlpt-export-all">{{ t('Export all levels (CSV)') }}</button>
     </div>
 
-    <h4 class="jlpt-section">Overview</h4>
+    <h4 class="jlpt-section">{{ t('Overview') }}</h4>
     <div class="jlpt-macro">
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-label">{{ t('Mastered') }}</div>
         <div class="jlpt-macro-hero"><span id="rus-mastered-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="rus-mastered-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="rus-mastered-detail">–</span> {{ t('terms') }}</div>
       </div>
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-label">{{ t('Seen') }}</div>
         <div class="jlpt-macro-hero"><span id="rus-seen-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="rus-seen-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="rus-seen-detail">–</span> {{ t('terms') }}</div>
       </div>
     </div>
 
-    <h4 class="jlpt-section">By level</h4>
+    <h4 class="jlpt-section">{{ t('By level') }}</h4>
     <div id="rus-levels"></div>
 
-    <div class="jlpt-foot">Hover a word for meaning · Dashed cells = Not seen (from the Russian list) · Inflected forms are matched to their infinitive · Click a level bar to drill down.</div>
+    <div class="jlpt-foot">{{ t('Hover a word for meaning · Dashed cells = Not seen (from the Russian list) · Inflected forms are matched to their infinitive · Click a level bar to drill down.') }}</div>
   </div>
 </div>
 
@@ -516,29 +559,29 @@
 <div id="ger-panel" style="display:none;">
   <div class="chart-card">
     <div class="jlpt-head">
-      <h3 style="margin:0;">German Vocabulary Progress</h3>
-      <span class="jlpt-sub">German · CEFR A1–C2 · data: IamHamud German-Language-Community + Goethe C2</span>
-      <button type="button" id="ger-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
+      <h3 style="margin:0;">{{ t('German Vocabulary Progress') }}</h3>
+      <span class="jlpt-sub">{{ t('German · CEFR A1–C2 · data: IamHamud German-Language-Community + Goethe C2') }}</span>
+      <button type="button" id="ger-export-all" class="jlpt-export-all">{{ t('Export all levels (CSV)') }}</button>
     </div>
 
-    <h4 class="jlpt-section">Overview</h4>
+    <h4 class="jlpt-section">{{ t('Overview') }}</h4>
     <div class="jlpt-macro">
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-label">{{ t('Mastered') }}</div>
         <div class="jlpt-macro-hero"><span id="ger-mastered-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="ger-mastered-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="ger-mastered-detail">–</span> {{ t('terms') }}</div>
       </div>
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-label">{{ t('Seen') }}</div>
         <div class="jlpt-macro-hero"><span id="ger-seen-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="ger-seen-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="ger-seen-detail">–</span> {{ t('terms') }}</div>
       </div>
     </div>
 
-    <h4 class="jlpt-section">By level</h4>
+    <h4 class="jlpt-section">{{ t('By level') }}</h4>
     <div id="ger-levels"></div>
 
-    <div class="jlpt-foot">Hover a word for meaning · Dashed cells = Not seen (from the German list) · Inflected forms are matched to their base word · Click a level bar to drill down.</div>
+    <div class="jlpt-foot">{{ t('Hover a word for meaning · Dashed cells = Not seen (from the German list) · Inflected forms are matched to their base word · Click a level bar to drill down.') }}</div>
   </div>
 </div>
 
@@ -546,29 +589,29 @@
 <div id="th-panel" style="display:none;">
   <div class="chart-card">
     <div class="jlpt-head">
-      <h3 style="margin:0;">Thai Vocabulary Progress</h3>
-      <span class="jlpt-sub">Thai · by frequency rank · data: PyThaiNLP Phupha Word-Freq (CC0)</span>
-      <button type="button" id="th-export-all" class="jlpt-export-all">Export all buckets (CSV)</button>
+      <h3 style="margin:0;">{{ t('Thai Vocabulary Progress') }}</h3>
+      <span class="jlpt-sub">{{ t('Thai · by frequency rank · data: PyThaiNLP Phupha Word-Freq (CC0)') }}</span>
+      <button type="button" id="th-export-all" class="jlpt-export-all">{{ t('Export all buckets (CSV)') }}</button>
     </div>
 
-    <h4 class="jlpt-section">Overview</h4>
+    <h4 class="jlpt-section">{{ t('Overview') }}</h4>
     <div class="jlpt-macro">
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-label">{{ t('Mastered') }}</div>
         <div class="jlpt-macro-hero"><span id="th-mastered-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="th-mastered-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="th-mastered-detail">–</span> {{ t('terms') }}</div>
       </div>
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-label">{{ t('Seen') }}</div>
         <div class="jlpt-macro-hero"><span id="th-seen-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="th-seen-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="th-seen-detail">–</span> {{ t('terms') }}</div>
       </div>
     </div>
 
-    <h4 class="jlpt-section">By frequency bucket</h4>
+    <h4 class="jlpt-section">{{ t('By frequency bucket') }}</h4>
     <div id="th-levels"></div>
 
-    <div class="jlpt-foot">Hover a word for meaning · Dashed cells = Not seen (from the Thai list) · Buckets are by frequency rank (Common Crawl) · Click a level bar to drill down.</div>
+    <div class="jlpt-foot">{{ t('Hover a word for meaning · Dashed cells = Not seen (from the Thai list) · Buckets are by frequency rank (Common Crawl) · Click a level bar to drill down.') }}</div>
   </div>
 </div>
 
@@ -576,29 +619,29 @@
 <div id="fr-panel" style="display:none;">
   <div class="chart-card">
     <div class="jlpt-head">
-      <h3 style="margin:0;">French Vocabulary Progress</h3>
-      <span class="jlpt-sub">French · CEFR A1–C2 · data: hyunahparc/bienvenue-au-croissant</span>
-      <button type="button" id="fr-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
+      <h3 style="margin:0;">{{ t('French Vocabulary Progress') }}</h3>
+      <span class="jlpt-sub">{{ t('French · CEFR A1–C2 · data: hyunahparc/bienvenue-au-croissant') }}</span>
+      <button type="button" id="fr-export-all" class="jlpt-export-all">{{ t('Export all levels (CSV)') }}</button>
     </div>
 
-    <h4 class="jlpt-section">Overview</h4>
+    <h4 class="jlpt-section">{{ t('Overview') }}</h4>
     <div class="jlpt-macro">
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-label">{{ t('Mastered') }}</div>
         <div class="jlpt-macro-hero"><span id="fr-mastered-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="fr-mastered-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="fr-mastered-detail">–</span> {{ t('terms') }}</div>
       </div>
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-label">{{ t('Seen') }}</div>
         <div class="jlpt-macro-hero"><span id="fr-seen-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="fr-seen-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="fr-seen-detail">–</span> {{ t('terms') }}</div>
       </div>
     </div>
 
-    <h4 class="jlpt-section">By level</h4>
+    <h4 class="jlpt-section">{{ t('By level') }}</h4>
     <div id="fr-levels"></div>
 
-    <div class="jlpt-foot">Click a level bar to drill down · Inflected forms are matched to their base word · Data: French-Korean CEFR word lists.</div>
+    <div class="jlpt-foot">{{ t('Click a level bar to drill down · Inflected forms are matched to their base word · Data: French-Korean CEFR word lists.') }}</div>
   </div>
 </div>
 
@@ -606,29 +649,29 @@
 <div id="ar-panel" style="display:none;">
   <div class="chart-card">
     <div class="jlpt-head">
-      <h3 style="margin:0;">Arabic Vocabulary Progress</h3>
-      <span class="jlpt-sub">Arabic · CEFR A1–C2 · data: KELLY Project</span>
-      <button type="button" id="ar-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
+      <h3 style="margin:0;">{{ t('Arabic Vocabulary Progress') }}</h3>
+      <span class="jlpt-sub">{{ t('Arabic · CEFR A1–C2 · data: KELLY Project') }}</span>
+      <button type="button" id="ar-export-all" class="jlpt-export-all">{{ t('Export all levels (CSV)') }}</button>
     </div>
 
-    <h4 class="jlpt-section">Overview</h4>
+    <h4 class="jlpt-section">{{ t('Overview') }}</h4>
     <div class="jlpt-macro">
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-label">{{ t('Mastered') }}</div>
         <div class="jlpt-macro-hero"><span id="ar-mastered-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="ar-mastered-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="ar-mastered-detail">–</span> {{ t('terms') }}</div>
       </div>
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-label">{{ t('Seen') }}</div>
         <div class="jlpt-macro-hero"><span id="ar-seen-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="ar-seen-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="ar-seen-detail">–</span> {{ t('terms') }}</div>
       </div>
     </div>
 
-    <h4 class="jlpt-section">By level</h4>
+    <h4 class="jlpt-section">{{ t('By level') }}</h4>
     <div id="ar-levels"></div>
 
-    <div class="jlpt-foot">Click a level bar to drill down · Diacritics are ignored and forms are matched to their base word · Data: KELLY (Leeds &amp; Gothenburg).</div>
+    <div class="jlpt-foot">{{ t('Click a level bar to drill down · Diacritics are ignored and forms are matched to their base word · Data: KELLY (Leeds &amp; Gothenburg).') }}</div>
   </div>
 </div>
 
@@ -636,29 +679,29 @@
 <div id="zh2-panel" style="display:none;">
   <div class="chart-card">
     <div class="jlpt-head">
-      <h3 style="margin:0;">Mandarin Vocabulary Progress · HSK 2.0</h3>
-      <span class="jlpt-sub">Chinese · HSK 2.0 levels 1–6 · data: tomcumming/hsk-word-list</span>
-      <button type="button" id="zh2-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
+      <h3 style="margin:0;">{{ t('Mandarin Vocabulary Progress · HSK 2.0') }}</h3>
+      <span class="jlpt-sub">{{ t('Chinese · HSK 2.0 levels 1–6 · data: tomcumming/hsk-word-list') }}</span>
+      <button type="button" id="zh2-export-all" class="jlpt-export-all">{{ t('Export all levels (CSV)') }}</button>
     </div>
 
-    <h4 class="jlpt-section">Overview</h4>
+    <h4 class="jlpt-section">{{ t('Overview') }}</h4>
     <div class="jlpt-macro">
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-label">{{ t('Mastered') }}</div>
         <div class="jlpt-macro-hero"><span id="zh2-mastered-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="zh2-mastered-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="zh2-mastered-detail">–</span> {{ t('terms') }}</div>
       </div>
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-label">{{ t('Seen') }}</div>
         <div class="jlpt-macro-hero"><span id="zh2-seen-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="zh2-seen-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="zh2-seen-detail">–</span> {{ t('terms') }}</div>
       </div>
     </div>
 
-    <h4 class="jlpt-section">By level</h4>
+    <h4 class="jlpt-section">{{ t('By level') }}</h4>
     <div id="zh2-levels"></div>
 
-    <div class="jlpt-foot">Click a level bar to drill down · Terms are matched by surface word · Data: HSK 2.0 1-6 (tomcumming/hsk-word-list).</div>
+    <div class="jlpt-foot">{{ t('Click a level bar to drill down · Terms are matched by surface word · Data: HSK 2.0 1-6 (tomcumming/hsk-word-list).') }}</div>
   </div>
 </div>
 
@@ -666,29 +709,29 @@
 <div id="zh3-panel" style="display:none;">
   <div class="chart-card">
     <div class="jlpt-head">
-      <h3 style="margin:0;">Mandarin Vocabulary Progress · HSK 3.0</h3>
-      <span class="jlpt-sub">Chinese · HSK 3.0 levels 1–9 (7 = 7–9) · data: drkameleon/complete-hsk-vocabulary</span>
-      <button type="button" id="zh3-export-all" class="jlpt-export-all">Export all levels (CSV)</button>
+      <h3 style="margin:0;">{{ t('Mandarin Vocabulary Progress · HSK 3.0') }}</h3>
+      <span class="jlpt-sub">{{ t('Chinese · HSK 3.0 levels 1–9 (7 = 7–9) · data: drkameleon/complete-hsk-vocabulary') }}</span>
+      <button type="button" id="zh3-export-all" class="jlpt-export-all">{{ t('Export all levels (CSV)') }}</button>
     </div>
 
-    <h4 class="jlpt-section">Overview</h4>
+    <h4 class="jlpt-section">{{ t('Overview') }}</h4>
     <div class="jlpt-macro">
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Mastered</div>
+        <div class="jlpt-macro-label">{{ t('Mastered') }}</div>
         <div class="jlpt-macro-hero"><span id="zh3-mastered-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="zh3-mastered-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="zh3-mastered-detail">–</span> {{ t('terms') }}</div>
       </div>
       <div class="jlpt-macro-card">
-        <div class="jlpt-macro-label">Seen</div>
+        <div class="jlpt-macro-label">{{ t('Seen') }}</div>
         <div class="jlpt-macro-hero"><span id="zh3-seen-pct">–</span></div>
-        <div class="jlpt-macro-detail"><span id="zh3-seen-detail">–</span> terms</div>
+        <div class="jlpt-macro-detail"><span id="zh3-seen-detail">–</span> {{ t('terms') }}</div>
       </div>
     </div>
 
-    <h4 class="jlpt-section">By level</h4>
+    <h4 class="jlpt-section">{{ t('By level') }}</h4>
     <div id="zh3-levels"></div>
 
-    <div class="jlpt-foot">Click a level bar to drill down · Terms are matched by surface word · Data: HSK 3.0 1-9 (drkameleon/complete-hsk-vocabulary).</div>
+    <div class="jlpt-foot">{{ t('Click a level bar to drill down · Terms are matched by surface word · Data: HSK 3.0 1-9 (drkameleon/complete-hsk-vocabulary).') }}</div>
   </div>
 </div>
 
@@ -696,31 +739,31 @@
 <div class="term-charts-grid">
   <!-- Top-left: New terms -->
   <div class="chart-card">
-    <h3>New terms</h3>
+    <h3>{{ t('New terms') }}</h3>
     <div class="chart-wrap"><canvas id="newTermsChart"></canvas></div>
   </div>
 
   <!-- Top-right: Mastered terms -->
   <div class="chart-card">
-    <h3>Fully mastered terms</h3>
+    <h3>{{ t('Fully mastered terms') }}</h3>
     <div class="chart-wrap"><canvas id="masteredTermsChart"></canvas></div>
   </div>
 
   <!-- Bottom-left: Summary -->
   <div class="chart-card">
-    <h3>Summary</h3>
+    <h3>{{ t('Summary') }}</h3>
     <div class="summary-panel" id="summary-panel">
-      <div class="chart-loading">Loading...</div>
+      <div class="chart-loading">{{ t('Loading...') }}</div>
     </div>
   </div>
 
   <!-- Bottom-right: Heatmap -->
   <div class="chart-card">
-    <h3>Term activity</h3>
+    <h3>{{ t('Term activity') }}</h3>
     <div class="heatmap-container">
       <div class="heatmap-main">
         <div class="heatmap-day-labels">
-          <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+          <span>{{ t('Sun') }}</span><span>{{ t('Mon') }}</span><span>{{ t('Tue') }}</span><span>{{ t('Wed') }}</span><span>{{ t('Thu') }}</span><span>{{ t('Fri') }}</span><span>{{ t('Sat') }}</span>
         </div>
         <div style="flex:1;min-width:0;max-width:100%;">
           <div class="heatmap-month-labels" id="heatmap-month-labels"></div>
@@ -730,32 +773,90 @@
         </div>
       </div>
       <div class="heatmap-footer">
-        <span id="heatmap-total-label">Total activities: <span class="heatmap-total" id="heatmap-total">0</span></span>
+        <span id="heatmap-total-label">{{ t('Total activities:') }} <span class="heatmap-total" id="heatmap-total">0</span></span>
         <div class="heatmap-legend">
-          <span>Less</span>
+          <span>{{ t('Less') }}</span>
           <span class="heatmap-cell"></span>
           <span class="heatmap-cell" style="background:#9be9a8"></span>
           <span class="heatmap-cell" style="background:#40c463"></span>
           <span class="heatmap-cell" style="background:#30a14e"></span>
           <span class="heatmap-cell" style="background:#216e39"></span>
-          <span>More</span>
+          <span>{{ t('More') }}</span>
         </div>
       </div>
     </div>
   </div>
 </div>
 
+<!-- Review queue (FSRS) statistics -->
+<h2 id="review" style="margin-top: 24px;">{{ t('Review') }}</h2>
+
+<div class="review-cards" id="review-cards">
+  <div class="chart-loading">{{ t('Loading...') }}</div>
+</div>
+
+<div class="term-charts-grid" id="review-charts">
+  <div class="chart-card">
+    <h3>{{ t('Reviews') }}</h3>
+    <div class="chart-wrap"><canvas id="reviewVolumeChart"></canvas></div>
+  </div>
+
+  <div class="chart-card">
+    <h3>{{ t('Rating distribution') }}</h3>
+    <div class="chart-wrap"><canvas id="reviewRatingChart"></canvas></div>
+  </div>
+
+  <div class="chart-card">
+    <h3>{{ t('Forgetting curve') }}</h3>
+    <div class="chart-wrap"><canvas id="reviewCurveChart"></canvas></div>
+  </div>
+
+  <div class="chart-card">
+    <h3>{{ t('Retention by group') }}</h3>
+    <div class="chart-wrap"><canvas id="reviewGroupChart"></canvas></div>
+  </div>
+</div>
+
+<div class="review-foot" id="review-foot">
+  {{ t('<b>On time</b> = graded within a day of falling due (learning cards come back minutes later, so a stricter rule would flag every one of them). <b>Retention</b> = share of gradings that were not <i>Again</i>. Cards, rating distribution and on-time rate follow the period/language filters above; the <b>forgetting curve</b> and <b>retention by group</b> always use every review, and the predicted curve is the FSRS-6 retrievability') }}
+  <code>(1 + 0.9806·t/S)^-0.1542</code>.
+  {{ t('Reviews logged before undo existed carry no scheduling snapshot, so they count towards volume and retention but not towards on-time rate or the curve.') }}
+</div>
+
+<!-- Shadowing (read-aloud) statistics -->
+<h2 id="shadowing" style="margin-top: 24px;">{{ t('Shadowing') }}</h2>
+
+<div class="review-cards" id="shadowing-cards">
+  <div class="chart-loading">{{ t('Loading...') }}</div>
+</div>
+
+<div class="term-charts-grid" id="shadowing-charts">
+  <div class="chart-card">
+    <h3>{{ t('Takes and average score') }}</h3>
+    <div class="chart-wrap"><canvas id="shadowingTrendChart"></canvas></div>
+  </div>
+
+  <div class="chart-card" style="grid-column: span 2;">
+    <h3>{{ t('Most stumbled words (all time)') }}</h3>
+    <div id="shadowing-missed" class="chart-wrap" style="overflow:auto; max-height: 260px;"></div>
+  </div>
+</div>
+
+<div class="review-foot">
+  {{ t("One row per scored <b>take</b>, from the reading page's shadowing panel and from shadowing review cards alike; summary cards and the trend follow the period/language filters above, while the <b>most stumbled words</b> always use every take. A word is <i>stumbled</i> when a take missed or misread it (at most once per take); these are the words a follow-up repetition pays off for most.") }}
+</div>
+
 <!-- Original words read section -->
-<h2 style="margin-top: 24px;">Words read</h2>
+<h2 style="margin-top: 24px;">{{ t('Words read') }}</h2>
 
 <table class="statsWordsRead">
   <tr>
     <th />
-    <th>today</th>
-    <th>last week</th>
-    <th>last month</th>
-    <th>last year</th>
-    <th>all time</th>
+    <th>{{ t('today') }}</th>
+    <th>{{ t('last week') }}</th>
+    <th>{{ t('last month') }}</th>
+    <th>{{ t('last year') }}</th>
+    <th>{{ t('all time') }}</th>
   </tr>
   {% for lang in read_table_data %}
   <tr>
@@ -774,7 +875,7 @@
 </div>
 
 {% if reading_streak > 0 %}
-  <h2>Reading Streak: {{ reading_streak }} day{{ reading_streak != 1 and 's' or '' }}</h2>
+  <h2>{{ t('Reading Streak:') }} {{ reading_streak }} {{ t('day') }}{{ reading_streak != 1 and 's' or '' }}</h2>
 {% endif %}
 
 <script>
@@ -805,12 +906,16 @@
     this.querySelectorAll('button').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     loadTermData();
+    loadReviewStats();
+    loadShadowingStats();
   });
 
   document.getElementById('ov-lang').addEventListener('change', function(e) {
     currentLang = e.target.value;
     updateJpButton();
     loadTermData();
+    loadReviewStats();
+    loadShadowingStats();
   });
 
   // --- JLPT uses the generic level-report engine (see jlptReport below) ---
@@ -834,7 +939,7 @@
     const panel = document.getElementById(cfg.panel);
     const levelsEl = document.getElementById(cfg.levelsEl);
     const dispLabel = l => (cfg.levelLabel ? cfg.levelLabel(l) : l);
-    const TAB_LABELS = { unmastered: 'Unmastered', notseen: 'Not seen', mastered: 'Mastered' };
+    const TAB_LABELS = { unmastered: I18N.t('Unmastered'), notseen: I18N.t('Not seen'), mastered: I18N.t('Mastered') };
     const state = { data: null, level: null, filter: 'unmastered', page: 1, total: 0 };
     let ddEl = null;
 
@@ -854,7 +959,7 @@
     function load() {
       closeDrilldown();
       state.data = null;
-      levelsEl.innerHTML = '<div class="jlpt-loading">Loading...</div>';
+      levelsEl.innerHTML = '<div class="jlpt-loading">' + I18N.t('Loading...') + '</div>';
       fetch(cfg.urls.data + '?lang_id=' + currentLang)
         .then(function(r) { return r.json(); })
         .then(function(d) {
@@ -863,7 +968,7 @@
           renderOverview(d);
         })
         .catch(function(err) {
-          levelsEl.innerHTML = '<div class="jlpt-loading">Failed to load data.</div>';
+          levelsEl.innerHTML = '<div class="jlpt-loading">' + I18N.t('Failed to load data.') + '</div>';
           console.error('Failed to load report:', err);
         });
     }
@@ -888,8 +993,8 @@
             '<span class="jlpt-badge" style="background:' + color + '">' + dispLabel(lv.level) + '</span>' +
             '<div class="jlpt-track">' +
               '<div class="jlpt-tip">' +
-                '<div>Mastered <span>' + pct(lv.mastered, lv.total) + '%</span></div>' +
-                '<div>Seen <span>' + pct(lv.seen, lv.total) + '%</span></div>' +
+                '<div>' + I18N.t('Mastered') + ' <span>' + pct(lv.mastered, lv.total) + '%</span></div>' +
+                '<div>' + I18N.t('Seen') + ' <span>' + pct(lv.seen, lv.total) + '%</span></div>' +
               '</div>' +
               '<div class="jlpt-fill" style="width:' + seenW + '%;background:' + color + '"></div>' +
               '<div class="jlpt-done" style="width:' + doneW + '%;background:' + color + '"></div>' +
@@ -902,7 +1007,7 @@
 
     function loadWords() {
       const listEl = ddEl.querySelector('.jlpt-w-list');
-      listEl.innerHTML = '<div class="jlpt-loading">Loading...</div>';
+      listEl.innerHTML = '<div class="jlpt-loading">' + I18N.t('Loading...') + '</div>';
       fetch(cfg.urls.words + '?lang_id=' + currentLang + '&level=' + state.level + '&filter=' + state.filter + '&page=' + state.page + '&per_page=' + cfg.perPage)
         .then(function(r) { return r.json(); })
         .then(function(d) {
@@ -911,7 +1016,7 @@
           renderWords(listEl, d);
         })
         .catch(function(err) {
-          listEl.innerHTML = '<div class="jlpt-loading">Failed to load words.</div>';
+          listEl.innerHTML = '<div class="jlpt-loading">' + I18N.t('Failed to load words.') + '</div>';
           console.error('Failed to load words:', err);
         });
     }
@@ -930,10 +1035,10 @@
              '</div>';
       });
       if (!d.words || !d.words.length) {
-        h = '<div class="jlpt-loading">No words.</div>';
+        h = '<div class="jlpt-loading">' + I18N.t('No words.') + '</div>';
       }
       listEl.innerHTML = h;
-      ddEl.querySelector('.jlpt-pg-info').textContent = 'Page ' + d.page + ' of ' + pages + ' · ' + d.total.toLocaleString() + ' words';
+      ddEl.querySelector('.jlpt-pg-info').textContent = I18N.t('Page') + ' ' + d.page + ' ' + I18N.t('of') + ' ' + pages + ' · ' + d.total.toLocaleString() + ' ' + I18N.t('words');
       ddEl.querySelector('[data-pg="prev"]').disabled = d.page <= 1;
       ddEl.querySelector('[data-pg="next"]').disabled = d.page >= pages;
     }
@@ -952,18 +1057,18 @@
       ddEl.className = 'jlpt-dd';
       ddEl.innerHTML =
         '<div class="jlpt-dd-head">' +
-          '<span class="jlpt-dd-title">' + dispLabel(level) + ' words</span>' +
+          '<span class="jlpt-dd-title">' + dispLabel(level) + ' ' + I18N.t('words') + '</span>' +
           '<div class="jlpt-tabs">' +
             ['unmastered', 'notseen', 'mastered'].map(function(t) {
               return '<button type="button" class="jlpt-tab' + (t === 'unmastered' ? ' on' : '') + '" data-tab="' + t + '">' + TAB_LABELS[t] + ' (' + counts[t].toLocaleString() + ')</button>';
             }).join('') +
           '</div>' +
-          '<button type="button" class="jlpt-export-cur">Export CSV</button>' +
+          '<button type="button" class="jlpt-export-cur">' + I18N.t('Export CSV') + '</button>' +
         '</div>' +
-        '<div class="jlpt-w-list jlpt-w-grid"><div class="jlpt-loading">Loading...</div></div>' +
+        '<div class="jlpt-w-list jlpt-w-grid"><div class="jlpt-loading">' + I18N.t('Loading...') + '</div></div>' +
         '<div class="jlpt-pager">' +
-          '<button type="button" class="jlpt-pg-btn" data-pg="prev">← Prev</button>' +
-          '<button type="button" class="jlpt-pg-btn" data-pg="next">Next →</button>' +
+          '<button type="button" class="jlpt-pg-btn" data-pg="prev">' + I18N.t('← Prev') + '</button>' +
+          '<button type="button" class="jlpt-pg-btn" data-pg="next">' + I18N.t('Next →') + '</button>' +
           '<span class="jlpt-pg-info"></span>' +
         '</div>';
       row.after(ddEl);
@@ -1156,13 +1261,13 @@
       .then(function(data) {
         renderSummary(data.summary);
         renderHeatmap(data.heatmap);
-        renderBarChart('newTermsChart', data.new_terms, '#e03131', 'New terms');
-        renderBarChart('masteredTermsChart', data.mastered_terms, '#37b24d', 'Mastered terms');
+        renderBarChart('newTermsChart', data.new_terms, '#e03131', I18N.t('New terms'));
+        renderBarChart('masteredTermsChart', data.mastered_terms, '#37b24d', I18N.t('Mastered terms'));
       })
       .catch(function(err) {
         console.error('Failed to load term data:', err);
         document.getElementById('summary-panel').innerHTML =
-          '<div class="empty-msg">Failed to load data.</div>';
+          '<div class="empty-msg">' + I18N.t('Failed to load data.') + '</div>';
       });
   }
 
@@ -1200,10 +1305,10 @@
     }
 
     const GROUP_META = [
-      { key: 'unknown', name: 'Unknown', color: '#ff6b6b' },
-      { key: 'vague', name: 'Vague', color: '#ffa94d' },
-      { key: 'mastered', name: 'Mastered', color: '#845ef7' },
-      { key: 'ignored', name: 'Ignored', color: '#adb5bd' },
+      { key: 'unknown', name: I18N.t('Unknown'), color: '#ff6b6b' },
+      { key: 'vague', name: I18N.t('Vague'), color: '#ffa94d' },
+      { key: 'mastered', name: I18N.t('Mastered'), color: '#845ef7' },
+      { key: 'ignored', name: I18N.t('Ignored'), color: '#adb5bd' },
     ];
 
     function groupHtml(data) {
@@ -1221,11 +1326,11 @@
     panel.innerHTML =
       '<div class="summary-total">' +
         '<span class="summary-total-num">' + total.toLocaleString() + '</span>' +
-        '<span class="summary-total-label">total terms</span>' +
+        '<span class="summary-total-label">' + I18N.t('total terms') + '</span>' +
       '</div>' +
       '<div class="summary-section-title">' + recentLabel + ' (' + recentTotal + ')</div>' +
       '<div class="summary-levels">' + groupHtml(groups) + '</div>' +
-      '<div class="summary-section-title">Cumulative</div>' +
+      '<div class="summary-section-title">' + I18N.t('Cumulative') + '</div>' +
       '<div class="summary-levels">' + groupHtml(cumGroups) + '</div>';
   }
 
@@ -1265,7 +1370,7 @@
     if (totalEl) totalEl.textContent = totalCount.toLocaleString();
 
     if (dataArr.length === 0) {
-      grid.innerHTML = '<span class="empty-msg">No activity yet.</span>';
+      grid.innerHTML = '<span class="empty-msg">' + I18N.t('No activity yet.') + '</span>';
       return;
     }
 
@@ -1306,7 +1411,7 @@
         const cell = document.createElement('span');
         cell.className = 'heatmap-cell';
         cell.style.background = HEATMAP_COLORS[level];
-        cell.title = key + ': ' + count + ' term' + (count !== 1 ? 's' : '');
+        cell.title = key + ': ' + count + ' ' + I18N.t('term') + (count !== 1 ? 's' : '');
         grid.appendChild(cell);
 
         const m = cellDate.getMonth();
@@ -1407,6 +1512,457 @@
     .catch(function(err) { console.error('Failed to load word data:', err); });
 
   loadTermData();
+  loadReviewStats();
+  loadShadowingStats();
+
+  // --- Review (FSRS) statistics ---
+  // The queue tables already know when a card was due and when it was
+  // graded; these charts turn that into the three numbers the review
+  // page cannot show on its own (on-time rate, retention, and the
+  // forgetting curve).
+  const RATING_COLORS = { again: '#e03131', hard: '#f76707', good: '#2f9e44', easy: '#1c7ed6' };
+  const RATING_LABELS = { again: I18N.t('Again'), hard: I18N.t('Hard'), good: I18N.t('Good'), easy: I18N.t('Easy') };
+
+  function fmtPct(v) {
+    if (v === null || v === undefined) return '&mdash;';
+    return (v * 100).toFixed(1) + '%';
+  }
+
+  function loadReviewStats() {
+    fetch('/stats/review_data?period=' + currentPeriod + '&lang_id=' + currentLang)
+      .then(function(r) { return r.json(); })
+      .then(renderReviewStats)
+      .catch(function(err) {
+        console.error('Failed to load review stats:', err);
+        document.getElementById('review-cards').innerHTML =
+          '<div class="empty-msg">' + I18N.t('Failed to load review data.') + '</div>';
+      });
+  }
+
+  function renderReviewStats(data) {
+    renderReviewCards(data);
+    const charts = document.getElementById('review-charts');
+    if (!data.has_data) {
+      // Nothing to plot: hide the whole grid rather than leave four
+      // empty frames under the message.
+      charts.style.display = 'none';
+      ['reviewVolumeChart', 'reviewRatingChart', 'reviewCurveChart', 'reviewGroupChart'].forEach(destroyChart);
+      return;
+    }
+    charts.style.display = '';
+    renderReviewVolume(data.daily, data.period);
+    renderReviewRatings(data.ratings);
+    renderReviewCurve(data.forgetting);
+    renderReviewGroups(data.by_state, data.by_card_type);
+  }
+
+  function renderReviewCards(data) {
+    const el = document.getElementById('review-cards');
+    if (!data.has_data) {
+      el.innerHTML = '<div class="review-empty"><div class="empty-msg">' +
+        I18N.t('No reviews recorded for this filter yet. Grade a few cards and these charts fill in.') +
+        '</div></div>';
+      el.style.gridTemplateColumns = '1fr';
+      return;
+    }
+    const s = data.summary;
+    const onTimeCls = s.on_time_rate === null ? '' :
+      (s.on_time_rate >= 0.8 ? 'ok' : (s.on_time_rate < 0.6 ? 'warn' : ''));
+    const retCls = s.retention === null ? '' :
+      (s.retention >= 0.85 ? 'ok' : (s.retention < 0.8 ? 'warn' : ''));
+    const cards = [
+      { num: s.reviews.toLocaleString(), label: I18N.t('reviews'), sub: I18N.t('all time') + ' ' + s.reviews_all_time.toLocaleString() },
+      { num: fmtPct(s.on_time_rate), label: I18N.t('on time'), cls: onTimeCls,
+        sub: s.on_time + ' ' + I18N.t('on time') + ' / ' + s.late + ' ' + I18N.t('late') },
+      { num: fmtPct(s.retention), label: I18N.t('retention'), cls: retCls,
+        sub: I18N.t('all time') + ' ' + fmtPct(s.retention_all_time) },
+      { num: s.cards_due_now.toLocaleString(), label: I18N.t('due now'), sub: I18N.t('new') + ' ' + s.cards_new.toLocaleString() },
+      { num: s.cards_total.toLocaleString(), label: I18N.t('cards'), sub: s.lapses.toLocaleString() + ' ' + I18N.t('lapses') },
+    ];
+    el.style.gridTemplateColumns = '';
+    el.innerHTML = cards.map(function(c) {
+      return '<div class="review-card">' +
+        '<div class="review-card-num ' + (c.cls || '') + '">' + c.num + '</div>' +
+        '<div class="review-card-label">' + c.label + '</div>' +
+        '<div class="review-card-sub">' + c.sub + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function destroyChart(canvasId) {
+    if (window[canvasId + '_instance']) {
+      window[canvasId + '_instance'].destroy();
+      window[canvasId + '_instance'] = null;
+    }
+  }
+
+  function reviewXScale(period, monthlyUnit) {
+    // Same date-window rules as renderBarChart, so the review bars line
+    // up with the term bars when the period changes.
+    const unit = period === 'monthly' ? (monthlyUnit || 'month') : 'day';
+    const scale = {
+      type: 'time',
+      time: { unit: unit },
+      stacked: true,
+      grid: { display: false },
+      ticks: { color: CHART_COLORS.tick },
+    };
+    if (period === '7days') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      scale.min = new Date(today.getTime() - 6 * 86400000);
+      scale.max = today;
+    } else if (period === 'today') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      scale.min = today;
+      scale.max = today;
+    }
+    return scale;
+  }
+
+  function renderReviewVolume(daily, period) {
+    const canvas = document.getElementById('reviewVolumeChart');
+    destroyChart('reviewVolumeChart');
+    const onTime = daily.map(function(d) { return { x: d.date, y: d.on_time }; });
+    const late = daily.map(function(d) { return { x: d.date, y: d.late }; });
+    window.reviewVolumeChart_instance = new Chart(canvas.getContext('2d'), {
+      type: 'bar',
+      data: {
+        datasets: [
+          { label: I18N.t('On time'), data: onTime, backgroundColor: '#2f9e44', stack: 'r' },
+          { label: I18N.t('Late'), data: late, backgroundColor: '#e8590c', stack: 'r' },
+        ]
+      },
+      options: {
+        maintainAspectRatio: false,
+        responsive: true,
+        scales: {
+          x: reviewXScale(period),
+          y: {
+            stacked: true,
+            beginAtZero: true,
+            ticks: { precision: 0, color: CHART_COLORS.tick },
+            grid: { color: CHART_COLORS.grid }
+          }
+        },
+        plugins: {
+          legend: { display: true, labels: { boxWidth: 12, font: { size: 11 } } },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) { return ctx.dataset.label + ': ' + ctx.parsed.y; }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function renderReviewRatings(ratings) {
+    const canvas = document.getElementById('reviewRatingChart');
+    destroyChart('reviewRatingChart');
+    const keys = ['again', 'hard', 'good', 'easy'];
+    const values = keys.map(function(k) { return ratings[k] || 0; });
+    const total = values.reduce(function(a, b) { return a + b; }, 0);
+    window.reviewRatingChart_instance = new Chart(canvas.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: keys.map(function(k) { return RATING_LABELS[k]; }),
+        datasets: [{
+          data: values,
+          backgroundColor: keys.map(function(k) { return RATING_COLORS[k]; }),
+          borderRadius: 3,
+        }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        responsive: true,
+        scales: {
+          x: { grid: { display: false }, ticks: { color: CHART_COLORS.tick } },
+          y: {
+            beginAtZero: true,
+            ticks: { precision: 0, color: CHART_COLORS.tick },
+            grid: { color: CHART_COLORS.grid }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                const v = ctx.parsed.y;
+                const share = total ? ' (' + (v / total * 100).toFixed(1) + '%)' : '';
+                return v + ' ' + I18N.t('cards') + share;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function renderReviewCurve(forgetting) {
+    const canvas = document.getElementById('reviewCurveChart');
+    destroyChart('reviewCurveChart');
+    const buckets = (forgetting && forgetting.buckets) || [];
+    const actual = [];
+    const predicted = [];
+    const sampleCounts = {};
+    buckets.forEach(function(b) {
+      sampleCounts[b.days] = b.reviews;
+      if (b.retention !== null && b.retention !== undefined) {
+        actual.push({ x: b.days, y: b.retention * 100 });
+      }
+      if (b.predicted !== null && b.predicted !== undefined) {
+        predicted.push({ x: b.days, y: b.predicted * 100 });
+      }
+    });
+    window.reviewCurveChart_instance = new Chart(canvas.getContext('2d'), {
+      type: 'line',
+      data: {
+        datasets: [
+          {
+            label: I18N.t('Actual'),
+            data: actual,
+            borderColor: '#228be6',
+            backgroundColor: '#228be6',
+            pointRadius: 4,
+            borderWidth: 2,
+            tension: 0.25,
+          },
+          {
+            label: I18N.t('FSRS predicted'),
+            data: predicted,
+            borderColor: '#adb5bd',
+            backgroundColor: '#adb5bd',
+            borderDash: [5, 4],
+            pointRadius: 0,
+            borderWidth: 2,
+            tension: 0.25,
+          },
+        ]
+      },
+      options: {
+        maintainAspectRatio: false,
+        responsive: true,
+        scales: {
+          x: {
+            type: 'logarithmic',
+            title: { display: true, text: I18N.t('days since last review'), color: CHART_COLORS.title, font: { size: 11 } },
+            grid: { color: CHART_COLORS.grid },
+            ticks: {
+              color: CHART_COLORS.tick,
+              maxRotation: 0,
+              // A logarithmic scale picks its own ticks and draws no
+              // others, so they all have to be labelled -- a whitelist
+              // leaves the axis blank.  Limit the count instead, or the
+              // sub-day ticks crowd into an unreadable "0.6d0.8d1d".
+              maxTicksLimit: 7,
+              callback: function(v) {
+                if (v >= 1) return Math.round(v) + 'd';
+                return v + 'd';
+              }
+            }
+          },
+          y: {
+            min: 0,
+            max: 100,
+            title: { display: true, text: I18N.t('retention %'), color: CHART_COLORS.title, font: { size: 11 } },
+            ticks: { color: CHART_COLORS.tick, callback: function(v) { return v + '%'; } },
+            grid: { color: CHART_COLORS.grid }
+          }
+        },
+        plugins: {
+          legend: { display: true, labels: { boxWidth: 12, font: { size: 11 } } },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                const n = sampleCounts[ctx.parsed.x];
+                const extra = n ? ' (n=' + n + ')' : '';
+                return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%' + extra;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function renderReviewGroups(byState, byCardType) {
+    const canvas = document.getElementById('reviewGroupChart');
+    destroyChart('reviewGroupChart');
+    const states = byState || [];
+    const types = byCardType || [];
+    const labels = states.map(function(g) { return g.label; })
+      .concat(types.map(function(g) { return g.label; }));
+    const stateData = states.map(function(g) { return g.retention * 100; })
+      .concat(types.map(function() { return null; }));
+    const typeData = states.map(function() { return null; })
+      .concat(types.map(function(g) { return g.retention * 100; }));
+    const counts = states.map(function(g) { return g.reviews; })
+      .concat(types.map(function(g) { return g.reviews; }));
+    window.reviewGroupChart_instance = new Chart(canvas.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          { label: I18N.t('Card state'), data: stateData, backgroundColor: '#845ef7', borderRadius: 3 },
+          { label: I18N.t('Card type'), data: typeData, backgroundColor: '#22b8cf', borderRadius: 3 },
+        ]
+      },
+      options: {
+        indexAxis: 'y',
+        maintainAspectRatio: false,
+        responsive: true,
+        scales: {
+          x: {
+            beginAtZero: true,
+            max: 100,
+            ticks: { color: CHART_COLORS.tick, callback: function(v) { return v + '%'; } },
+            grid: { color: CHART_COLORS.grid }
+          },
+          y: { grid: { display: false }, ticks: { color: CHART_COLORS.tick } }
+        },
+        plugins: {
+          legend: { display: true, labels: { boxWidth: 12, font: { size: 11 } } },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                const n = counts[ctx.dataIndex];
+                const extra = n ? ' (n=' + n + ')' : '';
+                return ctx.dataset.label + ': ' + ctx.parsed.x.toFixed(1) + '%' + extra;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // --- Shadowing (read-aloud) statistics ---
+  // One row per scored take (shadowattempts), from the reading page's
+  // panel and from shadowing review cards alike: volume + score trend,
+  // spoken time, and the words takes most often stumble over.
+  function loadShadowingStats() {
+    fetch('/stats/shadowing_data?period=' + currentPeriod + '&lang_id=' + currentLang)
+      .then(function(r) { return r.json(); })
+      .then(renderShadowingStats)
+      .catch(function(err) {
+        console.error('Failed to load shadowing stats:', err);
+        document.getElementById('shadowing-cards').innerHTML =
+          '<div class="empty-msg">' + I18N.t('Failed to load shadowing data.') + '</div>';
+      });
+  }
+
+  function renderShadowingStats(data) {
+    renderShadowingCards(data);
+    const charts = document.getElementById('shadowing-charts');
+    if (!data.has_data) {
+      charts.style.display = 'none';
+      destroyChart('shadowingTrendChart');
+      return;
+    }
+    charts.style.display = '';
+    renderShadowingTrend(data.daily, data.period);
+    renderShadowingMissed(data.top_missed);
+  }
+
+  function renderShadowingCards(data) {
+    const el = document.getElementById('shadowing-cards');
+    if (!data.has_data) {
+      el.innerHTML = '<div class="review-empty"><div class="empty-msg">' +
+        I18N.t("No shadowing takes recorded for this filter yet. Record a take in the reading page's shadowing panel (or on a shadowing review card) and these fill in.") +
+        '</div></div>';
+      el.style.gridTemplateColumns = '1fr';
+      return;
+    }
+    const s = data.summary;
+    const avgCls = s.avg_score === null ? '' :
+      (s.avg_score >= 85 ? 'ok' : (s.avg_score < 60 ? 'warn' : ''));
+    const cards = [
+      { num: s.attempts.toLocaleString(), label: I18N.t('takes'), sub: I18N.t('all time') + ' ' + s.attempts_all_time.toLocaleString() },
+      { num: s.avg_score === null ? '&mdash;' : s.avg_score + '%', label: I18N.t('avg score'), cls: avgCls,
+        sub: I18N.t('all time') + ' ' + (s.avg_score_all_time === null ? '&mdash;' : s.avg_score_all_time + '%') },
+      { num: s.best_score === null ? '&mdash;' : s.best_score + '%', label: I18N.t('best take'), sub: I18N.t('this period') },
+      { num: (s.minutes || 0).toLocaleString(), label: I18N.t('minutes read aloud'), sub: I18N.t('this period') },
+    ];
+    el.style.gridTemplateColumns = '';
+    el.innerHTML = cards.map(function(c) {
+      return '<div class="review-card">' +
+        '<div class="review-card-num ' + (c.cls || '') + '">' + c.num + '</div>' +
+        '<div class="review-card-label">' + c.label + '</div>' +
+        '<div class="review-card-sub">' + c.sub + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function renderShadowingTrend(daily, period) {
+    const canvas = document.getElementById('shadowingTrendChart');
+    destroyChart('shadowingTrendChart');
+    const takes = daily.map(function(d) { return { x: d.date, y: d.attempts }; });
+    const scores = daily.map(function(d) {
+      return d.avg_score === null ? null : { x: d.date, y: d.avg_score };
+    }).filter(function(v) { return v !== null; });
+    window.shadowingTrendChart_instance = new Chart(canvas.getContext('2d'), {
+      data: {
+        datasets: [
+          { type: 'bar', label: I18N.t('Takes'), data: takes, backgroundColor: '#1c7ed6', yAxisID: 'takes' },
+          { type: 'line', label: I18N.t('Avg score'), data: scores, borderColor: '#2f9e44',
+            backgroundColor: '#2f9e44', borderWidth: 2, pointRadius: 3, tension: 0.25, yAxisID: 'score' },
+        ]
+      },
+      options: {
+        maintainAspectRatio: false,
+        responsive: true,
+        scales: {
+          x: reviewXScale(period),
+          takes: {
+            position: 'left', beginAtZero: true,
+            ticks: { precision: 0, color: CHART_COLORS.tick },
+            grid: { color: CHART_COLORS.grid },
+          },
+          score: {
+            position: 'right', beginAtZero: true, max: 100,
+            ticks: { precision: 0, color: CHART_COLORS.tick, callback: function(v) { return v + '%'; } },
+            grid: { display: false },
+          },
+        },
+        plugins: {
+          legend: { display: true, labels: { boxWidth: 12, font: { size: 11 } } },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                const unit = ctx.dataset.yAxisID === 'score' ? '%' : '';
+                return ctx.dataset.label + ': ' + ctx.parsed.y + unit;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  function renderShadowingMissed(topMissed) {
+    const el = document.getElementById('shadowing-missed');
+    const rows = topMissed || [];
+    if (!rows.length) {
+      el.innerHTML = '<div class="empty-msg">' + I18N.t('No stumbled words yet.') + '</div>';
+      return;
+    }
+    el.innerHTML = '<table class="statsWordsRead" style="width:100%">' +
+      '<tr><th>' + I18N.t('word') + '</th><th>' + I18N.t('language') + '</th><th>' + I18N.t('stumbles') + '</th></tr>' +
+      rows.map(function(g) {
+        return '<tr><td>' + escapeHtmlStats(g.text) + '</td><td>' +
+          escapeHtmlStats(g.language) + '</td><td>' + g.misses + '</td></tr>';
+      }).join('') +
+      '</table>';
+  }
+
+  function escapeHtmlStats(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
 
   function renderWordChart(data) {
     var ctx = document.getElementById('wordCountChart').getContext('2d');
@@ -1437,7 +1993,7 @@
             type: 'time',
             display: true,
             time: { unit: 'day' },
-            title: { display: true, text: 'Date', color: CHART_COLORS.title },
+            title: { display: true, text: I18N.t('Date'), color: CHART_COLORS.title },
             ticks: {
               major: { enabled: true },
               color: CHART_COLORS.tick,
@@ -1452,7 +2008,7 @@
           },
           total: {
             position: 'right',
-            title: { display: true, text: 'total', color: CHART_COLORS.title },
+            title: { display: true, text: I18N.t('total'), color: CHART_COLORS.title },
             grid: { display: false },
             ticks: {
               beginAtZero: true,

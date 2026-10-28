@@ -1,0 +1,2013 @@
+[
+ {
+  "key": "agm_الاستثناءبإلاّexceptionwithilla__e607a9",
+  "name": "الاستثناء بإلاّ (exception with illa)",
+  "slug": "إلاّ",
+  "meaning": "exception with illa",
+  "type": "composite",
+  "examples": [
+   "لم يقرأ إلا كتابين.",
+   "مهما تسافر إلى المغرب فلن تجد إلا شعبا كريما."
+  ],
+  "example_zh": [
+   "他只读了两本书。",
+   "无论你去摩洛哥多少次，你都只会遇到慷慨的人民。"
+  ],
+  "example_en": [
+   "He read only two books.",
+   "However often you travel to Morocco, you will find only generous people."
+  ],
+  "focus": [
+   "إلا"
+  ],
+  "zh": "إلاّ：除……之外。肯定句里例外名词用宾格；否定句里可主格可宾格。",
+  "level": "B1",
+  "formation": "اسم منصوب بعد إلاّ في الجملة الموجبة",
+  "notes": "否定句（ما/لم/لن/ليس + إلاّ）里例外名词可为宾格或主格，取决于是不是被排除在外的成分。"
+ },
+ {
+  "key": "agm_الاستثناءبماعداexceptionwithmaaadaa__36b618",
+  "name": "الاستثناء بما عدا (exception with maa 'adaa)",
+  "slug": "ما عدا",
+  "meaning": "exception with maa 'adaa",
+  "type": "composite",
+  "examples": [
+   "حضر الطلاب ما عدا طالبا واحدا.",
+   "وصلت كل المدرسات ما عدا مدرسة واحدة."
+  ],
+  "example_zh": [
+   "所有学生都到了，只有一个学生除外。",
+   "所有女教师都到了，只有一位女教师除外。"
+  ],
+  "example_en": [
+   "The students came, all except one.",
+   "All the teachers arrived except one."
+  ],
+  "focus": [
+   "ما",
+   "عدا"
+  ],
+  "zh": "ما عدا：除了……（后接宾格名词）。",
+  "level": "B1",
+  "formation": "ما عدا + اسم منصوب",
+  "notes": "与 عدا 同义；ما 只是装饰性的，不改变格。"
+ },
+ {
+  "key": "agm_الاستثناءبعداexceptionwithadaa__d8b9ae",
+  "name": "الاستثناء بعدا (exception with 'adaa)",
+  "slug": "عدا",
+  "meaning": "exception with 'adaa",
+  "type": "composite",
+  "examples": [
+   "شاهدت المعلمة الطلاب عدا طالبا واحدا."
+  ],
+  "example_zh": [
+   "女教师看到了所有学生，只有一个学生除外。"
+  ],
+  "example_en": [
+   "The teacher saw the students, except one."
+  ],
+  "focus": [
+   "عدا"
+  ],
+  "zh": "عدا：除……之外（动词用法，后接宾格）。",
+  "level": "B1",
+  "formation": "عدا + اسم منصوب",
+  "notes": "既可作动词（例外名词作宾语），也可作介词（例外名词作属格）。"
+ },
+ {
+  "key": "agm_الاسمالنافيغيرthenegativenounghayr__352497",
+  "name": "الاسم النافي غير (the negative noun ghayr)",
+  "slug": "غير",
+  "meaning": "the negative noun ghayr",
+  "type": "composite",
+  "examples": [
+   "أشرب القهوة لا غير.",
+   "حضر الطلاب غير خالد."
+  ],
+  "example_zh": [
+   "我只喝咖啡。",
+   "除了哈立德，学生们都到了。"
+  ],
+  "example_en": [
+   "I drink coffee, nothing else.",
+   "The students came apart from Khalid."
+  ],
+  "focus": [
+   "غير"
+  ],
+  "zh": "غير：不是……；除……之外。作 إضافة 的第一名词，后接属格。",
+  "level": "B1",
+  "formation": "غير + اسم مجرور (الإضافة)",
+  "notes": "肯定句里 غير 自身是宾格；在否定句里随句法地位变化。与 سوى 同义。"
+ },
+ {
+  "key": "agm_الاسمالنافيسوىthenegativenounsiwaa__2b9626",
+  "name": "الاسم النافي سوى (the negative noun siwaa)",
+  "slug": "سوى",
+  "meaning": "the negative noun siwaa",
+  "type": "composite",
+  "examples": [
+   "سافر كل الطلاب سوى طالب واحد.",
+   "زاروا الجامعات سوى جامعة حلب."
+  ],
+  "example_zh": [
+   "所有学生都出发了，只有一个学生除外。",
+   "他们参观了所有大学，除了阿勒颇大学。"
+  ],
+  "example_en": [
+   "All the students left except one.",
+   "They visited the universities except Aleppo University."
+  ],
+  "focus": [
+   "سوى"
+  ],
+  "zh": "سوى：除……之外（不变格，后接属格）。",
+  "level": "B1",
+  "formation": "سوى + اسم مجرور",
+  "notes": "可接接尾代词：سواه / سواها。"
+ },
+ {
+  "key": "agm_الاستثناءبماخلاexceptionwithmaakhal__0e3973",
+  "name": "الاستثناء بما خلا (exception with maa khalā)",
+  "slug": "ما خلا",
+  "meaning": "exception with maa khalā",
+  "type": "composite",
+  "examples": [
+   "شاهدت المعلمة كل الطلاب ما خلا طالبا واحدا."
+  ],
+  "example_zh": [
+   "女教师看到了所有学生，只有一个学生除外。"
+  ],
+  "example_en": [
+   "The teacher saw all the students except one."
+  ],
+  "focus": [
+   "ما",
+   "خلا"
+  ],
+  "zh": "ما خلا：除了……（后接宾格）。",
+  "level": "B2",
+  "formation": "ما خلا + اسم منصوب",
+  "notes": "书面语色彩，常见于正式叙述。"
+ },
+ {
+  "key": "agm_الاستثناءبحاشاexceptionwithhaashaa__23dc62",
+  "name": "الاستثناء بحاشا (exception with haashaa)",
+  "slug": "حاشا",
+  "meaning": "exception with haashaa",
+  "type": "composite",
+  "examples": [
+   "حضر المديرون حاشا مديرا."
+  ],
+  "example_zh": [
+   "除了一个经理，所有经理都到了。"
+  ],
+  "example_en": [
+   "The managers came, except one."
+  ],
+  "focus": [
+   "حاشا"
+  ],
+  "zh": "حاشا：唯独……除外（古典色彩）。",
+  "level": "C1",
+  "formation": "حاشا + اسم مجرور أو منصوب",
+  "notes": "多见于古典文本，现代散文少见。"
+ },
+ {
+  "key": "agm_الاستثناءباستثناءexceptionwithbiistithnaa__2c554f",
+  "name": "الاستثناء باستثناء (exception with bi-istithnaa')",
+  "slug": "باستثناء",
+  "meaning": "exception with bi-istithnaa'",
+  "type": "composite",
+  "examples": [
+   "حضر كل الطلاب باستثناء طالب واحد.",
+   "دخلت كل الصفوف باستثناء صف واحد."
+  ],
+  "example_zh": [
+   "除了一个学生，所有学生都到了。",
+   "她进了所有教室，只有一个教室除外。"
+  ],
+  "example_en": [
+   "All the students came, except one student.",
+   "She entered every classroom except one."
+  ],
+  "focus": [
+   "باستثناء"
+  ],
+  "zh": "باستثناء：除……之外（介词短语，后接属格）。",
+  "level": "B1",
+  "formation": "باستثناء + اسم مجرور",
+  "notes": "由 بـ + استثناء 构成，肯定句和否定句都可用。"
+ },
+ {
+  "key": "agm_ياالنداءvocativeyaa__14d4c3",
+  "name": "يا النداء (vocative yaa)",
+  "slug": "يا (النداء)",
+  "meaning": "vocative yaa",
+  "type": "composite",
+  "examples": [
+   "يا ليلى، كنت قد ولدت قبل انتقال العائلة إلى بيروت.",
+   "يا سلمى، هل نوديت حتى تقابلي؟"
+  ],
+  "example_zh": [
+   "莱拉，你出生在全家搬到贝鲁特之前。",
+   "萨尔玛，你是被叫去面试的吗？"
+  ],
+  "example_en": [
+   "Layla, you had been born before the family moved to Beirut.",
+   "Salma, were you called in for an interview?"
+  ],
+  "focus": [
+   "يا"
+  ],
+  "zh": "يا：呼唤词，直接称呼某人。",
+  "level": "A1",
+  "formation": "يا + اسم مرفوع / منصوب (المضاف)",
+  "notes": "专有名词直接接；普通名词作呼语时用主格去 تنوين；إضافة 结构的第一名词用宾格。"
+ },
+ {
+  "key": "agm_أيهافيالنداءvocativeayyuhaa__6fa849",
+  "name": "أيها في النداء (vocative ayyuhaa)",
+  "slug": "أيها",
+  "meaning": "vocative ayyuhaa",
+  "type": "composite",
+  "examples": [
+   "يا أيها الأطفال، أنتم سنابل الآمال."
+  ],
+  "example_zh": [
+   "孩子们啊，你们是希望的麦穗。"
+  ],
+  "example_en": [
+   "O children, you are the ears of hope."
+  ],
+  "focus": [
+   "أيها"
+  ],
+  "zh": "أيها：各位……（阳性/混合群体，后接带 ال 的名词，主格）。",
+  "level": "B2",
+  "formation": "يا أيها + اسم معرفة بالـ (مرفوع)",
+  "notes": "演讲、广播电视开场常用。阴性用 أيتها。"
+ },
+ {
+  "key": "agm_أيتهافيالنداءvocativeayyatuhaa__4718d4",
+  "name": "أيتها في النداء (vocative ayyatuhaa)",
+  "slug": "أيتها",
+  "meaning": "vocative ayyatuhaa",
+  "type": "composite",
+  "examples": [
+   "أيتها الأخت المواطنة، التصويت حق لكل مواطن ومواطنة."
+  ],
+  "example_zh": [
+   "女公民同胞们，投票是每个男女公民的权利。"
+  ],
+  "example_en": [
+   "Fellow citizen, voting is the right of every citizen, man or woman."
+  ],
+  "focus": [
+   "أيتها"
+  ],
+  "zh": "أيتها：各位（女性）……。",
+  "level": "B2",
+  "formation": "يا أيتها + اسم معرفة بالـ (مرفوع)",
+  "notes": "与 أيها 分工按性别。"
+ },
+ {
+  "key": "agm_لولاالشرطيةcounterfactuallulaa__ba2d46",
+  "name": "لولا الشرطية (counterfactual lulaa)",
+  "slug": "لولا",
+  "meaning": "counterfactual lulaa",
+  "type": "composite",
+  "examples": [
+   "لولا المال لما تقدمت البلاد.",
+   "لولا حضور الرئيس لما اتفقت الأطراف."
+  ],
+  "example_zh": [
+   "要不是钱，国家就不会进步。",
+   "要不是总统出席，各方就不会达成一致。"
+  ],
+  "example_en": [
+   "Without money the country would not have progressed.",
+   "Had the president not attended, the parties would not have agreed."
+  ],
+  "focus": [
+   "لولا"
+  ],
+  "zh": "لولا：要不是……（与事实相反的假设，后接 لـ 引导的结果句）。",
+  "level": "B2",
+  "formation": "لولا + اسم ، لـ + نتيجة",
+  "notes": "表达「要不是 A，就 B 了」，与 لو 的虚拟不同：لولا 后接名词，لو 后接动词。"
+ },
+ {
+  "key": "agm_مهماالشرطيةconditionalmahmaa__cef161",
+  "name": "مهما الشرطية (conditional mahmaa)",
+  "slug": "مهما",
+  "meaning": "conditional mahmaa",
+  "type": "composite",
+  "examples": [
+   "مهما تسافر إلى المغرب فسوف تجد شعبا كريما.",
+   "مهما طالت ألسنتهم لا يضرون أحدا."
+  ],
+  "example_zh": [
+   "无论你去摩洛哥多少次，都会遇到慷慨的人民。",
+   "无论他们的话多长，也伤不到任何人。"
+  ],
+  "example_en": [
+   "However often you travel to Morocco, you will find generous people.",
+   "However long their tongues are, they harm no one."
+  ],
+  "focus": [
+   "مهما"
+  ],
+  "zh": "مهما：无论什么……（后接切格动词）。",
+  "level": "B2",
+  "formation": "مهما + فعل مضارع مجزوم",
+  "notes": "指非人类事物；指人用 من。"
+ },
+ {
+  "key": "agm_أينماالشرطيةconditionalaynamaa__ffbba6",
+  "name": "أينما الشرطية (conditional aynamaa)",
+  "slug": "أينما",
+  "meaning": "conditional aynamaa",
+  "type": "composite",
+  "examples": [
+   "أينما تذهب أجد صديقا."
+  ],
+  "example_zh": [
+   "无论你去哪里，我都能找到朋友。"
+  ],
+  "example_en": [
+   "Wherever you go, I find a friend."
+  ],
+  "focus": [
+   "أينما"
+  ],
+  "zh": "أينما：无论哪里……（أين + ما）。",
+  "level": "B2",
+  "formation": "أينما + فعل مضارع مجزوم",
+  "notes": "两个分句的动词都用切格式。"
+ },
+ {
+  "key": "agm_حيثماالشرطيةconditionalhaythumaa__5f7a14",
+  "name": "حيثما الشرطية (conditional haythumaa)",
+  "slug": "حيثما",
+  "meaning": "conditional haythumaa",
+  "type": "composite",
+  "examples": [
+   "ينظر إليها نظرة إعجاب حيثما ذهبت."
+  ],
+  "example_zh": [
+   "无论她走到哪里，人们都投以赞赏的目光。"
+  ],
+  "example_en": [
+   "Wherever she goes, people look at her with admiration."
+  ],
+  "focus": [
+   "حيثما"
+  ],
+  "zh": "حيثما：无论何处……（حيث + ما）。",
+  "level": "B2",
+  "formation": "حيثما + فعل مضارع مجزوم",
+  "notes": "比 أينما 更书面。"
+ },
+ {
+  "key": "agm_كيفماالشرطيةconditionalkayfamaa__c5d055",
+  "name": "كيفما الشرطية (conditional kayfamaa)",
+  "slug": "كيفما",
+  "meaning": "conditional kayfamaa",
+  "type": "composite",
+  "examples": [
+   "كيفما تعمل تجد نتيجة."
+  ],
+  "example_zh": [
+   "无论你怎么做，都会有结果。"
+  ],
+  "example_en": [
+   "However you work, you get a result."
+  ],
+  "focus": [
+   "كيفما"
+  ],
+  "zh": "كيفما：无论怎样……。",
+  "level": "C1",
+  "formation": "كيفما + فعل مضارع مجزوم",
+  "notes": "使用频率低于 مهما / أينما。"
+ },
+ {
+  "key": "agm_بينماwhilewhereas__e96312",
+  "name": "بينما (while, whereas)",
+  "slug": "بينما",
+  "meaning": "while, whereas",
+  "type": "composite",
+  "examples": [
+   "قرأت كتابا بينما كان أخي يلعب في الحديقة."
+  ],
+  "example_zh": [
+   "我读书的时候，弟弟在花园里玩。"
+  ],
+  "example_en": [
+   "I read a book while my brother was playing in the garden."
+  ],
+  "focus": [
+   "بينما"
+  ],
+  "zh": "بينما：当……的时候；而（对比）。",
+  "level": "B1",
+  "formation": "بينما + جملة اسمية أو فعلية",
+  "notes": "既可表同时（时间），也可表对比（而）。"
+ },
+ {
+  "key": "agm_فيحينwhereas__477afc",
+  "name": "في حين (whereas)",
+  "slug": "في حين",
+  "meaning": "whereas",
+  "type": "composite",
+  "examples": [
+   "أحمد يدرس الطب، في حين يدرس أخوه الهندسة."
+  ],
+  "example_zh": [
+   "艾哈迈德学医，而他弟弟学工程。"
+  ],
+  "example_en": [
+   "Ahmed studies medicine, whereas his brother studies engineering."
+  ],
+  "focus": [
+   "في",
+   "حين"
+  ],
+  "zh": "في حين：而……、与此同时（对比）。",
+  "level": "B2",
+  "formation": "في حين أن / في حين + جملة",
+  "notes": "比 بينما 更正式，常与 أن 连用。"
+ },
+ {
+  "key": "agm_علىالرغممنdespite__8716df",
+  "name": "على الرغم من (despite)",
+  "slug": "على الرغم من",
+  "meaning": "despite",
+  "type": "composite",
+  "examples": [
+   "على الرغم من أنه كان مريضا، استمر المدير في عمله."
+  ],
+  "example_zh": [
+   "尽管生病，经理仍继续工作。"
+  ],
+  "example_en": [
+   "Although he was ill, the manager kept working."
+  ],
+  "focus": [
+   "على",
+   "الرغم",
+   "من"
+  ],
+  "zh": "على الرغم من：尽管……（后接属格名词）。",
+  "level": "B1",
+  "formation": "على الرغم من + اسم مجرور",
+  "notes": "另形 بالرغم من，意义相同。"
+ },
+ {
+  "key": "agm_بالرغممنdespite__8421ab",
+  "name": "بالرغم من (despite)",
+  "slug": "بالرغم من",
+  "meaning": "despite",
+  "type": "composite",
+  "examples": [
+   "بالرغم من تعبه، أكمل العمل."
+  ],
+  "example_zh": [
+   "尽管很累，他还是完成了工作。"
+  ],
+  "example_en": [
+   "Despite his fatigue, he finished the work."
+  ],
+  "focus": [
+   "بالرغم",
+   "من"
+  ],
+  "zh": "بالرغم من：尽管……（= على الرغم من）。",
+  "level": "B1",
+  "formation": "بالرغم من + اسم مجرور",
+  "notes": "口语和书面都常见。"
+ },
+ {
+  "key": "agm_منأجلforthesakeof__089909",
+  "name": "من أجل (for the sake of)",
+  "slug": "من أجل",
+  "meaning": "for the sake of",
+  "type": "composite",
+  "examples": [
+   "سافرت من أجل العمل."
+  ],
+  "example_zh": [
+   "我为了工作而出行。"
+  ],
+  "example_en": [
+   "I travelled for the sake of work."
+  ],
+  "focus": [
+   "من",
+   "أجل"
+  ],
+  "zh": "من أجل：为了……（后接属格）。",
+  "level": "A2",
+  "formation": "من أجل + اسم مجرور / من أجل أن + فعل منصوب",
+  "notes": "表示目的；لأجل 更短，意义相同。"
+ },
+ {
+  "key": "agm_لأجلforthesakeof__0a84c2",
+  "name": "لأجل (for the sake of)",
+  "slug": "لأجل",
+  "meaning": "for the sake of",
+  "type": "composite",
+  "examples": [
+   "جاء لأجل العلم."
+  ],
+  "example_zh": [
+   "他为了求知而来。"
+  ],
+  "example_en": [
+   "He came for the sake of knowledge."
+  ],
+  "focus": [
+   "لأجل"
+  ],
+  "zh": "لأجل：为了……（لـ + أجل）。",
+  "level": "B1",
+  "formation": "لأجل + اسم مجرور",
+  "notes": "比 من أجل 紧凑，多见于书面语。"
+ },
+ {
+  "key": "agm_بسببbecauseof__ee94fa",
+  "name": "بسبب (because of)",
+  "slug": "بسبب",
+  "meaning": "because of",
+  "type": "composite",
+  "examples": [
+   "بسبب إهماله فشل في الامتحان.",
+   "لا تقول أنت متأخر بسبب الزحمة."
+  ],
+  "example_zh": [
+   "由于疏忽，他考试不及格。",
+   "别说你迟到了是因为堵车。"
+  ],
+  "example_en": [
+   "Because of his negligence he failed the exam.",
+   "Do not say you are late because of the traffic."
+  ],
+  "focus": [
+   "بسبب"
+  ],
+  "zh": "بسبب：由于……（后接属格）。",
+  "level": "A2",
+  "formation": "بسبب + اسم مجرور",
+  "notes": "表原因，不用于引导从句；从句用 لأن。"
+ },
+ {
+  "key": "agm_نتيجةasaresultoutcome__fa552f",
+  "name": "نتيجة (as a result, outcome)",
+  "slug": "نتيجة لـ",
+  "meaning": "as a result, outcome",
+  "type": "composite",
+  "examples": [
+   "لم أترك لبنان نتيجة الخوف، بل لأكون مع أولادي."
+  ],
+  "example_zh": [
+   "我离开黎巴嫩不是因为恐惧，而是为了和孩子们在一起。"
+  ],
+  "example_en": [
+   "I did not leave Lebanon out of fear, but to be with my children."
+  ],
+  "focus": [
+   "نتيجة"
+  ],
+  "zh": "نتيجة：结果；由于……（نتيجة لـ + 属格）。",
+  "level": "B2",
+  "formation": "نتيجة لـ + اسم مجرور",
+  "notes": "书面语，多用于因果叙述；单独用时表「结果」。"
+ },
+ {
+  "key": "agm_لكيinorderto__c64c14",
+  "name": "لكي (in order to)",
+  "slug": "لكي",
+  "meaning": "in order to",
+  "type": "composite",
+  "examples": [
+   "تدرس صديقاتي الأمريكيات العربية لكي يتكلمن مع أسر أزواجهن العرب."
+  ],
+  "example_zh": [
+   "我的美国女性朋友们学阿拉伯语，是为了能和丈夫的阿拉伯家庭交谈。"
+  ],
+  "example_en": [
+   "My American friends study Arabic so that they can talk with their Arab husbands' families."
+  ],
+  "focus": [
+   "لكي"
+  ],
+  "zh": "لكي：为了……（后接虚拟式动词）。",
+  "level": "B1",
+  "formation": "لكي + فعل مضارع منصوب",
+  "notes": "目的从句；主语可同可不同。"
+ },
+ {
+  "key": "agm_كيsothat__dbe44e",
+  "name": "كي (so that)",
+  "slug": "كي",
+  "meaning": "so that",
+  "type": "composite",
+  "examples": [
+   "طلب أحمد كي يوظف في الشركة.",
+   "دعي الطالبان كي يستخدما في الجيش."
+  ],
+  "example_zh": [
+   "艾哈迈德被请求到公司任职。",
+   "两名学生被召去服兵役。"
+  ],
+  "example_en": [
+   "Ahmed was requested so that he would be employed at the company.",
+   "The two students were called up so that they could serve in the army."
+  ],
+  "focus": [
+   "كي"
+  ],
+  "zh": "كي：以便……（古典色彩，后接虚拟式）。",
+  "level": "B2",
+  "formation": "كي + فعل مضارع منصوب",
+  "notes": "现代散文多用 لكي 或 حتى。"
+ },
+ {
+  "key": "agm_جدًاvery__0b3205",
+  "name": "جدًا (very)",
+  "slug": "جدًا",
+  "meaning": "very",
+  "type": "composite",
+  "examples": [
+   "الفيلم جميل جدا."
+  ],
+  "example_zh": [
+   "这部电影非常好。"
+  ],
+  "example_en": [
+   "The film is very beautiful."
+  ],
+  "focus": [
+   "جدا"
+  ],
+  "zh": "جدًا：非常（放在被修饰词之后）。",
+  "level": "A2",
+  "formation": "صفة / ظرف + جدًا",
+  "notes": "永远后置，不能说 جدا جميل。"
+ },
+ {
+  "key": "agm_كثيرًاalotoften__d482cb",
+  "name": "كثيرًا (a lot, often)",
+  "slug": "كثيرًا",
+  "meaning": "a lot, often",
+  "type": "composite",
+  "examples": [
+   "عاد الأصدقاء من الحفلة وقد أكلوا وشربوا كثيرا.",
+   "أثناء زيارة صديقي البلاد توقف كثيرا في المدن الأثرية."
+  ],
+  "example_zh": [
+   "朋友们参加完聚会回来，吃了也喝了很多。",
+   "我朋友在国内旅行期间，在很多古城停留。"
+  ],
+  "example_en": [
+   "The friends came back from the party having eaten and drunk a lot.",
+   "During my friend's visit to the country, he stopped often in the historic cities."
+  ],
+  "focus": [
+   "كثيرا"
+  ],
+  "zh": "كثيرًا：很多、经常（动词后作绝对宾语或状语）。",
+  "level": "A2",
+  "formation": "فعل + كثيرًا",
+  "notes": "与名词 كثير（许多）区别：作状语时带 تنوين 宾格。"
+ },
+ {
+  "key": "agm_تمامًاcompletely__d3529b",
+  "name": "تمامًا (completely)",
+  "slug": "تمامًا",
+  "meaning": "completely",
+  "type": "composite",
+  "examples": [
+   "مازالت تسريحة أمي مصففة تماما لم تعبث بها الأنسام القوية."
+  ],
+  "example_zh": [
+   "妈妈的发型依然整整齐齐，强风没能弄乱它。"
+  ],
+  "example_en": [
+   "My mother's hairstyle is still perfectly set; the strong breezes have not disturbed it."
+  ],
+  "focus": [
+   "تماما"
+  ],
+  "zh": "تمامًا：完全地。",
+  "level": "B1",
+  "formation": "صفة / فعل + تمامًا",
+  "notes": "强调程度到底，常与否定连用（ليس تمامًا）。"
+ },
+ {
+  "key": "agm_أكثرمنmorethan__3cff75",
+  "name": "أكثر من (more than)",
+  "slug": "أكثر من",
+  "meaning": "more than",
+  "type": "composite",
+  "examples": [
+   "العائلة العربية أكثر من العائلة الأمريكية أطفالا.",
+   "ثوب فاطمة زهري أكثر من ثوب سامية."
+  ],
+  "example_zh": [
+   "阿拉伯家庭的孩子比美国家庭多。",
+   "法蒂玛的裙子比萨米娅的更粉。"
+  ],
+  "example_en": [
+   "The Arab family has more children than the American family.",
+   "Fatima's dress is pinker than Samia's."
+  ],
+  "focus": [
+   "أكثر",
+   "من"
+  ],
+  "zh": "أكثر من：超过……；比……更（比较级 + من）。",
+  "level": "A2",
+  "formation": "أكثر من + اسم مجرور",
+  "notes": "比较级用 أفعل + من；أكثر من 也可表数量「多于」。"
+ },
+ {
+  "key": "agm_أقلمنlessthan__584722",
+  "name": "أقل من (less than)",
+  "slug": "أقل من",
+  "meaning": "less than",
+  "type": "composite",
+  "examples": [
+   "عدد الطلاب أقل من عدد المعلمين."
+  ],
+  "example_zh": [
+   "学生人数少于教师人数。"
+  ],
+  "example_en": [
+   "The number of students is smaller than the number of teachers."
+  ],
+  "focus": [
+   "أقل",
+   "من"
+  ],
+  "zh": "أقل من：少于……；不如……。",
+  "level": "A2",
+  "formation": "أقل من + اسم مجرور",
+  "notes": "与 أكثر من 对称。"
+ },
+ {
+  "key": "agm_الآنnow__071021",
+  "name": "الآن (now)",
+  "slug": "الآن",
+  "meaning": "now",
+  "type": "composite",
+  "examples": [
+   "أنا الآن، على أي حال، أدرك هذه الحكمة.",
+   "لا أستطيع الحضور إلى المحاضرة لأني أكتب واجبي الآن."
+  ],
+  "example_zh": [
+   "我现在，无论如何，明白了这个道理。",
+   "我不能去上课，因为我现在在写作业。"
+  ],
+  "example_en": [
+   "I now, in any case, understand this wisdom.",
+   "I cannot come to the lecture because I am writing my homework now."
+  ],
+  "focus": [
+   "الآن"
+  ],
+  "zh": "الآن：现在、此刻。",
+  "level": "A1",
+  "formation": "ظرف زمان مبني",
+  "notes": "可单独成句（الآن؟），也常与 حتى 连用（حتى الآن 直到现在）。"
+ },
+ {
+  "key": "agm_دائمًاalways__43b4a4",
+  "name": "دائمًا (always)",
+  "slug": "دائمًا",
+  "meaning": "always",
+  "type": "composite",
+  "examples": [
+   "من الواضح أن الطقس يتغير دائما.",
+   "دائما يكرر القول إن العربية سهلة."
+  ],
+  "example_zh": [
+   "很明显天气总是在变。",
+   "他总是反复说阿拉伯语很容易。"
+  ],
+  "example_en": [
+   "It is clear that the weather is always changing.",
+   "He always repeats that Arabic is easy."
+  ],
+  "focus": [
+   "دائما"
+  ],
+  "zh": "دائمًا：总是、一直。",
+  "level": "A2",
+  "formation": "ظرف زمان (مفعول فيه)",
+  "notes": "常与现在时连用表习惯。"
+ },
+ {
+  "key": "agm_أبدًاneverever__6c14b0",
+  "name": "أبدًا (never, ever)",
+  "slug": "أبدًا",
+  "meaning": "never, ever",
+  "type": "composite",
+  "examples": [
+   "لم أذهب إلى هناك أبدا."
+  ],
+  "example_zh": [
+   "我从没去过那里。"
+  ],
+  "example_en": [
+   "I have never gone there."
+  ],
+  "focus": [
+   "أبدا"
+  ],
+  "zh": "أبدًا：从不（多与否定连用）；永远。",
+  "level": "A2",
+  "formation": "ما / لا + فعل + أبدًا",
+  "notes": "لن أفعل ذلك أبدًا = 我永远不会做那件事。"
+ },
+ {
+  "key": "agm_غالبًاusuallyoften__abb4c2",
+  "name": "غالبًا (usually, often)",
+  "slug": "غالبًا",
+  "meaning": "usually, often",
+  "type": "composite",
+  "examples": [
+   "غالبا ما أستيقظ مبكرا."
+  ],
+  "example_zh": [
+   "我通常起得很早。"
+  ],
+  "example_en": [
+   "I usually wake up early."
+  ],
+  "focus": [
+   "غالبا"
+  ],
+  "zh": "غالبًا：通常、多半。",
+  "level": "B1",
+  "formation": "ظرف تكرر",
+  "notes": "频率副词序列：دائمًا > غالبًا > أحيانًا > نادرًا。"
+ },
+ {
+  "key": "agm_أحيانًاsometimes__c3c63c",
+  "name": "أحيانًا (sometimes)",
+  "slug": "أحيانًا",
+  "meaning": "sometimes",
+  "type": "composite",
+  "examples": [
+   "أحيانا أقرأ في المكتبة."
+  ],
+  "example_zh": [
+   "我有时在图书馆读书。"
+  ],
+  "example_en": [
+   "Sometimes I read in the library."
+  ],
+  "focus": [
+   "أحيانا"
+  ],
+  "zh": "أحيانًا：有时。",
+  "level": "B1",
+  "formation": "ظرف تكرر (جمع حين)",
+  "notes": "原形 حين（时候）的复数，作频率副词。"
+ },
+ {
+  "key": "agm_فورًاimmediately__4671f1",
+  "name": "فورًا (immediately)",
+  "slug": "فورًا",
+  "meaning": "immediately",
+  "type": "composite",
+  "examples": [
+   "سأعود فورا."
+  ],
+  "example_zh": [
+   "我马上回来。"
+  ],
+  "example_en": [
+   "I will come back at once."
+  ],
+  "focus": [
+   "فورا"
+  ],
+  "zh": "فورًا：立刻、马上。",
+  "level": "B1",
+  "formation": "فعل + فورًا",
+  "notes": "同义表达 في الحال / حالًا。"
+ },
+ {
+  "key": "agm_بعدafter__776c5d",
+  "name": "بعد (after)",
+  "slug": "بعد",
+  "meaning": "after",
+  "type": "composite",
+  "examples": [
+   "سيبني المهندسون البناء الجديد بعد سنة."
+  ],
+  "example_zh": [
+   "工程师们将在一年后建好新楼。"
+  ],
+  "example_en": [
+   "The engineers will build the new building in a year."
+  ],
+  "focus": [
+   "بعد"
+  ],
+  "zh": "بعد：在……之后（后接属格）。",
+  "level": "A1",
+  "formation": "بعد + اسم مجرور / بعد أن + جملة",
+  "notes": "与 قبل 相对；بعد 也可作时间副词「后来」。"
+ },
+ {
+  "key": "agm_قبلbefore__269c33",
+  "name": "قبل (before)",
+  "slug": "قبل",
+  "meaning": "before",
+  "type": "composite",
+  "examples": [
+   "كانت الطبيبة قد وصلت إلى المستشفى قبل إدخال المريض."
+  ],
+  "example_zh": [
+   "在病人被送进来之前，女医生已经到了医院。"
+  ],
+  "example_en": [
+   "The doctor had reached the hospital before the patient was admitted."
+  ],
+  "focus": [
+   "قبل"
+  ],
+  "zh": "قبل：在……之前（后接属格）。",
+  "level": "A1",
+  "formation": "قبل + اسم مجرور / قبل أن + جملة",
+  "notes": "与 بعد 相对。"
+ },
+ {
+  "key": "agm_منذsince__d30888",
+  "name": "منذ (since)",
+  "slug": "منذ",
+  "meaning": "since",
+  "type": "composite",
+  "examples": [
+   "تكلمنا عنه كثيرا منذ نيل الطالب الجائزة."
+  ],
+  "example_zh": [
+   "自从那名学生获奖以来，我们多次谈到他。"
+  ],
+  "example_en": [
+   "We have talked about him a lot since the student won the prize."
+  ],
+  "focus": [
+   "منذ"
+  ],
+  "zh": "منذ：自从……（后接时间点或时长）。",
+  "level": "A2",
+  "formation": "منذ + اسم / منذ أن + جملة",
+  "notes": "منذ سنة = 一年以来；منذ أن سافر = 自从他走后。"
+ },
+ {
+  "key": "agm_خلالduringwithin__13333a",
+  "name": "خلال (during, within)",
+  "slug": "خلال",
+  "meaning": "during, within",
+  "type": "composite",
+  "examples": [
+   "خلال لقاء الرئيس الطلاب تحدث عن هموم الجامعة."
+  ],
+  "example_zh": [
+   "在会见学生期间，校长谈到了大学的困扰。"
+  ],
+  "example_en": [
+   "During the university president's meeting with the students, he spoke about the university's problems."
+  ],
+  "focus": [
+   "خلال"
+  ],
+  "zh": "خلال：在……期间；在……之内。",
+  "level": "B1",
+  "formation": "خلال + اسم مجرور",
+  "notes": "خلال أسبوع 既可是「一周之内」也可是「一周期间」。"
+ },
+ {
+  "key": "agm_أمامinfrontof__d56623",
+  "name": "أمام (in front of)",
+  "slug": "أمام",
+  "meaning": "in front of",
+  "type": "composite",
+  "examples": [
+   "مريم وهالة وسحر أمام الصف.",
+   "المار أمام البيت سأل عن العنوان."
+  ],
+  "example_zh": [
+   "玛丽亚姆、哈拉和萨哈尔在教室前面。",
+   "从屋前经过的人问了地址。"
+  ],
+  "example_en": [
+   "Mariam, Hala and Sahar are in front of the class.",
+   "The passer-by in front of the house asked for the address."
+  ],
+  "focus": [
+   "أمام"
+  ],
+  "zh": "أمام：在……前面。",
+  "level": "A1",
+  "formation": "أمام + اسم مجرور",
+  "notes": "与 خلف 相对；也可作名词「前面」。"
+ },
+ {
+  "key": "agm_خلفbehind__19d58f",
+  "name": "خلف (behind)",
+  "slug": "خلف",
+  "meaning": "behind",
+  "type": "composite",
+  "examples": [
+   "جلس الولد خلف الباب."
+  ],
+  "example_zh": [
+   "男孩坐在门后。"
+  ],
+  "example_en": [
+   "The boy sat behind the door."
+  ],
+  "focus": [
+   "خلف"
+  ],
+  "zh": "خلف：在……后面。",
+  "level": "A1",
+  "formation": "خلف + اسم مجرور",
+  "notes": "与 أمام 相对。"
+ },
+ {
+  "key": "agm_حولaroundabout__21d6a2",
+  "name": "حول (around, about)",
+  "slug": "حول",
+  "meaning": "around, about",
+  "type": "composite",
+  "examples": [
+   "تحدث المدير حول المشكلة."
+  ],
+  "example_zh": [
+   "经理谈了这个问题。"
+  ],
+  "example_en": [
+   "The manager talked about the problem."
+  ],
+  "focus": [
+   "حول"
+  ],
+  "zh": "حول：在……周围；关于。",
+  "level": "B1",
+  "formation": "حول + اسم مجرور",
+  "notes": "حول العالم = 世界各地；بحث حول = 关于……的研究。"
+ },
+ {
+  "key": "agm_داخلinside__14fece",
+  "name": "داخل (inside)",
+  "slug": "داخل",
+  "meaning": "inside",
+  "type": "composite",
+  "examples": [
+   "يعيش جدي داخل المدينة."
+  ],
+  "example_zh": [
+   "我祖父住在城里。"
+  ],
+  "example_en": [
+   "My grandfather lives inside the city."
+  ],
+  "focus": [
+   "داخل"
+  ],
+  "zh": "داخل：在……里面。",
+  "level": "A2",
+  "formation": "داخل + اسم مجرور",
+  "notes": "反义 خارج。"
+ },
+ {
+  "key": "agm_خارجoutside__d7a60c",
+  "name": "خارج (outside)",
+  "slug": "خارج",
+  "meaning": "outside",
+  "type": "composite",
+  "examples": [
+   "لعب الأطفال خارج البيت."
+  ],
+  "example_zh": [
+   "孩子们在屋外玩。"
+  ],
+  "example_en": [
+   "The children played outside the house."
+  ],
+  "focus": [
+   "خارج"
+  ],
+  "zh": "خارج：在……外面。",
+  "level": "A2",
+  "formation": "خارج + اسم مجرور",
+  "notes": "反义 داخل。"
+ },
+ {
+  "key": "agm_لدىatwith__391fea",
+  "name": "لدى (at, with)",
+  "slug": "لدى",
+  "meaning": "at, with",
+  "type": "composite",
+  "examples": [
+   "لدى أحمد كتاب جديد."
+  ],
+  "example_zh": [
+   "艾哈迈德有一本新书。"
+  ],
+  "example_en": [
+   "Ahmed has a new book."
+  ],
+  "focus": [
+   "لدى"
+  ],
+  "zh": "لدى：在……那里；拥有（= عند 的书面形式）。",
+  "level": "B1",
+  "formation": "لدى + اسم مجرور",
+  "notes": "لديّ كتاب = 我有一本书。"
+ },
+ {
+  "key": "agm_أصبحtobecome__35f2f2",
+  "name": "أصبح (to become)",
+  "slug": "أصبح",
+  "meaning": "to become",
+  "type": "composite",
+  "examples": [
+   "أصبح الطقس باردا."
+  ],
+  "example_zh": [
+   "天气变冷了。"
+  ],
+  "example_en": [
+   "The weather has turned cold."
+  ],
+  "focus": [
+   "أصبح/أصبحت/أصبحوا"
+  ],
+  "zh": "أصبح：变成、成为（كان 的姐妹，表语主格）。",
+  "level": "A2",
+  "formation": "أصبح + اسم + خبر منصوب",
+  "notes": "أصبح 也表「到了早上」，注意语境。"
+ },
+ {
+  "key": "agm_ظلtoremain__cbe5f3",
+  "name": "ظل (to remain)",
+  "slug": "ظلّ",
+  "meaning": "to remain",
+  "type": "composite",
+  "examples": [
+   "ظل الطالب في المكتبة حتى المساء."
+  ],
+  "example_zh": [
+   "学生在图书馆待到晚上。"
+  ],
+  "example_en": [
+   "The student stayed in the library until the evening."
+  ],
+  "focus": [
+   "ظل/ظلت/ظلوا"
+  ],
+  "zh": "ظلّ：仍然是、一直（كان 的姐妹）。",
+  "level": "B1",
+  "formation": "ظل + اسم + خبر منصوب",
+  "notes": "后接名词时可与 بقي 互换。"
+ },
+ {
+  "key": "agm_باتtobecometospendthenight__18942c",
+  "name": "بات (to become, to spend the night)",
+  "slug": "بات",
+  "meaning": "to become, to spend the night",
+  "type": "composite",
+  "examples": [
+   "بات المسافر متعبا بعد رحلة طويلة."
+  ],
+  "example_zh": [
+   "长途旅行之后，旅客整夜疲惫。"
+  ],
+  "example_en": [
+   "The traveller spent the night tired after a long journey."
+  ],
+  "focus": [
+   "بات/باتت"
+  ],
+  "zh": "بات：变得（多指夜间状态）；过夜。",
+  "level": "B1",
+  "formation": "بات + اسم + خبر منصوب",
+  "notes": "بات يفعل 表持续动作（过去惯常）。"
+ },
+ {
+  "key": "agm_صارtobecome__9e86d4",
+  "name": "صار (to become)",
+  "slug": "صار",
+  "meaning": "to become",
+  "type": "composite",
+  "examples": [
+   "صار الأستاذ مديرا للمدرسة."
+  ],
+  "example_zh": [
+   "这位老师成了校长。"
+  ],
+  "example_en": [
+   "The teacher became the school principal."
+  ],
+  "focus": [
+   "صار/صارت"
+  ],
+  "zh": "صار：变成（= أصبح）。",
+  "level": "B1",
+  "formation": "صار + اسم + خبر منصوب",
+  "notes": "强调转变的结果。"
+ },
+ {
+  "key": "agm_مازالstill__98024b",
+  "name": "ما زال (still)",
+  "slug": "ما زال",
+  "meaning": "still",
+  "type": "composite",
+  "examples": [
+   "ما زال الجو باردا في الشتاء."
+  ],
+  "example_zh": [
+   "冬天天气仍然冷。"
+  ],
+  "example_en": [
+   "The weather is still cold in winter."
+  ],
+  "focus": [
+   "ما",
+   "زال"
+  ],
+  "zh": "ما زال / لا يزال：仍然、依旧。",
+  "level": "B1",
+  "formation": "ما زال + اسم + خبر منصوب",
+  "notes": "必须与否定词连用（ما / لا / لم）；肯定形式已废弃。"
+ },
+ {
+  "key": "agm_كادtobeaboutto__a37fb1",
+  "name": "كاد (to be about to)",
+  "slug": "كاد",
+  "meaning": "to be about to",
+  "type": "composite",
+  "examples": [
+   "كاد الطفل يبكي من الخوف."
+  ],
+  "example_zh": [
+   "孩子吓得差点哭出来。"
+  ],
+  "example_en": [
+   "The child almost cried from fear."
+  ],
+  "focus": [
+   "كاد/كادت/يكاد"
+  ],
+  "zh": "كاد：几乎要、险些（后接 أن + 虚拟式）。",
+  "level": "B2",
+  "formation": "كاد + اسم + أن + فعل منصوب",
+  "notes": "否定形式 ما كاد … حتى 表「刚一……就」。"
+ },
+ {
+  "key": "agm_أوشكtobeonthevergeof__2b379a",
+  "name": "أوشك (to be on the verge of)",
+  "slug": "أوشك",
+  "meaning": "to be on the verge of",
+  "type": "composite",
+  "examples": [
+   "أوشك الفريق أن يفوز بالمباراة."
+  ],
+  "example_zh": [
+   "球队差点赢得比赛。"
+  ],
+  "example_en": [
+   "The team was on the verge of winning the match."
+  ],
+  "focus": [
+   "أوشك/يوشك"
+  ],
+  "zh": "أوشك：快要……（أوشك أن + 虚拟式）。",
+  "level": "B2",
+  "formation": "أوشك + اسم + أن + فعل منصوب",
+  "notes": "与 كاد 近义，更书面。"
+ },
+ {
+  "key": "agm_عسىmayperhaps__3284d1",
+  "name": "عسى (may, perhaps)",
+  "slug": "عسى",
+  "meaning": "may, perhaps",
+  "type": "composite",
+  "examples": [
+   "عسى أن يتحسن الطقس غدا."
+  ],
+  "example_zh": [
+   "但愿明天天气好转。"
+  ],
+  "example_en": [
+   "May the weather improve tomorrow."
+  ],
+  "focus": [
+   "عسى"
+  ],
+  "zh": "عسى：也许、但愿（عسى أن + 虚拟式）。",
+  "level": "B2",
+  "formation": "عسى + أن + فعل منصوب",
+  "notes": "表希望或推测，古典色彩较浓。"
+ },
+ {
+  "key": "agm_يجبأنmust__b27ac7",
+  "name": "يجب أن (must)",
+  "slug": "يجب أن",
+  "meaning": "must",
+  "type": "composite",
+  "examples": [
+   "يجب أن تنشر هذه المقالة في الجريدة."
+  ],
+  "example_zh": [
+   "这篇文章必须登在报纸上。"
+  ],
+  "example_en": [
+   "This article must be published in the newspaper."
+  ],
+  "focus": [
+   "يجب",
+   "أن"
+  ],
+  "zh": "يجب أن：必须……（后接虚拟式）。",
+  "level": "A2",
+  "formation": "يجب أن + فعل مضارع منصوب",
+  "notes": "无人称用法：يجب عليّ أن = 我必须。"
+ },
+ {
+  "key": "agm_ينبغيأنoughtto__ce8936",
+  "name": "ينبغي أن (ought to)",
+  "slug": "ينبغي أن",
+  "meaning": "ought to",
+  "type": "composite",
+  "examples": [
+   "ينبغي أن نحترم القوانين."
+  ],
+  "example_zh": [
+   "我们应当遵守法律。"
+  ],
+  "example_en": [
+   "We ought to respect the laws."
+  ],
+  "focus": [
+   "ينبغي",
+   "أن"
+  ],
+  "zh": "ينبغي أن：应当……（比 يجب 委婉）。",
+  "level": "B1",
+  "formation": "ينبغي أن + فعل مضارع منصوب",
+  "notes": "书面语，规范、建议语气。"
+ },
+ {
+  "key": "agm_لابدأنitmustbethat__522d0a",
+  "name": "لا بد أن (it must be that)",
+  "slug": "لا بد أن",
+  "meaning": "it must be that",
+  "type": "composite",
+  "examples": [
+   "لا بد أن نتعلم من أخطائنا."
+  ],
+  "example_zh": [
+   "我们必须从错误中学习。"
+  ],
+  "example_en": [
+   "We must learn from our mistakes."
+  ],
+  "focus": [
+   "لا",
+   "بد",
+   "أن"
+  ],
+  "zh": "لا بد أن：必定……、非……不可。",
+  "level": "B1",
+  "formation": "لا بد أن + فعل مضارع منصوب",
+  "notes": "لا بد 本身是「不可避免」的名词短语。"
+ },
+ {
+  "key": "agm_منالممكنأنitispossiblethat__3815d5",
+  "name": "من الممكن أن (it is possible that)",
+  "slug": "من الممكن أن",
+  "meaning": "it is possible that",
+  "type": "composite",
+  "examples": [
+   "من الممكن أن يأتي غدا."
+  ],
+  "example_zh": [
+   "他明天可能来。"
+  ],
+  "example_en": [
+   "It is possible that he will come tomorrow."
+  ],
+  "focus": [
+   "من",
+   "الممكن",
+   "أن"
+  ],
+  "zh": "من الممكن أن：有可能……。",
+  "level": "B1",
+  "formation": "من الممكن أن + فعل مضارع منصوب",
+  "notes": "同义 يمكن أن；否定 من غير الممكن。"
+ },
+ {
+  "key": "agm_علىوشكonthevergeof__e58980",
+  "name": "على وشك (on the verge of)",
+  "slug": "على وشك",
+  "meaning": "on the verge of",
+  "type": "composite",
+  "examples": [
+   "هو على وشك أن يسافر إلى القاهرة."
+  ],
+  "example_zh": [
+   "他即将启程去开罗。"
+  ],
+  "example_en": [
+   "He is about to travel to Cairo."
+  ],
+  "focus": [
+   "على",
+   "وشك"
+  ],
+  "zh": "على وشك：即将……（على وشك أن + 虚拟式）。",
+  "level": "B2",
+  "formation": "على وشك + أن + فعل منصوب",
+  "notes": "与 كاد / أوشك 同义。"
+ },
+ {
+  "key": "agm_ليسفقطبلnotonlybutalso__d411a6",
+  "name": "ليس فقط … بل (not only … but also)",
+  "slug": "ليس فقط",
+  "meaning": "not only … but also",
+  "type": "composite",
+  "examples": [
+   "ليس فقط طالبا بل معلما أيضا."
+  ],
+  "example_zh": [
+   "他不仅是学生，还是老师。"
+  ],
+  "example_en": [
+   "He is not only a student but also a teacher."
+  ],
+  "focus": [
+   "ليس",
+   "فقط"
+  ],
+  "zh": "ليس فقط … بل：不仅……而且……。",
+  "level": "B2",
+  "formation": "ليس فقط + X بل + Y",
+  "notes": "后半句常接 بل 或 ولكن أيضًا。"
+ },
+ {
+  "key": "agm_ماإلاonly__66377c",
+  "name": "ما … إلا (only)",
+  "slug": "ما … إلا",
+  "meaning": "only",
+  "type": "composite",
+  "examples": [
+   "ما شاهدوا إلا فلما واحدا."
+  ],
+  "example_zh": [
+   "他们只看了一部电影。"
+  ],
+  "example_en": [
+   "They watched only one film."
+  ],
+  "focus": [
+   "ما",
+   "...",
+   "إلا"
+  ],
+  "zh": "ما … إلا：只……、不过……（限定）。",
+  "level": "B2",
+  "formation": "ما + فعل + إلا + اسم",
+  "notes": "ما 是否定，إلا 是例外，两者合起来表「只」。"
+ },
+ {
+  "key": "agm_بمجردأنassoonas__aef41c",
+  "name": "بمجرد أن (as soon as)",
+  "slug": "بمجرد أن",
+  "meaning": "as soon as",
+  "type": "composite",
+  "examples": [
+   "بمجرد أن وصل، بدأ العمل."
+  ],
+  "example_zh": [
+   "他一到就开始工作。"
+  ],
+  "example_en": [
+   "As soon as he arrived, he began work."
+  ],
+  "focus": [
+   "بمجرد",
+   "أن"
+  ],
+  "zh": "بمجرد أن：一……就……。",
+  "level": "B2",
+  "formation": "بمجرد أن + فعل ماضٍ",
+  "notes": "后接完成式动词，表两个动作紧接。"
+ },
+ {
+  "key": "agm_كماasjustas__e92894",
+  "name": "كما (as, just as)",
+  "slug": "كما",
+  "meaning": "as, just as",
+  "type": "composite",
+  "examples": [
+   "الهرم مجرد قبر فخم لشخص مهم ينشد الخلود، كما يظن معظم الناس.",
+   "كما أن العربية لغة غنية."
+  ],
+  "example_zh": [
+   "金字塔不过是一位追求永生的要人的豪华陵墓，正如多数人所想。",
+   "阿拉伯语也是一门丰富的语言。"
+  ],
+  "example_en": [
+   "The pyramid is merely a sumptuous tomb for an important person seeking immortality, as most people think.",
+   "Arabic is also a rich language."
+  ],
+  "focus": [
+   "كما"
+  ],
+  "zh": "كما：正如……；也……。",
+  "level": "A2",
+  "formation": "كما + جملة / كما أن",
+  "notes": "比较与类推的连接词；كما أن 后接名词句。"
+ },
+ {
+  "key": "agm_حيثwheresince__28430b",
+  "name": "حيث (where, since)",
+  "slug": "حيث",
+  "meaning": "where, since",
+  "type": "composite",
+  "examples": [
+   "خطر له أن يتذرع بحجة السفر، والرجوع من حيث أتى!"
+  ],
+  "example_zh": [
+   "他忽然想以旅行为借口，从哪儿来回哪儿去！"
+  ],
+  "example_en": [
+   "It occurred to him to plead the excuse of travel and return whence he came!"
+  ],
+  "focus": [
+   "حيث"
+  ],
+  "zh": "حيث：在那里；因为、鉴于（书面连接词）。",
+  "level": "B1",
+  "formation": "حيث + جملة",
+  "notes": "书面语中常表原因，相当于 إذ。"
+ },
+ {
+  "key": "agm_التحذيربإياكwarningwithiyyaaka__0427b6",
+  "name": "التحذير بإياك (warning with iyyaaka)",
+  "slug": "إياك (التحذير)",
+  "meaning": "warning with iyyaaka",
+  "type": "composite",
+  "examples": [
+   "إياك والكذب."
+  ],
+  "example_zh": [
+   "千万别撒谎。"
+  ],
+  "example_en": [
+   "Beware of lying."
+  ],
+  "focus": [
+   "إياك"
+  ],
+  "zh": "إياك…：千万别……（警告句式）。",
+  "level": "B2",
+  "formation": "إياك + و + المصدر / الفعل",
+  "notes": "إياك 是宾格分离代词，用于警示；常与 و 连写（إياك والكذب）。"
+ },
+ {
+  "key": "agm_بئسhowawful__9aabb5",
+  "name": "بئس (how awful)",
+  "slug": "بئس",
+  "meaning": "how awful",
+  "type": "composite",
+  "examples": [
+   "بئس الرجل من يكذب."
+  ],
+  "example_zh": [
+   "撒谎的人真差劲。"
+  ],
+  "example_en": [
+   "Wretched is the man who lies."
+  ],
+  "focus": [
+   "بئس"
+  ],
+  "zh": "بئس：……真糟糕（贬义评价动词，与 نعم 相对）。",
+  "level": "B2",
+  "formation": "بئس + اسم مرفوع",
+  "notes": "نعم / بئس 是固化的评价动词，后接主格名词。"
+ },
+ {
+  "key": "agm_نفسselfsame__6d9941",
+  "name": "نفس (self, same)",
+  "slug": "نفس",
+  "meaning": "self, same",
+  "type": "composite",
+  "examples": [
+   "قابلت المدير نفسه."
+  ],
+  "example_zh": [
+   "我见了经理本人。"
+  ],
+  "example_en": [
+   "I met the manager himself."
+  ],
+  "focus": [
+   "نفس/نفسه/نفسي"
+  ],
+  "zh": "نفس：亲自、本身（强调）；同一个。",
+  "level": "B2",
+  "formation": "نفس + ضمير / نفس + اسم",
+  "notes": "نفسي = 我自己；نفس الكتاب = 同一本书。也作名词「呼吸、灵魂」。"
+ },
+ {
+  "key": "agm_معظمmostof__6cff38",
+  "name": "معظم (most of)",
+  "slug": "معظم",
+  "meaning": "most of",
+  "type": "composite",
+  "examples": [
+   "كان يجلس في مكتبه معظم الوقت."
+  ],
+  "example_zh": [
+   "他大部分时间都坐在办公室里。"
+  ],
+  "example_en": [
+   "He was sitting in his office most of the time."
+  ],
+  "focus": [
+   "معظم"
+  ],
+  "zh": "معظم：大多数……（后接属格）。",
+  "level": "B1",
+  "formation": "معظم + اسم مجرور",
+  "notes": "书面语，与 أغلب 同义。"
+ },
+ {
+  "key": "agm_كلاوكلتاboth__2f3493",
+  "name": "كلا وكلتا (both)",
+  "slug": "كلا / كلتا",
+  "meaning": "both",
+  "type": "composite",
+  "examples": [
+   "كلا الطالبين ناجح.",
+   "كلتا الطالبتين مجتهدتان."
+  ],
+  "example_zh": [
+   "两个学生都合格。",
+   "两个女学生都很用功。"
+  ],
+  "example_en": [
+   "Both students passed.",
+   "Both students are diligent."
+  ],
+  "focus": [
+   "كلا/كلتا"
+  ],
+  "zh": "كلا / كلتا：两者都（后接属格；كلا 阳性，كلتا 阴性）。",
+  "level": "B2",
+  "formation": "كلا / كلتا + اسم مجرور",
+  "notes": "接代词时写作 كلاهما / كلتاهما。"
+ },
+ {
+  "key": "agm_عدةseveralanumberof__5a4f84",
+  "name": "عدة (several, a number of)",
+  "slug": "عدة",
+  "meaning": "several, a number of",
+  "type": "composite",
+  "examples": [
+   "قابل صديقي عدة زوار.",
+   "تكلمنا مع عدة موظفات."
+  ],
+  "example_zh": [
+   "我朋友会见了几位访客。",
+   "我们和几位女职员谈过。"
+  ],
+  "example_en": [
+   "My friend met several visitors.",
+   "We spoke with several employees."
+  ],
+  "focus": [
+   "عدة"
+  ],
+  "zh": "عدة：若干、好几个（后接属格）。",
+  "level": "B2",
+  "formation": "عدة + اسم مجرور (جمع)",
+  "notes": "不确定的小数量，比 بعض 更强调「数个」。"
+ },
+ {
+  "key": "agm_فيinat__74d9ac",
+  "name": "في (in, at)",
+  "slug": "في",
+  "meaning": "in, at",
+  "type": "composite",
+  "examples": [
+   "مشينا في الشوارع المزدحمة.",
+   "أعمل في الصباح."
+  ],
+  "example_zh": [
+   "我们走在拥挤的街道上。",
+   "我早上工作。"
+  ],
+  "example_en": [
+   "We walked in the crowded streets.",
+   "I work in the morning."
+  ],
+  "focus": [
+   "في"
+  ],
+  "zh": "في：在……里；在（时间）。后接属格。",
+  "level": "A1",
+  "formation": "في + اسم مجرور",
+  "notes": "表地点、时间或状态：في البيت（在家里）、في الصباح（早上）。"
+ },
+ {
+  "key": "agm_منfromof__a153ba",
+  "name": "من (from, of)",
+  "slug": "من",
+  "meaning": "from, of",
+  "type": "composite",
+  "examples": [
+   "سافرت من القاهرة إلى الإسكندرية.",
+   "هذا من أعظم العبر."
+  ],
+  "example_zh": [
+   "我从开罗旅行到亚历山大。",
+   "这是最大的教训之一。"
+  ],
+  "example_en": [
+   "I travelled from Cairo to Alexandria.",
+   "This is one of the greatest lessons."
+  ],
+  "focus": [
+   "من"
+  ],
+  "zh": "من：从……；属于；用于比较（比……）。",
+  "level": "A1",
+  "formation": "من + اسم مجرور",
+  "notes": "من + 属格也可表「某些」：من الناس（人们当中）。比较级后用 من 引出比较对象。"
+ },
+ {
+  "key": "agm_علىonupon__752f9d",
+  "name": "على (on, upon)",
+  "slug": "على",
+  "meaning": "on, upon",
+  "type": "composite",
+  "examples": [
+   "الكتاب على الطاولة.",
+   "عليك أن تدرس."
+  ],
+  "example_zh": [
+   "书在桌子上。",
+   "你必须学习。"
+  ],
+  "example_en": [
+   "The book is on the table.",
+   "You must study."
+  ],
+  "focus": [
+   "على"
+  ],
+  "zh": "على：在……上面；对……（有义务）。",
+  "level": "A1",
+  "formation": "على + اسم مجرور",
+  "notes": "على 也构成义务：عليك أن（你必须）。"
+ },
+ {
+  "key": "agm_إلىtotowards__d22013",
+  "name": "إلى (to, towards)",
+  "slug": "إلى",
+  "meaning": "to, towards",
+  "type": "composite",
+  "examples": [
+   "ذهبت إلى المكتبة.",
+   "سافر إلى بيروت."
+  ],
+  "example_zh": [
+   "我去了图书馆。",
+   "他去了贝鲁特。"
+  ],
+  "example_en": [
+   "I went to the library.",
+   "He travelled to Beirut."
+  ],
+  "focus": [
+   "إلى"
+  ],
+  "zh": "إلى：到……、向……；直到。",
+  "level": "A1",
+  "formation": "إلى + اسم مجرور",
+  "notes": "方向与终点；与 حتى 的区别：حتى 含「直到……为止」的界限义。"
+ },
+ {
+  "key": "agm_عنaboutawayfrom__c98351",
+  "name": "عن (about, away from)",
+  "slug": "عن",
+  "meaning": "about, away from",
+  "type": "composite",
+  "examples": [
+   "تحدث عن مشكلته.",
+   "بحث عن كتاب في المكتبة."
+  ],
+  "example_zh": [
+   "他谈了自己的问题。",
+   "他在图书馆找一本书。"
+  ],
+  "example_en": [
+   "He talked about his problem.",
+   "He looked for a book in the library."
+  ],
+  "focus": [
+   "عن"
+  ],
+  "zh": "عن：关于……；离开、代替。",
+  "level": "A2",
+  "formation": "عن + اسم مجرور",
+  "notes": "تحدث عن（谈论）、بحث عن（寻找）、بدلا عن（代替）。"
+ },
+ {
+  "key": "agm_معwith__caee9c",
+  "name": "مع (with)",
+  "slug": "مع",
+  "meaning": "with",
+  "type": "composite",
+  "examples": [
+   "سافرت مع صديقي.",
+   "كان يجتمع في المقهى مع أصدقائه."
+  ],
+  "example_zh": [
+   "我和朋友一起旅行。",
+   "他常和朋友在咖啡馆聚会。"
+  ],
+  "example_en": [
+   "I travelled with my friend.",
+   "He used to meet his friends in the café."
+  ],
+  "focus": [
+   "مع"
+  ],
+  "zh": "مع：和……一起；尽管。",
+  "level": "A2",
+  "formation": "مع + اسم مجرور",
+  "notes": "مع أن = 尽管；مع ذلك = 尽管如此。"
+ },
+ {
+  "key": "agm_ثمthenafterwards__7a22af",
+  "name": "ثم (then, afterwards)",
+  "slug": "ثم",
+  "meaning": "then, afterwards",
+  "type": "composite",
+  "examples": [
+   "دخل ثم جلس.",
+   "نضع الماء ثم نضيف السكر."
+  ],
+  "example_zh": [
+   "他进来，然后坐下。",
+   "我们先放水，然后加糖。"
+  ],
+  "example_en": [
+   "He came in, then sat down.",
+   "We put in the water, then add the sugar."
+  ],
+  "focus": [
+   "ثم"
+  ],
+  "zh": "ثم：然后（表先后顺序，比 و 更强调次第）。",
+  "level": "A2",
+  "formation": "ثم + جملة",
+  "notes": "与 فـ 不同：ثم 允许时间间隔，فـ 表紧接。"
+ },
+ {
+  "key": "agm_أوor__dcd54b",
+  "name": "أو (or)",
+  "slug": "أو",
+  "meaning": "or",
+  "type": "composite",
+  "examples": [
+   "أشرب الشاي أو القهوة.",
+   "اختر هذا أو ذاك."
+  ],
+  "example_zh": [
+   "我喝茶或咖啡。",
+   "选这个或那个。"
+  ],
+  "example_en": [
+   "I drink tea or coffee.",
+   "Choose this or that."
+  ],
+  "focus": [
+   "أو"
+  ],
+  "zh": "أو：或者；或者（疑问中选择）。",
+  "level": "A2",
+  "formation": "أو + مفرد أو جملة",
+  "notes": "أم 用于疑问句的选择（أ... أم），أو 用于陈述句。"
+ },
+ {
+  "key": "agm_أثناءduring__34ecc0",
+  "name": "أثناء (during)",
+  "slug": "أثناء",
+  "meaning": "during",
+  "type": "composite",
+  "examples": [
+   "أثناء زيارة صديقي البلاد توقف كثيرا في المدن الأثرية."
+  ],
+  "example_zh": [
+   "我朋友在国内旅行期间，在很多古城停留。"
+  ],
+  "example_en": [
+   "During my friend's visit to the country, he stopped often in the historic cities."
+  ],
+  "focus": [
+   "أثناء"
+  ],
+  "zh": "أثناء：在……期间（= خلال）。",
+  "level": "B1",
+  "formation": "أثناء + اسم مجرور",
+  "notes": "书面语，与 خلال 近义；أثناء ذلك = 与此同时。"
+ },
+ {
+  "key": "agm_ضدagainst__2b4fa0",
+  "name": "ضد (against)",
+  "slug": "ضد",
+  "meaning": "against",
+  "type": "composite",
+  "examples": [
+   "نحن ضد الحرب."
+  ],
+  "example_zh": [
+   "我们反对战争。"
+  ],
+  "example_en": [
+   "We are against the war."
+  ],
+  "focus": [
+   "ضد"
+  ],
+  "zh": "ضد：反对……；对抗。",
+  "level": "B1",
+  "formation": "ضد + اسم مجرور",
+  "notes": "也作名词「对立面」：العكس والضد。"
+ },
+ {
+  "key": "agm_نحوtowardsabout__f67dbc",
+  "name": "نحو (towards, about)",
+  "slug": "نحو",
+  "meaning": "towards, about",
+  "type": "composite",
+  "examples": [
+   "سافر نحو الشمال.",
+   "جاء نحو عشرين طالبا."
+  ],
+  "example_zh": [
+   "他朝北方旅行。",
+   "来了大约二十个学生。"
+  ],
+  "example_en": [
+   "He travelled towards the north.",
+   "About twenty students came."
+  ],
+  "focus": [
+   "نحو"
+  ],
+  "zh": "نحو：朝向……；大约（数量）；关于。",
+  "level": "B1",
+  "formation": "نحو + اسم مجرور",
+  "notes": "表约数时与 حوالي 同义。"
+ },
+ {
+  "key": "agm_حسبaccordingto__5c076f",
+  "name": "حسب (according to)",
+  "slug": "حسب",
+  "meaning": "according to",
+  "type": "composite",
+  "examples": [
+   "حسب الخطة، نبدأ غدا."
+  ],
+  "example_zh": [
+   "按计划，我们明天开始。"
+  ],
+  "example_en": [
+   "According to the plan, we start tomorrow."
+  ],
+  "focus": [
+   "حسب"
+  ],
+  "zh": "حسب：根据……；按照。",
+  "level": "B2",
+  "formation": "حسب + اسم مجرور",
+  "notes": "حسب ما = 根据……（后接从句）。"
+ }
+]

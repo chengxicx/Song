@@ -1,11 +1,16 @@
-"""Tests for the Spanish grammar-analysis engine (spaCy es_core_news_sm)."""
+"""Tests for the Spanish grammar-analysis engine (spaCy es_core_news_md)."""
 
 import pytest
 
 pytest.importorskip("spacy")
-pytest.importorskip("es_core_news_sm")
+pytest.importorskip("es_core_news_md")
 
-from lute.read.render.grammar_analysis_es import _ES_RULES, analyze_spanish
+from lute.read.render.grammar_analysis_es import _ES_RULES, _tokens_for, analyze_spanish
+from lute.read.render.grammar_analysis_matcher import (
+    make_rule,
+    match_rule,
+    spec_surface,
+)
 from lute.read.render.grammar_analysis import is_spanish_language
 
 
@@ -30,8 +35,10 @@ _RULE_SENTENCES = {
     "es_mas_que": "Este libro es más interesante que aquel.",
     "es_tan_como": "Es tan alto como su hermano.",
     "es_le": "Le gusta el café por la mañana.",
+    "es_imperativo": "Dame el periódico.",
     "es_subj_present": "Quiero que vengas.",
     "es_conditional": "Yo compraría esa casa.",
+    "es_futuro": "Mañana comprará el pan.",
     "es_present_perfect": "He comido ya.",
     "es_pluperfect": "Ya había comido cuando llegó.",
     "es_si_conditional": "Si tuviera dinero, compraría una casa.",
@@ -70,6 +77,88 @@ def test_preterite_and_imperfect_are_distinct():
     keys = _keys(text)
     assert "es_preterite" in keys
     assert "es_imperfect" in keys
+
+
+def test_preterite_ignores_participles():
+    """
+    A participle carries Tense=Past too, so the rule has to ask for a
+    finite indicative form: "ha pasado" is the present perfect, not a
+    preterite, and the panel used to report both on the same word.
+    """
+    keys = _keys("Ha pasado examen.")
+    assert "es_present_perfect" in keys
+    assert "es_preterite" not in keys
+    # The finite form still fires.
+    assert "es_preterite" in _keys("Ayer comió paella.")
+
+
+def test_imperfect_ignores_the_imperfect_subjunctive():
+    """
+    "entrase" is Tense=Imp but Mood=Sub -- the imperfect-subjunctive rule
+    owns it, and the imperfect indicative rule must not double-report it.
+    """
+    keys = _keys("Abrí la ventana para que entrase el aire fresco.")
+    assert "es_subj_past" in keys
+    assert "es_imperfect" not in keys
+    assert "es_imperfect" in _keys("Cuando era niño, vivía en Madrid.")
+
+
+def test_preterite_lets_the_command_keep_first_position():
+    """
+    The tagger reads "Dame" and "Hazlo" as past indicative forms.
+
+    A sentence cannot open with a preterite that has no subject, so first
+    position belongs to the imperative rule; a preterite behind a pronoun
+    ("te di") keeps its own reading.
+    """
+    keys = _keys("Dame el periódico, por favor.")
+    assert "es_imperativo" in keys
+    assert "es_preterite" not in keys
+    assert "es_imperativo" in _keys("Hazlo ahora mismo.")
+    assert "es_preterite" not in _keys("Hazlo ahora mismo.")
+    assert "es_preterite" in _keys("Ayer te di el libro.")
+
+
+def test_mas_que_ignores_the_fixed_phrase():
+    """
+    "menos mal que" is a B1 construction of its own; the filler between the
+    comparison anchors is what tells the two apart.  ("más vale que" keeps
+    the comparison reading: it is the idiom *más vale prevenir que curar*.)
+    """
+    assert "es_mas_que" not in _keys("Menos mal que llegaste.")
+    assert "es_mas_que" in _keys("Más vale prevenir que curar.")
+    assert "es_mas_que" in _keys("Este libro es más interesante que aquel.")
+
+
+def test_affirmative_imperative_needs_first_position():
+    """
+    The affirmative imperative keys on a command form opening the
+    sentence: the model tags Mood=Imp only sporadically, and "toma" /
+    "mira" / "di" are also ordinary indicative forms, so position is what
+    tells the two readings apart.
+    """
+    assert "es_imperativo" in _keys("Dame el periódico.")
+    assert "es_imperativo" in _keys("Hazlo ahora mismo.")
+    assert "es_imperativo" in _keys("Siéntese, por favor.")
+    # The same surfaces used declaratively keep their own reading.
+    assert "es_imperativo" not in _keys("El niño toma la sopa.")
+    assert "es_imperativo" not in _keys("Pedro mira a ella.")
+    assert "es_imperativo" not in _keys("Habla francés e inglés.")
+
+
+def test_at_start_vetoes_a_later_hit():
+    "A rule marked at_start reports only hits that open the sentence."
+    rule = make_rule(
+        "probe",
+        "probe",
+        "A2",
+        "probe",
+        {"seq": [spec_surface("toma")]},
+        at_start=True,
+    )
+    assert match_rule(rule, _tokens_for("Toma la sopa."), "Toma la sopa.")
+    later = "El niño toma la sopa."
+    assert not match_rule(rule, _tokens_for(later), later)
 
 
 def test_display_language_switches_desc():
@@ -122,3 +211,52 @@ def test_is_spanish_language_detects_by_name():
 def test_rules_are_loaded():
     "The rule set is populated."
     assert len(_ES_RULES) >= 10
+
+
+# ---- golden examples ----------------------------------------------------
+#
+# lute/jlpt_data/grammar_es_golden.json holds textbook sentences that each
+# hand-written rule must keep matching.  The sentences came out of a local
+# textbook extraction, so they are real prose rather than invented examples,
+# and a change that narrows a rule enough to lose them fails here.  The file
+# lives beside the grammar library because the /grammar page serves the same
+# sentences as each point's examples.
+
+import json  # noqa: E402
+import os  # noqa: E402
+
+_GOLDEN_PATH = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "..",
+        "..",
+        "lute",
+        "jlpt_data",
+        "grammar_es_golden.json",
+    )
+)
+
+
+def _golden():
+    if not os.path.exists(_GOLDEN_PATH):
+        pytest.skip("no es golden set yet")
+    with open(_GOLDEN_PATH, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def test_golden_examples_fire_their_rule():
+    "Every golden sentence must still be recognised by its own rule."
+    golden = _golden()
+    assert golden, "golden set is empty"
+    for key, entry in golden.items():
+        for ex in entry["examples"]:
+            hits = _keys(ex["es"])
+            assert key in hits, f"{key} lost its golden sentence: {ex['es']!r}"
+
+
+def test_golden_names_match_the_rules():
+    "A golden entry's name must be the display name of its rule."
+    names = {r["key"]: r["name"] for r in _ES_RULES}
+    for key, entry in _golden().items():
+        assert key in names, f"golden key {key} is not a rule"
+        assert entry["name"] == names[key], f"{key}: stale name {entry['name']!r}"

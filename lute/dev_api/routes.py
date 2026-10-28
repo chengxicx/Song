@@ -23,6 +23,7 @@ import lute.parse.registry
 from lute.db import db
 import lute.db.management
 from lute.db.demo import Service as DemoService
+from lute.i18n import t
 
 
 bp = Blueprint("dev_api", __name__, url_prefix="/dev_api")
@@ -39,7 +40,7 @@ def _ensure_is_test_db():
 def wipe_db():
     "Clean it all."
     lute.db.management.delete_all_data(db.session)
-    flash("db wiped")
+    flash(t("db wiped"))
     return redirect("/", 302)
 
 
@@ -50,7 +51,7 @@ def load_demo():
     demosvc = DemoService(db.session)
     demosvc.set_load_demo_flag()
     demosvc.load_demo_data()
-    flash("demo loaded")
+    flash(t("demo loaded"))
     return redirect("/", 302)
 
 
@@ -75,7 +76,7 @@ def load_demo_stories():
     "Stories only.  No db wipe."
     demosvc = DemoService(db.session)
     demosvc.load_demo_stories()
-    flash("stories loaded")
+    flash(t("stories loaded"))
     return redirect("/", 302)
 
 
@@ -94,7 +95,7 @@ def delete_all_terms():
     "Delete all the terms only."
     db.session.query(text("DELETE FROM words"))
     db.session.commit()
-    flash("terms deleted")
+    flash(t("terms deleted"))
     return redirect("/", 302)
 
 
@@ -163,7 +164,7 @@ def disable_backup():
     repo = UserSettingRepository(db.session)
     repo.set_value("backup_enabled", False)
     db.session.commit()
-    flash("backup disabled")
+    flash(t("backup disabled"))
     return redirect("/", 302)
 
 
