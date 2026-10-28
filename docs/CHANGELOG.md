@@ -3,6 +3,27 @@
 
 Feature changes:
 
+* Turning the page in a reader-mode EPUB chapter no longer drops the
+  reader at the bottom of the page they turned to.  A chapter scrolls
+  continuously, and the next arrow only appears once they have scrolled
+  to its bottom -- so the document offset they turn the page with IS the
+  chapter's bottom, and that offset survived the swap: the new chapter
+  opened at the same offset, i.e. at its own bottom, and every turn cost
+  a scroll back up.  Two things held it there: the term-save scroll
+  restore (the MutationObserver on #thetext that puts the offset back
+  after a re-swap) fired on the page turn's own DOM churn, and nothing
+  reset the document scroll afterwards.  A turn is now marked as such
+  from the request until the new page is laid out -- the restore stands
+  down for that window, the offset is not saved under the arriving
+  page's key, and a scrolling chapter lands on the top of the page it
+  turned to.  Turning back restores the offset the reader stopped at on
+  that page (same per-page store), so the left arrow still continues
+  where they were instead of rewinding to the first line.  Verified in a
+  browser against a scratch book: from the bottom of chapter 1, the side
+  arrow and the footer arrow both land at the top of page 2, the left
+  arrow returns to the 543px they left, mid-chapter turns and a phone
+  viewport behave the same, and a same-page refetch (term save) still
+  keeps its offset.
 * English (Latin-script) dictionary entries render structured on the
   reading page's Local tab, instead of every line -- phonetics, part of
   speech, examples and definitions alike -- degrading to one numbered
