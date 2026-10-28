@@ -7,9 +7,43 @@ templates/language/_form.html).  The reading page consumes it through
 lute-furigana.js, which reuses the shadowing panel's readings endpoint.
 """
 
+import os
+import re
+
+import lute
 from lute.db import db
 from lute.models.language import Language
 from lute.language.forms import LanguageForm
+
+_READ_TEMPLATES = os.path.join(os.path.dirname(lute.__file__), "templates", "read")
+
+
+def _template_source(name):
+    "Source of a read template, for the wiring checks below."
+    with open(os.path.join(_READ_TEMPLATES, name), "r", encoding="utf-8") as f:
+        return f.read()
+
+
+def test_furigana_script_is_only_loaded_when_the_toggle_is_on():
+    """
+    "Off" has to mean "absent", not "present and ignored".
+
+    lute-furigana.js annotates on load without looking at
+    LUTE_FURIGANA.enabled -- that is the contract epub_render.html spells
+    out ("the script self-annotates unconditionally ... so 'off' must
+    mean 'absent'").  The reading page loaded it unconditionally, which
+    made the per-language checkbox a no-op: every Japanese page drew ruby
+    whether or not the user had asked for it.
+    """
+    src = _template_source("index.html")
+    assert src.count("js/lute-furigana.js") == 1, "included exactly once"
+
+    guarded = re.search(
+        r"{%\s*if\s+show_furigana\s*%}(?:(?!{%\s*endif\s*%}).)*js/lute-furigana\.js",
+        src,
+        re.DOTALL,
+    )
+    assert guarded is not None, "the include must sit inside {% if show_furigana %}"
 
 
 def test_show_furigana_defaults_to_false(app_context):
