@@ -65,10 +65,15 @@ _LANGS = [
 _TOKENIZER = {"ko": "kiwipiepy", "th": "pythainlp", "zh": None}
 
 
-def _engine(tag):
-    package = _TOKENIZER.get(tag)
+def _need_tokenizer(module):
+    "Skip the set when the tokenizer its engine tokenises through is absent."
+    package = _TOKENIZER.get(module.removeprefix("grammar_analysis_"))
     if package:
         pytest.importorskip(package)
+
+
+def _engine(tag):
+    _need_tokenizer(tag)
     return importlib.import_module(f"lute.read.render.{tag}")
 
 
@@ -167,6 +172,7 @@ def test_golden_file_matches_the_generator_output(
 
     Guards against an edit that a regeneration would silently undo.
     """
+    _need_tokenizer(module)  # collect() re-tokenises through the engine
     generator = importlib.import_module(f"scripts.{script}")
     with open(os.path.join(_DATA, filename), encoding="utf-8") as fh:
         on_disk = json.load(fh)
