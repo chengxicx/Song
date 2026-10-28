@@ -58,7 +58,17 @@ _LANGS = [
 ]
 
 
+# The tokenizer each golden set tokenises its sentences with.  CI installs
+# develop deps only (see ci.yml: the engines are covered by
+# nightly-guardrail's grammar-engines job), so a missing one skips that set
+# instead of failing on ModuleNotFoundError.  Mandarin needs none.
+_TOKENIZER = {"ko": "kiwipiepy", "th": "pythainlp", "zh": None}
+
+
 def _engine(tag):
+    package = _TOKENIZER.get(tag)
+    if package:
+        pytest.importorskip(package)
     return importlib.import_module(f"lute.read.render.{tag}")
 
 

@@ -37,6 +37,9 @@ def _need_sudachi():
 
 def _ko_entries(display_lang="en"):
     "library_entries() for Korean, skipping when kiwipiepy is absent."
+    # kiwipiepy, not the engine module: the module imports fine without it
+    # (the tokenizer is loaded lazily) and then blows up on first use.
+    pytest.importorskip("kiwipiepy")
     ko = pytest.importorskip("lute.read.render.grammar_analysis_ko")
     return ko.library_entries(display_lang)
 
@@ -404,6 +407,13 @@ def test_th_library_examples_split_the_corpus_gloss():
         assert all(" ／ " not in r["text"] for r in golden_rows)
 
 
+# The tokenizer each merged corpus needs to build its data rules.  Absent
+# from CI's develop-only install, so the test skips there rather than
+# failing on ModuleNotFoundError; nightly-guardrail's grammar-engines job
+# installs the extras and runs it for real.
+_CORPUS_TOKENIZER = {"es": "spacy", "fr": "spacy", "de": "spacy", "ru": "pymorphy3"}
+
+
 @pytest.mark.parametrize("lang", ("es", "fr", "de", "ru"))
 def test_merged_corpora_translate_every_example(lang):
     """
@@ -417,6 +427,7 @@ def test_merged_corpora_translate_every_example(lang):
     is a different shape and has its own check below; these four also stay
     golden-only for it.
     """
+    pytest.importorskip(_CORPUS_TOKENIZER[lang])
     module = importlib.import_module("lute.read.render.grammar_analysis_" + lang)
     for display in ("en", "zh"):
         rows = [row for e in module.library_entries(display) for row in e["examples"]]
