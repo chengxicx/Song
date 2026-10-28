@@ -52,7 +52,15 @@
 <script type="text/javascript" src="{{ vstatic('js/tts-ui.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/lute-recorder.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/lute-shadowing.js') }}" charset="utf-8" defer></script>
+{# Only loaded when furigana is on for this language: lute-furigana.js
+   annotates unconditionally on load (its annotate() ignores
+   LUTE_FURIGANA.enabled), so "off" has to mean "absent" -- the same
+   contract read/epub_render.html states for its own include.  Loading it
+   always made the per-language "Show furigana" box a no-op: every
+   Japanese page drew ruby whether or not the user asked for it. #}
+{% if show_furigana %}
 <script type="text/javascript" src="{{ vstatic('js/lute-furigana.js') }}" charset="utf-8" defer></script>
+{% endif %}
 <script type="text/javascript" src="{{ vstatic('js/player-dock.js') }}" charset="utf-8" defer></script>
 
 <div id="rendering_controls" style="display: none">
