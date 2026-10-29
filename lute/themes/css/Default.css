@@ -388,6 +388,21 @@ table.dataTable, table {
   width: 100% !important;
 }
 
+/* EPUB 书内表格是"书的一部分"，不是 UI 表格：上面的全局美化会涂穿到
+   reader-mode 章节，night/original 的反相滤镜再把卡底翻成浅灰、压上
+   反相的深墨 —— 『悪意』目次页（整页 table 排版）实测 #2c2c2e 反相成
+   #bfbfbf 纸、#1c1b1f 钉墨反相成 #cccbce 字，1.07:1，整章看不清。
+   纸 look 下表格一律交还给书：透明底、继承墨色、无 UI 装饰。 */
+.epub-body table,
+.epub-body th,
+.epub-body td {
+  background-color: transparent !important;
+  color: inherit !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
 th {
   background-color: #242426 !important;
   color: #8e8e93 !important;

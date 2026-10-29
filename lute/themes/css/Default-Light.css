@@ -361,6 +361,19 @@ table.dataTable, table {
   width: 100% !important;
 }
 
+/* EPUB 书内表格是"书的一部分"，不是 UI 表格：上面的全局美化会涂穿到
+   reader-mode 章节（书自己的表格排版——目录页、对照表——被换成 UI 卡片，
+   边框/圆角/阴影压在书页上）。表格在书内一律交还给书。 */
+.epub-body table,
+.epub-body th,
+.epub-body td {
+  background-color: transparent !important;
+  color: inherit !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
 th {
   background-color: #faf7f2 !important;
   color: #636366 !important;
