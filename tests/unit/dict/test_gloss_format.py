@@ -9,8 +9,10 @@ rule change that would garble the actual dictionaries shows up here.
 from lute.dict.gloss_format import (
     COMPACT_GLOSS_MAX_CHARS,
     compact_gloss,
+    first_sense,
     parse_gloss,
     popup_gloss,
+    xrefs,
 )
 
 
@@ -323,6 +325,7 @@ def test_compact_caps_the_total_length_with_an_ellipsis():
 
 
 def test_compact_keeps_a_see_also_pointer():
+    "A stub with nothing else to offer still fills the field."
     gloss = "See also: 見開き【みひらき】"
 
     assert compact_gloss(gloss) == "See also: 見開き【みひらき】"
@@ -344,7 +347,7 @@ def test_compact_of_an_english_entry_keeps_the_chinese_definitions():
         ]
     )
 
-    assert compact_gloss(gloss) == ("noun\n词；单词；字\n诺言；保证\nSee also: wordy")
+    assert compact_gloss(gloss) == ("noun\n词；单词；字\n诺言；保证")
 
 
 def test_compact_keeps_an_english_see_also_without_reading():
@@ -828,6 +831,51 @@ def test_the_popup_gloss_lays_a_marked_entry_out_without_its_markers():
 def test_the_popup_gloss_passes_a_gloss_that_parses_to_nothing_through():
     assert popup_gloss("") == ""
     assert popup_gloss(None) is None
+
+
+def test_the_popup_gloss_drops_a_see_also_when_the_entry_has_senses():
+    """
+    A pointer names the word's other readings, not what it means, and
+    the card is a meaning -- the Local tab keeps the link.
+    """
+    gloss = "\n".join(["名", "天空。", "See also: 空く【あく】"])
+
+    assert popup_gloss(gloss) == "名\n天空。"
+
+
+def test_the_popup_gloss_keeps_a_see_also_when_it_is_all_the_entry_has():
+    "Nothing else to show: the pointer still beats an empty card."
+    gloss = "See also: 空く【あく】\nSee also: 空く【すく】"
+
+    assert popup_gloss(gloss) == (
+        "See also: 空く【あく】\nSee also: 空く【すく】"
+    )
+
+
+# --- first_sense / xrefs: what a card can be built from ---------------------
+#
+# The popup and the form's auto-fill show a *meaning*; these two read it
+# out of the parse, so a stub -- an entry that is nothing but pointers --
+# can be noticed and followed (see dict.service.resolved_gloss).
+
+
+def test_first_sense_is_the_first_meaning_not_the_pos():
+    gloss = "\n".join(["他动·二类", "吃。（飲食物をいただく。）", "生活。（生計を立てる。）"])
+
+    assert first_sense(gloss) == "吃。（飲食物をいただく。）"
+
+
+def test_first_sense_is_none_for_a_stub():
+    assert first_sense("See also: 空く【あく】\nSee also: 空く【すく】") is None
+
+
+def test_xrefs_lists_the_pointers_in_order():
+    gloss = "See also: 空く【あく】\n名\n天空。\nSee also: 空く【すく】"
+
+    assert [(b["text"], b["reading"]) for b in xrefs(gloss)] == [
+        ("空く", "あく"),
+        ("空く", "すく"),
+    ]
 
 
 # ---------------------------------------------------------------------------

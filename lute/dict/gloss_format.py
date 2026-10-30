@@ -1363,6 +1363,27 @@ def parse_gloss(gloss):
     return blocks
 
 
+def first_sense(gloss):
+    """
+    The entry's first actual meaning -- the first sense block -- or None
+    when the entry has none.
+
+    A homograph entry can be nothing but pointers to the word's other
+    readings (see xrefs), and a card that only lists options shows no
+    meaning at all; the callers use this to notice that and follow the
+    pointer instead (lute.dict.service.resolved_gloss).
+    """
+    for b in parse_gloss(gloss):
+        if b["t"] == "sense":
+            return b["text"]
+    return None
+
+
+def xrefs(gloss):
+    "The entry's cross-reference blocks, in order -- the See also pointers."
+    return [b for b in parse_gloss(gloss) if b["t"] == "xref"]
+
+
 def _looks_like_kanji_example(line, following):
     """
     True for a kanji-only example line: short, no sentence-ending mark,
@@ -1393,9 +1414,9 @@ COMPACT_GLOSS_MAX_CHARS = 200
 
 def compact_gloss(gloss, max_chars=COMPACT_GLOSS_MAX_CHARS):
     """
-    The entry's definitions only -- headword, examples and notes dropped
-    -- as one text capped at ``max_chars`` characters, with a trailing
-    "…" when something was left out.
+    The entry's definitions only -- headword, examples, notes and
+    cross-references dropped -- as one text capped at ``max_chars``
+    characters, with a trailing "…" when something was left out.
 
     This is what the term form's translation auto-fill saves (see
     /read/localdict_lookup): the translation is the term's meaning, and
@@ -1403,19 +1424,24 @@ def compact_gloss(gloss, max_chars=COMPACT_GLOSS_MAX_CHARS):
     popup and review card that shows the translation enormous.  The
     full entry stays in the reading page's Local tab.
 
+    "See also" pointers are dropped for the same reason popup_gloss
+    drops them: a list of the word's other readings is a menu, not a
+    meaning.  An entry that is *only* such a list still yields the
+    pointers -- a card with the options beats an empty one, and the
+    callers resolve the first pointer before they get here
+    (lute.dict.service.resolved_gloss).
+
     An entry whose lines parse as nothing usable still yields its first
     lines rather than nothing -- a trimmed definition beats none.
     """
     if not gloss:
         return gloss
-    lines = []
-    for b in parse_gloss(gloss):
-        # Section headers (惯用语…) only announce the example groups
-        # that follow them; with those dropped the header is noise.
-        if b["t"] == "xref":
-            lines.append(_xref_line(b))
-        elif b["t"] in ("pos", "sense"):
-            lines.append(b["text"])
+    blocks = parse_gloss(gloss)
+    # Section headers (惯用语…) only announce the example groups
+    # that follow them; with those dropped the header is noise.
+    lines = [b["text"] for b in blocks if b["t"] in ("pos", "sense")]
+    if not lines:
+        lines = [_xref_line(b) for b in blocks if b["t"] == "xref"]
     if not lines:
         lines = [ln.strip() for ln in gloss.split("\n") if ln.strip()]
     return _take_within(lines, max_chars)
@@ -1433,11 +1459,17 @@ def popup_gloss(gloss):
 
     The popup is a glance, not a reading pane -- read/service caps this
     further -- so the chrome a full card carries is dropped: the
-    headword line, the phonetics and the section labels (the popup
-    already names the term above them), and the notes, which are word
-    families and cross-references rather than meanings.  What is left
-    is the part of speech, the senses and the examples that come with
-    them.
+    headword line, the phonetics, the section labels (the popup
+    already names the term above them), the notes, which are word
+    families rather than meanings, and the "See also" pointers, which
+    name the word's other readings rather than saying what the word
+    means.  What is left is the part of speech, the senses and the
+    examples that come with them.
+
+    A homograph entry that is nothing but those pointers still shows
+    them -- something rather than nothing -- but the callers resolve
+    the first pointer to a meaning before they get here
+    (lute.dict.service.resolved_gloss), which is what the card is for.
 
     A marked entry reaches here as one line of raw text with 🔑/➤/◆/🔊
     still in it (see _lines_and_hints), which is what used to make the
@@ -1447,16 +1479,17 @@ def popup_gloss(gloss):
     """
     if not gloss:
         return gloss
+    blocks = parse_gloss(gloss)
     lines = []
-    for b in parse_gloss(gloss):
+    for b in blocks:
         if b["t"] in ("pos", "sense"):
             lines.append(b["text"])
         elif b["t"] == "example":
             lines.append(b["text"])
             if b.get("translation"):
                 lines.append(b["translation"])
-        elif b["t"] == "xref":
-            lines.append(_xref_line(b))
+    if not lines:
+        lines = [_xref_line(b) for b in blocks if b["t"] == "xref"]
     return "\n".join(lines) if lines else gloss
 
 
