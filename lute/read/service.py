@@ -1254,12 +1254,15 @@ class Service:
         lang = term.language
         if lang.term_popup_show_dict_gloss:
             for filename in lang.local_dict_files():
-                gloss = dict_service.lookup(term.text, term.romanization, filename)
-                if gloss:
-                    # The entry's own headword line repeats the term
-                    # and reading already shown above it, and the
-                    # example-sentence tail is for the strip.
-                    stripped = dict_service.strip_duplicate_headword(gloss, term.text)
+                # The entry to show, not the entry as stored: a homograph
+                # stub ("See also: 空く【あく】" and nothing else) is a list
+                # of options, so the card follows its first pointer to a
+                # meaning (see dict_service.resolved_gloss).  The reading
+                # page's Local tab keeps the list, and its links.
+                stripped = dict_service.resolved_gloss(
+                    term.text, term.romanization, filename
+                )
+                if stripped:
                     # A translation copied out of this same entry (the
                     # form's auto-fill used to save the whole card) is
                     # shown above already; the bordered copy below would

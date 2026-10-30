@@ -27,6 +27,14 @@ ENTRIES = [
     ("ひさしぶり", "<div>久し振り<br/>好久不见</div>"),
 ]
 
+# The bare kanji's entry is a homograph disambiguation list, as MOJi
+# serves it: no definition, only pointers to the reading entries.
+HOMOGRAPH_ENTRIES = [
+    ("下", "<div>See also: 下【か】</div>"),
+    ("下【か】", "<div>下级。（位が下のもの。）</div>"),
+    ("下【もと②】", "<div>下面。（物の下部。）</div>"),
+]
+
 
 def _import(app, scratch, entries=ENTRIES, name="fixture.mdx", target=None):
     "Convert a fixture dictionary and wait for it to be published."
@@ -387,3 +395,26 @@ def test_the_gloss_is_not_repeated_when_the_translation_is_the_entry(
     assert d.dict_gloss is None, "the bordered copy of the entry is dropped"
     assert "終，終了" in d.translation, "the translation still shows the senses"
     assert d.translation.split("<br />")[-1] == "…", "and is capped"
+
+
+# --- homographs: the card shows a meaning, not a menu ------------------------
+#
+# MOJi 辞書 gives the bare spelling a stub that only lists the word's
+# other readings ("See also: 下【か】").  Options are not a meaning, so the
+# card follows the first pointer; the Local tab keeps the list, where
+# picking another reading belongs.
+
+
+def test_the_popup_shows_a_meaning_for_a_homograph_stub(
+    app, app_context, dict_dirs, japanese
+):
+    _import(app, dict_dirs[1], entries=HOMOGRAPH_ENTRIES, name="homo.mdx")
+    _use(japanese)
+    t = Term(japanese, "下")
+    db.session.add(t)
+    db.session.commit()
+
+    gloss = _service().get_popup_data(t.id).dict_gloss
+
+    assert gloss == "下级。（位が下のもの。）", "the first reading's meaning"
+    assert "See also" not in gloss

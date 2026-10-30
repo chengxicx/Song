@@ -53,7 +53,7 @@ from datetime import datetime
 
 from flask import current_app, url_for
 
-from lute.dict import importer
+from lute.dict import gloss_format, importer
 
 # Re-exported: the definition cap is the importer's, but it is part of
 # what this module promises about the published dictionary.
@@ -481,6 +481,61 @@ def strip_duplicate_headword(gloss, text):
             break
         lines = lines[1:]
     return "\n".join(lines)
+
+
+# How far a chain of "See also" pointers is followed: a homograph stub
+# names another entry, which is normally the answer; a stub naming a
+# stub is as far as a dictionary is worth chasing.
+_XREF_FOLLOW_DEPTH = 3
+
+
+def resolved_gloss(text, reading=None, filename=None, prefer_reading=False):
+    """
+    The entry to *show* for ``text`` -- the popup's definition and the
+    term form's auto-fill -- with a homograph stub resolved to something
+    that means something.
+
+    MOJi 辞書 keeps one entry per reading, and the bare spelling gets a
+    stub that is nothing but "See also: 空く【あく】" lines: one card of
+    options and no definition, which as a definition is worth nothing.
+    Such an entry is followed to the first pointer's entry, so the card
+    shows a meaning (the first reading's) and the auto-fill saves one.
+
+    Only the *first* pointer is followed: the others are the readings the
+    card does not choose, and choosing for the reader is the point.  The
+    reading page's Local tab still shows the stub with its links
+    (read/localdict.html), which is where picking another reading
+    belongs.
+
+    Returns the entry's text with its headword line stripped, or None
+    when the dictionary has no entry for ``text``.  Never raises.
+    """
+    seen = set()
+    current, current_reading = text, reading
+    prefer = prefer_reading
+    stripped = None
+    for hop in range(_XREF_FOLLOW_DEPTH):
+        gloss = lookup(current, current_reading, filename, prefer_reading=prefer)
+        if not gloss:
+            # A missing *target* (the pointer names an entry this
+            # dictionary does not have) leaves the stub as the answer.
+            return stripped if hop else None
+        stripped = strip_duplicate_headword(gloss, current)
+        if gloss_format.first_sense(stripped):
+            return stripped
+        pointers = gloss_format.xrefs(stripped)
+        if not pointers:
+            return stripped
+        pointer = pointers[0]
+        target = (pointer["text"], pointer.get("reading") or None)
+        if target in seen:
+            return stripped
+        seen.add(target)
+        current, current_reading = target
+        # The pointer's reading names one specific homograph, so it
+        # outranks any bare-spelling key (see _homograph_candidates).
+        prefer = bool(current_reading)
+    return stripped
 
 
 # ---------------------------------------------------------------------------

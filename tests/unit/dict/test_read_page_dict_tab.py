@@ -277,6 +277,29 @@ def test_the_lookup_endpoint_also_returns_the_compact_gloss(
     assert data["compact"] == "形\n快乐的。（楽しいこと。）"
 
 
+HOMOGRAPH_ENTRIES = [
+    # The bare kanji's entry only lists the readings, as MOJi serves it.
+    ("下", "<div>See also: 下【か】</div>"),
+    ("下【か】", "<div>下级。（位が下のもの。）</div>"),
+]
+
+
+def test_the_lookup_endpoint_fills_a_homograph_stub_with_a_meaning(
+    client, app, app_context, dict_dirs, japanese
+):
+    """
+    The auto-fill saves a meaning, not a menu: the first reading's
+    definition (the card shows that reading, the Local tab lists them).
+    """
+    _import(app, dict_dirs[1], entries=HOMOGRAPH_ENTRIES, name="homo.mdx")
+    _use(japanese, "homo.db")
+
+    data = client.get(f"/read/localdict_lookup/{japanese.id}/{quote('下')}").get_json()
+
+    assert data["gloss"] == "See also: 下【か】", "the entry itself is unchanged"
+    assert data["compact"] == "下级。（位が下のもの。）"
+
+
 # --- the frame the tab loads ------------------------------------------------
 
 

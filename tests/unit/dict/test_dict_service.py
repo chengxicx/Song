@@ -127,6 +127,45 @@ def test_homograph_candidates_put_the_bare_term_last():
     ]
 
 
+def test_resolved_gloss_follows_a_homograph_stub_to_its_first_reading(
+    app, app_context, dict_dirs
+):
+    """
+    The card shows a meaning: the entry the first "See also" pointer
+    names, not the list of readings (the reader picks a reading in the
+    Local tab, whose links are the same list).
+    """
+    _static, scratch = dict_dirs
+    _import(app, scratch, build_mdx(HOMOGRAPH_ENTRIES))
+
+    assert service.resolved_gloss("下", "か") == "下级。（位が下のもの。）"
+
+
+def test_resolved_gloss_leaves_an_ordinary_entry_alone(app, app_context, dict_dirs):
+    "No pointers: the entry is already a meaning (headword line stripped)."
+    _static, scratch = dict_dirs
+    _import(app, scratch, build_mdx(ENTRIES))
+
+    assert service.resolved_gloss("たのしい") == "楽しい\n愉快yúkuài"
+    # Found through its reading, so the entry's own headword line is the
+    # term's spelling and comes off -- the card names the term already.
+    assert service.resolved_gloss("楽しい", "たのしい") == "愉快yúkuài"
+
+
+def test_resolved_gloss_returns_a_stub_whose_target_is_missing(
+    app, app_context, dict_dirs
+):
+    "A pointer to an entry this dictionary does not have still shows."
+    _static, scratch = dict_dirs
+    _import(app, scratch, build_mdx([("生", "<div>See also: 生【なま】</div>")]))
+
+    assert service.resolved_gloss("生") == "See also: 生【なま】"
+
+
+def test_resolved_gloss_returns_none_without_an_entry(app_context, dict_dirs):
+    assert service.resolved_gloss("たのしい") is None
+
+
 def test_lookup_returns_none_without_a_dictionary(app_context, dict_dirs):
     assert service.lookup("たのしい") is None
 

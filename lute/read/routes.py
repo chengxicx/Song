@@ -1697,6 +1697,29 @@ def _local_gloss(lang, langid, text, reading=None):
     return None
 
 
+def _local_shown_gloss(lang, langid, text, reading=None):
+    """
+    The entry a card *shows* for ``text``: _local_gloss's entry with a
+    homograph stub followed to the meaning it points at (see
+    dict_service.resolved_gloss), across the language's dictionaries in
+    the same tab order.
+
+    The Local tab itself keeps using _local_gloss: there the "See also"
+    list is the way to the word's other readings, which is exactly what
+    a reading pane is for.
+    """
+    if lang is None:
+        return None
+    use_reading = reading or _reading_for(langid, text)
+    for filename in lang.local_dict_files():
+        shown = dict_service.resolved_gloss(
+            text, use_reading, filename, prefer_reading=bool(reading)
+        )
+        if shown:
+            return shown
+    return None
+
+
 @bp.route("/localdict/<int:langid>/<filename>/<text>", methods=["GET"])
 def local_dict_file(langid, filename, text):
     """
@@ -1770,10 +1793,14 @@ def local_dict_lookup(langid, text):
     gloss_format.compact_gloss): the auto-fill saves that, not the
     whole card -- a translation holding the entry's tail of example
     sentences makes every popup and flashcard that shows it enormous.
+    It is the *shown* entry's definitions, so a homograph stub
+    ("See also: 空く【あく】") saves that reading's meaning rather than
+    a list of the readings (see dict_service.resolved_gloss).
     """
     lang = db.session.get(Language, langid)
     gloss = _local_gloss(lang, langid, text)
-    return jsonify({"gloss": gloss, "compact": gloss_format.compact_gloss(gloss)})
+    shown = _local_shown_gloss(lang, langid, text) if gloss else None
+    return jsonify({"gloss": gloss, "compact": gloss_format.compact_gloss(shown)})
 
 
 @bp.route("/flashcopied", methods=["GET"])

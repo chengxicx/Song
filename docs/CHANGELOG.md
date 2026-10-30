@@ -3,6 +3,20 @@
 
 Feature changes:
 
+* A homograph's term card shows a meaning instead of a menu of
+  readings.  MOJi 辞書 keys one entry per reading and gives the bare
+  spelling a stub that is nothing but "See also: 空く【あく】" lines, so
+  the popup's definition was that list and the form's auto-fill saved it
+  as the translation -- two places saying "see also" and neither saying
+  what the word means.  Both now show the meaning the first pointer
+  names (dict.service.resolved_gloss follows one cross-reference, with a
+  depth cap and a cycle guard), and "See also" lines are dropped from
+  the popup and the auto-fill everywhere else, a pointer naming another
+  word rather than a meaning.  The reading page's Local tab is
+  unchanged: there the list is how you reach the other readings, and
+  its links still do.  An entry that is only pointers, whose target the
+  dictionary does not have, still shows the pointers -- something beats
+  an empty card -- and compact_gloss keeps that same last resort.
 * Turning the page in a reader-mode EPUB chapter no longer drops the
   reader at the bottom of the page they turned to.  A chapter scrolls
   continuously, and the next arrow only appears once they have scrolled
