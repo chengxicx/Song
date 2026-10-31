@@ -42,8 +42,13 @@
   const WHITESPACE = /\s/;
   // Never descend into these: ruby readings (already stripped
   // server-side, but a stray one must not desync the stream), and the
-  // sentence play buttons tts.js injects.
-  const SKIP_SELECTOR = "rt, rp, script, style, .lute-sentence-play-btn";
+  // chrome injected at runtime -- the sentence play buttons tts.js adds
+  // and the mobile app's end-of-chapter block, which it appends inside
+  // `#epub-chapter .epub-body` so the paper filter paints it.  Both were
+  // counted as chapter text once, and a single mismatch means the
+  // chapter renders with no word spans at all.
+  const SKIP_SELECTOR =
+    "rt, rp, script, style, .lute-sentence-play-btn, .lute-chapter-nav";
 
   // The <link> this module owns in <head> for the current book.
   const STYLESHEET_ID = "lute-epub-stylesheet";
