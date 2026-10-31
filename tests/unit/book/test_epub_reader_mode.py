@@ -15,6 +15,7 @@ it to plain text, so it has two properties worth pinning down:
 
 import io
 import json
+import logging
 import os
 import stat
 
@@ -22,6 +23,7 @@ from bs4 import BeautifulSoup
 
 from lute.book.epub_css import scope_css
 from lute.book.epub_extract import css_path_for, orig_css_path_for
+from lute.book import epub_paths
 from lute.db import db
 from lute.models.book import Book as DBBook
 from tests.utils import make_epub
@@ -281,6 +283,88 @@ def test_token_stream_matches_the_chapter_dom(
     assert all(len(t) == 5 for t in tokens), "order/sentence/paragraph are present"
     assert any(t[2] == 0 for t in words), "new words have status 0"
     assert "the" in [t[0] for t in words], "words on both sides of a curly quote parse"
+
+
+def _rendered_tokens(client, book):
+    """
+    The token stream a page ships, and the chapter text it has to align
+    to -- normalised with the substitutions the page applies itself.
+    """
+    fragment = client.get(f"/read/start_reading/{book.id}/1").get_data(as_text=True)
+    soup = BeautifulSoup(fragment, "html.parser")
+    data = soup.find("script", {"id": "lute-epub-tokens"})
+    tokens = json.loads(data.string or "[]")
+    subs = json.loads(
+        soup.find("script", {"id": "lute-epub-substitutions"}).string or "[]"
+    )
+    # get_text() leaves out <rt>, which is what the page's SKIP_SELECTOR
+    # does too -- this is the character stream the aligner sees.
+    dom_text = soup.find(id="epub-chapter").get_text()
+    for frm, to in subs:
+        dom_text = dom_text.replace(frm, to)
+    return tokens, dom_text, fragment
+
+
+def _bare(s):
+    return "".join(ch for ch in s if not ch.isspace())
+
+
+def test_token_stream_is_realigned_when_the_stored_text_has_drifted(
+    app, app_context, english, client, tmp_path, caplog
+):
+    """
+    A chapter whose stored text no longer matches its chapter file still
+    renders with a stream the page can align to.
+
+    The tokens come from the page's stored text, the markup from the
+    chapter file, and nothing re-checks that the two agree after import
+    -- a book re-imported or re-split part-way through can leave them
+    describing different characters.  The front end then refuses to
+    mount, and the chapter renders as plain text: no word spans, so no
+    ruby, no tapping, no status colours.  The render re-parses the
+    chapter in that case instead of shipping a stream that cannot work.
+    """
+    book = _import_reader_book(app, client, english, tmp_path)
+    text = book.text_at_page(1)
+    text.text = f"{text.text} drifted"
+    db.session.add(text)
+    db.session.commit()
+
+    caplog.set_level(logging.WARNING)
+    tokens, dom_text, _ = _rendered_tokens(client, book)
+    assert tokens, "a drifted chapter still gets a token stream"
+    assert _bare("".join(t[0] for t in tokens)) == _bare(dom_text)
+    assert "token stream realigned" in caplog.text, "the drift was reported"
+
+
+def test_ruby_readings_in_the_markup_do_not_count_as_drift(
+    app, app_context, english, client, tmp_path, caplog
+):
+    """
+    A chapter that still carries its ruby annotations is not "drifted".
+
+    Books imported before the extraction dropped rt/rp have readings in
+    both the chapter file and the stored text.  The page skips them when
+    it collects the characters to align (SKIP_SELECTOR), so the readings
+    must be left out of the comparison here too -- otherwise every such
+    chapter would look broken and be re-parsed for nothing.
+    """
+    book = _import_reader_book(app, client, english, tmp_path)
+    path = epub_paths.chapter_file(app, book.epub_path, 1)
+    html = open(path, encoding="utf-8").read()
+    # A new import keeps the <ruby> shell but drops the reading itself.
+    assert "<ruby>" in html and "<rt>" not in html, "annotations are stripped"
+    open(path, "w", encoding="utf-8").write(
+        html.replace("</ruby>", "<rt>かんじ</rt></ruby>", 1)
+    )
+
+    caplog.set_level(logging.WARNING)
+    tokens, dom_text, fragment = _rendered_tokens(client, book)
+    assert "<rt>かんじ</rt>" in fragment, "the reading is rendered"
+    assert _bare("".join(t[0] for t in tokens)) == _bare(
+        dom_text
+    ), "the reading is not part of the aligned stream"
+    assert "token stream realigned" not in caplog.text, "nothing to repair"
 
 
 def test_parser_reports_the_substitutions_it_applies_to_text(app, app_context, english):

@@ -8,6 +8,7 @@ from collections import defaultdict
 from datetime import datetime
 import functools
 from flask import current_app, url_for
+from bs4 import BeautifulSoup
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import StaleDataError
 from lute.models.term import Term, Status
@@ -20,6 +21,7 @@ from lute.read.render.service import Service as RenderService
 from lute.read.render.calculate_textitems import get_string_indexes
 from lute.read import manga_columns
 from lute.book.epub_extract import css_path_for, orig_css_path_for, ensure_orig_css
+from lute.book.epub_parser import _extract_text, _prep_soup  # internal reuse
 from lute.book import epub_paths
 from lute.term.model import Repository
 from lute.term import pos_tags
@@ -285,6 +287,51 @@ def _epub_token(ti):
             ti.paragraph_number,
         ]
     return [ti.html_display_text, 0, -1, ti.sentence_number, ti.paragraph_number]
+
+
+def _epub_tokens_from(paragraphs):
+    "Flatten rendered paragraphs into the token stream the page embeds."
+    return [
+        _epub_token(ti) for para in paragraphs for sentence in para for ti in sentence
+    ]
+
+
+# JS `/\s/`, which the page uses on both streams.  Python's \s matches a
+# couple of exotic characters JS does not (e.g. \x1c-\x1f); those never
+# appear in book text, and a false "match" would only skip a rebuild the
+# page then rejects on its own.
+_EPUB_WS_RE = re.compile(r"\s")
+
+
+def _chapter_align_text(chapter_html, subs):
+    """
+    The chapter's text as the reader page's aligner sees it: the text a
+    fresh import of the same markup would store.
+
+    Reuses the import's own extraction, so ruby readings, scripts and
+    styles are dropped and one line per block element is kept -- the same
+    normalisation the front end performs (its SKIP_SELECTOR skips rt/rp)
+    before comparing the token stream to the chapter.  The parser's
+    character substitutions are applied on top, because the stored tokens
+    come from text that already went through them.
+    """
+    soup = BeautifulSoup(chapter_html, "html.parser")
+    _prep_soup(soup)
+    text = _extract_text(soup)
+    for pair in subs:
+        if len(pair) == 2 and pair[0]:
+            text = text.replace(pair[0], pair[1])
+    return text
+
+
+def _epub_streams_match(chapter_html, tokens, subs):
+    """
+    Whether the token stream and the chapter markup describe the same
+    characters -- the invariant the front end's mount() depends on.
+    """
+    markup = _EPUB_WS_RE.sub("", _chapter_align_text(chapter_html, subs))
+    stream = _EPUB_WS_RE.sub("", "".join(t[0] for t in tokens))
+    return markup == stream
 
 
 # A converted dictionary entry is the headword, the part of speech,
@@ -1159,6 +1206,18 @@ class Service:
         lang = dbbook.language
         subs = [list(pair) for pair in lang.parser.text_substitutions(lang)]
 
+        # The two sides are written at import time and never re-checked, so
+        # a book re-imported or re-split halfway through can leave them
+        # describing different characters.  The page then finds no match
+        # and silently renders the chapter without word spans -- no ruby,
+        # no tapping, no status colours, and nothing in the UI saying why.
+        # Catch it here and hand the page a stream built from the markup it
+        # is about to render, which matches by construction.
+        if not _epub_streams_match(chapter_html, tokens, subs):
+            tokens = self._realign_epub_tokens(
+                dbbook, pagenum, chapter_html, subs, tokens
+            )
+
         # The original-look variant of the scoped stylesheet: produced at
         # import for new packages, regenerated from the extracted
         # originals on demand for old ones.  None (theme URL reused)
@@ -1177,6 +1236,53 @@ class Service:
             "tokens": tokens,
             "substitutions": subs,
         }
+
+    def _realign_epub_tokens(self, dbbook, pagenum, chapter_html, subs, stored):
+        """
+        A token stream built from the chapter's own markup.
+
+        The stored stream comes from the page's TextItems while the markup
+        comes from the chapter file; when the two disagree the reader page
+        refuses to mount and the chapter renders as plain text.  Re-parsing
+        the chapter's own text yields a stream that agrees with the markup
+        by construction, so the page always mounts.
+
+        The store is deliberately left alone: rewriting the page's text
+        would move every word's position and orphan the sentences behind
+        them, which is a worse outcome than a chapter that is re-parsed on
+        each open.  Only the render is repaired; [stored] is returned
+        unchanged if the re-parse fails for any reason.
+        """
+        try:
+            lang = dbbook.language
+            rs = RenderService(self.session)
+            paragraphs = rs.get_paragraphs(
+                _chapter_align_text(chapter_html, subs), lang
+            )
+            rebuilt = _epub_tokens_from(paragraphs)
+            if not _epub_streams_match(chapter_html, rebuilt, subs):
+                # Still no agreement -- the markup has something the parser
+                # cannot reproduce.  Leave the stored stream in place.
+                return stored
+            # Words that are new to this chapter must exist before the page
+            # can give them a status colour, same as a normal page open.
+            self._save_new_status_0_terms(paragraphs)
+            current_app.logger.warning(
+                "epub book %s page %s: token stream realigned to the "
+                "chapter markup (%d tokens)",
+                dbbook.id,
+                pagenum,
+                len(rebuilt),
+            )
+            return rebuilt
+        except Exception as e:  # pragma: no cover - defensive
+            current_app.logger.warning(
+                "epub book %s page %s: realign failed (%s)",
+                dbbook.id,
+                pagenum,
+                e,
+            )
+            return stored
 
     def _save_new_rendered_terms(self, items):
         """
