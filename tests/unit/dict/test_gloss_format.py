@@ -266,6 +266,7 @@ def test_display_blocks_drops_a_standalone_phonetic_line():
 
 
 def test_display_blocks_leaves_a_japanese_entry_untouched():
+    "The filter is English-only: kana readings and definitions pass through."
     gloss = "\n".join(
         [
             "他动·二类",
