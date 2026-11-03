@@ -4,7 +4,6 @@ Reading helpers.
 
 import os
 import re
-from collections import defaultdict
 from datetime import datetime
 import functools
 from flask import current_app, url_for
@@ -26,6 +25,7 @@ from lute.book import epub_paths
 from lute.term.model import Repository
 from lute.term import pos_tags
 from lute.utils.manga_images import image_path_for_page
+from lute.userimage.service import full_url, thumbnail_url
 
 # from lute.utils.debug_helpers import DebugTimer
 
@@ -397,7 +397,8 @@ class TermPopup:
         self.tags = [tt.text for tt in term.term_tags]
         self.flash = self._clean(term.get_flash_message())
         self.image = term.get_current_image()
-        self.popup_image_data = self._get_popup_image_data()
+        self.popup_images = self._get_popup_images()
+        self.popup_image_data = {i["full"]: i["tooltip"] for i in self.popup_images}
 
         # Final data to include in popup.
         self.parents = []
@@ -427,22 +428,39 @@ class TermPopup:
             ret = f"{ret} ({self.parents_text})"
         return ret
 
-    def _get_popup_image_data(self):
-        "Get images"
+    def _get_popup_images(self):
+        "Images for the popup, with thumbnail and original URLs."
         # Don't include component images in the hover for now,
         # it can get confusing!
         # ref https://github.com/LuteOrg/lute-v3/issues/355
         terms = [self.term, *self.term.parents]
+        grouped = {}
+        for term in terms:
+            filename = term.get_current_image()
+            if not filename:
+                continue
+            original = full_url(term.language.id, filename)
+            item = grouped.setdefault(
+                original,
+                {
+                    "full": original,
+                    "thumb": thumbnail_url(term.language.id, filename),
+                    "tooltips": [],
+                },
+            )
+            item["tooltips"].append(self._clean(term.text))
+        return [
+            {
+                "full": item["full"],
+                "thumb": item["thumb"],
+                "tooltip": ", ".join(item["tooltips"]),
+            }
+            for item in grouped.values()
+        ]
 
-        def _make_image_url(t):
-            return f"/userimages/{t.language.id}/{t.get_current_image()}"
-
-        images = [(_make_image_url(t), t.text) for t in terms if t.get_current_image()]
-        imageresult = defaultdict(list)
-        for key, value in images:
-            imageresult[key].append(self._clean(value))
-        # Convert lists to comma-separated strings
-        return {k: ", ".join(v) for k, v in imageresult.items()}
+    def _get_popup_image_data(self):
+        "Legacy mapping of original image URL to tooltip text."
+        return {i["full"]: i["tooltip"] for i in self.popup_images}
 
 
 class Service:

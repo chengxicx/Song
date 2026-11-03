@@ -17,7 +17,7 @@ from flask import (
     current_app,
     url_for,
 )
-
+from lute.userimage.service import ensure_thumbnail
 
 bp = Blueprint("bing", __name__, url_prefix="/bing")
 
@@ -91,8 +91,19 @@ def bing_search(langid, text, searchstring):
         try:
             data = json.loads(m_data.replace("&quot;", '"'))
             murl = data.get("murl", "")
+            turl = data.get("turl", "")
             if murl and murl.startswith("http"):
-                images.append({"html": '<img src="' + murl + '">', "src": murl})
+                if not (turl and turl.startswith("http")):
+                    turl = ""
+                images.append(
+                    {
+                        # The picker displays the Bing thumbnail; saving
+                        # still downloads the full murl.
+                        "html": '<img src="' + murl + '">',
+                        "src": murl,
+                        "thumb": turl,
+                    }
+                )
         except Exception:  # pylint: disable=broad-exception-caught
             pass
 
@@ -110,7 +121,7 @@ def bing_search(langid, text, searchstring):
             m = re.search(r'src="(.*?)"', normalized_source)
             if m:
                 src = m.group(1)
-            return {"html": image, "src": src}
+            return {"html": image, "src": src, "thumb": src}
 
         raw_images = list(re.findall(r"(<img .*?>)", content, re.I))
         images = [build_struct(i) for i in raw_images if is_search_img(i)]
@@ -174,8 +185,10 @@ def bing_save():
         # Return a failure.
         return jsonify({"reason": str(e)}), 500
 
+    ensure_thumbnail(destfile)
     ret = {
         "url": f"/userimages/{langid}/{filename}",
+        "thumb_url": f"/userimages/{langid}/thumb/{filename}",
         "filename": filename,
     }
     return jsonify(ret)
@@ -201,9 +214,11 @@ def manual_image_post():
     imgdir, filename = _get_dir_and_filename(langid, text)
     destfile = os.path.join(imgdir, filename)
     f.save(destfile)
+    ensure_thumbnail(destfile)
 
     ret = {
         "url": f"/userimages/{langid}/{filename}",
+        "thumb_url": f"/userimages/{langid}/thumb/{filename}",
         "filename": filename,
     }
     return jsonify(ret)

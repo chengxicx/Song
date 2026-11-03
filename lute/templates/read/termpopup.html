@@ -20,8 +20,8 @@
 <p><i>{{ data.romanization }}</i></p>
 {% endif %}
 
-{% for img, tooltip in data.popup_image_data.items() %}
-<img class="tooltip-image" src="{{ img }}" tooltip="{{ tooltip }}"/>
+{% for img in data.popup_images %}
+<img class="tooltip-image" src="{{ img.thumb }}" data-full-src="{{ img.full }}" tooltip="{{ img.tooltip }}" width="150" height="150" loading="lazy" decoding="async" onclick="window.open(this.dataset.fullSrc, '_blank', 'noopener');"/>
 {% endfor %}
 
 {% if data.translation != "" %}<p>{{ data.translation | safe }}</p>{% endif %}
