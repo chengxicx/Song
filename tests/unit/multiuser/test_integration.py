@@ -3,6 +3,7 @@ Multi-user integration tests over the HTTP test client: login flow,
 auth gate, per-user data isolation, user management permissions.
 """
 
+import io
 import os
 import time
 from unittest.mock import patch
@@ -12,7 +13,7 @@ from lute.app_factory import create_app
 from lute.models.book import Book as BookModel
 from lute.book.model import Book as ServiceBook, Repository as ServiceRepository
 from lute.models.repositories import UserSettingRepository
-from lute.multiuser import context, store
+from lute.multiuser import context, paths, store
 from lute.language.service import Service as LanguageService
 from lute.read import shadowing
 
@@ -298,9 +299,10 @@ def test_background_shadowing_task_runs_in_the_requesting_users_scope(mu_enabled
         seen["scope"] = context.get_current_user()
         return "Hello world.", 3.0
 
-    with patch.object(
-        shadowing, "transcribe_clip", side_effect=_fake_clip
-    ), patch.object(shadowing, "_load_model", return_value=object()):
+    with (
+        patch.object(shadowing, "transcribe_clip", side_effect=_fake_clip),
+        patch.object(shadowing, "_load_model", return_value=object()),
+    ):
         task_id = shadowing.start_task(
             mu_enabled_app,
             "/tmp/does-not-exist.wav",
@@ -314,3 +316,52 @@ def test_background_shadowing_task_runs_in_the_requesting_users_scope(mu_enabled
     assert status["state"] == "finished", status
     assert seen["scope"] == "admin", "task ran without the user's scope"
     assert status["result"]["transcription"] == "Hello world."
+
+
+def test_bing_image_writes_are_scoped_to_the_current_user(mu_client, mu_enabled_app):
+    "A language id from another user's data cannot be used for an image write."
+    mu_client.login("admin", "pass1234")
+    mu_client.post(
+        "/users/new",
+        data={"username": "mei", "password": "meipass1", "confirm": "meipass1"},
+    )
+
+    with mu_enabled_app.app_context(), context.user_scope("admin"):
+        admin_lang_id = _make_language(db.session, "English").id
+    admin_images = paths.user_config(
+        mu_enabled_app.env_config.base_config, "admin"
+    ).userimagespath
+
+    mu_client.post("/logout")
+    assert mu_client.login("mei", "meipass1").status_code == 302
+
+    # mei has no languages of her own yet: admin's id is foreign here.
+    resp = mu_client.post(
+        "/bing/manual_image_post",
+        data={
+            "text": "gato",
+            "langid": str(admin_lang_id),
+            "manual_image_file": (io.BytesIO(b"not really an image"), "x.jpg"),
+        },
+        content_type="multipart/form-data",
+    )
+    assert resp.status_code == 400
+    admin_dir = os.path.join(admin_images, str(admin_lang_id))
+    assert not os.path.isdir(admin_dir) or os.listdir(admin_dir) == []
+
+    with mu_enabled_app.app_context(), context.user_scope("mei"):
+        mei_lang_id = _make_language(db.session, "English").id
+    resp = mu_client.post(
+        "/bing/manual_image_post",
+        data={
+            "text": "gato",
+            "langid": str(mei_lang_id),
+            "manual_image_file": (io.BytesIO(b"not really an image"), "x.jpg"),
+        },
+        content_type="multipart/form-data",
+    )
+    assert resp.status_code == 200
+    mei_images = paths.user_config(
+        mu_enabled_app.env_config.base_config, "mei"
+    ).userimagespath
+    assert os.listdir(os.path.join(mei_images, str(mei_lang_id)))

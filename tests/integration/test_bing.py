@@ -8,7 +8,23 @@ from unittest.mock import patch, MagicMock
 import urllib.error
 import urllib.request
 
+import pytest
 from PIL import Image
+
+from lute.db import db
+from lute.models.language import Language
+
+
+@pytest.fixture(autouse=True)
+def _language_one(app):
+    "The write routes require the posted language to exist in current data."
+    with app.app_context():
+        if db.session.get(Language, 1) is None:
+            lang = Language()
+            lang.name = "English"
+            db.session.add(lang)
+            db.session.commit()
+    yield
 
 
 def test_bing_search_success_json_parsing(client):
@@ -119,19 +135,19 @@ def _image_bytes(fmt="JPEG", size=(1200, 800)):
     return buffer.getvalue()
 
 
-def _post_bing_save(client, content):
+def _post_bing_save(client, content, src="https://example.com/image.jpg", langid="1"):
     "Save bytes through /bing/save, patching the download."
-    mock_response = MagicMock()
-    mock_response.read.return_value = content
-    with patch("urllib.request.urlopen") as mock_urlopen:
-        mock_urlopen.return_value.__enter__.return_value = mock_response
+    from lute.bing import routes as bing_routes
+
+    with (
+        patch.object(
+            bing_routes, "_resolved_addresses", return_value=["93.184.216.34"]
+        ),
+        patch.object(bing_routes, "_fetch_image_bytes", return_value=content),
+    ):
         return client.post(
             "/bing/save",
-            data={
-                "src": "https://example.com/image.jpg",
-                "text": "gato",
-                "langid": "1",
-            },
+            data={"src": src, "text": "gato", "langid": langid},
         )
 
 
@@ -257,3 +273,197 @@ def test_original_image_route_has_long_private_cache(
     resp = client.get("/userimages/1/gato.jpeg")
     assert resp.status_code == 200
     assert resp.headers["Cache-Control"] == "private, max-age=31536000, immutable"
+
+
+## Security: langid, remote URL fetching, and path traversal.
+
+
+@pytest.mark.parametrize(
+    "langid",
+    [
+        "../../admin/userimages/1",
+        "/1",
+        "abc",
+        "0",
+        "-1",
+        "1.5",
+        "999999",  # not a language in the current user's data
+    ],
+)
+def test_bing_save_rejects_invalid_or_foreign_langid(
+    client, app, monkeypatch, tmp_path, langid
+):
+    "A langid that is not a positive id in this user's data is a 400."
+    userimages = _use_tmp_userimages(app, monkeypatch, tmp_path)
+    resp = client.post(
+        "/bing/save",
+        data={"src": "https://example.com/x.jpg", "text": "gato", "langid": langid},
+    )
+    assert resp.status_code == 400
+    assert resp.get_json()["reason"] == "Invalid language id"
+    assert list(userimages.iterdir()) == [], "no directory may be created"
+
+
+@pytest.mark.parametrize(
+    "src",
+    [
+        "file:///etc/hosts",
+        "ftp://example.com/x.jpg",
+        "data:image/png;base64,AAAA",
+    ],
+)
+def test_bing_save_rejects_non_http_urls(client, app, monkeypatch, tmp_path, src):
+    "Only http/https may be fetched; other schemes are refused up front."
+    userimages = _use_tmp_userimages(app, monkeypatch, tmp_path)
+    resp = client.post("/bing/save", data={"src": src, "text": "gato", "langid": "1"})
+    assert resp.status_code == 400
+    assert "Only http and https" in resp.get_json()["reason"]
+    assert list(userimages.iterdir()) == [], "no directory may be created"
+
+
+@pytest.mark.parametrize(
+    "src",
+    [
+        "http://127.0.0.1/x.jpg",
+        "http://10.0.0.1/x.jpg",
+        "http://172.16.0.1/x.jpg",
+        "http://192.168.1.1/x.jpg",
+        "http://169.254.1.1/x.jpg",
+        "http://[::1]/x.jpg",
+        "http://[fc00::1]/x.jpg",
+    ],
+)
+def test_bing_save_rejects_loopback_and_private_addresses(
+    client, app, monkeypatch, tmp_path, src
+):
+    "Internal addresses are refused so the endpoint cannot be used as an SSRF proxy."
+    userimages = _use_tmp_userimages(app, monkeypatch, tmp_path)
+    resp = client.post("/bing/save", data={"src": src, "text": "gato", "langid": "1"})
+    assert resp.status_code == 400
+    assert "private address" in resp.get_json()["reason"]
+    assert list(userimages.iterdir()) == []
+
+
+def test_safe_redirect_handler_rejects_private_target():
+    "A redirect that lands on a private address is refused."
+    from lute.bing import routes as bing_routes
+
+    req = urllib.request.Request("https://example.com/a.jpg")
+    handler = bing_routes._SafeRedirectHandler()
+    with pytest.raises(bing_routes.UnsafeImageUrl):
+        handler.redirect_request(req, None, 302, "Found", {}, "http://127.0.0.1/x.jpg")
+
+
+def test_safe_redirect_handler_allows_public_target(monkeypatch):
+    "A redirect that stays on a public host is followed."
+    from lute.bing import routes as bing_routes
+
+    monkeypatch.setattr(
+        bing_routes, "_resolved_addresses", lambda _host: ["93.184.216.34"]
+    )
+    req = urllib.request.Request("https://example.com/a.jpg")
+    handler = bing_routes._SafeRedirectHandler()
+    new_req = handler.redirect_request(
+        req, None, 302, "Found", {}, "https://example.com/b.jpg"
+    )
+    assert new_req.full_url == "https://example.com/b.jpg"
+
+
+def test_fetch_rejects_oversized_image(monkeypatch):
+    "The download size cap is enforced from Content-Length."
+    from lute.bing import routes as bing_routes
+
+    class FakeResponse:
+        headers = {"Content-Length": str(bing_routes._MAX_IMAGE_BYTES + 1)}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def read(self, _size):
+            return b"x" * 10
+
+    class FakeOpener:
+        def open(self, _req, timeout=None):  # pylint: disable=unused-argument
+            return FakeResponse()
+
+    monkeypatch.setattr(
+        bing_routes.urllib.request, "build_opener", lambda *_handlers: FakeOpener()
+    )
+    with pytest.raises(bing_routes.UnsafeImageUrl):
+        bing_routes._fetch_image_bytes("https://example.com/x.jpg")
+
+
+def _raw_get(app, path):
+    "Run a GET with the exact PATH_INFO, bypassing client-side path cleanup."
+    from werkzeug.test import EnvironBuilder, run_wsgi_app
+
+    environ = EnvironBuilder(path=path, method="GET").get_environ()
+    _app_iter, status, _headers = run_wsgi_app(app, environ)
+    return status
+
+
+def test_thumbnail_route_rejects_path_traversal(app, monkeypatch, tmp_path):
+    "Generation must never escape the requested language directory."
+    root = tmp_path / "userimages"
+    (root / "admin").mkdir(parents=True)
+    (root / "admin" / "untouched.jpg").write_bytes(_image_bytes("JPEG"))
+    (root / "1").mkdir()
+    monkeypatch.setattr(app.env_config.base_config, "userimagespath", str(root))
+
+    status = _raw_get(app, "/userimages/1/thumb/../../admin/untouched.jpg")
+    assert status.startswith("404")
+    assert not (root / "admin" / "untouched_thumb.webp").exists()
+
+
+def test_image_route_rejects_path_traversal(app, monkeypatch, tmp_path):
+    "The original-image route rejects traversal too."
+    root = tmp_path / "userimages"
+    (root / "admin").mkdir(parents=True)
+    (root / "admin" / "untouched.jpg").write_bytes(_image_bytes("JPEG"))
+    (root / "1").mkdir()
+    monkeypatch.setattr(app.env_config.base_config, "userimagespath", str(root))
+
+    status = _raw_get(app, "/userimages/1/../../admin/untouched.jpg")
+    assert status.startswith("404")
+    assert (root / "admin" / "untouched.jpg").exists(), "no file may be touched"
+
+
+def test_missing_images_return_404(client, app, monkeypatch, tmp_path):
+    "Absent files are real 404s, not 200 with an empty body."
+    userimages = _use_tmp_userimages(app, monkeypatch, tmp_path)
+    (userimages / "1").mkdir()
+
+    assert client.get("/userimages/1/thumb/missing.jpg").status_code == 404
+    assert client.get("/userimages/1/missing.jpg").status_code == 404
+
+
+def test_thumbnail_generation_is_concurrent_safe(app, monkeypatch, tmp_path):
+    "Simultaneous first requests for the same image all succeed."
+    from concurrent.futures import ThreadPoolExecutor
+
+    from lute.userimage.service import ensure_thumbnail, thumbnail_path_for
+
+    lang_dir = tmp_path / "userimages" / "1"
+    lang_dir.mkdir(parents=True)
+    original_path = lang_dir / "gato.jpeg"
+    original_path.write_bytes(_image_bytes("JPEG"))
+    expected_thumb = thumbnail_path_for(str(original_path))
+
+    errors = []
+
+    def generate(_):
+        try:
+            return ensure_thumbnail(str(original_path))
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            errors.append(e)
+            return None
+
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        results = list(executor.map(generate, range(8)))
+
+    assert errors == []
+    assert all(result == expected_thumb for result in results)
+    _assert_thumbnail(original_path)

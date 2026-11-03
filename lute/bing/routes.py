@@ -5,9 +5,13 @@ Getting and saving bing image search results.
 import os
 import datetime
 import hashlib
+import ipaddress
 import re
+import socket
+import tempfile
 import urllib.request
 import json
+from urllib.parse import urlsplit
 from flask import (
     Blueprint,
     request,
@@ -17,9 +21,132 @@ from flask import (
     current_app,
     url_for,
 )
+from lute.db import db
+from lute.models.language import Language
 from lute.userimage.service import ensure_thumbnail
 
 bp = Blueprint("bing", __name__, url_prefix="/bing")
+
+_IMAGE_TIMEOUT_SECONDS = 10
+_MAX_IMAGE_BYTES = 10 * 1024 * 1024
+_ALLOWED_IMAGE_SCHEMES = ("http", "https")
+_IMAGE_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/120.0.0.0 Safari/537.36"
+    ),
+    "Referer": "https://www.bing.com/",
+    "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+}
+
+
+class UnsafeImageUrl(Exception):
+    "The requested image URL is not allowed."
+
+
+def _resolved_addresses(hostname):
+    "All IP addresses the host name resolves to."
+    return [info[4][0] for info in socket.getaddrinfo(hostname, None)]
+
+
+def _validate_image_url(url):
+    """
+    Raise UnsafeImageUrl unless url is an http(s) resource on a public host.
+
+    Only http/https are allowed, so file:// and other schemes are refused
+    before any connection is attempted.  Every resolved address must be
+    public: loopback, private, link-local and reserved ranges (including
+    IPv6 ::1 and fc00::/7) are rejected to stop server-side request
+    forgery.
+    """
+    parts = urlsplit(url)
+    if parts.scheme.lower() not in _ALLOWED_IMAGE_SCHEMES:
+        raise UnsafeImageUrl("Only http and https image URLs are allowed")
+    if not parts.hostname:
+        raise UnsafeImageUrl("Image URL has no host")
+
+    try:
+        addresses = _resolved_addresses(parts.hostname)
+    except OSError as e:
+        raise UnsafeImageUrl(f"Could not resolve image host: {e}") from e
+    if not addresses:
+        raise UnsafeImageUrl("Could not resolve image host")
+
+    for address in addresses:
+        try:
+            ip = ipaddress.ip_address(address)
+        except ValueError as e:
+            raise UnsafeImageUrl("Image host resolved to an invalid address") from e
+        if (
+            ip.is_private
+            or ip.is_loopback
+            or ip.is_link_local
+            or ip.is_reserved
+            or ip.is_multicast
+            or ip.is_unspecified
+        ):
+            raise UnsafeImageUrl(
+                f"Refusing to fetch an image from a private address ({address})"
+            )
+
+
+class _SafeRedirectHandler(urllib.request.HTTPRedirectHandler):
+    "Validate every redirect target before following it."
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        _validate_image_url(newurl)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+def _fetch_image_bytes(src):
+    "Download the image into memory, enforcing the size cap."
+    opener = urllib.request.build_opener(_SafeRedirectHandler())
+    req = urllib.request.Request(src, headers=_IMAGE_HEADERS)
+    with opener.open(req, timeout=_IMAGE_TIMEOUT_SECONDS) as response:
+        content_length = response.headers.get("Content-Length")
+        if content_length is not None:
+            try:
+                if int(content_length) > _MAX_IMAGE_BYTES:
+                    raise UnsafeImageUrl("Image is too large")
+            except ValueError:
+                pass
+        data = response.read(_MAX_IMAGE_BYTES + 1)
+    if len(data) > _MAX_IMAGE_BYTES:
+        raise UnsafeImageUrl("Image is too large")
+    return data
+
+
+def _write_image(destfile, data):
+    "Write the image through a temp file so a failure leaves no partial file."
+    fd, temp_path = tempfile.mkstemp(dir=os.path.dirname(destfile), suffix=".img.tmp")
+    try:
+        with os.fdopen(fd, "wb") as out_file:
+            out_file.write(data)
+        os.replace(temp_path, destfile)
+    finally:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+
+
+def _validated_langid(raw):
+    """
+    Return the posted language id, or None when it is not acceptable.
+
+    The value must be a plain positive integer, and the language must
+    exist in the current user's data (the single-user instance's data
+    when multi-user mode is off).  Anything else -- path fragments,
+    absolute paths, non-numbers, another user's language -- is refused.
+    """
+    raw = (raw or "").strip()
+    if not raw.isdigit():
+        return None
+    langid = int(raw)
+    if langid <= 0:
+        return None
+    if db.session.get(Language, langid) is None:
+        return None
+    return langid
 
 
 @bp.route(
@@ -142,7 +269,12 @@ def bing_search(langid, text, searchstring):
 def _get_dir_and_filename(langid, text):
     "Make a directory if needed, return [dir, filename]"
     # env_config is the user-scoped proxy (multi-user isolation).
-    image_dir = os.path.join(current_app.env_config.userimagespath, langid)
+    root = os.path.realpath(current_app.env_config.userimagespath)
+    image_dir = os.path.join(root, str(langid))
+    # The id is already a validated positive integer, but check the
+    # resolved path too: no write may land outside the userimages root.
+    if os.path.commonpath([os.path.realpath(image_dir), root]) != root:
+        raise UnsafeImageUrl("Image directory is outside the user images folder")
     if not os.path.exists(image_dir):
         os.makedirs(image_dir)
 
@@ -153,6 +285,11 @@ def _get_dir_and_filename(langid, text):
     return [image_dir, filename]
 
 
+def _bad_langid_response():
+    "A readable 400 for an invalid or foreign language id."
+    return jsonify({"reason": "Invalid language id"}), 400
+
+
 @bp.route("/save", methods=["POST"])
 def bing_save():
     """
@@ -161,29 +298,29 @@ def bing_save():
     """
     src = request.form["src"]
     text = request.form["text"]
-    langid = request.form["langid"]
-
-    imgdir, filename = _get_dir_and_filename(langid, text)
-    destfile = os.path.join(imgdir, filename)
-
-    headers = {
-        "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/120.0.0.0 Safari/537.36"
-        ),
-        "Referer": "https://www.bing.com/",
-        "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
-    }
+    langid = _validated_langid(request.form.get("langid", ""))
+    if langid is None:
+        return _bad_langid_response()
 
     try:
-        req = urllib.request.Request(src, headers=headers)
-        with urllib.request.urlopen(req) as response, open(destfile, "wb") as out_file:
-            out_file.write(response.read())
+        _validate_image_url(src)
+        content = _fetch_image_bytes(src)
+    except UnsafeImageUrl as e:
+        return jsonify({"reason": str(e)}), 400
+    except urllib.error.URLError as e:
+        return jsonify({"reason": f"Could not download image: {e.reason}"}), 502
     except Exception as e:  # pylint: disable=broad-exception-caught
         # Some sites won't allow direct calls :-( not sure what to do.
-        # Return a failure.
-        return jsonify({"reason": str(e)}), 500
+        return jsonify({"reason": f"Could not download image: {e}"}), 502
+
+    try:
+        imgdir, filename = _get_dir_and_filename(langid, text)
+        destfile = os.path.join(imgdir, filename)
+        _write_image(destfile, content)
+    except UnsafeImageUrl as e:
+        return jsonify({"reason": str(e)}), 400
+    except OSError as e:
+        return jsonify({"reason": f"Could not save image: {e}"}), 500
 
     ensure_thumbnail(destfile)
     ret = {
@@ -202,7 +339,9 @@ def manual_image_post():
     returning the filename.
     """
     text = request.form["text"]
-    langid = request.form["langid"]
+    langid = _validated_langid(request.form.get("langid", ""))
+    if langid is None:
+        return _bad_langid_response()
 
     if "manual_image_file" not in request.files:
         return Response("No file part in request", status=400)
@@ -211,7 +350,10 @@ def manual_image_post():
     if f.filename == "":
         return Response("No selected file", status=400)
 
-    imgdir, filename = _get_dir_and_filename(langid, text)
+    try:
+        imgdir, filename = _get_dir_and_filename(langid, text)
+    except UnsafeImageUrl as e:
+        return jsonify({"reason": str(e)}), 400
     destfile = os.path.join(imgdir, filename)
     f.save(destfile)
     ensure_thumbnail(destfile)
