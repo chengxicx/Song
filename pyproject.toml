@@ -32,6 +32,9 @@ dependencies = [
   "toml>=0.10.2,<1",
   "waitress>=2.1.2,<3",
   "openepub>=0.0.9,<1",
+  # User-image thumbnails (WebP, max 400px) are generated on save and
+  # on first request for older images.
+  "Pillow>=10.0.0,<12",
   "pyparsing>=3.1.4",
   "pypdf>=3.17.4",
   "pdfminer.six>=20221105",

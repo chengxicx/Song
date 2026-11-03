@@ -116,6 +116,13 @@ def test_images_combined_in_popup(spanish, app_context, service):
     d = service.get_popup_data(t.id)
     img_url_start = f"/userimages/{spanish.id}/"
     assert d.popup_image_data == {img_url_start + "gato.jpg": "gato"}
+    assert d.popup_images == [
+        {
+            "full": img_url_start + "gato.jpg",
+            "thumb": img_url_start + "thumb/gato.jpg",
+            "tooltip": "gato",
+        }
+    ]
 
     p.set_current_image("perro.jpg")
     db.session.add(p)

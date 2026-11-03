@@ -78,12 +78,14 @@
 
       <div id="translation-container">
         <div>{{ form.translation }}</div>
-        <img {% if term.current_image %}style="grid-column: -1; display: block"{% endif %} 
+        <img {% if term.current_image %}style="grid-column: -1; display: block"{% endif %}
              class="zoomableTermImage"
              id="term_image"
              tabindex="0"
-             src="/userimages/{{ term.language_id or 0 }}/{{ form.current_image.object_data or '-' }}"
-             onclick="clicked_zoomable_image(this);"
+             loading="lazy"
+             src="/userimages/{{ term.language_id or 0 }}/thumb/{{ form.current_image.object_data or '-' }}"
+             data-full-src="/userimages/{{ term.language_id or 0 }}/{{ form.current_image.object_data or '-' }}"
+             onclick="openTermImageOriginal(this);"
              />
       </div>
 
@@ -203,9 +205,12 @@
 
   var term_image = null;
 
-  function clicked_zoomable_image(el) {
-    // alert('clicked');
+  function openTermImageOriginal(el) {
     $(el).toggleClass("clickedZoomableImage");
+    const full = el.getAttribute("data-full-src");
+    if (full) {
+      window.open(full, "_blank", "noopener");
+    }
   }
 
   // The parent tag list, managed by tagify.
@@ -269,6 +274,7 @@
         if (k === "Delete" || k === "Backspace") {
           // Hide image on screen.
           term_image.attr("src", "");
+          term_image.removeAttr("data-full-src");
           term_image.css("display", "none");
           // Erase hidden form control value.
           $("#current_image").val("");
@@ -400,11 +406,14 @@
       $("#translation").val(data.translation || "");
       const img = $("#term_image");
       if (data.current_image) {
-        img.attr("src", "/userimages/" + (data.language_id || 0) + "/" + data.current_image);
+        const imageBase = "/userimages/" + (data.language_id || 0) + "/";
+        img.attr("src", imageBase + "thumb/" + data.current_image);
+        img.attr("data-full-src", imageBase + data.current_image);
         img.attr("style", "grid-column: -1; display: block");
         $("#current_image").val(data.current_image);
       } else {
         img.attr("src", "");
+        img.removeAttr("data-full-src");
         img.removeAttr("style");
         $("#current_image").val("");
       }
