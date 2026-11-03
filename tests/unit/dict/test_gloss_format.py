@@ -9,7 +9,9 @@ rule change that would garble the actual dictionaries shows up here.
 from lute.dict.gloss_format import (
     COMPACT_GLOSS_MAX_CHARS,
     compact_gloss,
+    display_blocks,
     first_sense,
+    is_phonetic_annotation,
     parse_gloss,
     popup_gloss,
     xrefs,
@@ -213,6 +215,68 @@ def test_an_english_bilingual_entry_gets_phonetics_pos_senses_and_examples():
     assert blocks[4]["text"] == "He is a man of his word."
     assert blocks[4]["translation"] == "他是个说话算数的人。"
     assert blocks[5] == {"t": "xref", "text": "wordy", "reading": None}
+
+
+def test_display_blocks_hides_english_phonetics_but_keeps_the_definition():
+    "The Local card's default: headword + POS, no BrE/NAmE /.../ run."
+    gloss = "\n".join(
+        [
+            "arch·eryBrE /ˈɑːtʃəri/NAmE /ˈɑːrtʃəri/ noun [U]",
+            "the art or sport of shooting arrows with a bow2  射箭术；射箭运动",
+        ]
+    )
+    shown = display_blocks(parse_gloss(gloss))
+    texts = " ".join(str(b.get("text") or "") for b in shown)
+
+    assert "BrE" not in texts
+    assert "NAmE" not in texts
+    assert "/ˈɑːtʃəri/" not in texts
+    assert "phonetic" not in types(shown)
+    # The part of speech survives, and so does the definition.
+    assert any(b["t"] == "headword" and b["text"] == "noun" for b in shown)
+    assert "射箭术；射箭运动" in texts
+
+    # Turning the setting on draws the entry exactly as parsed.
+    assert display_blocks(parse_gloss(gloss), show_phonetics=True) == parse_gloss(gloss)
+
+
+def test_display_blocks_drops_a_standalone_phonetic_line():
+    "A line-based entry's /…/ line disappears; its reading field is not a reading."
+    gloss = "\n".join(
+        [
+            "/wɜːd/ ; NAmE /wɜːrd/",
+            "noun",
+            "1. 词；单词；字",
+            "He is a man of his word.",
+            "他是个说话算数的人。",
+        ]
+    )
+    shown = display_blocks(parse_gloss(gloss))
+
+    assert "phonetic" not in types(shown)
+    assert [b["text"] for b in shown if b["t"] == "pos"] == ["noun"]
+    assert "他是个说话算数的人。" in [b.get("translation") for b in shown]
+
+    assert is_phonetic_annotation("/wɜːd/ ; NAmE /wɜːrd/")
+    assert is_phonetic_annotation("BrE /blʌd/NAmE /blʌd/")
+    # Readings and ordinary text must never be mistaken for IPA.
+    assert not is_phonetic_annotation("食べる")
+    assert not is_phonetic_annotation("tabe·ru")
+    assert not is_phonetic_annotation("especially BrE")
+
+
+def test_display_blocks_leaves_a_japanese_entry_untouched():
+    gloss = "\n".join(
+        [
+            "他动·二类",
+            "吃。（飲食物をいただく。）",
+            "ご飯を食べる。",
+            "吃饭。",
+        ]
+    )
+    blocks = parse_gloss(gloss)
+
+    assert display_blocks(blocks) == blocks
 
 
 def test_english_pos_lines_and_pos_prefixed_senses():

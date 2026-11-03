@@ -137,6 +137,14 @@ class Language(
         "LgTermPopupShowDictGloss", db.Boolean, default=True
     )
 
+    # Whether the reading page's Local dictionary card (and an English
+    # term's IPA reading in the popup) shows pronunciation notation.
+    # Default off: the definitions are the content; /ˈɑːtʃəri/ is data
+    # the dictionary happens to carry.  The lookup and the stored gloss
+    # are unchanged -- this only trims what gets drawn (see
+    # gloss_format.display_blocks).
+    show_dict_phonetics = db.Column("LgShowDictPhonetics", db.Boolean, default=False)
+
     # What fills a new term's translation: 'online' (machine
     # translation, the old behaviour) or 'local_dict' -- the language's
     # local dictionaries (see the 'localdict' rows in self.dictionaries)
@@ -153,6 +161,7 @@ class Language(
         self.right_to_left = False
         self.show_romanization = False
         self.show_furigana = False
+        self.show_dict_phonetics = False
         self.parser_type = "spacedel"
         self.dictionaries = []
         self.is_active = True

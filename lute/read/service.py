@@ -387,6 +387,13 @@ class TermPopup:
         # gloss is -- the popup is a glance, the form holds the full text.
         self.translation = self._clean(_popup_first_lines(term.translation))
         self.romanization = self._clean(term.romanization)
+        # An English term's reading may be an IPA string rather than a
+        # true reading (kana/pinyin).  Hide the *visible* copy when the
+        # language has phonetics off; the hidden copy stays for TTS.
+        self.show_romanization = self.romanization != "" and (
+            getattr(term.language, "show_dict_phonetics", True)
+            or not gloss_format.is_phonetic_annotation(self.romanization)
+        )
         self.tags = [tt.text for tt in term.term_tags]
         self.flash = self._clean(term.get_flash_message())
         self.image = term.get_current_image()

@@ -1743,15 +1743,20 @@ def local_dict_file(langid, filename, text):
             filename,
             prefer_reading=bool(xref_reading),
         )
+    stripped = dict_service.strip_duplicate_headword(gloss, text)
     return render_template(
         "read/localdict.html",
         text=text,
         # The card's head is the term; the definition need not open
         # by repeating it (an entry reached through its reading keeps
         # its own headword -- see strip_duplicate_headword).
-        gloss=dict_service.strip_duplicate_headword(gloss, text),
-        blocks=gloss_format.parse_gloss(
-            dict_service.strip_duplicate_headword(gloss, text)
+        gloss=stripped,
+        # English phonetic runs are data, not meaning: the card only
+        # draws them when the language asks (default off, see
+        # Language.show_dict_phonetics / gloss_format.display_blocks).
+        blocks=gloss_format.display_blocks(
+            gloss_format.parse_gloss(stripped),
+            show_phonetics=bool(lang.show_dict_phonetics) if lang else False,
         ),
         langid=langid,
     )
@@ -1772,7 +1777,10 @@ def local_dict(langid, text):
         "read/localdict.html",
         text=text,
         gloss=stripped,
-        blocks=gloss_format.parse_gloss(stripped),
+        blocks=gloss_format.display_blocks(
+            gloss_format.parse_gloss(stripped),
+            show_phonetics=bool(lang.show_dict_phonetics) if lang else False,
+        ),
         langid=langid,
     )
 

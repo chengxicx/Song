@@ -1493,6 +1493,88 @@ def popup_gloss(gloss):
     return "\n".join(lines) if lines else gloss
 
 
+# ---- Display-time phonetics ------------------------------------------------
+#
+# The card's data still carries everything the dictionary says; only what
+# the Local tab *draws* is trimmed here (see display_blocks), so a card can
+# be shown with or without the English pronunciation run without touching
+# the lookup or the stored gloss.  The rules only look at headword lines and
+# whole phonetic blocks: sense and example text is never rewritten, so an
+# example that mentions a sound ("... begins with /j/ ...") keeps it.
+
+
+def is_phonetic_annotation(text):
+    """
+    True when *text* is nothing but an English pronunciation annotation
+    ("/.../" or "BrE /.../ NAmE /.../").
+
+    The term's pronunciation/reading field is a kana or pinyin reading for
+    Japanese and Chinese terms, and an IPA string for some English ones.
+    A value containing any non-Latin script is a reading, never IPA, so it
+    passes through untouched.
+    """
+    if not text:
+        return False
+    t = " ".join(text.split())
+    if _has_cjk_or_kana(t) or _HANGUL_RE.search(t):
+        return False
+    if t.startswith("/"):
+        return _phonetic_run_end(t) == len(t)
+    if _PHONETIC_START_RE.match(t) is None:
+        return False
+    return _phonetic_run_end(t) == len(t)
+
+
+def _headword_without_phonetics(text):
+    "A headword line's pronunciation run removed, its POS left in place."
+    if not text or _has_cjk_or_kana(text) or _HANGUL_RE.search(text):
+        return text
+    t = text.strip()
+    if not t:
+        return ""
+    if t.startswith("/"):
+        return t[_phonetic_run_end(t) :].strip()
+    if _PHONETIC_START_RE.match(t) is None:
+        return text
+    end = _phonetic_run_end(t)
+    if not end:
+        return text
+    # A later pronunciation variant ("BrE strong form /.../") goes too;
+    # the variety labels themselves are not meaningful on their own.
+    rest = re.sub(
+        r"(?:BrE|NAmE|AmE|Br|Am|US|UK)\s+(?:strong form|weak form)?\s*/[^/]+/",
+        " ",
+        t[end:],
+    )
+    return " ".join(rest.split())
+
+
+def display_blocks(blocks, show_phonetics=False):
+    """
+    The blocks as a dictionary card draws them.
+
+    When ``show_phonetics`` is off (the default, and what the per-language
+    setting starts as), whole phonetic blocks are dropped and the
+    pronunciation run glued to a headword line is removed, leaving the POS
+    label ("noun", "verb [T]").  Nothing else is touched: senses,
+    translations and examples are returned exactly as parsed.
+    """
+    if show_phonetics:
+        return blocks
+    shown = []
+    for b in blocks:
+        if b["t"] == "phonetic":
+            continue
+        if b["t"] in ("headword", "pos"):
+            text = _headword_without_phonetics(b.get("text") or "")
+            if not text.strip():
+                continue
+            if text != b["text"]:
+                b = {**b, "text": text}
+        shown.append(b)
+    return shown
+
+
 def _take_within(lines, max_chars):
     "The lines up to ``max_chars`` characters in total, plus '…' if cut."
     kept = []
