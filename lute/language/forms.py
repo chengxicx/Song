@@ -150,6 +150,21 @@ class LanguageForm(FlaskForm):
             )
         },
     )
+    # English pronunciation notation (BrE/NAmE /.../) in the Local
+    # dictionary card.  Off by default: the card is for the word's
+    # meaning, and the IPA is optional detail.  Japanese/Chinese
+    # readings are not affected -- this only targets the English/IPA
+    # annotation forms (see gloss_format.display_blocks).
+    show_dict_phonetics = BooleanField(
+        "Show phonetics in dictionary cards",
+        render_kw={
+            "title": (
+                "Show the BrE/NAmE /.../ pronunciation run on the reading "
+                "page's Local dictionary card.  Off by default; definitions, "
+                "POS and examples are always shown."
+            )
+        },
+    )
     # What fills a new term's translation.  'local_dict' tries the local
     # dictionaries in tab order and falls back to online translation
     # when none has an entry -- only meaningful when the language has

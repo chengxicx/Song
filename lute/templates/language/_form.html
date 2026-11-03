@@ -143,6 +143,15 @@
     </tr>
     <tr>
       <td style="vertical-align: top;">
+        {{ form.show_dict_phonetics.label(class="form-control-label") }}
+        <div style="color:#666; font-size:0.85em; max-width:24em;">
+          {{ t('Show the BrE/NAmE /.../ pronunciation run on the Local dictionary card.  Off by default: the word, part of speech, definitions, translations and examples are always shown.') }}
+        </div>
+      </td>
+      <td>{{ form.show_dict_phonetics() }}</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
         {{ form.term_translation_source.label(class="form-control-label") }}
         <div style="color:#666; font-size:0.85em; max-width:24em;">
           {{ t("What auto-fills a new term's translation.  <b>Local dictionary</b> tries this language's Local dictionaries in tab order, and falls back to online translation when none has an entry.") }}
@@ -153,7 +162,7 @@
 
     {% set _kiwi_fields = ('kiwi_tokenizer_mode', 'kiwi_stemming', 'kiwi_filter_particles', 'kiwi_join_compound_nouns') %}
     {# Fields rendered by a hand-written block below, not by the loop. #}
-    {% set _custom_fields = ('hidden_grammar_levels', 'term_popup_show_dict_gloss', 'term_translation_source', 'show_furigana') %}
+    {% set _custom_fields = ('hidden_grammar_levels', 'term_popup_show_dict_gloss', 'show_dict_phonetics', 'term_translation_source', 'show_furigana') %}
     {% for field in form %}
     {% if field.name not in ('name', 'csrf_token', 'dictionaries') and field.name not in _kiwi_fields and field.name not in _custom_fields %}
     <tr>
