@@ -109,13 +109,11 @@ def edit_settings():
             field.data = 1 if str_val in true_vals else 0
 
     from lute.ai.service import all_status as ai_all_status
-    from lute.ai.service import all_grammar_status as ai_grammar_status
 
     return render_template(
         "settings/form.html",
         form=form,
         ai_providers=ai_all_status(),
-        ai_grammar_providers=ai_grammar_status(),
     )
 
 

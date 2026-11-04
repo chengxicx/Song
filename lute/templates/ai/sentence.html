@@ -59,6 +59,61 @@
         line-height: 1.45;
         white-space: pre-wrap;
       }
+      .ai-sections { margin-top: 1.1rem; }
+      .ai-section { margin-top: 1.1rem; }
+      .ai-section:first-child { margin-top: 0; }
+      .ai-section-title {
+        margin: 0 0 0.4rem 0;
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        color: color-mix(in srgb, var(--font-color, #888) 65%, transparent);
+      }
+      .ai-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        line-height: 1.4;
+      }
+      .ai-table th, .ai-table td {
+        padding: 0.3rem 0.45rem;
+        text-align: left;
+        vertical-align: top;
+        border-bottom: 1px solid color-mix(in srgb, var(--font-color, #888) 14%, transparent);
+        overflow-wrap: anywhere;
+      }
+      .ai-table th {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: color-mix(in srgb, var(--font-color, #888) 60%, transparent);
+      }
+      .ai-table td:first-child { font-weight: 600; }
+      .ai-reading {
+        display: block;
+        font-size: 0.76rem;
+        font-weight: 400;
+        color: color-mix(in srgb, var(--font-color, #888) 65%, transparent);
+      }
+      .ai-grammar-item { margin: 0 0 0.55rem 0; font-size: 0.92rem; line-height: 1.45; }
+      .ai-grammar-item:last-child { margin-bottom: 0; }
+      .ai-fragment {
+        display: inline-block;
+        margin-left: 0.35rem;
+        padding: 0 0.3rem;
+        border-radius: 0.2rem;
+        background: color-mix(in srgb, var(--font-color, #888) 10%, transparent);
+        font-size: 0.82rem;
+        font-weight: 400;
+      }
+      .ai-context, .ai-example { font-size: 0.92rem; line-height: 1.5; overflow-wrap: anywhere; }
+      .ai-context { margin: 0; white-space: pre-wrap; }
+      .ai-examples { margin: 0; padding-left: 1.2rem; }
+      .ai-examples li { margin-bottom: 0.45rem; }
+      .ai-examples li:last-child { margin-bottom: 0; }
+      .ai-example-translation {
+        display: block;
+        color: color-mix(in srgb, var(--font-color, #888) 75%, transparent);
+      }
       .ai-actions {
         display: flex;
         flex-wrap: wrap;
@@ -81,11 +136,18 @@
     </style>
   </head>
   <body>
-    {% if configured %}
+    {% if disabled %}
+    <div class="ai-guidance">
+      <h1>{{ t('AI sentence translation is turned off for this language') }}</h1>
+      <p>{{ t(disabled_reason) }}</p>
+      <div class="ai-source">{{ sentence }}</div>
+    </div>
+    {% elif configured %}
     <div class="ai-card">
       <div class="ai-eyebrow">{{ provider_label }}</div>
       <div class="ai-source">{{ sentence }}</div>
       <div id="ai-result" class="ai-result" aria-live="polite"></div>
+      <div id="ai-sections" class="ai-sections"></div>
       <div id="ai-error" class="ai-error" hidden></div>
       <div class="ai-actions">
         <button type="button" id="ai-retry" class="btn btn-secondary">
@@ -98,14 +160,209 @@
       (function () {
         var TEXT = {{ sentence|tojson }};
         var LANG = {{ lang_id|tojson }};
+        var LABELS = {
+          segments: {{ t('Word-by-word')|tojson }},
+          part: {{ t('Part')|tojson }},
+          meaning: {{ t('Meaning')|tojson }},
+          role: {{ t('Role')|tojson }},
+          grammar: {{ t('Grammar points')|tojson }},
+          context: {{ t('Context')|tojson }},
+          examples: {{ t('Examples')|tojson }},
+          exampleTranslation: {{ t('Translation')|tojson }}
+        };
         var resultEl = document.getElementById('ai-result');
+        var sectionsEl = document.getElementById('ai-sections');
         var errorEl = document.getElementById('ai-error');
         var retryEl = document.getElementById('ai-retry');
+        var streamBuffer = '';
 
         function showError(message) {
           errorEl.textContent = message;
           errorEl.hidden = false;
           retryEl.disabled = false;
+        }
+
+        /**
+         * The model stream is JSON.  `translation` is required to be the
+         * first key, so this grows that string as the bytes arrive and the
+         * reader sees the translation straight away, without a second
+         * billed request.
+         */
+        function partialTranslation(buffer) {
+          var keyAt = buffer.indexOf('"translation"');
+          if (keyAt < 0) return '';
+          var colon = buffer.indexOf(':', keyAt + 13);
+          if (colon < 0) return '';
+          var i = colon + 1;
+          while (i < buffer.length && /\s/.test(buffer.charAt(i))) i++;
+          if (buffer.charAt(i) !== '"') return '';
+          i++;
+          var out = '';
+          while (i < buffer.length) {
+            var ch = buffer.charAt(i);
+            if (ch === '\\') {
+              var next = buffer.charAt(i + 1);
+              if (!next) break;
+              if (next === 'n') { out += '\n'; i += 2; }
+              else if (next === 't') { out += '\t'; i += 2; }
+              else if (next === 'r') { out += '\r'; i += 2; }
+              else if (next === 'u') {
+                var hex = buffer.substr(i + 2, 4);
+                if (!/^[0-9a-fA-F]{4}$/.test(hex)) break;
+                out += String.fromCharCode(parseInt(hex, 16));
+                i += 6;
+              } else { out += next; i += 2; }
+            } else if (ch === '"') {
+              break;
+            } else {
+              out += ch;
+              i++;
+            }
+          }
+          return out;
+        }
+
+        function section(title) {
+          var box = document.createElement('div');
+          box.className = 'ai-section';
+          if (title) {
+            var h = document.createElement('h2');
+            h.className = 'ai-section-title';
+            h.textContent = title;
+            box.appendChild(h);
+          }
+          sectionsEl.appendChild(box);
+          return box;
+        }
+
+        function textOf(value) {
+          return typeof value === 'string' ? value.trim() : '';
+        }
+
+        function renderSegments(segments) {
+          if (!segments.length) return;
+          var box = section(LABELS.segments);
+          var table = document.createElement('table');
+          table.className = 'ai-table';
+          var head = document.createElement('thead');
+          var headRow = document.createElement('tr');
+          [LABELS.part, LABELS.meaning, LABELS.role].forEach(function (label) {
+            var th = document.createElement('th');
+            th.textContent = label;
+            headRow.appendChild(th);
+          });
+          head.appendChild(headRow);
+          table.appendChild(head);
+          var body = document.createElement('tbody');
+          segments.forEach(function (segment) {
+            if (!segment || typeof segment !== 'object') return;
+            var row = document.createElement('tr');
+            var part = textOf(segment.part);
+            var reading = textOf(segment.reading);
+            var partCell = document.createElement('td');
+            partCell.textContent = part;
+            // Kana words read themselves; only show a reading that adds
+            // information (kanji, pinyin, ...).  Keeping it inside the
+            // part cell leaves three columns, so a narrow sidebar is not
+            // squeezed by a mostly-empty pronunciation column.
+            if (reading && reading !== part) {
+              var readingEl = document.createElement('span');
+              readingEl.className = 'ai-reading';
+              readingEl.textContent = reading;
+              partCell.appendChild(readingEl);
+            }
+            row.appendChild(partCell);
+            [textOf(segment.meaning), textOf(segment.role)].forEach(function (value) {
+              var td = document.createElement('td');
+              td.textContent = value;
+              row.appendChild(td);
+            });
+            body.appendChild(row);
+          });
+          table.appendChild(body);
+          box.appendChild(table);
+        }
+
+        function renderGrammar(items) {
+          if (!items.length) return;
+          var box = section(LABELS.grammar);
+          items.forEach(function (item) {
+            if (!item || typeof item !== 'object') return;
+            var point = textOf(item.point);
+            var explanation = textOf(item.explanation);
+            var fragment = textOf(item.fragment);
+            if (!point && !explanation && !fragment) return;
+            var row = document.createElement('div');
+            row.className = 'ai-grammar-item';
+            var strong = document.createElement('strong');
+            strong.textContent = point || fragment;
+            row.appendChild(strong);
+            if (fragment && point) {
+              var chip = document.createElement('span');
+              chip.className = 'ai-fragment';
+              chip.textContent = fragment;
+              row.appendChild(chip);
+            }
+            if (explanation) {
+              row.appendChild(document.createTextNode(' — ' + explanation));
+            }
+            box.appendChild(row);
+          });
+          if (!box.querySelector('.ai-grammar-item')) {
+            box.remove();
+          }
+        }
+
+        function renderContext(value) {
+          if (!value) return;
+          var box = section(LABELS.context);
+          var p = document.createElement('p');
+          p.className = 'ai-context';
+          p.textContent = value;
+          box.appendChild(p);
+        }
+
+        function renderExamples(items) {
+          if (!items.length) return;
+          var box = section(LABELS.examples);
+          var list = document.createElement('ol');
+          list.className = 'ai-examples';
+          items.forEach(function (item) {
+            if (!item || typeof item !== 'object') return;
+            var source = textOf(item.source);
+            var translation = textOf(item.translation);
+            if (!source && !translation) return;
+            var li = document.createElement('li');
+            var s = document.createElement('span');
+            s.className = 'ai-example';
+            s.textContent = source;
+            li.appendChild(s);
+            if (translation) {
+              var tr = document.createElement('span');
+              tr.className = 'ai-example-translation';
+              tr.textContent = translation;
+              li.appendChild(tr);
+            }
+            list.appendChild(li);
+          });
+          if (!list.children.length) {
+            box.remove();
+            return;
+          }
+          box.appendChild(list);
+        }
+
+        function renderResult(result) {
+          sectionsEl.textContent = '';
+          if (!result || typeof result !== 'object') {
+            resultEl.textContent = '';
+            return;
+          }
+          resultEl.textContent = textOf(result.translation);
+          renderSegments(Array.isArray(result.segments) ? result.segments : []);
+          renderGrammar(Array.isArray(result.grammar) ? result.grammar : []);
+          renderContext(textOf(result.context));
+          renderExamples(Array.isArray(result.examples) ? result.examples : []);
         }
 
         function handleEvent(raw) {
@@ -119,7 +376,16 @@
           var data;
           try { data = JSON.parse(dataLines.join('\n')); } catch (e) { return; }
           if (eventName === 'text' && data.text) {
-            resultEl.textContent += data.text;
+            streamBuffer += data.text;
+            var partial = partialTranslation(streamBuffer);
+            if (partial) resultEl.textContent = partial;
+          } else if (eventName === 'result') {
+            if (data.result) {
+              renderResult(data.result);
+            } else {
+              sectionsEl.textContent = '';
+              resultEl.textContent = data.text || partialTranslation(streamBuffer);
+            }
           } else if (eventName === 'error') {
             showError(data.message || '{{ t("Translation failed.") }}');
           } else if (eventName === 'done') {
@@ -129,6 +395,8 @@
 
         async function run() {
           resultEl.textContent = '';
+          sectionsEl.textContent = '';
+          streamBuffer = '';
           errorEl.hidden = true;
           errorEl.textContent = '';
           retryEl.disabled = true;

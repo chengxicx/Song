@@ -23,7 +23,12 @@ from lute.db import db
 from lute.models.repositories import UserSettingRepository
 from lute.ai.crypto import decrypt, encrypt
 
+# One choice serves both the reader Sentence tab and the Grammar panel.
+# The old per-feature keys are still read as a fallback so existing
+# accounts keep working without touching their stored values.
+AI_PROVIDER_SETTING_KEY = "ai_provider"
 PROVIDER_SETTING_KEY = "ai_sentence_provider"
+GRAMMAR_PROVIDER_SETTING_KEY = "ai_grammar_provider"
 
 
 class AiError(Exception):
@@ -67,20 +72,71 @@ def providers_fallback_label():
     return "AI"
 
 
+def _raw_setting(key):
+    "The stored value, or None when the key was never saved."
+    return _repo().get_dynamic_value(key)
+
+
+def _legacy_provider(key):
+    "A provider id still valid from the per-feature keys, or ''."
+    p = (_raw_setting(key) or "").strip()
+    return p if p in _API_PROVIDERS else ""
+
+
+def provider_choice():
+    """
+    The single provider used by both AI features, or ''.
+
+    ``ai_provider`` is authoritative once it has been saved (an empty
+    value means the user turned every provider off).  Accounts that have
+    never saved it fall back to the old per-feature keys; when those
+    disagree, the provider enabled for grammar analysis wins because
+    that is the card the settings page showed as "enabled".
+    """
+    canonical = _raw_setting(AI_PROVIDER_SETTING_KEY)
+    if canonical is not None:
+        p = canonical.strip()
+        return p if p in _API_PROVIDERS else ""
+    sentence = _legacy_provider(PROVIDER_SETTING_KEY)
+    grammar = _legacy_provider(GRAMMAR_PROVIDER_SETTING_KEY)
+    if grammar and sentence and grammar != sentence:
+        return grammar
+    return grammar or sentence
+
+
+def provider_conflict():
+    """
+    The old keys still disagree and ``ai_provider`` was never saved.
+
+    Returned for the settings page so it can explain why one of the two
+    saved choices won, instead of silently dropping the other.
+    """
+    if _raw_setting(AI_PROVIDER_SETTING_KEY) is not None:
+        return None
+    sentence = _legacy_provider(PROVIDER_SETTING_KEY)
+    grammar = _legacy_provider(GRAMMAR_PROVIDER_SETTING_KEY)
+    if sentence and grammar and sentence != grammar:
+        return {
+            "sentence": sentence,
+            "grammar": grammar,
+            "selected": grammar,
+            "sentence_label": _API_PROVIDERS[sentence]["label"],
+            "grammar_label": _API_PROVIDERS[grammar]["label"],
+        }
+    return None
+
+
 def selected_provider():
     "The provider the reader should use, or '' when none is selected."
-    p = _get(PROVIDER_SETTING_KEY).strip()
-    if p in _API_PROVIDERS:
-        return p
-    return ""
+    return provider_choice()
 
 
 def set_selected_provider(provider):
-    "Persist the reader's provider choice; unknown ones are refused."
+    "Persist the shared provider choice; unknown ones are refused."
     provider = (provider or "").strip()
     if provider and provider not in _API_PROVIDERS:
         raise AiError(f"Unknown AI provider: {provider}", "unconfigured")
-    _set(PROVIDER_SETTING_KEY, provider)
+    _set(AI_PROVIDER_SETTING_KEY, provider)
 
 
 def mask_token(token):
@@ -113,6 +169,7 @@ def all_status():
     return {
         "selected": selected_provider(),
         "providers": [provider_status(p) for p in _API_PROVIDERS],
+        "conflict": provider_conflict(),
     }
 
 
@@ -132,15 +189,131 @@ def clean_sentence(text):
 
 
 def build_translation_system_prompt(source_lang="", target_lang=""):
-    "The chat-system half of the translation prompt."
+    "The chat-system half of the structured sentence translation prompt."
     source = (source_lang or "").strip()
     target = (target_lang or "").strip() or "English"
     origin = f"{source} " if source else ""
     return (
-        f"You are a translation engine. Translate the following {origin}"
-        f"sentence into {target}. Reply with the translation only, "
-        f"without explanations, quotes, or the original text."
+        f"You are a translation and language tutor. Analyse the following "
+        f"{origin}sentence and explain the result in {target}.\n"
+        "Reply with ONE JSON object and nothing else, with these keys in "
+        "this order:\n"
+        '{"translation": "...", '
+        '"segments": [{"part": "...", "reading": "...", "meaning": "...", '
+        '"role": "..."}], '
+        '"grammar": [{"point": "...", "explanation": "...", '
+        '"fragment": "..."}], '
+        '"context": "...", '
+        '"examples": [{"source": "...", "translation": "..."}]}\n'
+        "Rules:\n"
+        f"- translation: one natural, fluent translation of the whole "
+        f"sentence into {target}; translate the meaning, not word by word, "
+        "and do not wrap it in quotation marks.  This must be the first key.\n"
+        "- segments: cover the whole sentence, split the way the target "
+        "language naturally divides it (words and particles for Japanese, "
+        "words or phrases for English); never split single characters.\n"
+        "- reading: pronunciation only when the source language needs it "
+        "(kana for Japanese, pinyin for Chinese, ...); use an empty string "
+        "when it does not apply.\n"
+        f"- meaning, role, grammar.explanation, context and "
+        f"examples.translation must all be in {target}.\n"
+        "- grammar: only the genuinely important points, not every particle; "
+        "quote the exact source fragment each point governs.\n"
+        "- examples: 2 to 3 short source-language sentences with their "
+        f"{target} translation, close to a learner's level.\n"
+        "- context: why this translation, the tone/register, and any "
+        "ambiguities a learner should know about.\n"
+        "- Quote original fragments verbatim.\n"
+        "- If a field does not apply, use an empty string or empty array, "
+        "but keep every key."
     )
+
+
+def build_translation_user_prompt(sentence, source_lang=""):
+    "The sentence itself, preceded by its source language."
+    source = (source_lang or "").strip() or "unknown"
+    return f"Sentence ({source}):\n{clean_sentence(sentence)}"
+
+
+_SENTENCE_JSON_KEYS = ("translation", "segments", "grammar", "context", "examples")
+
+_SENTENCE_CACHE_PREFIX = "ai_sentence_cache_"
+
+# v1 stored a single translated line; structured results live under v2
+# so an old entry is never mistaken for a complete analysis.
+_SENTENCE_CACHE_VERSION = "v2_"
+
+
+def parse_sentence_json(text):
+    """
+    Pull the structured translation out of a model reply.
+
+    Same tolerance as parse_grammar_json: markdown fences and chatter are
+    ignored, and a reply with at least one expected key is accepted so a
+    partially-filled object still renders.  Returns None for plain prose,
+    which the UI shows as the translation text.
+    """
+    raw = (text or "").strip()
+    if not raw:
+        return None
+    if raw.startswith("```"):
+        raw = re.sub(r"^```[a-zA-Z0-9_-]*\s*", "", raw)
+        raw = re.sub(r"\s*```$", "", raw).strip()
+    start = raw.find("{")
+    end = raw.rfind("}")
+    if start < 0 or end <= start:
+        return None
+    try:
+        data = json.loads(raw[start : end + 1])
+    except (TypeError, ValueError):
+        return None
+    if not isinstance(data, dict):
+        return None
+    if not any(key in data for key in _SENTENCE_JSON_KEYS):
+        return None
+    return data
+
+
+def sentence_cache_key(sentence, model, source_lang="", target_lang=""):
+    "Sentence hash plus model and language pair; one key per stored result."
+    raw = "\x1f".join(
+        [
+            clean_sentence(sentence),
+            model or "",
+            (source_lang or "").strip(),
+            (target_lang or "").strip(),
+        ]
+    )
+    digest = hashlib.sha1(raw.encode("utf-8")).hexdigest()
+    return _SENTENCE_CACHE_PREFIX + _SENTENCE_CACHE_VERSION + digest
+
+
+def sentence_cached_result(sentence, model, source_lang="", target_lang=""):
+    "A previously stored structured result, or None."
+    value = _get(sentence_cache_key(sentence, model, source_lang, target_lang))
+    if not value:
+        return None
+    try:
+        data = json.loads(value)
+    except (TypeError, ValueError):
+        return None
+    if not isinstance(data, dict):
+        return None
+    if not any(key in data for key in _SENTENCE_JSON_KEYS):
+        return None
+    return data
+
+
+def store_sentence_result(sentence, model, source_lang, target_lang, result):
+    "Persist one parsed result so the same sentence is not billed twice."
+    try:
+        _set(
+            sentence_cache_key(sentence, model, source_lang, target_lang),
+            json.dumps(result, ensure_ascii=False),
+        )
+    except Exception:  # pylint: disable=broad-exception-caught
+        # A failed cache write must not break the reader's result.
+        db.session.rollback()
 
 
 # ---------------------------------------------------------------------
@@ -158,8 +331,8 @@ def translate_stream(provider, sentence, source_lang="", target_lang=""):
     provider = provider or selected_provider()
     if not provider:
         raise AiError(
-            "No AI provider is configured for sentence translation. Add an "
-            "OpenAI or Anthropic API key in Settings and select it there.",
+            "No AI provider is configured. Add an OpenAI or Anthropic API "
+            "key in Settings.",
             "unconfigured",
         )
 
@@ -169,13 +342,14 @@ def translate_stream(provider, sentence, source_lang="", target_lang=""):
 
     ready = grammar_ready(provider)
     system_prompt = build_translation_system_prompt(source_lang, target_lang)
+    user_prompt = build_translation_user_prompt(sentence, source_lang)
     if ready["provider"] == "openai":
         yield from _openai_stream(
             ready["base_url"],
             ready["token"],
             ready["model"],
             system_prompt,
-            sentence,
+            user_prompt,
         )
         return
     yield from _anthropic_stream(
@@ -183,7 +357,7 @@ def translate_stream(provider, sentence, source_lang="", target_lang=""):
         ready["token"],
         ready["model"],
         system_prompt,
-        sentence,
+        user_prompt,
     )
 
 
@@ -216,15 +390,13 @@ def _text_from_payload(data):
 
 
 # ---------------------------------------------------------------------
-# Official API providers for grammar analysis
+# Official API providers
 #
-# Official API providers.  These serve both sentence translation (the
-# provider chosen in Settings) and grammar analysis (the provider enabled
-# for the Grammar panel).  The two choices are separate settings, but the
-# encrypted API key and model are shared, so one key serves both features.
+# One provider serves both sentence translation and grammar analysis, so
+# the reader only configures a key/model once.  Which features are
+# allowed is decided per language (see Language.ai_sentence_translation /
+# ai_grammar_analysis), not here.
 # ---------------------------------------------------------------------
-
-GRAMMAR_PROVIDER_SETTING_KEY = "ai_grammar_provider"
 
 _API_PROVIDERS = {
     "openai": {
@@ -292,18 +464,15 @@ def _api_model_key(provider):
 
 
 def selected_grammar_provider():
-    "The provider the Grammar panel should use, or '' when none is enabled."
-    p = _get(GRAMMAR_PROVIDER_SETTING_KEY).strip()
-    if p in _API_PROVIDERS:
-        return p
-    return ""
+    "The Grammar panel's provider: the same single choice as the Sentence tab."
+    return provider_choice()
 
 
 def _set_grammar_provider(provider):
     provider = (provider or "").strip()
     if provider and provider not in _API_PROVIDERS:
-        raise AiError(f"Unknown grammar AI provider: {provider}", "unsupported")
-    _set(GRAMMAR_PROVIDER_SETTING_KEY, provider)
+        raise AiError(f"Unknown AI provider: {provider}", "unsupported")
+    _set(AI_PROVIDER_SETTING_KEY, provider)
 
 
 def _api_token(provider):
@@ -372,7 +541,7 @@ def grammar_provider_status(provider):
     if p is None:
         return None
     token = _api_token(provider)
-    selected = selected_grammar_provider()
+    selected = selected_provider()
     return {
         "provider": provider,
         "label": p["label"],
@@ -392,22 +561,20 @@ def grammar_provider_status(provider):
 
 
 def all_grammar_status():
-    "The grammar-provider block the settings page renders, with masks only."
-    return {
-        "selected": selected_grammar_provider(),
-        "providers": [grammar_provider_status(p) for p in _API_PROVIDERS],
-    }
+    "Backward-compatible alias for the single provider block."
+    return all_status()
 
 
 def save_grammar_config(provider, token=None, base_url=None, model=None, enabled=None):
     """
     Save one API provider's key (encrypted), Base URL and model.
 
-    ``enabled`` is optional: True selects this provider, False deselects it
-    (only when it was selected).  The key itself is never echoed back.
+    ``enabled`` is optional: True selects this provider for both AI
+    features, False deselects it (only when it was selected).  The key
+    itself is never echoed back.
     """
     if provider not in _API_PROVIDERS:
-        raise AiError(f"Unknown grammar AI provider: {provider}", "unsupported")
+        raise AiError(f"Unknown AI provider: {provider}", "unsupported")
     if base_url is not None:
         _set(
             _api_base_url_key(provider),
@@ -441,7 +608,7 @@ def save_grammar_config(provider, token=None, base_url=None, model=None, enabled
 def clear_grammar_config(provider):
     "Forget the stored API key; also deselect the provider if selected."
     if provider not in _API_PROVIDERS:
-        raise AiError(f"Unknown grammar AI provider: {provider}", "unsupported")
+        raise AiError(f"Unknown AI provider: {provider}", "unsupported")
     _set(_api_key_key(provider), "")
     if selected_grammar_provider() == provider:
         _set_grammar_provider("")
@@ -455,16 +622,16 @@ def grammar_ready(provider=None):
     Returns the internal call context (including the decrypted key).  Callers
     must never serialize this dict.
     """
-    provider = (provider or "").strip() or selected_grammar_provider()
+    provider = (provider or "").strip() or selected_provider()
     if not provider:
         raise AiError(
-            "No grammar AI provider is enabled. Add an OpenAI or Anthropic "
-            "API key in Settings and enable it for grammar analysis.",
+            "No AI provider is enabled. Add an OpenAI or Anthropic API key "
+            "in Settings.",
             "unconfigured",
         )
     p = _API_PROVIDERS.get(provider)
     if p is None:
-        raise AiError(f"Unknown grammar AI provider: {provider}", "unsupported")
+        raise AiError(f"Unknown AI provider: {provider}", "unsupported")
     token = _api_token(provider)
     if not token:
         raise AiError(

@@ -84,6 +84,10 @@
   // The sentence dictionaries configured for the language.  This var
   // is used in lute.js.
   var LUTE_SENTENCE_LOOKUP_DICTS = {{ sentence_dict_uris|safe }};
+  // The language's "AI grammar analysis" switch (Language form).  When
+  // false the Grammar panel keeps the grammar library but drops the AI
+  // section, so the entry point disappears instead of failing on click.
+  window.LUTE_AI_GRAMMAR_ENABLED = {{ ai_grammar_enabled|tojson }};
   var LUTE_BOOK_TYPE = {{ book_type|tojson }};
   // What auto-fills a new term's translation (see tts-translate.js):
   // 'online', or 'local_dict' = this language's local dictionary first,

@@ -259,13 +259,16 @@ def test_grammar_analyze_unconfigured_and_auth_errors(monkeypatch, app_context, 
     assert TOKEN not in body
 
 
-def test_settings_page_has_exactly_two_api_cards_and_masks(app_context, client):
-    "Only OpenAI and Anthropic remain; no web-session cards or keys."
+def test_settings_page_has_one_section_and_two_api_cards(app_context, client):
+    "The old Sentence-provider selector is gone; only the two cards remain."
     _configure(client)
     resp = client.get("/settings/index")
     assert resp.status_code == 200
     body = resp.get_data(as_text=True)
-    assert "AI sentence translation" in body
+    assert "AI provider (API key)" in body
+    assert "Use this provider for sentence translation and grammar analysis" in body
+    assert "id=\"ai_provider_select\"" not in body
+    assert "Provider used by the reader Sentence tab" not in body
     assert 'data-provider="openai"' in body
     assert 'data-provider="anthropic"' in body
     assert body.count('class="ai-grammar-provider"') == 2
@@ -273,6 +276,20 @@ def test_settings_page_has_exactly_two_api_cards_and_masks(app_context, client):
         assert removed not in body.lower()
     assert TOKEN not in body
     assert "••••••7890" in body
+
+
+def test_settings_page_explains_legacy_provider_conflict(app_context, client):
+    "Old sentence/grammar choices that disagree are explained, not hidden."
+    from lute.models.repositories import UserSettingRepository
+
+    repository = UserSettingRepository(db.session)
+    repository.set_dynamic_value("ai_sentence_provider", "openai")
+    repository.set_dynamic_value("ai_grammar_provider", "anthropic")
+    db.session.commit()
+
+    body = client.get("/settings/index").get_data(as_text=True)
+    assert "Your old settings chose" in body
+    assert "is now used for both" in body
 
 
 def test_read_page_uses_the_ai_tab(app_context, client, english):
@@ -306,3 +323,115 @@ def test_grammar_target_language_follows_the_language_setting(app_context, engli
     english.grammar_translate_lang = "xx"
     db.session.commit()
     assert _grammar_language_context(english.id)[1] == "English"
+
+
+def test_translate_returns_the_structured_result(monkeypatch, app_context, client):
+    "The SSE stream carries translation, segments, grammar, context, examples."
+    _configure(client)
+    result = {
+        "translation": "Hello, world.",
+        "segments": [
+            {"part": "Hello", "reading": "", "meaning": "你好", "role": "greeting"}
+        ],
+        "grammar": [{"point": "compound", "explanation": "Two clauses.", "fragment": "Hello, world"}],
+        "context": "A neutral greeting.",
+        "examples": [{"source": "Hello!", "translation": "你好！"}],
+    }
+    text = json.dumps(result, ensure_ascii=False)
+    monkeypatch.setattr(
+        "lute.ai.service.requests.post",
+        lambda *a, **k: FakeResponse(
+            lines=_sse({"choices": [{"delta": {"content": text}}]})
+        ),
+    )
+    body = client.post(
+        "/ai/translate", json={"q": "Hello, world.", "lang": ""}
+    ).get_data(as_text=True)
+    assert "event: result" in body
+    assert '"segments"' in body
+    assert '"examples"' in body
+    assert '"cached": false' in body
+    assert TOKEN not in body
+
+
+def test_translate_cache_hit_skips_the_provider_and_shows_no_loading(
+    monkeypatch, app_context, client
+):
+    "A stored structured result is returned without a second API call."
+    _configure(client)
+    result = {"translation": "Hello.", "segments": [], "examples": []}
+    text = json.dumps(result, ensure_ascii=False)
+    monkeypatch.setattr(
+        "lute.ai.service.requests.post",
+        lambda *a, **k: FakeResponse(
+            lines=_sse({"choices": [{"delta": {"content": text}}]})
+        ),
+    )
+    first = client.post("/ai/translate", json={"q": "Hello.", "lang": ""}).get_data(
+        as_text=True
+    )
+    assert "event: result" in first
+
+    monkeypatch.setattr(
+        "lute.ai.service.requests.post",
+        lambda *a, **k: pytest.fail("cache hit should not call the provider"),
+    )
+    body = client.post("/ai/translate", json={"q": "Hello.", "lang": ""}).get_data(
+        as_text=True
+    )
+    assert '"cached": true' in body
+    assert '"translation": "Hello."' in body
+    assert "event: text" not in body
+
+
+def test_sentence_translation_can_be_turned_off_for_a_language(
+    app_context, client, english
+):
+    "The backend refuses with the same readable reason the UI shows."
+    english.ai_sentence_translation = False
+    db.session.commit()
+
+    body = client.post(
+        "/ai/translate", json={"q": "Hello", "lang": english.id}
+    ).get_data(as_text=True)
+    assert "event: error" in body
+    assert "unsupported" in body
+    assert "Language settings" in body
+
+    page = client.get(f"/ai/sentence?q=Hello&lang={english.id}").get_data(as_text=True)
+    assert "turned off for this language" in page
+
+
+def test_grammar_analysis_can_be_turned_off_for_a_language(
+    app_context, client, english
+):
+    "Off hides the AI section on the read page and rejects the endpoint."
+    english.ai_grammar_analysis = False
+    db.session.commit()
+
+    body = client.post(
+        "/ai/grammar/analyze", json={"q": "Hello.", "lang": english.id}
+    ).get_data(as_text=True)
+    assert "event: error" in body
+    assert "unsupported" in body
+    assert "Language settings" in body
+
+    book = make_book("AI off", "This is a sentence.", english)
+    db.session.add(book)
+    db.session.commit()
+    page = client.get(f"/read/{book.id}").get_data(as_text=True)
+    assert "LUTE_AI_GRAMMAR_ENABLED = false" in page
+
+
+def test_sentence_tab_hides_ai_when_the_language_turns_it_off(
+    app_context, client, english
+):
+    "No AI tab is offered for a language that opted out."
+    english.ai_sentence_translation = False
+    db.session.commit()
+    book = make_book("Sentence AI off", "This is a sentence.", english)
+    db.session.add(book)
+    db.session.commit()
+
+    page = client.get(f"/read/{book.id}").get_data(as_text=True)
+    assert "/ai/sentence?lang=" not in page
