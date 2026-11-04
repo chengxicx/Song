@@ -426,7 +426,16 @@
    */
   function wrapSentences(root) {
     const blocks = Array.from(root.querySelectorAll("*")).filter((el) => {
-      if (!BLOCK_TAGS.has(el.tagName.toLowerCase())) return false;
+      const tag = el.tagName.toLowerCase();
+      // A table is never a sentence container.  Wrapping it puts
+      // `.textsentence` spans between <table> and its <tbody> and clones
+      // a tbody/tr/td per sentence -- invalid table structure that the
+      // browser lays out as side-by-side fragments, so a book's
+      // table-typeset TOC page scatters into one block per word.  The
+      // cells and paragraphs inside it are blocks in their own right and
+      // still get wrapped.
+      if (tag === "table") return false;
+      if (!BLOCK_TAGS.has(tag)) return false;
       if (!el.querySelector("span.word")) return false;
       // Only the innermost block: a <div> holding <p>s must not swallow
       // its children's sentences.

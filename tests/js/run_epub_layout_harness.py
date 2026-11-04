@@ -42,6 +42,16 @@ Checks:
      The harness carries that rule verbatim, so the scope check below
      (text-indent 24px = 1.5em against the inherited 16px) and the
      A+ check both go red without the fix in styles.css.
+  11. a table-typeset TOC chapter keeps its table.  Calibre-made
+     Japanese books lay their 目次 page out as a `<table>`; the browser
+     auto-inserts the `<tbody>`, which is not a block tag, so the
+     sentence wrapper saw the table itself as the innermost block,
+     cloned a tbody/tr/td per sentence and inserted `.textsentence`
+     spans between `<table>` and its `<tbody>` -- invalid table
+     structure the browser lays out as side-by-side fragments, i.e.
+     the scattered word-block TOC page.  The table must keep exactly
+     one table element, an untouched table/tbody/tr/td chain, and
+     stack its cells' paragraphs vertically.
 
 Run:  ./venv/bin/python tests/js/run_epub_layout_harness.py
 """
@@ -71,6 +81,25 @@ CHAPTER = """<div class="epub-body novel">
 <div class="fixed-deco"></div>
 </div>"""
 
+# A calibre-made Japanese table of contents.  The `<tr>` has no explicit
+# `<tbody>` in the source, exactly like the book's own page, so the
+# browser inserts one -- which is what made the table look like the
+# innermost block to wrapSentences.
+TOC_CHAPTER = """<div class="epub-body novel">
+<table class="pcalibre middle">
+<tr>
+<td class="pcalibre1"><div class="pt"><p>目次</p><p>事件</p><p>の章　野々口 馨</p></div></td>
+<td class="pcalibre2"><div class="pt"><p>疑惑</p><p>の章　加賀 恭一郎</p></div></td>
+<td class="pcalibre3"><div class="pt"><p>純白</p><p>の章　新田 由加里</p></div></td>
+</tr>
+<tr>
+<td><div class="pt"><p>過去</p><p>の章　加賀 恭一郎</p></div></td>
+<td><div class="pt"><p>兆し</p><p>の章　野々口 馨</p></div></td>
+<td><div class="pt"><p>標的</p><p>の章　新田 由加里</p></div></td>
+</tr>
+</table>
+</div>"""
+
 BOOK_CSS = """
 html body { margin: 0; font-family: Georgia, serif; }
 body.novel p { text-indent: 1.5em; }
@@ -80,12 +109,12 @@ h2 { font-size: 32px; color: #000; }
 """
 
 
-def chapter_text():
+def chapter_text(chapter=None):
     "The chapter's rendered text -- what the token stream has to match."
-    return BeautifulSoup(CHAPTER, "html.parser").get_text("")
+    return BeautifulSoup(chapter or CHAPTER, "html.parser").get_text("")
 
 
-def build_tokens():
+def build_tokens(chapter=None):
     """Word / non-word runs over the chapter's own text.
 
     The front end aligns the token stream against the DOM character by
@@ -93,7 +122,7 @@ def build_tokens():
     split into runs -- which words the runs contain does not matter to
     the layout checks, so anything alphanumeric counts as a word.
     """
-    text = chapter_text()
+    text = chapter_text(chapter)
     tokens = []
     sentence = 0
     for ch in text:
@@ -110,10 +139,11 @@ def build_tokens():
     return tokens
 
 
-def build_html(theme_css_uri, orig_css_uri):
+def build_html(theme_css_uri, orig_css_uri, chapter=None):
     """The generated harness page."""
+    chapter = chapter or CHAPTER
     css = scope_css(BOOK_CSS, "", "/static/epub/x")
-    tokens = build_tokens()
+    tokens = build_tokens(chapter)
     # The token entries are [text, wo_id, status, sentence, paragraph]
     # as plain arrays; json keeps them compact for the embed.
     import json
@@ -139,7 +169,7 @@ div#thetext p {{ font-size: 18px; }}
   <div id="thetext" class="epub-text-container">
     <div id="epub-chapter"
          data-epub-css="{theme_css_uri}"
-         data-epub-orig-css="{orig_css_uri}">{CHAPTER}</div>
+         data-epub-orig-css="{orig_css_uri}">{chapter}</div>
     <script type="application/json" id="lute-epub-tokens">{json.dumps(tokens)}</script>
   </div>
   <div id="outside"><p>outside paragraph</p></div>
@@ -224,6 +254,12 @@ def main():
     harness.write_text(
         build_html(theme_css.as_uri(), orig_css.as_uri()), encoding="utf-8"
     )
+    # Same page, same real scripts, but a calibre table-typeset TOC.
+    toc_harness = tmpdir / "toc.html"
+    toc_harness.write_text(
+        build_html(theme_css.as_uri(), orig_css.as_uri(), TOC_CHAPTER), encoding="utf-8"
+    )
+    toc_paragraphs = len(BeautifulSoup(TOC_CHAPTER, "html.parser").find_all("p"))
 
     with sync_playwright() as p:
         browser = p.chromium.launch(channel="msedge", headless=True)
@@ -576,6 +612,93 @@ def main():
             and zoom_effect["imgInWithinColumn"],
             " word x%.2f imgInColumn=%s"
             % (zoom_effect["wordIn"], zoom_effect["imgInWithinColumn"]),
+        )
+
+        # 11. table-typeset TOC.  The TOC page's table must survive the
+        # word and sentence spans: `<table>` is not a sentence container
+        # (its cells' paragraphs are), otherwise the clone-per-sentence
+        # leaves `.textsentence` spans between `<table>` and `<tbody>`.
+        toc_page = browser.new_page(viewport={"width": 900, "height": 700})
+        toc_errors = []
+        toc_page.on("pageerror", lambda e: toc_errors.append(str(e)))
+        toc_page.goto(toc_harness.as_uri())
+        toc_page.wait_for_function(
+            "() => document.querySelectorAll('span.word').length > 0", timeout=5000
+        )
+        check("toc: no page errors", not toc_errors, " %s" % toc_errors[:1])
+
+        toc = toc_page.evaluate(
+            """() => {
+              const body = document.querySelector('.epub-body');
+              const table = body.querySelector('table');
+              const TABLE_CHILDREN = ['tbody', 'thead', 'tfoot', 'caption', 'colgroup'];
+              const tableChildren = Array.from(table.children)
+                .map(c => c.tagName.toLowerCase());
+              const strayUnderTable = tableChildren.filter(
+                t => !TABLE_CHILDREN.includes(t));
+              const structureOk = Array.from(body.querySelectorAll('tbody, tr, td'))
+                .every(el => ['TABLE', 'TBODY', 'TR'].includes(el.parentElement.tagName));
+              const cells = Array.from(body.querySelectorAll('td'));
+              // Each cell's entries are lines of the TOC: same left edge,
+              // one below the other.  Side-by-side fragments (the broken
+              // layout) share a top instead.
+              const stackOk = cells.every(td => {
+                const rects = Array.from(td.querySelectorAll('p'))
+                  .map(p => p.getBoundingClientRect());
+                return rects.every((r, i) =>
+                  i === 0 ||
+                  (Math.abs(r.left - rects[0].left) < 1 &&
+                   r.top > rects[i - 1].top + 8));
+              });
+              return {
+                tables: body.querySelectorAll('table').length,
+                tableChildren: tableChildren.join(','),
+                strayUnderTable: strayUnderTable.join(','),
+                structureOk,
+                stackOk,
+                cells: cells.length,
+                paragraphCount: body.querySelectorAll('p').length,
+                sentenceInParagraph:
+                  body.querySelectorAll('p > span.textsentence').length,
+                scrollW: document.documentElement.scrollWidth,
+                clientW: document.documentElement.clientWidth,
+              };
+            }"""
+        )
+        check(
+            "toc: the table-typeset page keeps its one table",
+            toc["tables"] == 1,
+            " %d" % toc["tables"],
+        )
+        check(
+            "toc: no sentence wrappers between <table> and <tbody>",
+            toc["strayUnderTable"] == "" and toc["tableChildren"] == "tbody",
+            " table children %s / stray %s"
+            % (toc["tableChildren"], toc["strayUnderTable"]),
+        )
+        check(
+            "toc: table/tbody/tr/td chain is intact",
+            toc["structureOk"],
+        )
+        check(
+            "toc: every entry paragraph is still there",
+            toc["paragraphCount"] == toc_paragraphs,
+            " %d / %d" % (toc["paragraphCount"], toc_paragraphs),
+        )
+        check(
+            "toc: each cell stacks its entries",
+            toc["stackOk"] and toc["cells"] == 6,
+            " %d cells" % toc["cells"],
+        )
+        check(
+            "toc: sentence wrappers still wrap the prose",
+            toc["sentenceInParagraph"] == toc_paragraphs,
+            " %d / %d" % (toc["sentenceInParagraph"], toc_paragraphs),
+        )
+        check(
+            "toc: the page has no sideways scroll",
+            toc["scrollW"] <= toc["clientW"] + 1,
+            " %d / %d" % (toc["scrollW"], toc["clientW"]),
         )
 
         browser.close()
