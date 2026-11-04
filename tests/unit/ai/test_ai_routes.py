@@ -114,12 +114,14 @@ def test_translate_401_is_an_error_event_and_retry_works(
     _configure(client)
     monkeypatch.setattr(
         "lute.ai.service.requests.post",
-        lambda *a, **k: FakeResponse(status_code=401, body="do not echo"),
+        lambda *a, **k: FakeResponse(
+            status_code=401, body=json.dumps({"error": {"message": "invalid api key"}})
+        ),
     )
     body = client.post("/ai/translate", json={"q": "Hello"}).get_data(as_text=True)
     assert "event: error" in body
     assert "auth" in body
-    assert "do not echo" not in body
+    assert "invalid api key" in body
     assert TOKEN not in body
 
     monkeypatch.setattr(
@@ -244,14 +246,16 @@ def test_grammar_analyze_unconfigured_and_auth_errors(monkeypatch, app_context, 
     _configure(client, enabled=True)
     monkeypatch.setattr(
         "lute.ai.service.requests.post",
-        lambda *a, **k: FakeResponse(status_code=401, body="do not echo"),
+        lambda *a, **k: FakeResponse(
+            status_code=401, body=json.dumps({"error": {"message": "Forbidden"}})
+        ),
     )
     body = client.post(
         "/ai/grammar/analyze", json={"q": "Hello.", "lang": ""}
     ).get_data(as_text=True)
     assert "event: error" in body
     assert "auth" in body
-    assert "do not echo" not in body
+    assert "Forbidden" in body
     assert TOKEN not in body
 
 
