@@ -109,7 +109,11 @@ def edit_settings():
             str_val = str(field.data or "")
             field.data = 1 if str_val in true_vals else 0
 
-    return render_template("settings/form.html", form=form)
+    from lute.ai.service import all_status as ai_all_status
+
+    return render_template(
+        "settings/form.html", form=form, ai_providers=ai_all_status()
+    )
 
 
 @bp.route("/test_mecab", methods=["GET"])
