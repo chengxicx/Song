@@ -887,6 +887,8 @@
   "Use this provider for sentence translation and grammar analysis": "句译与语法分析都使用此服务商",
   "AI features": "AI 功能",
   "The AI provider and API key are configured once in Settings.  These switches decide which AI features this language uses; both are on by default.": "AI 服务商与 API 密钥只需在设置页配置一次。这里的开关决定该语言使用哪些 AI 功能，默认全部开启。",
+  "AI analysis & translation language": "AI 分析与翻译语言",
+  "Language of grammar explanations and of sentence translation, word meanings, context notes and example translations.  Google Translate Target above is separate.": "用于语法解释，以及句译的译文、逐词含义、语境说明和例句翻译。上方的 Google 翻译目标语言与此无关。",
   "Show the AI entry in the reader's Sentence tab for this language.": "在阅读页「句子」页签里显示该语言的 AI 入口。",
   "Use AI in the Grammar panel.  Off hides the AI section; the grammar library itself is unaffected.": "在「语法」面板中使用 AI。关闭后隐藏 AI 区块，语法库本身不受影响。",
   "AI grammar analysis is turned off for this language in Language settings.": "该语言已在语言设置中关闭 AI 语法分析。",
