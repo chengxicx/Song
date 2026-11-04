@@ -117,6 +117,13 @@ class Service:
             self.session.add(lang)
         self.session.commit()
 
+        # The AI sentence tab is a dictionary row (see
+        # Language.active_dict_uris); add it where the hardcoded tab
+        # used to appear for every demo language.
+        for lang in supported:
+            lang.ensure_ai_dictionary_row()
+        self.session.commit()
+
     def load_demo_stories(self):
         "Load the stories for any languages already loaded."
         demo_langs = self._demo_languages()
