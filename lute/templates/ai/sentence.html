@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ t('Sentence translation') }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ vstatic('css/styles.css') }}" />
+    {% if theme_css_hash %}
+    <link rel="stylesheet" type="text/css" href="/theme/current?v={{ theme_css_hash }}">
+    {% endif %}
+    {% if custom_styles %}
+    <link rel="stylesheet" type="text/css" href="/theme/custom_styles?v={{ custom_styles_hash }}">
+    {% endif %}
+    <style>
+      body {
+        margin: 0;
+        padding: 1.1rem 1.4rem 1.4rem;
+      }
+      .ai-card { max-width: 46rem; }
+      .ai-eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: color-mix(in srgb, var(--font-color, #888) 55%, transparent);
+        margin: 0 0 0.35rem 0;
+      }
+      .ai-source {
+        margin: 0 0 0.9rem 0;
+        padding: 0.65rem 0.85rem;
+        border-left: 3px solid color-mix(in srgb, var(--font-color, #888) 30%, transparent);
+        border-radius: 0.25rem;
+        background: color-mix(in srgb, var(--font-color, #888) 6%, transparent);
+        font-size: 0.95rem;
+        line-height: 1.45;
+        overflow-wrap: anywhere;
+      }
+      .ai-result {
+        font-size: 1.05rem;
+        line-height: 1.55;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        min-height: 1.5rem;
+      }
+      .ai-result:empty::after {
+        content: '…';
+        opacity: 0.5;
+      }
+      .ai-error {
+        margin: 0.4rem 0 0;
+        padding: 0.6rem 0.75rem;
+        border-radius: 0.25rem;
+        color: #b3261e;
+        background: color-mix(in srgb, #b3261e 10%, transparent);
+        font-size: 0.9rem;
+        line-height: 1.45;
+        white-space: pre-wrap;
+      }
+      .ai-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.6rem;
+        margin-top: 1rem;
+        font-size: 0.85rem;
+      }
+      .ai-actions a { color: inherit; }
+      .ai-guidance {
+        max-width: 46rem;
+        font-size: 0.92rem;
+        line-height: 1.5;
+      }
+      .ai-guidance h1 {
+        font-size: 1.05rem;
+        margin: 0 0 0.5rem 0;
+      }
+      .ai-guidance .ai-source { margin-top: 0.8rem; }
+    </style>
+  </head>
+  <body>
+    {% if configured %}
+    <div class="ai-card">
+      <div class="ai-eyebrow">{{ provider_label }}</div>
+      <div class="ai-source">{{ sentence }}</div>
+      <div id="ai-result" class="ai-result" aria-live="polite"></div>
+      <div id="ai-error" class="ai-error" hidden></div>
+      <div class="ai-actions">
+        <button type="button" id="ai-retry" class="btn btn-secondary">
+          {{ t('Retry') }}
+        </button>
+        <a href="{{ fallback_url }}" target="_blank" rel="noopener">
+          {{ t('Open in a new tab') }}
+        </a>
+        <a href="{{ settings_url }}" target="_top">{{ t('AI settings') }}</a>
+      </div>
+    </div>
+    <script>
+      (function () {
+        var TEXT = {{ sentence|tojson }};
+        var LANG = {{ lang_id|tojson }};
+        var resultEl = document.getElementById('ai-result');
+        var errorEl = document.getElementById('ai-error');
+        var retryEl = document.getElementById('ai-retry');
+
+        function showError(message) {
+          errorEl.textContent = message;
+          errorEl.hidden = false;
+          retryEl.disabled = false;
+        }
+
+        function handleEvent(raw) {
+          var eventName = 'message';
+          var dataLines = [];
+          raw.split('\n').forEach(function (line) {
+            if (line.indexOf('event:') === 0) eventName = line.slice(6).trim();
+            else if (line.indexOf('data:') === 0) dataLines.push(line.slice(5).trim());
+          });
+          if (!dataLines.length) return;
+          var data;
+          try { data = JSON.parse(dataLines.join('\n')); } catch (e) { return; }
+          if (eventName === 'text' && data.text) {
+            resultEl.textContent += data.text;
+          } else if (eventName === 'error') {
+            showError(data.message || '{{ t("Translation failed.") }}');
+          } else if (eventName === 'done') {
+            retryEl.disabled = false;
+          }
+        }
+
+        async function run() {
+          resultEl.textContent = '';
+          errorEl.hidden = true;
+          errorEl.textContent = '';
+          retryEl.disabled = true;
+          try {
+            var resp = await fetch('/ai/translate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ q: TEXT, lang: LANG })
+            });
+            if (!resp.ok || !resp.body) {
+              throw new Error('HTTP ' + resp.status);
+            }
+            var reader = resp.body.getReader();
+            var decoder = new TextDecoder();
+            var buffer = '';
+            while (true) {
+              var chunk = await reader.read();
+              if (chunk.done) break;
+              buffer += decoder.decode(chunk.value, { stream: true });
+              var idx;
+              while ((idx = buffer.indexOf('\n\n')) >= 0) {
+                handleEvent(buffer.slice(0, idx));
+                buffer = buffer.slice(idx + 2);
+              }
+            }
+            if (buffer.trim()) handleEvent(buffer);
+          } catch (e) {
+            showError('{{ t("Could not reach the translator.") }} ' + e.message);
+          }
+          retryEl.disabled = false;
+        }
+
+        retryEl.addEventListener('click', run);
+        run();
+      })();
+    </script>
+    {% else %}
+    <div class="ai-guidance">
+      <h1>{{ t('Set up an AI provider to translate sentences') }}</h1>
+      <p>
+        {{ t('The Sentence tab now translates through a service you bind on the Settings page.  No provider is bound for this account yet, so nothing was sent anywhere.') }}
+      </p>
+      <p>
+        <a href="{{ settings_url }}" target="_top">{{ t('Open AI settings') }}</a>
+        &nbsp;·&nbsp;
+        <a href="{{ fallback_url }}" target="_blank" rel="noopener">
+          {{ t('Open') }} {{ provider_label }} {{ t('in a new tab') }}</a>
+      </p>
+      <div class="ai-source">{{ sentence }}</div>
+    </div>
+    {% endif %}
+  </body>
+</html>
