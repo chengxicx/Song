@@ -22,12 +22,28 @@ TOKEN = "sk-test-abcdef1234567890"
 class FakeResponse:
     "Minimal stand-in for requests.Response with streaming lines."
 
-    def __init__(self, status_code=200, lines=None, body="", payload=None, ctype=None):
+    def __init__(
+        self,
+        status_code=200,
+        lines=None,
+        body="",
+        payload=None,
+        ctype=None,
+        content=None,
+    ):
         self.status_code = status_code
         self._lines = lines or []
         self.text = body
         self._payload = payload
         self.headers = {"Content-Type": ctype or "text/event-stream"}
+        if content is not None:
+            self.content = content
+        elif body:
+            self.content = body.encode("utf-8")
+        elif payload is not None:
+            self.content = json.dumps(payload).encode("utf-8")
+        else:
+            self.content = b""
 
     def iter_lines(self, decode_unicode=False):  # pylint: disable=unused-argument
         for line in self._lines:
@@ -484,3 +500,62 @@ def test_clear_removes_the_key_and_grammar_selection(app_context):
     state = service.clear_grammar_config("openai")
     assert state["configured"] is False
     assert service.selected_grammar_provider() == ""
+
+
+def test_sse_without_charset_is_decoded_as_utf8(
+    monkeypatch, app_context, openai_configured
+):
+    "A text/event-stream body with no charset still yields real CJK text."
+    lines = [
+        'data: {"choices":[{"delta":{"content":"一"}}]}'.encode("utf-8"),
+        'data: {"choices":[{"delta":{"content":"緒"}}]}'.encode("utf-8"),
+        'data: {"choices":[{"delta":{"content":"に"}}]}'.encode("utf-8"),
+        b"data: [DONE]",
+    ]
+    monkeypatch.setattr(
+        service.requests,
+        "post",
+        lambda *a, **k: FakeResponse(lines=lines, ctype="text/event-stream"),
+    )
+    chunks = list(service.translate_stream("openai", "Hello"))
+    assert "".join(chunks) == "一緒に"
+    assert "\u00e4" not in "".join(chunks)
+
+
+def test_plain_json_without_charset_is_decoded_as_utf8(
+    monkeypatch, app_context, openai_configured
+):
+    "A non-streamed JSON body is decoded as UTF-8, not ISO-8859-1."
+    body = json.dumps(
+        {"choices": [{"message": {"content": "日本語の文法"}}]},
+        ensure_ascii=False,
+    ).encode("utf-8")
+    monkeypatch.setattr(
+        service.requests,
+        "post",
+        lambda *a, **k: FakeResponse(content=body, ctype="application/json"),
+    )
+    chunks = list(service.translate_stream("openai", "Hello"))
+    assert "".join(chunks) == "日本語の文法"
+
+
+def test_error_body_without_charset_is_decoded_as_utf8(
+    monkeypatch, app_context, openai_configured
+):
+    "The upstream error message stays readable instead of mojibake."
+    body = json.dumps(
+        {"error": {"message": "您已达到免费用户的 API 速率限制"}},
+        ensure_ascii=False,
+    ).encode("utf-8")
+    monkeypatch.setattr(
+        service.requests,
+        "post",
+        lambda *a, **k: FakeResponse(
+            status_code=429, content=body, ctype="application/json"
+        ),
+    )
+    with pytest.raises(AiError) as exc:
+        list(service.translate_stream("openai", "Hello"))
+    assert exc.value.kind == "rate"
+    assert "您已达到免费用户的 API 速率限制" in exc.value.message
+    assert "ä" not in exc.value.message

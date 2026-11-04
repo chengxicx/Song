@@ -595,6 +595,41 @@ def _redact(text, secret):
     return text
 
 
+def _declared_charset(resp):
+    "The charset explicitly declared in Content-Type, or ''."
+    ctype = getattr(resp, "headers", None) or {}
+    content_type = ctype.get("Content-Type") or ""
+    for part in content_type.split(";"):
+        name, _, value = part.strip().partition("=")
+        if name.lower() == "charset":
+            return value.strip().strip('"').strip("'")
+    return ""
+
+
+def _decode_utf8(raw, charset=""):
+    """
+    Decode upstream bytes as UTF-8, whatever the response claims.
+
+    requests falls back to ISO-8859-1 when a Content-Type has no charset,
+    which turns Chinese/Japanese text into latin fragments.  A declared
+    non-UTF-8 charset is honoured only as a last resort.
+    """
+    if isinstance(raw, str):
+        return raw
+    try:
+        return raw.decode("utf-8")
+    except (UnicodeDecodeError, AttributeError):
+        return raw.decode(charset or "latin-1", "replace")
+
+
+def _response_text(resp):
+    "The full body as text, decoded as UTF-8 rather than via resp.encoding."
+    content = getattr(resp, "content", None)
+    if isinstance(content, (bytes, bytearray)) and content:
+        return _decode_utf8(bytes(content), _declared_charset(resp))
+    return getattr(resp, "text", "") or ""
+
+
 def _upstream_detail(resp, token):
     """
     A short, sanitized message from an upstream error body.
@@ -603,7 +638,7 @@ def _upstream_detail(resp, token):
     request headers -- and the key is redacted before it reaches the UI.
     """
     try:
-        body = (resp.text or "")[:1000]
+        body = _response_text(resp)[:1000]
     except Exception:  # pylint: disable=broad-exception-caught
         return ""
     message = ""
@@ -689,12 +724,16 @@ def _iter_sse_payloads(resp):
     ``data: {...}``, some omit the space, and a few send one raw JSON object
     per line.  ``event:`` lines only name the type and are skipped here;
     Anthropic's payload carries the same type inside the JSON.
+
+    Lines are read as bytes and decoded here: ``decode_unicode=True`` would
+    use ``resp.encoding``, which is ISO-8859-1 for a ``text/event-stream``
+    body without a charset and mangles every CJK character.
     """
-    for raw in resp.iter_lines(decode_unicode=True):
+    charset = _declared_charset(resp)
+    for raw in resp.iter_lines(decode_unicode=False):
         if raw is None:
             continue
-        line = raw.decode("utf-8", "replace") if isinstance(raw, bytes) else raw
-        line = line.strip()
+        line = _decode_utf8(raw, charset).strip()
         if not line:
             continue
         if line.startswith("data:"):
@@ -714,9 +753,9 @@ def _iter_sse_payloads(resp):
 
 
 def _response_json(resp, label):
-    "Decode a whole JSON body, or report an unreadable answer."
+    "Decode a whole JSON body as UTF-8, or report an unreadable answer."
     try:
-        return resp.json()
+        return json.loads(_response_text(resp))
     except ValueError as e:
         raise AiError(f"{label} returned an unreadable response.", "upstream") from e
 
