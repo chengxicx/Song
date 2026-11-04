@@ -532,7 +532,12 @@ def test_a_percent_encoded_source_name_is_decoded(app, app_context, dict_dirs):
         {"title": "", "source": "moji%b4%c7%ca%e9:MOJi%b4%c7%95%f8.mdx"},
     )
 
-    assert service.status("moji-b4-c7.db")["title"] == "moji辞书:MOJi辞書"
+    info = service.status("moji-b4-c7.db")
+
+    assert info["title"] == "moji辞书:MOJi辞書"
+    # The settings list shows this field ("imported from ..."), so it
+    # is decoded too; the raw value stays in the sidecar.
+    assert info["source"] == "moji辞书:MOJi辞書.mdx"
 
 
 def test_a_dictionary_with_no_metadata_falls_back_to_its_file_name(

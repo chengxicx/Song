@@ -101,8 +101,49 @@ const DictSettings = (function () {
   }
 
   /**
-   * One row: what the dictionary is, where to download it, and a Remove
-   * button.
+   * The compact facts shown on a row's second line: entries and size.
+   * Provenance (source, dates) lives in the row's Details toggle; the
+   * list stays one line per dictionary.
+   */
+  function summary(d) {
+    if (!d) return "";
+    const parts = [];
+    if (d.entries !== null && d.entries !== undefined) {
+      parts.push(d.entries.toLocaleString() + " " + I18N.t("entries"));
+    }
+    if (d.size_mb !== null && d.size_mb !== undefined) {
+      parts.push(d.size_mb + " MB");
+    }
+    return parts.join(" \u00b7 ");
+  }
+
+  /**
+   * The folded-away details: pool file name, download URL, where the
+   * .mdx came from, and when it was imported.  Hidden until the row's
+   * Details button is pressed; the same text is also on the row's
+   * hover title.
+   */
+  function detailsBody(d) {
+    const rows = [];
+    if (d.filename) rows.push(_esc(d.filename));
+    if (d.url) {
+      rows.push('<a href="' + _esc(d.url) + '">' + _esc(d.url) + "</a>");
+    }
+    // A dictionary the .mdx left untitled is named after the file it was
+    // built from (the server falls back to that), so the provenance
+    // would only repeat the title.
+    const source = d.source && d.title && d.source.indexOf(d.title) === 0
+      ? ""
+      : d.source;
+    if (source) rows.push(I18N.t("imported from ") + _esc(source));
+    if (d.imported_at) rows.push(I18N.t("on ") + _esc(d.imported_at));
+    if (rows.length === 0) return "";
+    return '<div class="dict-settings__body" hidden>' + rows.join("<br>") + "</div>";
+  }
+
+  /**
+   * One compact row: the dictionary's name, its entries/size line, a
+   * Details toggle, and a small Remove button on the right.
    *
    * The button is an inline onclick rather than a delegated listener,
    * matching the card's other buttons.  The file name is safe to embed
@@ -110,31 +151,50 @@ const DictSettings = (function () {
    * _POOL_NAME_RE), which cannot contain a quote or a separator.
    */
   function rowHtml(d) {
-    // Styled inline like the rest of the card rather than with new
-    // classes in styles.css: this is a server-level admin card, and the
-    // theme files are the wrong place for it.
     const name = d.filename;
-    const facts = describe(d);
-    const parts = [
-      '<div style="border-top: 1px solid #ddd; padding: 6px 0;">',
-      "<b>" + _esc(d.title || name) + "</b>",
-    ];
-    parts.push(
-      '<div style="font-size: 0.85em; color: #666;">' + _esc(name) +
-      (facts ? " \u00b7 " + _esc(facts) : "") + "</div>"
-    );
-    if (d.url) {
-      parts.push(
-        '<div style="font-size: 0.85em; margin: 2px 0 4px 0;">' +
-        '<a href="' + _esc(d.url) + '">' + _esc(d.url) + "</a></div>"
-      );
+    const label = d.title || name;
+    const facts = summary(d);
+    const hover = [name, d.url, d.source, d.imported_at].filter(Boolean).join(" \u00b7 ");
+    return [
+      '<div class="dict-settings__item">',
+      '<div class="dict-settings__row" title="' + _esc(hover) + '">',
+      '<div class="dict-settings__main">',
+      '<div class="dict-settings__title">' + _esc(label) + "</div>",
+      facts
+        ? '<div class="dict-settings__summary">' + _esc(facts) + "</div>"
+        : "",
+      "</div>",
+      '<div class="dict-settings__actions">',
+      '<button type="button" class="dict-settings__more" aria-expanded="false"' +
+        " onclick=\"DictSettings.toggleDetails(this); return false;\">" +
+        I18N.t("Details") + "</button>",
+      '<button type="button" class="dict-settings__remove"' +
+        ' aria-label="' + _esc(I18N.t("Remove") + " " + label) + '"' +
+        " onclick=\"DictSettings.remove('" + name + "'); return false;\">" +
+        I18N.t("Remove") + "</button>",
+      "</div>",
+      "</div>",
+      detailsBody(d),
+      "</div>",
+    ].join("");
+  }
+
+  /**
+   * Open or close one row's details.  Kept as a function (rather than a
+   * <details> element) so the toggle sits next to Remove instead of
+   * taking its own line; the button's aria-expanded carries the state.
+   */
+  function toggleDetails(button) {
+    const item = button.closest(".dict-settings__item");
+    const body = item ? item.querySelector(".dict-settings__body") : null;
+    if (!body) return;
+    const open = body.hasAttribute("hidden");
+    if (open) {
+      body.removeAttribute("hidden");
+    } else {
+      body.setAttribute("hidden", "");
     }
-    parts.push(
-      '<button type="button" class="btn btn-danger" onclick="DictSettings.remove(\'' +
-      name + "'); return false;\">" + I18N.t("Remove") + "</button>"
-    );
-    parts.push("</div>");
-    return parts.join("");
+    button.setAttribute("aria-expanded", open ? "true" : "false");
   }
 
   function render(dictionaries) {
@@ -310,7 +370,9 @@ const DictSettings = (function () {
   return {
     describe,
     statusText,
+    summary,
     rowHtml,
+    toggleDetails,
     render,
     refresh,
     upload,
