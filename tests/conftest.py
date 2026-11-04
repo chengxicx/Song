@@ -238,6 +238,11 @@ def _get_test_language(lang_name):
     lang = service.get_language_def(lang_name).language
     db.session.add(lang)
     db.session.commit()
+    # Languages loaded by the app get the AI dictionary row at creation
+    # (see Language.ensure_ai_dictionary_row); do the same here so the
+    # fixtures match a migrated database.
+    if lang.ensure_ai_dictionary_row():
+        db.session.commit()
     return lang
 
 

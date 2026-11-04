@@ -17,7 +17,10 @@ from wtforms import (
 from wtforms.validators import DataRequired
 from wtforms.widgets import ListWidget, CheckboxInput
 from lute.language.langtags import tag_choices
-from lute.models.language import LanguageDictionary
+from lute.models.language import (
+    AI_DICT_TYPE,
+    LanguageDictionary,
+)
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -271,8 +274,27 @@ class LanguageForm(FlaskForm):
                     "dictionaries, ending in .db."
                 )
 
+        # The AI tab is one row per language, and only ever a sentence
+        # dictionary: the reading page renders it from the row's
+        # position (see Language.active_dict_uris).
+        ai_rows = [
+            d for d in self.dictionaries.data if d.get("dicttype") == AI_DICT_TYPE
+        ]
+        if len(ai_rows) > 1:
+            raise ValidationError("Only one AI dictionary row is allowed per language.")
+        for d in ai_rows:
+            if d.get("usefor", "") != "sentences":
+                raise ValidationError(
+                    "The AI dictionary row can only be used for Sentences."
+                )
+
         term_dicts = _get_actives("terms")
-        sentence_dicts = _get_actives("sentences")
+        # The AI row doesn't count as a Sentences dictionary: a language
+        # still needs a real dictionary for its sentence tabs, exactly
+        # like before the AI row existed.
+        sentence_dicts = [
+            d for d in _get_actives("sentences") if d.get("dicttype") != AI_DICT_TYPE
+        ]
         if len(term_dicts) == 0:
             raise ValidationError("Please add an active Terms dictionary")
         if len(sentence_dicts) == 0:

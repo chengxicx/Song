@@ -42,12 +42,38 @@
              showing the file name it points at.
           #}
           {% set dict_is_local = (dictionary.dicttype.data == 'localdict') and (dict_pool | length > 0) %}
+          {#
+            The AI row is Lute's own /ai/sentence tab.  Its use and type
+            are fixed (sentences / AI), its URL is generated from the
+            language id, and it can't be removed: the "AI sentence
+            translation" switch above is the master gate.  The row
+            itself only holds the tab's position, so the drag handle
+            stays live like every other row.
+          #}
+          {% set dict_is_ai = (dictionary.dicttype.object_data == 'AI') %}
           <div class="dict_entry valign"
                {% if dictionary.dicturi.data == '__TEMPLATE__' %}
                style="display: none"
                {% endif %}
                >
             <span class="drag-handle">☰</span>
+            {% if dict_is_ai %}
+            {# Disabled controls are not submitted: the hidden inputs
+               carry the fixed values so the row still validates. #}
+            {{ dictionary.usefor(class="dict-usefor", disabled=True) }}
+            <input type="hidden" name="{{ dictionary.usefor.name }}" value="sentences">
+            {{ dictionary.dicttype(class="dict-type", disabled=True) }}
+            <input type="hidden" name="{{ dictionary.dicttype.name }}" value="AI">
+            <input type="hidden" name="{{ dictionary.dicturi.name }}" value="{{ dictionary.dicturi.data }}">
+            <span title="{{ t('AI sentence translation tab: drag to set its position among the sentence dictionaries') }}">
+              {{ t('AI sentence translation') }}
+            </span>
+            {% if not form.ai_sentence_translation.data %}
+            <span style="color:#a94442; font-size:0.85em;">
+              {{ t('The AI switch above is off, so this row offers no tab.  It keeps its position for when you turn it back on.') }}
+            </span>
+            {% endif %}
+            {% else %}
             {{ dictionary.usefor(class="dict-usefor") }}
             {{ dictionary.dicttype(class="dict-type") }}
             {# A row's URL is either an online lookup URL (a text input)
@@ -79,18 +105,21 @@
               {% endif %}
             </select>
             {% endif %}
+            {% endif %}
             {{ dictionary.is_active }}
             <label class="dict-hidden-toggle" style="white-space: nowrap;"
                    title="{{ t('Keep this dictionary but hide its tab from the reading page') }}">
               {{ dictionary.is_hidden }} <span style="font-size:0.85em;">{{ t('Hide') }}</span>
             </label>
             {{ dictionary.sort_order }}
+            {% if not dict_is_ai %}
             <span class="test-dict-entity" title="{{ t('Test dictionary') }}" style="margin-left: 20px">
               <img src="{{ vstatic('icn/external.png') }}">
             </span>
             <span class="remove-dict-entity" title="{{ t('Remove dictionary') }}">
               <img src="{{ vstatic('icn/minus-button.png') }}">
             </span>
+            {% endif %}
           </div>
           {% endfor %}
         </div>
@@ -164,7 +193,7 @@
       <td colspan="2">
         <h3 class="language-form__section-title">{{ t('AI features') }}</h3>
         <div style="color:#666; font-size:0.85em; max-width:32em;">
-          {{ t('The AI provider and API key are configured once in Settings.  These switches decide which AI features this language uses; both are on by default.') }}
+          {{ t('The AI provider and API key are configured once in Settings.  These switches decide which AI features this language uses; both are on by default.  The AI tab is a row in the Dictionaries list above: drag it to change its order.') }}
         </div>
       </td>
     </tr>
@@ -190,7 +219,7 @@
       <td style="vertical-align: top;">
         {{ form.ai_sentence_translation.label(class="form-control-label") }}
         <div style="color:#666; font-size:0.85em; max-width:24em;">
-          {{ t("Show the AI entry in the reader's Sentence tab for this language.") }}
+          {{ t('Master switch for the AI tab.  Its position is the AI row in the Dictionaries list above; off hides the tab and the AI endpoint refuses this language.') }}
         </div>
       </td>
       <td>{{ form.ai_sentence_translation() }}</td>

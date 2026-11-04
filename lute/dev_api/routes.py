@@ -17,7 +17,7 @@ safeguards, so they can only be run against a test_ db.
 import os
 from sqlalchemy import text
 from flask import Blueprint, current_app, Response, jsonify, redirect, flash
-from lute.models.language import Language
+from lute.models.language import AI_DICT_TYPE, Language
 from lute.models.repositories import UserSettingRepository
 import lute.parse.registry
 from lute.db import db
@@ -63,7 +63,9 @@ def load_demo_languages():
     demosvc.load_demo_languages()
     langs = db.session.query(Language).all()
     for lang in langs:
-        d = lang.dictionaries[0]
+        # The first row may be Lute's own AI row; point the language's
+        # first *ordinary* dictionary at the dummy frame.
+        d = next(d for d in lang.dictionaries if d.dicttype != AI_DICT_TYPE)
         d.dicturi = f"/dev_api/dummy_dict/{lang.name}/[LUTE]"
         d.dicttype = "embeddedhtml"  # Ensure not pop-up
         db.session.add(lang)
