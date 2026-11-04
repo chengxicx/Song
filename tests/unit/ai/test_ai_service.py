@@ -559,3 +559,57 @@ def test_error_body_without_charset_is_decoded_as_utf8(
     assert exc.value.kind == "rate"
     assert "您已达到免费用户的 API 速率限制" in exc.value.message
     assert "ä" not in exc.value.message
+
+
+def test_grammar_prompt_asks_for_a_whole_sentence_translation():
+    "translation comes first and names the requested display language."
+    prompt = service.build_grammar_system_prompt("Japanese", "Simplified Chinese")
+    assert '"translation"' in prompt
+    assert prompt.index('"translation"') < prompt.index('"skeleton"')
+    assert "one natural, fluent translation" in prompt
+    assert "not word by word" in prompt
+    assert "Simplified Chinese" in prompt
+
+
+def test_parse_grammar_json_reads_the_translation():
+    "A fenced reply still yields the translation plus the structured cards."
+    text = (
+        "```json\n"
+        '{"translation":"但房间里只有我一个人。",'
+        '"skeleton":{"subject":"わたし","verb":"でした","object":""},'
+        '"clauses":[{"type":"main","text":"でも、へやには、わたしだけがでした。",'
+        '"role":"转折"}]}\n'
+        "```"
+    )
+    data = service.parse_grammar_json(text)
+    assert data["translation"] == "但房间里只有我一个人。"
+    assert data["skeleton"]["subject"] == "わたし"
+
+
+def test_a_cache_entry_without_translation_is_not_reused(app_context):
+    "Old v1 results would render a missing first card, so they are dropped."
+    repository = UserSettingRepository(db.session)
+    legacy = service._legacy_grammar_cache_key(
+        "Hello there.", "gpt-4o-mini", "English", "English"
+    )
+    repository.set_dynamic_value(
+        legacy, json.dumps({"skeleton": {"subject": "I", "verb": "am", "object": ""}})
+    )
+    db.session.commit()
+
+    cached = service.grammar_cached_result(
+        "Hello there.", "gpt-4o-mini", "English", "English"
+    )
+    assert cached is None
+    assert repository.get_dynamic_value(legacy) is None
+
+
+def test_a_new_cache_entry_round_trips_the_translation(app_context):
+    "The v2 key stores and returns the whole-sentence translation."
+    result = {
+        "translation": "但房间里只有我一个人。",
+        "skeleton": {"subject": "わたし", "verb": "でした", "object": ""},
+    }
+    service.store_grammar_result("sentence one.", "m", "Japanese", "Chinese", result)
+    cached = service.grammar_cached_result("sentence one.", "m", "Japanese", "Chinese")
+    assert cached["translation"] == "但房间里只有我一个人。"
