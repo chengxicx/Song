@@ -231,7 +231,10 @@ _API_PROVIDERS = {
         "id": "openai",
         "label": "OpenAI (API key)",
         "default_base_url": "https://api.openai.com/v1",
-        "base_url_hint": "e.g. https://api.openai.com/v1, or a proxy / gateway",
+        "base_url_hint": (
+            "e.g. https://api.openai.com/v1, or a proxy / gateway "
+            "(a bare host gets /v1 added automatically)"
+        ),
         "default_model": "gpt-4o-mini",
         "model_hint": "e.g. gpt-4o-mini",
         "credential_label": "API key",
@@ -242,7 +245,10 @@ _API_PROVIDERS = {
         "id": "anthropic",
         "label": "Anthropic (API key)",
         "default_base_url": "https://api.anthropic.com",
-        "base_url_hint": "e.g. https://api.anthropic.com, or a proxy / gateway",
+        "base_url_hint": (
+            "e.g. https://api.anthropic.com, or a proxy / gateway "
+            "(a bare host gets /v1/messages automatically)"
+        ),
         "default_model": "claude-sonnet-4-5",
         "model_hint": "e.g. claude-sonnet-4-5",
         "credential_label": "API key",
@@ -314,6 +320,12 @@ def normalize_base_url(raw, default=""):
     "A user-editable http(s) base URL; no credentials, no trailing slash."
     text = (raw or "").strip() or (default or "")
     text = text.rstrip("/")
+    # Accept a pasted full endpoint as a base, too; the endpoint builder
+    # adds the path back exactly once.
+    for suffix in ("/chat/completions", "/messages"):
+        if text.endswith(suffix):
+            text = text[: -len(suffix)]
+            break
     if not text:
         raise AiError("The Base URL cannot be empty.", "config")
     parsed = urlparse(text)
@@ -322,6 +334,31 @@ def normalize_base_url(raw, default=""):
     if parsed.username or parsed.password:
         raise AiError("The Base URL must not contain a username or password.", "config")
     return text
+
+
+def api_endpoint(base_url, provider):
+    """
+    The request URL for one provider, tolerating ``/v1`` or its absence.
+
+    Gateways publish different bases: ``https://host`` (with the API under
+    /v1), ``https://host/v1``, or a self-hosted mount such as
+    ``https://host/openai/v1``.  Appending ``/v1`` blindly either repeats
+    it (``/v1/v1/chat/completions``) or drops it (``/chat/completions``),
+    so the path decides.  Any other prefix is respected as-is.
+    """
+    base = (base_url or "").rstrip("/")
+    path = urlparse(base).path.rstrip("/")
+    if provider == "openai":
+        endpoint, suffix = "/chat/completions", "/chat/completions"
+    else:
+        endpoint, suffix = "/messages", "/messages"
+    if path.endswith(endpoint):
+        return base
+    if path.endswith("/v1"):
+        return base + suffix
+    if path in ("", "/"):
+        return base + "/v1" + suffix
+    return base + suffix
 
 
 def grammar_provider_status(provider):
@@ -545,42 +582,94 @@ def store_grammar_result(sentence, model, source_lang, target_lang, result):
         db.session.rollback()
 
 
-def _api_response_error(resp, label):
-    """
-    Map an official-API status to a readable error.
+_UPSTREAM_DETAIL_LIMIT = 200
 
-    The upstream body is deliberately not echoed: gateways sometimes quote
-    the request, and the request carries the key.
+
+def _redact(text, secret):
+    "Remove the API key, in any spelling, from text we are about to show."
+    if not text:
+        return ""
+    if secret:
+        text = text.replace(f"Bearer {secret}", "Bearer ****")
+        text = text.replace(secret, "****")
+    return text
+
+
+def _upstream_detail(resp, token):
+    """
+    A short, sanitized message from an upstream error body.
+
+    Only the message field is used -- never the whole body, which may echo
+    request headers -- and the key is redacted before it reaches the UI.
+    """
+    try:
+        body = (resp.text or "")[:1000]
+    except Exception:  # pylint: disable=broad-exception-caught
+        return ""
+    message = ""
+    try:
+        data = json.loads(body)
+    except ValueError:
+        data = None
+    if isinstance(data, dict):
+        error = data.get("error")
+        if isinstance(error, dict):
+            message = error.get("message") or error.get("msg") or ""
+        elif isinstance(error, str):
+            message = error
+        if not message:
+            message = data.get("message") or data.get("msg") or ""
+    if not message and not isinstance(data, dict):
+        message = body
+    message = " ".join(str(_redact(message, token)).split())
+    if not message:
+        return ""
+    if len(message) > _UPSTREAM_DETAIL_LIMIT:
+        message = message[:_UPSTREAM_DETAIL_LIMIT] + "…"
+    return message
+
+
+def _api_response_error(resp, label, token, url=""):
+    """
+    Map an official-API status to a readable error, with a safe detail.
+
+    The detail is the upstream's own message field (status + text such as
+    "401 Forbidden" or "404 model not found"), redacted and truncated; the
+    body is never echoed wholesale because gateways sometimes quote the
+    request, and the request carries the key.
     """
     status = resp.status_code
+    detail = _upstream_detail(resp, token)
+    tail = f": {detail}" if detail else ""
     if status in (401, 403):
         return AiError(
-            f"{label} rejected the API key (HTTP {status}). "
+            f"{label} rejected the API key (HTTP {status}{tail}). "
             "Check the key in Settings.",
             "auth",
         )
     if status == 429:
         return AiError(
-            f"{label} is rate-limiting this key (HTTP 429). "
+            f"{label} is rate-limiting this key (HTTP 429{tail}). "
             "Wait a moment and try again.",
             "rate",
         )
     if status == 404:
+        where = f" for {url}" if url else ""
         return AiError(
-            f"{label} returned HTTP 404. Check the Base URL.",
+            f"{label} returned HTTP 404{where}{tail}. Check the Base URL.",
             "upstream",
         )
-    return AiError(f"{label} returned HTTP {status}.", "upstream")
+    return AiError(f"{label} returned HTTP {status}{tail}.", "upstream")
 
 
-def _api_post(url, headers, payload, label):
-    "POST with streaming; translate transport failures into AiError."
+def _api_post(url, headers, payload, label, stream=True):
+    "POST; translate transport failures into AiError."
     try:
         return requests.post(
             url,
             json=payload,
             headers=headers,
-            stream=True,
+            stream=stream,
             timeout=_API_TIMEOUT,
             allow_redirects=False,
         )
@@ -593,15 +682,27 @@ def _api_post(url, headers, payload, label):
 
 
 def _iter_sse_payloads(resp):
-    "Yield parsed JSON from one SSE response; ignore comments and junk."
+    """
+    Yield parsed JSON from one SSE response; ignore comments and junk.
+
+    Chat-completion gateways disagree on the envelope: most send
+    ``data: {...}``, some omit the space, and a few send one raw JSON object
+    per line.  ``event:`` lines only name the type and are skipped here;
+    Anthropic's payload carries the same type inside the JSON.
+    """
     for raw in resp.iter_lines(decode_unicode=True):
         if raw is None:
             continue
         line = raw.decode("utf-8", "replace") if isinstance(raw, bytes) else raw
         line = line.strip()
-        if not line or not line.startswith("data:"):
+        if not line:
             continue
-        data_str = line[5:].strip()
+        if line.startswith("data:"):
+            data_str = line[5:].strip()
+        elif line.startswith("{"):
+            data_str = line
+        else:
+            continue
         if data_str == "[DONE]":
             return
         try:
@@ -610,6 +711,14 @@ def _iter_sse_payloads(resp):
             continue
         if isinstance(data, dict):
             yield data
+
+
+def _response_json(resp, label):
+    "Decode a whole JSON body, or report an unreadable answer."
+    try:
+        return resp.json()
+    except ValueError as e:
+        raise AiError(f"{label} returned an unreadable response.", "upstream") from e
 
 
 def _anthropic_text_from_payload(data):
@@ -631,10 +740,51 @@ def _anthropic_text_from_payload(data):
     return ""
 
 
+_STREAM_FALLBACK_KINDS = ("upstream", "config")
+
+
+def _openai_read(url, headers, payload, label, token):
+    "One streamed request; yields text chunks from deltas or a JSON body."
+    resp = _api_post(url, headers, payload, label, stream=True)
+    try:
+        if resp.status_code != 200:
+            raise _api_response_error(resp, label, token, url)
+        content_type = (resp.headers.get("Content-Type") or "").lower()
+        if "text/event-stream" not in content_type:
+            text = _text_from_payload(_response_json(resp, label))
+            if text:
+                yield text
+            return
+        for data in _iter_sse_payloads(resp):
+            text = _text_from_payload(data)
+            if text:
+                yield text
+    finally:
+        resp.close()
+
+
+def _openai_plain(url, headers, payload, label, token):
+    "One non-streamed request; returns the whole reply."
+    resp = _api_post(url, headers, payload, label, stream=False)
+    try:
+        if resp.status_code != 200:
+            raise _api_response_error(resp, label, token, url)
+        return _text_from_payload(_response_json(resp, label))
+    finally:
+        resp.close()
+
+
 def _openai_stream(base_url, token, model, system_prompt, user_prompt):
-    "POST /chat/completions and parse choices[0].delta.content."
+    """
+    POST /chat/completions and parse choices[0].delta.content.
+
+    If the gateway refuses ``stream: true`` (some proxies answer 400 or
+    return no usable event) the same request is retried once without
+    streaming, so a non-streaming-compatible gateway still works.  Auth,
+    rate-limit and timeout failures are not retried.
+    """
     label = _API_PROVIDERS["openai"]["label"]
-    url = base_url.rstrip("/") + "/chat/completions"
+    url = api_endpoint(base_url, "openai")
     headers = {
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json",
@@ -649,26 +799,57 @@ def _openai_stream(base_url, token, model, system_prompt, user_prompt):
             {"role": "user", "content": user_prompt},
         ],
     }
-    resp = _api_post(url, headers, payload, label)
+    emitted = False
+    try:
+        for text in _openai_read(url, headers, payload, label, token):
+            emitted = True
+            yield text
+        return
+    except AiError as e:
+        if emitted or e.kind not in _STREAM_FALLBACK_KINDS:
+            raise
+    plain = dict(payload)
+    plain["stream"] = False
+    text = _openai_plain(url, headers, plain, label, token)
+    if text:
+        yield text
+
+
+def _anthropic_read(url, headers, payload, label, token):
+    "One streamed request; yields content_block_delta text or a JSON body."
+    resp = _api_post(url, headers, payload, label, stream=True)
     try:
         if resp.status_code != 200:
-            raise _api_response_error(resp, label)
+            raise _api_response_error(resp, label, token, url)
         content_type = (resp.headers.get("Content-Type") or "").lower()
         if "text/event-stream" not in content_type:
-            try:
-                data = resp.json()
-            except ValueError as e:
-                raise AiError(
-                    f"{label} returned an unreadable response.", "upstream"
-                ) from e
-            text = _text_from_payload(data)
+            text = _anthropic_text_from_payload(_response_json(resp, label))
             if text:
                 yield text
             return
         for data in _iter_sse_payloads(resp):
-            text = _text_from_payload(data)
-            if text:
+            event_type = data.get("type")
+            if event_type == "error":
+                raise AiError(f"{label} reported an upstream error.", "upstream")
+            if event_type and event_type != "content_block_delta":
+                continue
+            delta = data.get("delta")
+            if not isinstance(delta, dict):
+                continue
+            text = delta.get("text")
+            if isinstance(text, str) and text:
                 yield text
+    finally:
+        resp.close()
+
+
+def _anthropic_plain(url, headers, payload, label, token):
+    "One non-streamed request; returns the whole reply."
+    resp = _api_post(url, headers, payload, label, stream=False)
+    try:
+        if resp.status_code != 200:
+            raise _api_response_error(resp, label, token, url)
+        return _anthropic_text_from_payload(_response_json(resp, label))
     finally:
         resp.close()
 
@@ -676,9 +857,14 @@ def _openai_stream(base_url, token, model, system_prompt, user_prompt):
 def _anthropic_stream(
     base_url, token, model, system_prompt, user_prompt, max_tokens=None
 ):
-    "POST /messages and parse content_block_delta.delta.text."
+    """
+    POST /messages and parse content_block_delta.delta.text.
+
+    Falls back to a plain request once when the gateway refuses streaming,
+    exactly like the OpenAI adapter.
+    """
     label = _API_PROVIDERS["anthropic"]["label"]
-    url = base_url.rstrip("/") + "/messages"
+    url = api_endpoint(base_url, "anthropic")
     headers = {
         "x-api-key": token,
         "anthropic-version": _ANTHROPIC_VERSION,
@@ -693,36 +879,20 @@ def _anthropic_stream(
         "system": system_prompt,
         "messages": [{"role": "user", "content": user_prompt}],
     }
-    resp = _api_post(url, headers, payload, label)
+    emitted = False
     try:
-        if resp.status_code != 200:
-            raise _api_response_error(resp, label)
-        content_type = (resp.headers.get("Content-Type") or "").lower()
-        if "text/event-stream" not in content_type:
-            try:
-                data = resp.json()
-            except ValueError as e:
-                raise AiError(
-                    f"{label} returned an unreadable response.", "upstream"
-                ) from e
-            text = _anthropic_text_from_payload(data)
-            if text:
-                yield text
-            return
-        for data in _iter_sse_payloads(resp):
-            event_type = data.get("type")
-            if event_type == "error":
-                raise AiError(f"{label} reported an upstream error.", "upstream")
-            if event_type != "content_block_delta":
-                continue
-            delta = data.get("delta")
-            if not isinstance(delta, dict):
-                continue
-            text = delta.get("text")
-            if isinstance(text, str) and text:
-                yield text
-    finally:
-        resp.close()
+        for text in _anthropic_read(url, headers, payload, label, token):
+            emitted = True
+            yield text
+        return
+    except AiError as e:
+        if emitted or e.kind not in _STREAM_FALLBACK_KINDS:
+            raise
+    plain = dict(payload)
+    plain["stream"] = False
+    text = _anthropic_plain(url, headers, plain, label, token)
+    if text:
+        yield text
 
 
 def grammar_stream(provider, sentence, source_lang="", target_lang=""):

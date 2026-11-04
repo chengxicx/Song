@@ -123,6 +123,69 @@ def test_base_url_must_be_http_without_credentials(app_context):
     assert state["base_url"] == "https://gateway.example.com/v1"
 
 
+def test_base_url_accepts_a_pasted_endpoint(app_context):
+    "A full endpoint in the Base URL field is reduced to its base."
+    state = service.save_grammar_config(
+        "openai", base_url="https://token.sensenova.cn/v1/chat/completions"
+    )
+    assert state["base_url"] == "https://token.sensenova.cn/v1"
+
+
+@pytest.mark.parametrize(
+    ("base", "provider", "expected"),
+    [
+        (
+            "https://token.sensenova.cn",
+            "openai",
+            "https://token.sensenova.cn/v1/chat/completions",
+        ),
+        (
+            "https://token.sensenova.cn/",
+            "openai",
+            "https://token.sensenova.cn/v1/chat/completions",
+        ),
+        (
+            "https://token.sensenova.cn/v1",
+            "openai",
+            "https://token.sensenova.cn/v1/chat/completions",
+        ),
+        (
+            "https://token.sensenova.cn/v1/",
+            "openai",
+            "https://token.sensenova.cn/v1/chat/completions",
+        ),
+        (
+            "https://api.openai.com/v1",
+            "openai",
+            "https://api.openai.com/v1/chat/completions",
+        ),
+        (
+            "https://proxy.example/openai/v1",
+            "openai",
+            "https://proxy.example/openai/v1/chat/completions",
+        ),
+        (
+            "https://api.anthropic.com",
+            "anthropic",
+            "https://api.anthropic.com/v1/messages",
+        ),
+        (
+            "https://api.anthropic.com/v1",
+            "anthropic",
+            "https://api.anthropic.com/v1/messages",
+        ),
+        (
+            "https://proxy.example/anthropic",
+            "anthropic",
+            "https://proxy.example/anthropic/messages",
+        ),
+    ],
+)
+def test_api_endpoint_adds_v1_exactly_once(base, provider, expected):
+    "Base URLs with or without /v1 produce the same, correct endpoint."
+    assert service.api_endpoint(base, provider) == expected
+
+
 def test_openai_request_body_headers_and_sse(monkeypatch, app_context):
     "OpenAI gets /chat/completions, Bearer auth, stream=true, and deltas."
     service.save_grammar_config("openai", token=TOKEN)
@@ -171,7 +234,7 @@ def test_anthropic_request_body_headers_and_sse(monkeypatch, app_context):
     monkeypatch.setattr(service.requests, "post", fake_post)
     chunks = list(service.translate_stream("anthropic", "Hello", target_lang="French"))
     assert "".join(chunks) == "Bonjour"
-    assert captured["url"] == "https://api.anthropic.com/messages"
+    assert captured["url"] == "https://api.anthropic.com/v1/messages"
     assert captured["headers"]["x-api-key"] == TOKEN
     assert captured["headers"]["anthropic-version"] == "2023-06-01"
     assert captured["json"]["model"] == "claude-sonnet-4-5"
@@ -183,23 +246,61 @@ def test_anthropic_request_body_headers_and_sse(monkeypatch, app_context):
 
 
 @pytest.mark.parametrize(
-    ("status", "kind"),
-    [(401, "auth"), (403, "auth"), (429, "rate"), (500, "upstream")],
+    ("status", "kind", "detail"),
+    [
+        (401, "auth", "Forbidden"),
+        (403, "auth", "Forbidden"),
+        (429, "rate", "rate limited"),
+        (500, "upstream", "server error"),
+    ],
 )
 def test_http_status_maps_to_specific_error(
-    monkeypatch, app_context, openai_configured, status, kind
+    monkeypatch, app_context, openai_configured, status, kind, detail
 ):
-    "Each failure class gets a readable, key-free message."
+    "Each failure class gets a readable message with the upstream detail."
+    body = json.dumps({"error": {"code": 16, "message": detail}})
     monkeypatch.setattr(
         service.requests,
         "post",
-        lambda *a, **k: FakeResponse(status_code=status, body="do not echo"),
+        lambda *a, **k: FakeResponse(status_code=status, body=body),
     )
     with pytest.raises(AiError) as exc:
         list(service.translate_stream("openai", "Bonjour"))
     assert exc.value.kind == kind
+    assert detail in exc.value.message
     assert TOKEN not in exc.value.message
-    assert "do not echo" not in exc.value.message
+
+
+def test_upstream_message_is_redacted_before_display(
+    monkeypatch, app_context, openai_configured
+):
+    "A gateway that echoes the key must not leak it into our error."
+    body = json.dumps({"error": {"message": f"invalid key Bearer {TOKEN}"}})
+    monkeypatch.setattr(
+        service.requests,
+        "post",
+        lambda *a, **k: FakeResponse(status_code=401, body=body),
+    )
+    with pytest.raises(AiError) as exc:
+        list(service.translate_stream("openai", "Bonjour"))
+    assert "invalid key" in exc.value.message
+    assert TOKEN not in exc.value.message
+
+
+def test_404_names_the_base_url_for_diagnosis(
+    monkeypatch, app_context, openai_configured
+):
+    "A wrong gateway mount shows the URL we actually requested."
+    body = json.dumps({"error": {"message": "path not found"}})
+    monkeypatch.setattr(
+        service.requests,
+        "post",
+        lambda *a, **k: FakeResponse(status_code=404, body=body),
+    )
+    with pytest.raises(AiError) as exc:
+        list(service.translate_stream("openai", "Bonjour"))
+    assert "path not found" in exc.value.message
+    assert "https://api.openai.com/v1/chat/completions" in exc.value.message
 
 
 def test_timeout_maps_to_timeout(monkeypatch, app_context, openai_configured):
@@ -228,6 +329,73 @@ def test_non_stream_json_response_is_accepted(
         ),
     )
     assert list(service.translate_stream("openai", "Hello")) == ["Bonjour"]
+
+
+def test_sse_envelope_variants_are_parsed(app_context):
+    "``data:{...}``, raw JSON lines and ``event:`` lines all work."
+
+    class Resp:
+        headers = {"Content-Type": "text/event-stream"}
+
+        def iter_lines(self, decode_unicode=False):  # pylint: disable=unused-argument
+            return iter(
+                [
+                    b"event: message",
+                    b'data:{"choices":[{"delta":{"content":"A"}}]}',
+                    b'{"choices":[{"delta":{"content":"B"}}]}',
+                    b"data: [DONE]",
+                ]
+            )
+
+    texts = [service._text_from_payload(d) for d in service._iter_sse_payloads(Resp())]
+    assert "".join(texts) == "AB"
+
+
+def test_stream_refusal_falls_back_to_a_plain_request(
+    monkeypatch, app_context, openai_configured
+):
+    "A gateway that rejects stream:true still answers the plain request."
+    calls = []
+
+    def fake_post(url, **kwargs):
+        calls.append(kwargs["json"]["stream"])
+        if len(calls) == 1:
+            body = json.dumps({"error": {"message": "stream is not supported"}})
+            return FakeResponse(status_code=400, body=body)
+        return FakeResponse(
+            ctype="application/json",
+            payload={"choices": [{"message": {"content": "Bonjour"}}]},
+        )
+
+    monkeypatch.setattr(service.requests, "post", fake_post)
+    assert list(service.translate_stream("openai", "Hello")) == ["Bonjour"]
+    assert calls == [True, False]
+
+
+def test_auth_failure_is_not_retried(monkeypatch, app_context, openai_configured):
+    "A bad key is reported once; no second, identical request is sent."
+    calls = []
+
+    def fake_post(url, **kwargs):
+        calls.append(kwargs["json"]["stream"])
+        body = json.dumps({"error": {"message": "Forbidden"}})
+        return FakeResponse(status_code=401, body=body)
+
+    monkeypatch.setattr(service.requests, "post", fake_post)
+    with pytest.raises(AiError):
+        list(service.translate_stream("openai", "Hello"))
+    assert calls == [True]
+
+
+def test_anthropic_delta_without_a_type_field_is_accepted(monkeypatch, app_context):
+    "Some gateways drop the SSE type but keep delta.text."
+    service.save_grammar_config("anthropic", token=TOKEN)
+    monkeypatch.setattr(
+        service.requests,
+        "post",
+        lambda *a, **k: FakeResponse(lines=_sse({"delta": {"text": "Bonjour"}})),
+    )
+    assert "".join(service.translate_stream("anthropic", "Hello")) == "Bonjour"
 
 
 def test_grammar_stream_uses_the_json_prompt(monkeypatch, app_context):
