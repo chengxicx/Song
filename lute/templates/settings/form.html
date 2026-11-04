@@ -409,7 +409,7 @@
     {% if can_manage_server %}
     <tr>
       <td>
-        <h2>{{ t('Whisper (auto-subtitles)') }}</h2>
+        <h2>{{ t('Speech-to-text (auto-subtitles)') }}</h2>
       </td>
     </tr>
     <tr>
@@ -759,7 +759,7 @@
   document.addEventListener('DOMContentLoaded', netease_refresh_status);
 
   {% if can_manage_server %}
-  // --- Whisper (auto-subtitles) management. ---
+  // --- Speech-to-text (auto-subtitles) management. ---
   function whisperMsg(text, ok) {
     const el = document.getElementById('whisper_settings_msg');
     el.textContent = text;
@@ -787,7 +787,7 @@
           const row = document.createElement('div');
           row.style.marginTop = '4px';
           const state = document.createElement('span');
-          state.textContent = m.size + ' — ' + (m.cached ? I18N.t('cached,') + ' ' + m.size_mb + ' MB' : I18N.t('not downloaded'));
+          state.textContent = 'faster-whisper · ' + m.size + ' — ' + (m.cached ? I18N.t('cached,') + ' ' + m.size_mb + ' MB' : I18N.t('not downloaded'));
           row.appendChild(state);
 
           const dl = document.createElement('button');
@@ -814,7 +814,7 @@
           const row = document.createElement('div');
           row.style.marginTop = '8px';
           const state = document.createElement('span');
-          let stateText = I18N.t('sensevoice (zh/yue/en/ja/ko · fastest) — ');
+          let stateText = I18N.t('SenseVoice (zh/yue/en/ja/ko · fastest, sherpa-onnx) — ');
           if (!sv.installed) stateText += I18N.t('sherpa-onnx package not installed');
           else if (sv.cached) stateText += I18N.t('cached,') + ' ' + sv.size_mb + ' MB';
           else stateText += I18N.t('not downloaded');
@@ -841,7 +841,7 @@
         }
       })
       .catch(() => {
-        document.getElementById('whisper_settings_status').textContent = I18N.t('Could not load Whisper status.');
+        document.getElementById('whisper_settings_status').textContent = I18N.t('Could not load speech-to-text status.');
       });
   }
 
