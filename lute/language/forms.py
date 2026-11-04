@@ -129,8 +129,16 @@ class LanguageForm(FlaskForm):
         default="",
     )
     grammar_translate_lang = SelectField(
-        "Grammar Analysis Language",
-        choices=[("en", "English"), ("zh", "中文"), ("ko", "한국어")],
+        "AI analysis & translation language",
+        choices=[
+            ("en", "English"),
+            ("zh", "中文"),
+            ("ja", "日本語"),
+            ("ko", "한국어"),
+            ("fr", "Français"),
+            ("de", "Deutsch"),
+            ("es", "Español"),
+        ],
         default="en",
     )
     # Which AI features this language may use.  The API key and model

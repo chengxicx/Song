@@ -168,6 +168,24 @@
         </div>
       </td>
     </tr>
+    {#
+      The single language for both AI outputs: grammar explanations and
+      the sentence translation, word meanings, context notes and
+      examples.  Rendered here (not by the generic field loop) so the
+      help text can say both jobs; "Google Translate Target" above is
+      untouched and still only drives Google Translate.
+    #}
+    <tr>
+      <td style="vertical-align: top;">
+        <label class="form-control-label" for="{{ form.grammar_translate_lang.id }}">
+          {{ t('AI analysis & translation language') }}
+        </label>
+        <div style="color:#666; font-size:0.85em; max-width:24em;">
+          {{ t('Language of grammar explanations and of sentence translation, word meanings, context notes and example translations.  Google Translate Target above is separate.') }}
+        </div>
+      </td>
+      <td>{{ form.grammar_translate_lang(class="form-control") }}</td>
+    </tr>
     <tr>
       <td style="vertical-align: top;">
         {{ form.ai_sentence_translation.label(class="form-control-label") }}
@@ -189,7 +207,7 @@
 
     {% set _kiwi_fields = ('kiwi_tokenizer_mode', 'kiwi_stemming', 'kiwi_filter_particles', 'kiwi_join_compound_nouns') %}
     {# Fields rendered by a hand-written block below, not by the loop. #}
-    {% set _custom_fields = ('hidden_grammar_levels', 'term_popup_show_dict_gloss', 'show_dict_phonetics', 'term_translation_source', 'show_furigana', 'ai_sentence_translation', 'ai_grammar_analysis') %}
+    {% set _custom_fields = ('hidden_grammar_levels', 'term_popup_show_dict_gloss', 'show_dict_phonetics', 'term_translation_source', 'show_furigana', 'ai_sentence_translation', 'ai_grammar_analysis', 'grammar_translate_lang') %}
     {% for field in form %}
     {% if field.name not in ('name', 'csrf_token', 'dictionaries') and field.name not in _kiwi_fields and field.name not in _custom_fields %}
     <tr>

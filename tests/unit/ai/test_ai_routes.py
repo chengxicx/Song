@@ -304,6 +304,47 @@ def test_read_page_uses_the_ai_tab(app_context, client, english):
     assert "/ai/sentence?lang=" in body
 
 
+def test_sentence_target_language_uses_the_shared_ai_language(app_context, english):
+    """
+    Sentence translation reads grammar_translate_lang (the Language form's
+    "AI analysis & translation language"), falls back to the Google
+    Translate target only when that is empty, then to the UI language.
+    """
+    from lute.ai.routes import _language_context
+
+    english.grammar_translate_lang = "zh"
+    english.translate_target_lang = "en"
+    db.session.commit()
+    assert _language_context(english.id) == ("English", "Simplified Chinese")
+
+    english.grammar_translate_lang = ""
+    english.translate_target_lang = "ja"
+    db.session.commit()
+    assert _language_context(english.id)[1] == "Japanese"
+
+    english.translate_target_lang = ""
+    db.session.commit()
+    assert _language_context(english.id)[1] == "English"
+
+    english.grammar_translate_lang = "fr"
+    db.session.commit()
+    assert _language_context(english.id)[1] == "French"
+
+
+def test_language_form_offers_japanese_and_other_ai_languages(app_context):
+    "The shared AI language select is a fixed list, so prompts stay well-formed."
+    from lute.language.forms import LanguageForm
+
+    choices = dict(LanguageForm().grammar_translate_lang.choices)
+    assert choices["ja"] == "日本語"
+    assert choices["zh"] == "中文"
+    assert choices["en"] == "English"
+    assert "fr" in choices and "de" in choices and "es" in choices
+    assert LanguageForm().grammar_translate_lang.label.text == (
+        "AI analysis & translation language"
+    )
+
+
 def test_grammar_target_language_follows_the_language_setting(app_context, english):
     "Grammar Analysis Language wins; empty or unknown falls back to the UI."
     from lute.ai.routes import _grammar_language_context

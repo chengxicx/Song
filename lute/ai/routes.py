@@ -125,10 +125,29 @@ def _language_context(langid):
         lang = None
     if lang is None:
         return "", ""
-    # translate_target_lang stores a code ("zh"); prompts want a name.
-    raw_target = (lang.translate_target_lang or "").strip()
-    target = _UI_LANGUAGE_NAMES.get(raw_target, raw_target)
-    return (lang.name or "", target)
+    return (lang.name or "", _language_target_name(lang))
+
+
+def _language_target_name(lang):
+    """
+    The language sentence translations and explanations are written in.
+
+    The Language form's "AI analysis & translation language"
+    (grammar_translate_lang) is the single source for both grammar
+    analysis and sentence translation.  The Google Translate target is
+    only a fallback for languages that never set it, then the reader's
+    interface language, then English.  (translate_target_lang keeps its
+    original Google Translate meaning; it is not changed or removed.)
+    """
+    for code in (
+        getattr(lang, "grammar_translate_lang", ""),
+        getattr(lang, "translate_target_lang", ""),
+        current_language(),
+    ):
+        code = (code or "").strip()
+        if code in _UI_LANGUAGE_NAMES:
+            return _UI_LANGUAGE_NAMES[code]
+    return "English"
 
 
 def _language_feature_enabled(langid, field_name):
@@ -285,6 +304,9 @@ _UI_LANGUAGE_NAMES = {
     "zh": "Simplified Chinese",
     "ja": "Japanese",
     "ko": "Korean",
+    "fr": "French",
+    "de": "German",
+    "es": "Spanish",
 }
 
 
