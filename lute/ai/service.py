@@ -1,29 +1,21 @@
 """
-AI provider configuration and the sentence-translation adapters.
+AI provider configuration and translation/grammar adapters.
 
-Only Qwen's web session is usable from the server today (see
-PROVIDERS).  ChatGPT and DeepSeek are still listed so the settings page
-can explain why, and so the reader's fallback links point somewhere
-useful, but their web endpoints are deliberately not called:
-
-- ChatGPT puts every message behind Cloudflare Turnstile plus a
-  per-message proof-of-work and browser fingerprint checks; a cookie
-  replayed from another machine/IP is challenged instead of answered.
-- DeepSeek requires a per-message ``DeepSeekHashV1`` proof-of-work
-  (a 23-round Keccak variant implemented in WASM).  Reproducing it
-  server-side without the WASM is both slow and fragile.
-
-Trying either would just turn "no translation" into a confusing 403, so
-they are marked unsupported and the UI offers the top-level web link.
+Sentence translation and grammar analysis both use official OpenAI or
+Anthropic API keys, configured per user in Settings.  Browser-session
+providers (Qwen, ChatGPT, DeepSeek) are deliberately not used: their
+proof-of-work and Cloudflare challenges cannot be replayed from a server.
+Existing ``ai_qwen_token`` values in a user's database are simply ignored.
 
 Credential values are dynamic user settings (the same mechanism the
 NetEase login uses) and are stored encrypted (lute/ai/crypto.py).
-Nothing here ever returns or logs the raw token.
+Nothing here ever returns or logs the raw API key.
 """
 
+import hashlib
 import json
 import re
-import uuid
+from urllib.parse import urlparse
 
 import requests
 
@@ -33,80 +25,13 @@ from lute.ai.crypto import decrypt, encrypt
 
 PROVIDER_SETTING_KEY = "ai_sentence_provider"
 
-PROVIDERS = {
-    "qwen": {
-        "id": "qwen",
-        "label": "Qwen (chat.qwen.ai)",
-        "supported": True,
-        "login_url": "https://chat.qwen.ai/",
-        "web_url": "https://chat.qwen.ai/?q={q}",
-        "credential_label": "Authorization token",
-        "credential_hint": "eyJ... (paste only the token, without 'Bearer')",
-        "default_model": "qwen3.6-plus",
-        "model_hint": "e.g. qwen3.6-plus",
-        "steps": [
-            "Open chat.qwen.ai in a new tab and log in.",
-            "Open the browser developer tools (F12), then the Network tab.",
-            "Send one message, click the request named 'completions', and open its Headers.",
-            "Copy the value of the 'Authorization' header, without the leading 'Bearer '.",
-            "Paste it below.  The token stays on this server, encrypted, and expires when Qwen logs you out.",
-        ],
-    },
-    "deepseek": {
-        "id": "deepseek",
-        "label": "DeepSeek (chat.deepseek.com)",
-        "supported": False,
-        "login_url": "https://chat.deepseek.com/",
-        "web_url": "https://chat.deepseek.com/",
-        "credential_label": "userToken",
-        "credential_hint": "",
-        "default_model": "",
-        "model_hint": "",
-        "unsupported_reason": (
-            "DeepSeek's web chat now requires a per-message proof-of-work "
-            "(DeepSeekHashV1) that only its in-browser WASM can solve "
-            "quickly.  Server-side replay of the userToken therefore fails, "
-            "so Lute does not offer it.  Use the web link below instead."
-        ),
-        "steps": [],
-    },
-    "chatgpt": {
-        "id": "chatgpt",
-        "label": "ChatGPT (chatgpt.com)",
-        "supported": False,
-        "login_url": "https://chatgpt.com/",
-        "web_url": "https://chatgpt.com/?q={q}",
-        "credential_label": "session cookie",
-        "credential_hint": "",
-        "default_model": "",
-        "model_hint": "",
-        "unsupported_reason": (
-            "ChatGPT protects every message behind Cloudflare Turnstile, a "
-            "per-message proof-of-work, and a browser fingerprint.  A session "
-            "cookie copied from your browser is replayed from this server's "
-            "IP and user agent, which Cloudflare challenges (403), so it "
-            "cannot be used reliably.  Use the web link below instead."
-        ),
-        "steps": [],
-    },
-}
-
-# The only web endpoint we call today.
-QWEN_ENDPOINT = "https://chat.qwen.ai/api/chat/completions"
-QWEN_MODEL_FALLBACK = "qwen3.6-plus"
-
-_USER_AGENT = (
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0 Safari/537.36"
-)
-
 
 class AiError(Exception):
     """
-    A sentence-translation failure the UI should show.
+    An AI failure the UI should show.
 
-    ``kind`` is one of unconfigured, unsupported, session, rate, timeout,
-    upstream, so the page can phrase the message precisely.
+    ``kind`` is one of unconfigured, unsupported, auth, config, rate,
+    timeout, upstream, so the page can phrase the message precisely.
     """
 
     def __init__(self, message, kind="upstream"):
@@ -124,14 +49,6 @@ def _repo():
     return UserSettingRepository(db.session)
 
 
-def _token_key(provider):
-    return f"ai_{provider}_token"
-
-
-def _model_key(provider):
-    return f"ai_{provider}_model"
-
-
 def _get(key):
     return _repo().get_dynamic_value(key) or ""
 
@@ -141,12 +58,8 @@ def _set(key, value):
     db.session.commit()
 
 
-def provider_ids():
-    return list(PROVIDERS.keys())
-
-
 def provider_def(provider):
-    return PROVIDERS.get(provider)
+    return _API_PROVIDERS.get(provider)
 
 
 def providers_fallback_label():
@@ -157,21 +70,16 @@ def providers_fallback_label():
 def selected_provider():
     "The provider the reader should use, or '' when none is selected."
     p = _get(PROVIDER_SETTING_KEY).strip()
-    if p in PROVIDERS and PROVIDERS[p]["supported"]:
+    if p in _API_PROVIDERS:
         return p
     return ""
 
 
 def set_selected_provider(provider):
-    "Persist the reader's provider choice; unsupported ones are refused."
+    "Persist the reader's provider choice; unknown ones are refused."
     provider = (provider or "").strip()
-    if provider and provider not in PROVIDERS:
+    if provider and provider not in _API_PROVIDERS:
         raise AiError(f"Unknown AI provider: {provider}", "unconfigured")
-    if provider and not PROVIDERS[provider]["supported"]:
-        raise AiError(
-            f"{PROVIDERS[provider]['label']} cannot be used server-side.",
-            "unsupported",
-        )
     _set(PROVIDER_SETTING_KEY, provider)
 
 
@@ -186,75 +94,26 @@ def mask_token(token):
 
 def provider_status(provider):
     "Everything the settings page may display about one provider."
-    p = PROVIDERS.get(provider)
-    if p is None:
+    state = grammar_provider_status(provider)
+    if state is None:
         return None
-    token = decrypt(_get(_token_key(provider)))
-    model = _get(_model_key(provider)) or p["default_model"]
-    return {
-        "provider": provider,
-        "label": p["label"],
-        "supported": p["supported"],
-        "configured": bool(token),
-        "masked": mask_token(token),
-        "model": model,
-        "login_url": p["login_url"],
-        "credential_label": p["credential_label"],
-        "credential_hint": p["credential_hint"],
-        "model_hint": p["model_hint"],
-        "steps": p["steps"],
-        "unsupported_reason": p.get("unsupported_reason", ""),
-    }
+    state.update(
+        {
+            "kind": "api",
+            "supported": True,
+            "steps": [],
+            "unsupported_reason": "",
+        }
+    )
+    return state
 
 
 def all_status():
     "Status for the settings page, plus the current provider choice."
     return {
         "selected": selected_provider(),
-        "providers": [provider_status(p) for p in provider_ids()],
+        "providers": [provider_status(p) for p in _API_PROVIDERS],
     }
-
-
-def save_config(provider, token=None, model=None):
-    """
-    Save a provider's credential and/or model.
-
-    A blank token means "leave the stored one alone" (the input is
-    empty on a normal form submit); use clear_config() to forget it.
-    """
-    p = PROVIDERS.get(provider)
-    if p is None:
-        raise AiError(f"Unknown AI provider: {provider}", "unconfigured")
-    if not p["supported"]:
-        raise AiError(
-            f"{p['label']} cannot be used server-side; nothing was saved.",
-            "unsupported",
-        )
-    if token is not None:
-        token = (token or "").strip()
-        if token.lower().startswith("bearer "):
-            token = token[7:].strip()
-        if token:
-            _set(_token_key(provider), encrypt(token))
-    if model is not None:
-        _set(_model_key(provider), (model or "").strip())
-    return provider_status(provider)
-
-
-def clear_config(provider):
-    "Forget a provider's stored credential (logout / re-bind)."
-    if provider not in PROVIDERS:
-        raise AiError(f"Unknown AI provider: {provider}", "unconfigured")
-    _set(_token_key(provider), "")
-    return provider_status(provider)
-
-
-def _stored_token(provider):
-    return decrypt(_get(_token_key(provider)))
-
-
-def _stored_model(provider):
-    return _get(_model_key(provider)) or PROVIDERS[provider]["default_model"]
 
 
 # ---------------------------------------------------------------------
@@ -272,55 +131,35 @@ def clean_sentence(text):
     return re.sub(r"\s+", " ", text).strip()
 
 
-def build_prompt(sentence, source_lang="", target_lang=""):
-    "The one-shot translation prompt; output-only, no chat context."
+def build_translation_system_prompt(source_lang="", target_lang=""):
+    "The chat-system half of the translation prompt."
     source = (source_lang or "").strip()
     target = (target_lang or "").strip() or "English"
     origin = f"{source} " if source else ""
     return (
         f"You are a translation engine. Translate the following {origin}"
         f"sentence into {target}. Reply with the translation only, "
-        f"without explanations, quotes, or the original text.\n\n"
-        f"{sentence}"
+        f"without explanations, quotes, or the original text."
     )
 
 
-def web_url(provider, sentence):
-    "A top-level (new tab) link to the provider's own web chat."
-    p = PROVIDERS.get(provider) or PROVIDERS["qwen"]
-    from urllib.parse import quote
-
-    return p["web_url"].replace("{q}", quote(clean_sentence(sentence)))
-
-
 # ---------------------------------------------------------------------
-# Qwen web-session adapter
+# Sentence translation via official APIs
 # ---------------------------------------------------------------------
 
 
 def translate_stream(provider, sentence, source_lang="", target_lang=""):
     """
-    Yield translation text chunks.
+    Yield translation text chunks from the selected API provider.
 
-    Raises AiError (session/rate/timeout/upstream) on failure; the
-    route turns those into an SSE error event.
+    Raises AiError (auth/rate/timeout/upstream) on failure; the route
+    turns those into an SSE error event.
     """
     provider = provider or selected_provider()
     if not provider:
         raise AiError(
-            "No AI provider is configured for sentence translation.",
-            "unconfigured",
-        )
-    p = PROVIDERS.get(provider)
-    if p is None or not p["supported"]:
-        raise AiError(
-            (p or {}).get("unsupported_reason") or "This provider is unsupported.",
-            "unsupported",
-        )
-    token = _stored_token(provider)
-    if not token:
-        raise AiError(
-            f"{p['label']} is not bound yet.  Add its session token in Settings.",
+            "No AI provider is configured for sentence translation. Add an "
+            "OpenAI or Anthropic API key in Settings and select it there.",
             "unconfigured",
         )
 
@@ -328,129 +167,28 @@ def translate_stream(provider, sentence, source_lang="", target_lang=""):
     if sentence == "":
         raise AiError("No sentence text was passed to the translator.", "upstream")
 
-    prompt = build_prompt(sentence, source_lang, target_lang)
-    if provider == "qwen":
-        yield from _qwen_stream(token, _stored_model(provider), prompt)
+    ready = grammar_ready(provider)
+    system_prompt = build_translation_system_prompt(source_lang, target_lang)
+    if ready["provider"] == "openai":
+        yield from _openai_stream(
+            ready["base_url"],
+            ready["token"],
+            ready["model"],
+            system_prompt,
+            sentence,
+        )
         return
-    raise AiError("This provider has no server-side adapter.", "unsupported")
-
-
-def test_connection(provider):
-    """
-    Do a tiny round-trip and report a short, credential-free result.
-
-    Returns {"ok": bool, "message": str}.  The translation text itself
-    is not returned, only whether the provider answered.
-    """
-    try:
-        chunks = []
-        for chunk in translate_stream(provider, "Hello", target_lang="English"):
-            chunks.append(chunk)
-            if len("".join(chunks)) >= 24:
-                break
-        if "".join(chunks).strip():
-            return {"ok": True, "message": "The provider answered."}
-        return {"ok": False, "message": "The provider returned an empty reply."}
-    except AiError as e:
-        return {"ok": False, "message": e.message}
-    except Exception as e:  # pylint: disable=broad-exception-caught
-        return {"ok": False, "message": f"Connection failed ({type(e).__name__})."}
-
-
-def _qwen_stream(token, model, prompt):
-    "POST to Qwen's web completions endpoint and parse its SSE stream."
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json",
-        "Accept": "text/event-stream",
-        "User-Agent": _USER_AGENT,
-        "Referer": "https://chat.qwen.ai/",
-        "Origin": "https://chat.qwen.ai",
-        "source": "web",
-        "X-Request-Id": str(uuid.uuid4()),
-    }
-    payload = {
-        "stream": True,
-        "incremental_output": True,
-        "model": model or QWEN_MODEL_FALLBACK,
-        "messages": [{"role": "user", "content": prompt}],
-    }
-
-    try:
-        resp = requests.post(
-            QWEN_ENDPOINT, json=payload, headers=headers, stream=True, timeout=(10, 90)
-        )
-    except requests.exceptions.Timeout as e:
-        raise AiError("Qwen did not answer in time (timeout).", "timeout") from e
-    except requests.exceptions.RequestException as e:
-        raise AiError(f"Could not reach Qwen ({type(e).__name__}).", "upstream") from e
-
-    try:
-        if resp.status_code != 200:
-            raise _response_error(resp)
-        content_type = (resp.headers.get("Content-Type") or "").lower()
-        if "text/event-stream" not in content_type:
-            # Some deployments answer a non-streamed JSON body even when
-            # stream was requested; accept it instead of failing.
-            try:
-                data = resp.json()
-            except ValueError as e:
-                raise AiError(
-                    "Qwen returned an unreadable response.", "upstream"
-                ) from e
-            text = _text_from_payload(data)
-            if text:
-                yield text
-            return
-
-        for raw in resp.iter_lines(decode_unicode=True):
-            if raw is None:
-                continue
-            line = raw.decode("utf-8", "replace") if isinstance(raw, bytes) else raw
-            line = line.strip()
-            if not line or not line.startswith("data:"):
-                continue
-            data_str = line[5:].strip()
-            if data_str == "[DONE]":
-                break
-            try:
-                data = json.loads(data_str)
-            except ValueError:
-                continue
-            text = _text_from_payload(data)
-            if text:
-                yield text
-    finally:
-        resp.close()
-
-
-def _response_error(resp):
-    "Map an upstream status to the message the reader should see."
-    status = resp.status_code
-    if status in (401, 403):
-        return AiError(
-            "The stored session was rejected (expired, logged out, or risk "
-            "control).  Re-bind the token in Settings, or open the provider's "
-            "web page from the link below.",
-            "session",
-        )
-    if status == 429:
-        return AiError(
-            "The provider is rate-limiting this account.  Wait a moment and "
-            "try again.",
-            "rate",
-        )
-    body = ""
-    try:
-        body = (resp.text or "").strip()[:200]
-    except Exception:  # pylint: disable=broad-exception-caught
-        body = ""
-    suffix = f" ({body})" if body else ""
-    return AiError(f"The provider returned HTTP {status}{suffix}.", "upstream")
+    yield from _anthropic_stream(
+        ready["base_url"],
+        ready["token"],
+        ready["model"],
+        system_prompt,
+        sentence,
+    )
 
 
 def _text_from_payload(data):
-    "Pull text out of the common web-response shapes, leniently."
+    "Pull text out of the common response shapes, leniently."
     if not isinstance(data, dict):
         return ""
     choices = data.get("choices")
@@ -475,3 +213,576 @@ def _text_from_payload(data):
         if isinstance(data.get(key), str):
             return data[key]
     return ""
+
+
+# ---------------------------------------------------------------------
+# Official API providers for grammar analysis
+#
+# Official API providers.  These serve both sentence translation (the
+# provider chosen in Settings) and grammar analysis (the provider enabled
+# for the Grammar panel).  The two choices are separate settings, but the
+# encrypted API key and model are shared, so one key serves both features.
+# ---------------------------------------------------------------------
+
+GRAMMAR_PROVIDER_SETTING_KEY = "ai_grammar_provider"
+
+_API_PROVIDERS = {
+    "openai": {
+        "id": "openai",
+        "label": "OpenAI (API key)",
+        "default_base_url": "https://api.openai.com/v1",
+        "base_url_hint": "e.g. https://api.openai.com/v1, or a proxy / gateway",
+        "default_model": "gpt-4o-mini",
+        "model_hint": "e.g. gpt-4o-mini",
+        "credential_label": "API key",
+        "credential_hint": "sk-... (stored encrypted; never shown again)",
+        "login_url": "https://platform.openai.com/api-keys",
+    },
+    "anthropic": {
+        "id": "anthropic",
+        "label": "Anthropic (API key)",
+        "default_base_url": "https://api.anthropic.com",
+        "base_url_hint": "e.g. https://api.anthropic.com, or a proxy / gateway",
+        "default_model": "claude-sonnet-4-5",
+        "model_hint": "e.g. claude-sonnet-4-5",
+        "credential_label": "API key",
+        "credential_hint": "sk-ant-... (stored encrypted; never shown again)",
+        "login_url": "https://console.anthropic.com/settings/keys",
+    },
+}
+
+_GRAMMAR_CACHE_PREFIX = "ai_grammar_cache_"
+
+_GRAMMAR_JSON_KEYS = (
+    "skeleton",
+    "clauses",
+    "grammar_points",
+    "tense_voice",
+    "pitfalls",
+)
+
+_ANTHROPIC_VERSION = "2023-06-01"
+
+_API_TIMEOUT = (10, 120)
+
+_ANTHROPIC_MAX_TOKENS = 2048
+
+
+def _api_key_key(provider):
+    return f"ai_api_{provider}_token"
+
+
+def _api_base_url_key(provider):
+    return f"ai_api_{provider}_base_url"
+
+
+def _api_model_key(provider):
+    return f"ai_api_{provider}_model"
+
+
+def selected_grammar_provider():
+    "The provider the Grammar panel should use, or '' when none is enabled."
+    p = _get(GRAMMAR_PROVIDER_SETTING_KEY).strip()
+    if p in _API_PROVIDERS:
+        return p
+    return ""
+
+
+def _set_grammar_provider(provider):
+    provider = (provider or "").strip()
+    if provider and provider not in _API_PROVIDERS:
+        raise AiError(f"Unknown grammar AI provider: {provider}", "unsupported")
+    _set(GRAMMAR_PROVIDER_SETTING_KEY, provider)
+
+
+def _api_token(provider):
+    return decrypt(_get(_api_key_key(provider)))
+
+
+def _api_base_url(provider):
+    p = _API_PROVIDERS[provider]
+    raw = _get(_api_base_url_key(provider)) or p["default_base_url"]
+    return normalize_base_url(raw, p["default_base_url"])
+
+
+def _api_model(provider):
+    p = _API_PROVIDERS[provider]
+    return _get(_api_model_key(provider)) or p["default_model"]
+
+
+def normalize_base_url(raw, default=""):
+    "A user-editable http(s) base URL; no credentials, no trailing slash."
+    text = (raw or "").strip() or (default or "")
+    text = text.rstrip("/")
+    if not text:
+        raise AiError("The Base URL cannot be empty.", "config")
+    parsed = urlparse(text)
+    if parsed.scheme not in ("http", "https") or not parsed.netloc:
+        raise AiError("The Base URL must be an http(s) URL.", "config")
+    if parsed.username or parsed.password:
+        raise AiError("The Base URL must not contain a username or password.", "config")
+    return text
+
+
+def grammar_provider_status(provider):
+    "Everything the settings page may display; never the raw API key."
+    p = _API_PROVIDERS.get(provider)
+    if p is None:
+        return None
+    token = _api_token(provider)
+    selected = selected_grammar_provider()
+    return {
+        "provider": provider,
+        "label": p["label"],
+        "configured": bool(token),
+        "masked": mask_token(token),
+        "enabled": selected == provider,
+        "base_url": _api_base_url(provider),
+        "default_base_url": p["default_base_url"],
+        "base_url_hint": p["base_url_hint"],
+        "model": _api_model(provider),
+        "default_model": p["default_model"],
+        "model_hint": p["model_hint"],
+        "credential_label": p["credential_label"],
+        "credential_hint": p["credential_hint"],
+        "login_url": p["login_url"],
+    }
+
+
+def all_grammar_status():
+    "The grammar-provider block the settings page renders, with masks only."
+    return {
+        "selected": selected_grammar_provider(),
+        "providers": [grammar_provider_status(p) for p in _API_PROVIDERS],
+    }
+
+
+def save_grammar_config(provider, token=None, base_url=None, model=None, enabled=None):
+    """
+    Save one API provider's key (encrypted), Base URL and model.
+
+    ``enabled`` is optional: True selects this provider, False deselects it
+    (only when it was selected).  The key itself is never echoed back.
+    """
+    if provider not in _API_PROVIDERS:
+        raise AiError(f"Unknown grammar AI provider: {provider}", "unsupported")
+    if base_url is not None:
+        _set(
+            _api_base_url_key(provider),
+            normalize_base_url(base_url, _API_PROVIDERS[provider]["default_base_url"]),
+        )
+    if model is not None:
+        model = (model or "").strip()
+        if model:
+            _set(_api_model_key(provider), model)
+    if token is not None:
+        token = (token or "").strip()
+        if token.lower().startswith("bearer "):
+            token = token[7:].strip()
+        if token:
+            _set(_api_key_key(provider), encrypt(token))
+
+    if enabled:
+        if not _api_token(provider):
+            raise AiError(
+                f"{_API_PROVIDERS[provider]['label']} needs an API key before "
+                f"it can be enabled.",
+                "config",
+            )
+        _set_grammar_provider(provider)
+    elif enabled is False and selected_grammar_provider() == provider:
+        _set_grammar_provider("")
+
+    return grammar_provider_status(provider)
+
+
+def clear_grammar_config(provider):
+    "Forget the stored API key; also deselect the provider if selected."
+    if provider not in _API_PROVIDERS:
+        raise AiError(f"Unknown grammar AI provider: {provider}", "unsupported")
+    _set(_api_key_key(provider), "")
+    if selected_grammar_provider() == provider:
+        _set_grammar_provider("")
+    return grammar_provider_status(provider)
+
+
+def grammar_ready(provider=None):
+    """
+    Resolve and validate the provider for one analysis.
+
+    Returns the internal call context (including the decrypted key).  Callers
+    must never serialize this dict.
+    """
+    provider = (provider or "").strip() or selected_grammar_provider()
+    if not provider:
+        raise AiError(
+            "No grammar AI provider is enabled. Add an OpenAI or Anthropic "
+            "API key in Settings and enable it for grammar analysis.",
+            "unconfigured",
+        )
+    p = _API_PROVIDERS.get(provider)
+    if p is None:
+        raise AiError(f"Unknown grammar AI provider: {provider}", "unsupported")
+    token = _api_token(provider)
+    if not token:
+        raise AiError(
+            f"{p['label']} has no API key yet. Add one in Settings.",
+            "unconfigured",
+        )
+    return {
+        "provider": provider,
+        "label": p["label"],
+        "token": token,
+        "base_url": _api_base_url(provider),
+        "model": _api_model(provider),
+    }
+
+
+def build_grammar_system_prompt(source_lang="", target_lang=""):
+    "Instruct the model to answer with the panel's JSON card structure."
+    source = (source_lang or "").strip() or "the source language"
+    target = (target_lang or "").strip() or "English"
+    return (
+        "You are a precise grammar-analysis engine. "
+        f"The sentence is written in {source}. Explain it in {target}.\n"
+        "Return ONLY one JSON object, with no markdown fences, no preamble "
+        "and no trailing commentary. Use exactly these keys:\n"
+        '{"skeleton":{"subject":"","verb":"","object":""},'
+        '"clauses":[{"type":"","text":"","role":""}],'
+        '"grammar_points":[{"name":"","role":"","fragment":""}],'
+        '"tense_voice":{"tense":"","voice":"","aspect":""},'
+        '"pitfalls":[""]}\n'
+        "Rules:\n"
+        "- skeleton: the main subject, predicate verb and object "
+        "(empty string when absent).\n"
+        "- clauses: split the sentence into main/subordinate/relative/etc. "
+        "clauses; quote the original text verbatim.\n"
+        "- grammar_points: every key grammar point, with its name, its "
+        "function/role, and the exact source fragment it governs.\n"
+        "- tense_voice: tense, voice and aspect of the main clause.\n"
+        "- pitfalls: learner pitfalls or ambiguities, one per array item.\n"
+        f"- All explanatory strings must be in {target}; quote original "
+        "fragments verbatim.\n"
+        "- If a field does not apply, use an empty string or empty array, "
+        "but keep every key."
+    )
+
+
+def build_grammar_user_prompt(sentence, source_lang=""):
+    "The sentence itself, preceded by its source language."
+    source = (source_lang or "").strip() or "unknown"
+    return f"Sentence ({source}):\n{clean_sentence(sentence)}"
+
+
+def parse_grammar_json(text):
+    """
+    Pull a structured analysis out of a model reply.
+
+    Tolerates markdown fences and leading/trailing chatter.  Returns None
+    when the reply is not a JSON object with at least one expected key,
+    so the caller can fall back to showing the plain text.
+    """
+    raw = (text or "").strip()
+    if not raw:
+        return None
+    if raw.startswith("```"):
+        raw = re.sub(r"^```[a-zA-Z0-9_-]*\s*", "", raw)
+        raw = re.sub(r"\s*```$", "", raw).strip()
+    start = raw.find("{")
+    end = raw.rfind("}")
+    if start < 0 or end <= start:
+        return None
+    try:
+        data = json.loads(raw[start : end + 1])
+    except (TypeError, ValueError):
+        return None
+    if not isinstance(data, dict):
+        return None
+    if not any(key in data for key in _GRAMMAR_JSON_KEYS):
+        return None
+    return data
+
+
+def grammar_cache_key(sentence, model, source_lang="", target_lang=""):
+    "Sentence hash plus model and language pair; one key per stored result."
+    raw = "\x1f".join(
+        [
+            clean_sentence(sentence),
+            model or "",
+            (source_lang or "").strip(),
+            (target_lang or "").strip(),
+        ]
+    )
+    digest = hashlib.sha1(raw.encode("utf-8")).hexdigest()
+    return _GRAMMAR_CACHE_PREFIX + digest
+
+
+def grammar_cached_result(sentence, model, source_lang="", target_lang=""):
+    "A previously stored structured result, or None."
+    value = _get(grammar_cache_key(sentence, model, source_lang, target_lang))
+    if not value:
+        return None
+    try:
+        data = json.loads(value)
+    except (TypeError, ValueError):
+        return None
+    if not isinstance(data, dict):
+        return None
+    if not any(key in data for key in _GRAMMAR_JSON_KEYS):
+        return None
+    return data
+
+
+def store_grammar_result(sentence, model, source_lang, target_lang, result):
+    "Persist one parsed result so the same sentence is not billed twice."
+    try:
+        _set(
+            grammar_cache_key(sentence, model, source_lang, target_lang),
+            json.dumps(result, ensure_ascii=False),
+        )
+    except Exception:  # pylint: disable=broad-exception-caught
+        # A failed cache write must not break the reader's result.
+        db.session.rollback()
+
+
+def _api_response_error(resp, label):
+    """
+    Map an official-API status to a readable error.
+
+    The upstream body is deliberately not echoed: gateways sometimes quote
+    the request, and the request carries the key.
+    """
+    status = resp.status_code
+    if status in (401, 403):
+        return AiError(
+            f"{label} rejected the API key (HTTP {status}). "
+            "Check the key in Settings.",
+            "auth",
+        )
+    if status == 429:
+        return AiError(
+            f"{label} is rate-limiting this key (HTTP 429). "
+            "Wait a moment and try again.",
+            "rate",
+        )
+    if status == 404:
+        return AiError(
+            f"{label} returned HTTP 404. Check the Base URL.",
+            "upstream",
+        )
+    return AiError(f"{label} returned HTTP {status}.", "upstream")
+
+
+def _api_post(url, headers, payload, label):
+    "POST with streaming; translate transport failures into AiError."
+    try:
+        return requests.post(
+            url,
+            json=payload,
+            headers=headers,
+            stream=True,
+            timeout=_API_TIMEOUT,
+            allow_redirects=False,
+        )
+    except requests.exceptions.Timeout as e:
+        raise AiError(f"{label} did not answer in time (timeout).", "timeout") from e
+    except requests.exceptions.RequestException as e:
+        raise AiError(
+            f"Could not reach {label} ({type(e).__name__}).", "upstream"
+        ) from e
+
+
+def _iter_sse_payloads(resp):
+    "Yield parsed JSON from one SSE response; ignore comments and junk."
+    for raw in resp.iter_lines(decode_unicode=True):
+        if raw is None:
+            continue
+        line = raw.decode("utf-8", "replace") if isinstance(raw, bytes) else raw
+        line = line.strip()
+        if not line or not line.startswith("data:"):
+            continue
+        data_str = line[5:].strip()
+        if data_str == "[DONE]":
+            return
+        try:
+            data = json.loads(data_str)
+        except ValueError:
+            continue
+        if isinstance(data, dict):
+            yield data
+
+
+def _anthropic_text_from_payload(data):
+    "Text from a non-streamed Anthropic message payload."
+    if not isinstance(data, dict):
+        return ""
+    content = data.get("content")
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = [
+            block.get("text", "")
+            for block in content
+            if isinstance(block, dict) and isinstance(block.get("text"), str)
+        ]
+        return "".join(parts)
+    if isinstance(data.get("completion"), str):
+        return data["completion"]
+    return ""
+
+
+def _openai_stream(base_url, token, model, system_prompt, user_prompt):
+    "POST /chat/completions and parse choices[0].delta.content."
+    label = _API_PROVIDERS["openai"]["label"]
+    url = base_url.rstrip("/") + "/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Accept": "text/event-stream",
+    }
+    payload = {
+        "model": model,
+        "stream": True,
+        "temperature": 0.2,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+    }
+    resp = _api_post(url, headers, payload, label)
+    try:
+        if resp.status_code != 200:
+            raise _api_response_error(resp, label)
+        content_type = (resp.headers.get("Content-Type") or "").lower()
+        if "text/event-stream" not in content_type:
+            try:
+                data = resp.json()
+            except ValueError as e:
+                raise AiError(
+                    f"{label} returned an unreadable response.", "upstream"
+                ) from e
+            text = _text_from_payload(data)
+            if text:
+                yield text
+            return
+        for data in _iter_sse_payloads(resp):
+            text = _text_from_payload(data)
+            if text:
+                yield text
+    finally:
+        resp.close()
+
+
+def _anthropic_stream(
+    base_url, token, model, system_prompt, user_prompt, max_tokens=None
+):
+    "POST /messages and parse content_block_delta.delta.text."
+    label = _API_PROVIDERS["anthropic"]["label"]
+    url = base_url.rstrip("/") + "/messages"
+    headers = {
+        "x-api-key": token,
+        "anthropic-version": _ANTHROPIC_VERSION,
+        "Content-Type": "application/json",
+        "Accept": "text/event-stream",
+    }
+    payload = {
+        "model": model,
+        "max_tokens": max_tokens or _ANTHROPIC_MAX_TOKENS,
+        "stream": True,
+        "temperature": 0.2,
+        "system": system_prompt,
+        "messages": [{"role": "user", "content": user_prompt}],
+    }
+    resp = _api_post(url, headers, payload, label)
+    try:
+        if resp.status_code != 200:
+            raise _api_response_error(resp, label)
+        content_type = (resp.headers.get("Content-Type") or "").lower()
+        if "text/event-stream" not in content_type:
+            try:
+                data = resp.json()
+            except ValueError as e:
+                raise AiError(
+                    f"{label} returned an unreadable response.", "upstream"
+                ) from e
+            text = _anthropic_text_from_payload(data)
+            if text:
+                yield text
+            return
+        for data in _iter_sse_payloads(resp):
+            event_type = data.get("type")
+            if event_type == "error":
+                raise AiError(f"{label} reported an upstream error.", "upstream")
+            if event_type != "content_block_delta":
+                continue
+            delta = data.get("delta")
+            if not isinstance(delta, dict):
+                continue
+            text = delta.get("text")
+            if isinstance(text, str) and text:
+                yield text
+    finally:
+        resp.close()
+
+
+def grammar_stream(provider, sentence, source_lang="", target_lang=""):
+    "Stream one grammar analysis; yields raw model text chunks."
+    ready = grammar_ready(provider)
+    sentence = clean_sentence(sentence)
+    if not sentence:
+        raise AiError("There is no sentence to analyze.", "upstream")
+    system_prompt = build_grammar_system_prompt(source_lang, target_lang)
+    user_prompt = build_grammar_user_prompt(sentence, source_lang)
+    if ready["provider"] == "openai":
+        yield from _openai_stream(
+            ready["base_url"],
+            ready["token"],
+            ready["model"],
+            system_prompt,
+            user_prompt,
+        )
+        return
+    yield from _anthropic_stream(
+        ready["base_url"],
+        ready["token"],
+        ready["model"],
+        system_prompt,
+        user_prompt,
+    )
+
+
+def test_grammar_connection(provider):
+    "Round-trip a tiny prompt; never returns the reply or the key."
+    try:
+        ready = grammar_ready(provider)
+        system_prompt = "Reply with the single word OK."
+        user_prompt = "OK"
+        if ready["provider"] == "openai":
+            chunks = _openai_stream(
+                ready["base_url"],
+                ready["token"],
+                ready["model"],
+                system_prompt,
+                user_prompt,
+            )
+        else:
+            chunks = _anthropic_stream(
+                ready["base_url"],
+                ready["token"],
+                ready["model"],
+                system_prompt,
+                user_prompt,
+                max_tokens=16,
+            )
+        seen = ""
+        for chunk in chunks:
+            seen += chunk
+            if len(seen) >= 24:
+                break
+        if seen.strip():
+            return {"ok": True, "message": "The provider answered."}
+        return {"ok": False, "message": "The provider returned an empty reply."}
+    except AiError as e:
+        return {"ok": False, "message": e.message}
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        return {"ok": False, "message": f"Connection failed ({type(e).__name__})."}

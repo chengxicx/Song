@@ -709,33 +709,21 @@ def _reading_for(langid, text):
     return term.romanization if term is not None else None
 
 
-_LEGACY_AI_CHAT_HOSTS = ("chat.qwen.ai", "chat.qianwen.com")
-
-
 def _sentence_dicts_for(lang):
     """
     Sentence-mode tabs for one language.
 
-    The old setup pointed a sentence dictionary at
-    https://chat.qwen.ai/?q=[LUTE] with dicttype embeddedhtml.  Qwen
-    refuses framing (frame-ancestors 'self'), so that tab can never
-    work; drop those entries and put Lute's own /ai/sentence frame
-    first instead.  The AI tab is always present, even before a
-    provider is bound, so the reader sees setup guidance rather than
-    a dead iframe.
+    Lute's own /ai/sentence frame is put first.  The AI tab is always
+    present, even before an API provider is configured, so the reader
+    sees setup guidance rather than a dead iframe.
     """
-    configured = [
-        d
-        for d in lang.sentence_dict_uris
-        if not any(host in (d.get("url") or "") for host in _LEGACY_AI_CHAT_HOSTS)
-    ]
     ai_tab = {
         "url": f"/ai/sentence?lang={lang.id}&q=[LUTE]",
         "dicttype": "embeddedhtml",
         "label": "AI",
         "title": "AI sentence translation",
     }
-    return [ai_tab] + configured
+    return [ai_tab] + list(lang.sentence_dict_uris)
 
 
 def _render_book_page(book, pagenum, track_page_open=True):

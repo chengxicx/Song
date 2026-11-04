@@ -1,10 +1,10 @@
 """
-At-rest encryption for AI session tokens.
+At-rest encryption for AI API keys.
 
 The project stores most settings as plain text (the NetEase MUSIC_U
-cookie included), and Lute has no cipher dependency.  AI session tokens
-are bearer credentials for a user's own ChatGPT/Qwen/DeepSeek account,
-so they get a small authenticated-encryption wrapper here instead:
+cookie included), and Lute has no cipher dependency.  AI API keys are
+bearer credentials for a user's own OpenAI or Anthropic account, so they
+get a small authenticated-encryption wrapper here instead:
 
 - the key is derived from the app SECRET_KEY (persisted in
   <datapath>/.secret_key, see lute/app_factory.py), never from a
@@ -14,8 +14,8 @@ so they get a small authenticated-encryption wrapper here instead:
   random nonce, authenticated with encrypt-then-MAC.
 
 A changed SECRET_KEY makes old values undecryptable, at which point the
-provider simply reads as "not configured" and the user re-binds.  That
-is preferable to silently keeping credentials that no longer verify.
+provider simply reads as "not configured" and the user re-saves the key.
+That is preferable to silently keeping credentials that no longer verify.
 """
 
 import hashlib
