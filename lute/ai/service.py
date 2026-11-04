@@ -259,7 +259,12 @@ _API_PROVIDERS = {
 
 _GRAMMAR_CACHE_PREFIX = "ai_grammar_cache_"
 
+# v1 results have no ``translation`` field, so they cannot be reused for
+# the current panel; a new prefix makes every old entry a miss.
+_GRAMMAR_CACHE_VERSION = "v2_"
+
 _GRAMMAR_JSON_KEYS = (
+    "translation",
     "skeleton",
     "clauses",
     "grammar_points",
@@ -483,13 +488,17 @@ def build_grammar_system_prompt(source_lang="", target_lang=""):
         "You are a precise grammar-analysis engine. "
         f"The sentence is written in {source}. Explain it in {target}.\n"
         "Return ONLY one JSON object, with no markdown fences, no preamble "
-        "and no trailing commentary. Use exactly these keys:\n"
-        '{"skeleton":{"subject":"","verb":"","object":""},'
+        "and no trailing commentary. Use exactly these keys, in this order:\n"
+        '{"translation":"",'
+        '"skeleton":{"subject":"","verb":"","object":""},'
         '"clauses":[{"type":"","text":"","role":""}],'
         '"grammar_points":[{"name":"","role":"","fragment":""}],'
         '"tense_voice":{"tense":"","voice":"","aspect":""},'
         '"pitfalls":[""]}\n'
         "Rules:\n"
+        f"- translation: one natural, fluent translation of the whole "
+        f"sentence into {target}; translate the meaning, not word by word, "
+        "and do not wrap it in quotation marks.\n"
         "- skeleton: the main subject, predicate verb and object "
         "(empty string when absent).\n"
         "- clauses: split the sentence into main/subordinate/relative/etc. "
@@ -551,13 +560,36 @@ def grammar_cache_key(sentence, model, source_lang="", target_lang=""):
         ]
     )
     digest = hashlib.sha1(raw.encode("utf-8")).hexdigest()
-    return _GRAMMAR_CACHE_PREFIX + digest
+    return _GRAMMAR_CACHE_PREFIX + _GRAMMAR_CACHE_VERSION + digest
+
+
+def _legacy_grammar_cache_key(sentence, model, source_lang="", target_lang=""):
+    "The pre-v2 key, whose cached result has no whole-sentence translation."
+    return grammar_cache_key(sentence, model, source_lang, target_lang).replace(
+        _GRAMMAR_CACHE_PREFIX + _GRAMMAR_CACHE_VERSION,
+        _GRAMMAR_CACHE_PREFIX,
+        1,
+    )
+
+
+def _drop_legacy_grammar_cache(sentence, model, source_lang="", target_lang=""):
+    "Best-effort cleanup of the one old entry, after a v2 cache miss."
+    try:
+        key = _legacy_grammar_cache_key(sentence, model, source_lang, target_lang)
+        repository = _repo()
+        if repository.get_dynamic_value(key):
+            repository.delete_key(key)
+            db.session.commit()
+    except Exception:  # pylint: disable=broad-exception-caught
+        # Cleanup is optional; never break the analysis because of it.
+        db.session.rollback()
 
 
 def grammar_cached_result(sentence, model, source_lang="", target_lang=""):
     "A previously stored structured result, or None."
     value = _get(grammar_cache_key(sentence, model, source_lang, target_lang))
     if not value:
+        _drop_legacy_grammar_cache(sentence, model, source_lang, target_lang)
         return None
     try:
         data = json.loads(value)

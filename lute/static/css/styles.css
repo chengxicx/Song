@@ -5954,6 +5954,14 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     font-weight: 600;
     color: var(--g-accent);
 }
+/* Whole-sentence translation: the first card of the AI block.  Long
+   sentences wrap instead of widening the panel. */
+.grammar-ai__translation {
+    font-size: 0.95em;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
 .grammar-ai__row {
     display: grid;
     grid-template-columns: 5.5em minmax(0, 1fr);

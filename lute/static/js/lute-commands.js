@@ -783,6 +783,14 @@ function open_grammar_analysis(opts) {
     if (!result || typeof result !== "object") return "";
     var html = "";
 
+    var translation = typeof result.translation === "string" ? result.translation.trim() : "";
+    if (translation) {
+      html += aiCardHtml(
+        I18N.t("Translation"),
+        '<div class="grammar-ai__translation">' + escapeHtml(translation) + "</div>"
+      );
+    }
+
     var skeleton = result.skeleton && typeof result.skeleton === "object" ? result.skeleton : {};
     var skeletonBody =
       aiRowHtml(I18N.t("Subject"), skeleton.subject) +

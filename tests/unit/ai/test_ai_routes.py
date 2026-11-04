@@ -285,3 +285,24 @@ def test_read_page_uses_the_ai_tab(app_context, client, english):
     assert resp.status_code == 200
     body = resp.get_data(as_text=True)
     assert "/ai/sentence?lang=" in body
+
+
+def test_grammar_target_language_follows_the_language_setting(app_context, english):
+    "Grammar Analysis Language wins; empty or unknown falls back to the UI."
+    from lute.ai.routes import _grammar_language_context
+
+    english.grammar_translate_lang = "zh"
+    db.session.commit()
+    assert _grammar_language_context(english.id)[1] == "Simplified Chinese"
+
+    english.grammar_translate_lang = "ja"
+    db.session.commit()
+    assert _grammar_language_context(english.id)[1] == "Japanese"
+
+    english.grammar_translate_lang = ""
+    db.session.commit()
+    assert _grammar_language_context(english.id)[1] == "English"
+
+    english.grammar_translate_lang = "xx"
+    db.session.commit()
+    assert _grammar_language_context(english.id)[1] == "English"

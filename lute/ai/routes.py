@@ -212,13 +212,22 @@ _UI_LANGUAGE_NAMES = {
 
 
 def _grammar_language_context(langid):
-    "Source language name plus the reader's UI language, for the prompt."
+    """
+    Source language name, plus the display language chosen for this book's
+    language in Settings ("Grammar Analysis Language").
+
+    An empty or unknown setting falls back to the reader's UI language,
+    which is the behaviour before that column existed.
+    """
     try:
         lang = db.session.get(Language, int(langid))
     except (TypeError, ValueError):
         lang = None
     source = (lang.name or "") if lang is not None else ""
-    target = _UI_LANGUAGE_NAMES.get(current_language(), "English")
+    chosen = (getattr(lang, "grammar_translate_lang", "") or "").strip()
+    target = _UI_LANGUAGE_NAMES.get(chosen) or _UI_LANGUAGE_NAMES.get(
+        current_language(), "English"
+    )
     return source, target
 
 

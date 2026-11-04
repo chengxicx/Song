@@ -907,6 +907,7 @@
   "Set up an AI provider to translate sentences": "请先设置 AI 服务商以翻译句子",
   "The Sentence tab translates through the official OpenAI or Anthropic API.  No usable API key is configured for this account yet, so nothing was sent anywhere.": "「句子」页签通过 OpenAI 或 Anthropic 官方 API 翻译。此账号尚未配置可用的 API 密钥，因此没有向任何服务发送内容。",
   "Open AI settings": "打开 AI 设置",
+  "Translation": "译文",
   "Sentence skeleton": "句子主干",
   "Subject": "主语",
   "Verb": "谓语动词",
