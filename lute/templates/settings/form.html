@@ -338,70 +338,77 @@
     </tr>
     <tr>
       <td>
-        {{ t('The reader Sentence tab translates through a provider you bind here, from the Lute server, using a web session you already have.  Credentials stay on this server, encrypted, and only a mask is shown.  Nothing is ever framed from the provider site.') }}
+        {{ t('The reader Sentence tab translates through the official OpenAI or Anthropic API.  Choose the provider here and add its API key in the Grammar section below; the same key serves sentence translation and grammar analysis.  Keys stay on this server, encrypted, and only a mask is shown.') }}
       </td>
       <td>
         <label for="ai_provider_select">{{ t('Provider used by the reader Sentence tab') }}</label>
         <select id="ai_provider_select" class="form-control" style="max-width: 22rem;" onchange="ai_set_provider();">
           <option value="">{{ t('Not configured') }}</option>
           {% for p in ai_providers.providers %}
-          <option value="{{ p.provider }}" {% if not p.supported %}disabled{% endif %}>
-            {{ p.label }}{% if not p.supported %} — {{ t('not supported server-side') }}{% endif %}
-          </option>
+          <option value="{{ p.provider }}">{{ p.label }}</option>
           {% endfor %}
         </select>
         <div id="ai_provider_message" style="margin-top: 6px;"></div>
+      </td>
+    </tr>
 
-        <div id="ai_providers_box" style="margin-top: 12px;">
-          {% for p in ai_providers.providers %}
-          <details class="ai-provider" data-provider="{{ p.provider }}" style="margin-bottom: 8px;">
+    <tr>
+      <td>
+        <h2 id="ai-grammar">{{ t('AI grammar analysis (API key)') }}</h2>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        {{ t('The reader Grammar panel can analyze the selected sentence through the official OpenAI or Anthropic API.  Enable one provider here; its key is shared with the Sentence tab when you choose it in the provider selector above.  Keys stay on this server, encrypted, and only a mask is shown.') }}
+      </td>
+      <td>
+        <div id="ai_grammar_box">
+          {% for p in ai_grammar_providers.providers %}
+          <details class="ai-grammar-provider" data-provider="{{ p.provider }}" style="margin-bottom: 8px;">
             <summary>
               <strong>{{ p.label }}</strong>
-              <span class="ai-provider-state" data-role="state">
-                {% if p.supported %}
-                  {% if p.configured %}{{ t('connected') }} {{ p.masked }}{% else %}{{ t('not connected') }}{% endif %}
-                {% else %}{{ t('not supported server-side') }}{% endif %}
+              <span data-role="state">
+                {% if p.enabled %}
+                  {% if p.configured %}{{ t('enabled') }} · {{ p.masked }}{% else %}{{ t('enabled') }} · {{ t('no key') }}{% endif %}
+                {% elif p.configured %}
+                  {{ t('key saved') }} {{ p.masked }}
+                {% else %}{{ t('not configured') }}{% endif %}
               </span>
             </summary>
-            {% if p.supported %}
             <div style="margin-top: 8px;">
-              <ol style="margin: 4px 0 8px 1.1rem; padding: 0;">
-                {% for step in p.steps %}
-                <li>{{ t(step) }}</li>
-                {% endfor %}
-              </ol>
-              <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
-                <input type="password" id="ai_token_{{ p.provider }}" class="form-control"
-                       autocomplete="off" spellcheck="false" style="max-width: 26rem;"
+              <label style="display: inline-flex; align-items: center; gap: 6px;">
+                <input type="checkbox" id="ai_grammar_enabled_{{ p.provider }}"
+                       {% if p.enabled %}checked{% endif %}
+                       onchange="ai_grammar_save('{{ p.provider }}'); return false;">
+                {{ t('Enable for grammar analysis') }}
+              </label>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px;">
+                <input type="text" id="ai_grammar_base_url_{{ p.provider }}" class="form-control"
+                       autocomplete="off" spellcheck="false" style="max-width: 22rem;"
+                       value="{{ p.base_url }}" placeholder="{{ p.base_url_hint }}">
+                <input type="password" id="ai_grammar_token_{{ p.provider }}" class="form-control"
+                       autocomplete="off" spellcheck="false" style="max-width: 20rem;"
                        placeholder="{{ p.credential_label }}: {{ p.credential_hint }}">
-                <input type="text" id="ai_model_{{ p.provider }}" class="form-control"
-                       autocomplete="off" spellcheck="false" style="max-width: 12rem;"
+                <input type="text" id="ai_grammar_model_{{ p.provider }}" class="form-control"
+                       autocomplete="off" spellcheck="false" style="max-width: 13rem;"
                        value="{{ p.model }}" placeholder="{{ p.model_hint }}">
               </div>
               <div style="margin-top: 8px;">
-                <button type="button" class="btn btn-secondary" onclick="ai_save('{{ p.provider }}'); return false;">
+                <button type="button" class="btn btn-secondary" onclick="ai_grammar_save('{{ p.provider }}'); return false;">
                   {{ t('Save') }}
                 </button>
-                <button type="button" class="btn btn-secondary" onclick="ai_test('{{ p.provider }}'); return false;">
+                <button type="button" class="btn btn-secondary" onclick="ai_grammar_test('{{ p.provider }}'); return false;">
                   {{ t('Test connection') }}
                 </button>
-                <button type="button" class="btn btn-danger" onclick="ai_clear('{{ p.provider }}'); return false;">
-                  {{ t('Forget session') }}
+                <button type="button" class="btn btn-danger" onclick="ai_grammar_clear('{{ p.provider }}'); return false;">
+                  {{ t('Clear key') }}
                 </button>
                 <a href="{{ p.login_url }}" target="_blank" rel="noopener" style="margin-left: 8px;">
-                  {{ t('Open the provider site') }}
+                  {{ t('Get an API key') }}
                 </a>
               </div>
               <div data-role="message" style="margin-top: 6px;"></div>
             </div>
-            {% else %}
-            <div style="margin-top: 8px;">
-              <p style="margin: 4px 0;">{{ t(p.unsupported_reason) }}</p>
-              <a href="{{ p.login_url }}" target="_blank" rel="noopener">
-                {{ t('Open the provider site') }}
-              </a>
-            </div>
-            {% endif %}
           </details>
           {% endfor %}
         </div>
@@ -912,37 +919,11 @@
   document.addEventListener('DOMContentLoaded', whisperRefresh);
   {% endif %}
 
-  /* AI sentence translation providers (web sessions, encrypted at rest). */
-
-  function ai_provider_card(provider) {
-    return document.querySelector('.ai-provider[data-provider="' + provider + '"]');
-  }
-
-  function ai_msg(provider, text, ok) {
-    const card = ai_provider_card(provider);
-    if (!card) return;
-    const box = card.querySelector('[data-role="message"]');
-    if (!box) return;
-    box.textContent = text;
-    box.style.color = ok ? 'green' : '#b3261e';
-  }
+  /* AI sentence translation provider selection (API keys live below). */
 
   function ai_apply_status(data) {
     const select = document.getElementById('ai_provider_select');
     if (select) select.value = data.selected || '';
-    (data.providers || []).forEach(function (p) {
-      const card = ai_provider_card(p.provider);
-      if (!card) return;
-      const state = card.querySelector('[data-role="state"]');
-      if (!state) return;
-      if (!p.supported) {
-        state.textContent = I18N.t('not supported server-side');
-      } else if (p.configured) {
-        state.textContent = I18N.t('connected') + ' ' + p.masked;
-      } else {
-        state.textContent = I18N.t('not connected');
-      }
-    });
   }
 
   function ai_refresh_status() {
@@ -980,13 +961,66 @@
       });
   }
 
-  function ai_save(provider) {
-    const tokenEl = document.getElementById('ai_token_' + provider);
-    const modelEl = document.getElementById('ai_model_' + provider);
+  function ai_grammar_card(provider) {
+    return document.querySelector('.ai-grammar-provider[data-provider="' + provider + '"]');
+  }
+
+  function ai_grammar_msg(provider, text, ok) {
+    const card = ai_grammar_card(provider);
+    if (!card) return;
+    const box = card.querySelector('[data-role="message"]');
+    if (!box) return;
+    box.textContent = text;
+    box.style.color = ok ? 'green' : '#b3261e';
+  }
+
+  function ai_grammar_state_text(p) {
+    if (p.enabled) {
+      return p.configured
+        ? I18N.t('enabled') + ' · ' + p.masked
+        : I18N.t('enabled') + ' · ' + I18N.t('no key');
+    }
+    return p.configured
+      ? I18N.t('key saved') + ' ' + p.masked
+      : I18N.t('not configured');
+  }
+
+  function ai_grammar_apply_status(data) {
+    (data.providers || []).forEach(function (p) {
+      const card = ai_grammar_card(p.provider);
+      if (!card) return;
+      const state = card.querySelector('[data-role="state"]');
+      if (state) state.textContent = ai_grammar_state_text(p);
+      const enabledEl = document.getElementById('ai_grammar_enabled_' + p.provider);
+      if (enabledEl) enabledEl.checked = !!p.enabled;
+      const baseEl = document.getElementById('ai_grammar_base_url_' + p.provider);
+      if (baseEl) baseEl.value = p.base_url || p.default_base_url || '';
+      const modelEl = document.getElementById('ai_grammar_model_' + p.provider);
+      if (modelEl) modelEl.value = p.model || p.default_model || '';
+    });
+  }
+
+  function ai_grammar_refresh_status() {
+    fetch('/ai/grammar/status')
+      .then(r => r.json())
+      .then(ai_grammar_apply_status)
+      .catch(() => {
+        const box = document.getElementById('ai_grammar_box');
+        if (box) box.textContent = I18N.t('Could not load AI provider status.');
+      });
+  }
+
+  function ai_grammar_save(provider) {
+    const tokenEl = document.getElementById('ai_grammar_token_' + provider);
+    const baseEl = document.getElementById('ai_grammar_base_url_' + provider);
+    const modelEl = document.getElementById('ai_grammar_model_' + provider);
+    const enabledEl = document.getElementById('ai_grammar_enabled_' + provider);
     const body = 'token=' + encodeURIComponent(tokenEl ? tokenEl.value : '') +
-                 '&model=' + encodeURIComponent(modelEl ? modelEl.value : '');
-    ai_msg(provider, I18N.t('Saving…'), true);
-    fetch('/ai/config/' + provider, {
+                 '&base_url=' + encodeURIComponent(baseEl ? baseEl.value : '') +
+                 '&model=' + encodeURIComponent(modelEl ? modelEl.value : '') +
+                 '&enabled=' + (enabledEl && enabledEl.checked ? '1' : '0');
+    ai_grammar_msg(provider, I18N.t('Saving…'), true);
+    fetch('/ai/grammar/config/' + provider, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: body,
@@ -994,47 +1028,44 @@
       .then(r => r.json().then(d => ({ ok: r.ok, data: d })))
       .then(({ ok, data }) => {
         if (!ok) {
-          ai_msg(provider, data.message || I18N.t('Could not save.'), false);
+          ai_grammar_msg(provider, data.message || I18N.t('Could not save.'), false);
+          ai_grammar_refresh_status();
           return;
         }
         if (tokenEl) tokenEl.value = '';
-        ai_msg(provider, I18N.t('Saved.'), true);
-        ai_refresh_status();
-        const select = document.getElementById('ai_provider_select');
-        if (select && !select.value) {
-          select.value = provider;
-          ai_set_provider(provider);
-        }
+        ai_grammar_msg(provider, I18N.t('Saved.'), true);
+        ai_grammar_apply_status(data);
       })
-      .catch(() => ai_msg(provider, I18N.t('Could not save.'), false));
+      .catch(() => ai_grammar_msg(provider, I18N.t('Could not save.'), false));
   }
 
-  function ai_clear(provider) {
-    if (!confirm(I18N.t('Forget the stored session for this provider?'))) return;
-    fetch('/ai/clear/' + provider, { method: 'POST' })
+  function ai_grammar_clear(provider) {
+    if (!confirm(I18N.t('Forget the stored API key for this provider?'))) return;
+    fetch('/ai/grammar/clear/' + provider, { method: 'POST' })
       .then(r => r.json().then(d => ({ ok: r.ok, data: d })))
       .then(({ ok, data }) => {
         if (!ok) {
-          ai_msg(provider, data.message || I18N.t('Could not clear.'), false);
+          ai_grammar_msg(provider, data.message || I18N.t('Could not clear.'), false);
           return;
         }
-        const tokenEl = document.getElementById('ai_token_' + provider);
+        const tokenEl = document.getElementById('ai_grammar_token_' + provider);
         if (tokenEl) tokenEl.value = '';
-        ai_msg(provider, I18N.t('Session forgotten.'), true);
-        ai_refresh_status();
+        ai_grammar_msg(provider, I18N.t('Key cleared.'), true);
+        ai_grammar_apply_status(data);
       })
-      .catch(() => ai_msg(provider, I18N.t('Could not clear.'), false));
+      .catch(() => ai_grammar_msg(provider, I18N.t('Could not clear.'), false));
   }
 
-  function ai_test(provider) {
-    ai_msg(provider, I18N.t('Testing the connection…'), true);
-    fetch('/ai/test/' + provider, { method: 'POST' })
+  function ai_grammar_test(provider) {
+    ai_grammar_msg(provider, I18N.t('Testing the connection…'), true);
+    fetch('/ai/grammar/test/' + provider, { method: 'POST' })
       .then(r => r.json())
-      .then(d => ai_msg(provider, d.message || I18N.t('No result.'), !!d.ok))
-      .catch(() => ai_msg(provider, I18N.t('Could not reach the server.'), false));
+      .then(d => ai_grammar_msg(provider, d.message || I18N.t('No result.'), !!d.ok))
+      .catch(() => ai_grammar_msg(provider, I18N.t('Could not reach the server.'), false));
   }
 
   document.addEventListener('DOMContentLoaded', ai_refresh_status);
+  document.addEventListener('DOMContentLoaded', ai_grammar_refresh_status);
 
 </script>
 

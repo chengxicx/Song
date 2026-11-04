@@ -409,6 +409,21 @@ function open_grammar_analysis(opts) {
   // The deadline keeps a book that never finishes from spinning forever.
   var bookPollTimer = null;
   var bookPollDeadline = 0;
+  // AI grammar analysis for the one sentence this panel was opened from.
+  // The state survives re-renders of the library rows, so switching scope
+  // does not restart (or re-bill) the same analysis.
+  var aiState = {
+    sentence: null,
+    status: "idle",
+    raw: "",
+    result: null,
+    fallback: false,
+    error: null,
+    cached: false,
+    provider: "",
+    model: "",
+  };
+  var aiRunToken = 0;
 
   function header() {
     // The library index for this book's language -- the way to find a
@@ -546,6 +561,9 @@ function open_grammar_analysis(opts) {
 
   function bindPanelControls() {
     panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
+    panel.find(".grammar-ai__retry").on("click", function () {
+      if (aiState.sentence) startAiAnalysis(aiState.sentence, true);
+    });
     // Three scopes, three behaviours:
     //   sentence -- narrow the already-rendered rows to the one sentence,
     //               purely in the DOM (instant, no request)
@@ -721,6 +739,291 @@ function open_grammar_analysis(opts) {
   // examples come from every other page, have no nodes on this screen, and
   // narrowing there filtered nearly every card away while the level headers
   // still counted the whole payload ("This book: 1 point", N5: 10).
+  // -------------------------------------------------------------------
+  // AI grammar analysis (official OpenAI / Anthropic API, configured in
+  // Settings).  The block is tied to the sentence the panel opened from;
+  // the server caches by sentence hash + model + language pair.
+  // -------------------------------------------------------------------
+
+  function aiSentenceText() {
+    if (!filterableSentence) return "";
+    var text = grammarCleanText(grammarVisibleText(filterableSentence));
+    return text.replace(/\s+/g, " ").trim();
+  }
+
+  function aiMetaText() {
+    var bits = [];
+    if (aiState.provider) bits.push(aiState.provider);
+    if (aiState.model) bits.push(aiState.model);
+    if (aiState.cached) bits.push(I18N.t("cached"));
+    if (aiState.status === "loading") bits.push(I18N.t("Analyzing…"));
+    return bits.join(" · ");
+  }
+
+  function aiCardHtml(title, inner) {
+    return (
+      '<section class="grammar-ai__card">' +
+      '<div class="grammar-ai__card-title">' + escapeHtml(title) + "</div>" +
+      inner +
+      "</section>"
+    );
+  }
+
+  function aiRowHtml(label, value) {
+    if (value === undefined || value === null || String(value).trim() === "") return "";
+    return (
+      '<div class="grammar-ai__row">' +
+      '<span class="grammar-ai__label">' + escapeHtml(label) + "</span>" +
+      '<span class="grammar-ai__value">' + escapeHtml(value) + "</span>" +
+      "</div>"
+    );
+  }
+
+  function aiRenderResult(result) {
+    if (!result || typeof result !== "object") return "";
+    var html = "";
+
+    var skeleton = result.skeleton && typeof result.skeleton === "object" ? result.skeleton : {};
+    var skeletonBody =
+      aiRowHtml(I18N.t("Subject"), skeleton.subject) +
+      aiRowHtml(I18N.t("Verb"), skeleton.verb) +
+      aiRowHtml(I18N.t("Object"), skeleton.object);
+    if (skeletonBody) html += aiCardHtml(I18N.t("Sentence skeleton"), skeletonBody);
+
+    var clauses = Array.isArray(result.clauses) ? result.clauses : [];
+    clauses = clauses.filter(function (c) {
+      return c && typeof c === "object" && (c.text || c.role || c.type);
+    });
+    if (clauses.length) {
+      html += aiCardHtml(
+        I18N.t("Clauses"),
+        clauses
+          .map(function (c) {
+            return (
+              '<div class="grammar-ai__item">' +
+              (c.type ? '<span class="grammar-ai__badge">' + escapeHtml(c.type) + "</span>" : "") +
+              (c.text ? '<div class="grammar-ai__quote">' + escapeHtml(c.text) + "</div>" : "") +
+              (c.role ? '<div class="grammar-ai__role">' + escapeHtml(c.role) + "</div>" : "") +
+              "</div>"
+            );
+          })
+          .join("")
+      );
+    }
+
+    var points = Array.isArray(result.grammar_points) ? result.grammar_points : [];
+    points = points.filter(function (p) {
+      return p && typeof p === "object" && (p.name || p.role || p.fragment);
+    });
+    if (points.length) {
+      html += aiCardHtml(
+        I18N.t("Grammar points"),
+        points
+          .map(function (p) {
+            return (
+              '<div class="grammar-ai__item">' +
+              (p.name ? '<div class="grammar-ai__name">' + escapeHtml(p.name) + "</div>" : "") +
+              (p.role ? '<div class="grammar-ai__role">' + escapeHtml(p.role) + "</div>" : "") +
+              (p.fragment ? '<div class="grammar-ai__frag">' + escapeHtml(p.fragment) + "</div>" : "") +
+              "</div>"
+            );
+          })
+          .join("")
+      );
+    }
+
+    var tv = result.tense_voice && typeof result.tense_voice === "object" ? result.tense_voice : {};
+    var tvBody =
+      aiRowHtml(I18N.t("Tense"), tv.tense) +
+      aiRowHtml(I18N.t("Voice"), tv.voice) +
+      aiRowHtml(I18N.t("Aspect"), tv.aspect);
+    if (tvBody) html += aiCardHtml(I18N.t("Tense · voice · aspect"), tvBody);
+
+    var pitfalls = Array.isArray(result.pitfalls) ? result.pitfalls : [];
+    pitfalls = pitfalls.filter(function (p) {
+      return typeof p === "string" && p.trim() !== "";
+    });
+    if (pitfalls.length) {
+      html += aiCardHtml(
+        I18N.t("Pitfalls"),
+        pitfalls.map(function (p) {
+          return '<div class="grammar-ai__item">' + escapeHtml(p) + "</div>";
+        }).join("")
+      );
+    }
+    return html;
+  }
+
+  function aiFallbackBlock(html, sentence) {
+    if (!sentence) return html;
+    var block = aiBlockHtml();
+    var marker = '<div class="grammar-analysis-panel__body">';
+    if (html.indexOf(marker) === 0) {
+      return marker + block + html.slice(marker.length);
+    }
+    return '<div class="grammar-analysis-panel__body">' + block + html + "</div>";
+  }
+
+  function aiBlockHtml() {
+    return (
+      '<section class="grammar-ai">' +
+      '<div class="grammar-ai__head">' +
+      '<span class="grammar-ai__title">' + I18N.t("AI grammar analysis") + "</span>" +
+      '<span class="grammar-ai__meta" data-role="ai-meta"></span>' +
+      '<button type="button" class="grammar-ai__retry" data-role="ai-retry">' +
+      I18N.t("Retry") + "</button>" +
+      "</div>" +
+      '<div class="grammar-ai__error" data-role="ai-error" hidden></div>' +
+      '<div class="grammar-ai__raw" data-role="ai-raw"></div>' +
+      '<div class="grammar-ai__result" data-role="ai-result"></div>' +
+      "</section>"
+    );
+  }
+
+  function aiErrorHtml() {
+    if (!aiState.error) return "";
+    var message = escapeHtml(aiState.error.message || I18N.t("AI analysis failed."));
+    var kind = aiState.error.kind || "";
+    if (kind === "unconfigured" || kind === "auth" || kind === "config") {
+      message += ' <a href="/settings/index" target="_blank" rel="noopener">' +
+        I18N.t("AI settings") + "</a>";
+    }
+    return message;
+  }
+
+  function paintAi() {
+    var root = panel[0] && panel[0].querySelector(".grammar-ai");
+    if (!root) return;
+    var meta = root.querySelector('[data-role="ai-meta"]');
+    var raw = root.querySelector('[data-role="ai-raw"]');
+    var result = root.querySelector('[data-role="ai-result"]');
+    var error = root.querySelector('[data-role="ai-error"]');
+    var retry = root.querySelector('[data-role="ai-retry"]');
+
+    if (meta) meta.textContent = aiMetaText();
+    if (retry) retry.disabled = aiState.status === "loading";
+
+    if (error) {
+      error.innerHTML = aiErrorHtml();
+      error.hidden = !aiState.error;
+    }
+
+    if (aiState.result && !aiState.fallback) {
+      var rendered = aiRenderResult(aiState.result);
+      if (rendered) {
+        result.innerHTML = rendered;
+        result.hidden = false;
+        raw.hidden = true;
+        return;
+      }
+    }
+    result.innerHTML = "";
+    result.hidden = true;
+    raw.textContent = aiState.raw;
+    raw.hidden = !aiState.raw && aiState.status !== "loading";
+  }
+
+  function aiHandleEvent(rawEvent, runId) {
+    if (runId !== aiRunToken) return;
+    var eventName = "message";
+    var dataLines = [];
+    rawEvent.split("\n").forEach(function (line) {
+      if (line.indexOf("event:") === 0) eventName = line.slice(6).trim();
+      else if (line.indexOf("data:") === 0) dataLines.push(line.slice(5).trim());
+    });
+    if (!dataLines.length) return;
+    var data;
+    try {
+      data = JSON.parse(dataLines.join("\n"));
+    } catch (e) {
+      return;
+    }
+    if (eventName === "meta") {
+      aiState.provider = data.provider || "";
+      aiState.model = data.model || "";
+      aiState.cached = !!data.cached;
+    } else if (eventName === "text") {
+      aiState.raw += data.text || "";
+    } else if (eventName === "result") {
+      if (data.result) {
+        aiState.result = data.result;
+        aiState.fallback = false;
+      } else {
+        aiState.fallback = true;
+        if (data.text) aiState.raw = data.text;
+      }
+      aiState.status = "done";
+    } else if (eventName === "error") {
+      aiState.status = "error";
+      aiState.error = {
+        kind: data.kind || "upstream",
+        message: data.message || I18N.t("AI analysis failed."),
+      };
+    } else if (eventName === "done" && aiState.status === "loading") {
+      aiState.status = "done";
+    }
+    paintAi();
+  }
+
+  function startAiAnalysis(sentence, force) {
+    if (!sentence) return;
+    if (!force && aiState.sentence === sentence && aiState.status !== "idle") {
+      paintAi();
+      return;
+    }
+    aiState = {
+      sentence: sentence,
+      status: "loading",
+      raw: "",
+      result: null,
+      fallback: false,
+      error: null,
+      cached: false,
+      provider: "",
+      model: "",
+    };
+    var runId = ++aiRunToken;
+    paintAi();
+
+    fetch("/ai/grammar/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ q: sentence, lang: $("#lang_id").val() }),
+    })
+      .then(function (resp) {
+        if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
+        var reader = resp.body.getReader();
+        var decoder = new TextDecoder();
+        var buffer = "";
+        function pump() {
+          return reader.read().then(function (chunk) {
+            if (runId !== aiRunToken) return;
+            if (chunk.done) {
+              if (buffer.trim()) aiHandleEvent(buffer, runId);
+              return;
+            }
+            buffer += decoder.decode(chunk.value, { stream: true });
+            var splitAt;
+            while ((splitAt = buffer.indexOf("\n\n")) >= 0) {
+              aiHandleEvent(buffer.slice(0, splitAt), runId);
+              buffer = buffer.slice(splitAt + 2);
+            }
+            return pump();
+          });
+        }
+        return pump();
+      })
+      .catch(function (e) {
+        if (runId !== aiRunToken) return;
+        aiState.status = "error";
+        aiState.error = {
+          kind: "upstream",
+          message: I18N.t("Could not reach the grammar analyzer.") + " (" + e.message + ")",
+        };
+        paintAi();
+      });
+  }
+
   function renderResults(data, narrowToTarget) {
     // Resolved before the header is built: header() renders the "This
     // sentence" button only when a sentence is known, and syncScopeControl
@@ -743,6 +1046,7 @@ function open_grammar_analysis(opts) {
         if (scope === "page") scope = "sentence";
       }
     }
+    var aiSentence = aiSentenceText();
     let bodyHtml;
     if (!data || data.length === 0) {
       bodyHtml = '<div class="grammar-analysis-panel__state">' + I18N.t('No known grammar points detected on this page.') + '</div>';
@@ -989,11 +1293,12 @@ function open_grammar_analysis(opts) {
           I18N.t('No known grammar points for this sentence.') +
           "</div></div>";
       }
-      panel.html(header() + bodyHtml);
+      panel.html(header() + aiFallbackBlock(bodyHtml, aiSentence));
       panel.find("#grammar-count").text(
         data.length + (data.length === 1 ? I18N.t(' point') : I18N.t(' points'))
       );
       bindPanelControls();
+      if (aiSentence) startAiAnalysis(aiSentence);
 
       // Cross-highlight: hovering a grammar entry on the right draws a blue
       // ring around the whole example sentence and an amber glow around the

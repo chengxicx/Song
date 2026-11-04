@@ -91,9 +91,6 @@
         <button type="button" id="ai-retry" class="btn btn-secondary">
           {{ t('Retry') }}
         </button>
-        <a href="{{ fallback_url }}" target="_blank" rel="noopener">
-          {{ t('Open in a new tab') }}
-        </a>
         <a href="{{ settings_url }}" target="_top">{{ t('AI settings') }}</a>
       </div>
     </div>
@@ -172,13 +169,10 @@
     <div class="ai-guidance">
       <h1>{{ t('Set up an AI provider to translate sentences') }}</h1>
       <p>
-        {{ t('The Sentence tab now translates through a service you bind on the Settings page.  No provider is bound for this account yet, so nothing was sent anywhere.') }}
+        {{ t('The Sentence tab translates through the official OpenAI or Anthropic API.  No usable API key is configured for this account yet, so nothing was sent anywhere.') }}
       </p>
       <p>
         <a href="{{ settings_url }}" target="_top">{{ t('Open AI settings') }}</a>
-        &nbsp;·&nbsp;
-        <a href="{{ fallback_url }}" target="_blank" rel="noopener">
-          {{ t('Open') }} {{ provider_label }} {{ t('in a new tab') }}</a>
       </p>
       <div class="ai-source">{{ sentence }}</div>
     </div>

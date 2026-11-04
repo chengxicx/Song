@@ -1962,6 +1962,16 @@ span.textitem {
     border-bottom: 1px solid transparent;
 }
 
+/* Some EPUBs carry a converter-injected `* { border-color: #555 !important }`
+   (with the matching forced-ink `* { color: ... !important }`), which paints
+   every word's invisible placeholder border as a visible hairline -- one
+   under every token of the chapter.  Re-pin the transparent colour here:
+   an element selector outranks `*` under !important, while .wordhover /
+   .kwordmarked (class selectors) still win when they apply. */
+span.textitem {
+    border-bottom-color: transparent !important;
+}
+
 /* Furigana above reading-page words (per-language "show furigana"
    toggle, drawn by lute-furigana.js).  #thetext gets .furigana-on as
    soon as the pane renders, so the roomier line height is reserved
@@ -5875,6 +5885,121 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
    aloud, and they re-use the page's sentence text). */
 .grammar-analysis-panel .lute-sentence-play-btn {
     display: none !important;
+}
+
+/* AI grammar analysis block: same card tokens as the library rows, placed
+   at the top of the sentence view. */
+.grammar-ai {
+    margin: 0 0 12px;
+    padding: 12px 14px;
+    background: var(--g-card);
+    border: 1px solid var(--g-accent-line);
+    border-radius: 10px;
+}
+.grammar-ai__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.grammar-ai__title {
+    font-weight: 600;
+}
+.grammar-ai__meta {
+    font-size: 0.78em;
+    opacity: 0.7;
+}
+.grammar-ai__retry {
+    margin-left: auto;
+    padding: 2px 9px;
+    font-size: 0.78em;
+    border: 1px solid var(--g-card-border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--font-color);
+    cursor: pointer;
+}
+.grammar-ai__retry:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+.grammar-ai__raw {
+    margin-top: 8px;
+    font-size: 0.9em;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+.grammar-ai__error {
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 0.88em;
+    background: color-mix(in srgb, #e03131 12%, transparent);
+    color: #c92a2a;
+}
+.grammar-ai__result {
+    display: grid;
+    gap: 8px;
+    margin-top: 8px;
+}
+.grammar-ai__card {
+    padding: 10px 12px;
+    background: var(--g-card);
+    border: 1px solid var(--g-card-border);
+    border-radius: 8px;
+}
+.grammar-ai__card-title {
+    margin-bottom: 6px;
+    font-size: 0.85em;
+    font-weight: 600;
+    color: var(--g-accent);
+}
+.grammar-ai__row {
+    display: grid;
+    grid-template-columns: 5.5em minmax(0, 1fr);
+    gap: 8px;
+    font-size: 0.9em;
+    margin-top: 3px;
+}
+.grammar-ai__label {
+    opacity: 0.7;
+}
+.grammar-ai__value {
+    white-space: pre-wrap;
+}
+.grammar-ai__item {
+    margin-top: 8px;
+    font-size: 0.9em;
+}
+.grammar-ai__item:first-child {
+    margin-top: 0;
+}
+.grammar-ai__badge {
+    display: inline-block;
+    margin-bottom: 3px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 0.78em;
+    background: var(--g-accent-soft);
+    color: var(--g-accent);
+}
+.grammar-ai__quote {
+    font-style: italic;
+}
+.grammar-ai__name {
+    font-weight: 600;
+}
+.grammar-ai__role {
+    opacity: 0.85;
+}
+.grammar-ai__frag {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.95em;
+    background: var(--g-accent-soft);
 }
 
 /* Reading-text highlight driven by hovering a grammar entry on the right.
