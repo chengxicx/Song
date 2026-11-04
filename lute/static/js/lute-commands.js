@@ -1054,7 +1054,13 @@ function open_grammar_analysis(opts) {
         if (scope === "page") scope = "sentence";
       }
     }
-    var aiSentence = aiSentenceText();
+    // Language form's "AI grammar analysis" switch (read/index.html sets
+    // this; other pages leave it undefined, which keeps AI on).
+    var aiGrammarEnabled =
+      typeof window.LUTE_AI_GRAMMAR_ENABLED === "undefined"
+        ? true
+        : window.LUTE_AI_GRAMMAR_ENABLED !== false;
+    var aiSentence = aiGrammarEnabled ? aiSentenceText() : "";
     let bodyHtml;
     if (!data || data.length === 0) {
       bodyHtml = '<div class="grammar-analysis-panel__state">' + I18N.t('No known grammar points detected on this page.') + '</div>';
@@ -1300,6 +1306,13 @@ function open_grammar_analysis(opts) {
           '<div class="grammar-analysis-panel__filter-empty" hidden>' +
           I18N.t('No known grammar points for this sentence.') +
           "</div></div>";
+      }
+      if (!aiGrammarEnabled) {
+        bodyHtml =
+          '<div class="grammar-analysis-panel__state">' +
+          I18N.t('AI grammar analysis is turned off for this language in Language settings.') +
+          '</div>' +
+          bodyHtml;
       }
       panel.html(header() + aiFallbackBlock(bodyHtml, aiSentence));
       panel.find("#grammar-count").text(

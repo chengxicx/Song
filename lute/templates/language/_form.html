@@ -160,9 +160,36 @@
       <td>{{ form.term_translation_source(class="form-control") }}</td>
     </tr>
 
+    <tr>
+      <td colspan="2">
+        <h3 class="language-form__section-title">{{ t('AI features') }}</h3>
+        <div style="color:#666; font-size:0.85em; max-width:32em;">
+          {{ t('The AI provider and API key are configured once in Settings.  These switches decide which AI features this language uses; both are on by default.') }}
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+        {{ form.ai_sentence_translation.label(class="form-control-label") }}
+        <div style="color:#666; font-size:0.85em; max-width:24em;">
+          {{ t("Show the AI entry in the reader's Sentence tab for this language.") }}
+        </div>
+      </td>
+      <td>{{ form.ai_sentence_translation() }}</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+        {{ form.ai_grammar_analysis.label(class="form-control-label") }}
+        <div style="color:#666; font-size:0.85em; max-width:24em;">
+          {{ t('Use AI in the Grammar panel.  Off hides the AI section; the grammar library itself is unaffected.') }}
+        </div>
+      </td>
+      <td>{{ form.ai_grammar_analysis() }}</td>
+    </tr>
+
     {% set _kiwi_fields = ('kiwi_tokenizer_mode', 'kiwi_stemming', 'kiwi_filter_particles', 'kiwi_join_compound_nouns') %}
     {# Fields rendered by a hand-written block below, not by the loop. #}
-    {% set _custom_fields = ('hidden_grammar_levels', 'term_popup_show_dict_gloss', 'show_dict_phonetics', 'term_translation_source', 'show_furigana') %}
+    {% set _custom_fields = ('hidden_grammar_levels', 'term_popup_show_dict_gloss', 'show_dict_phonetics', 'term_translation_source', 'show_furigana', 'ai_sentence_translation', 'ai_grammar_analysis') %}
     {% for field in form %}
     {% if field.name not in ('name', 'csrf_token', 'dictionaries') and field.name not in _kiwi_fields and field.name not in _custom_fields %}
     <tr>

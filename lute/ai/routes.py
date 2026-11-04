@@ -125,7 +125,29 @@ def _language_context(langid):
         lang = None
     if lang is None:
         return "", ""
-    return (lang.name or "", lang.translate_target_lang or "")
+    # translate_target_lang stores a code ("zh"); prompts want a name.
+    raw_target = (lang.translate_target_lang or "").strip()
+    target = _UI_LANGUAGE_NAMES.get(raw_target, raw_target)
+    return (lang.name or "", target)
+
+
+def _language_feature_enabled(langid, field_name):
+    """
+    Whether this language may use one AI feature.
+
+    Returns None when the language cannot be resolved (no langid, or a
+    stale id): the caller then keeps its old behaviour instead of
+    breaking requests from pages that do not carry a language.
+    """
+    try:
+        lang = db.session.get(Language, int(langid))
+    except (TypeError, ValueError):
+        lang = None
+    if lang is None:
+        return None
+    value = getattr(lang, field_name, True)
+    # NULL in a not-yet-migrated or hand-edited row means "on", the default.
+    return True if value is None else bool(value)
 
 
 @bp.route("/sentence", methods=["GET"])
@@ -138,15 +160,17 @@ def sentence_page():
     configure.  There is no third-party iframe or web-chat link.
     """
     sentence = service.clean_sentence(request.args.get("q", ""))
+    langid = request.args.get("lang", "")
     provider = service.selected_provider()
     provider_info = service.provider_def(provider) if provider else None
     state = service.provider_status(provider) if provider else None
     configured = bool(state and state["configured"])
+    disabled = _language_feature_enabled(langid, "ai_sentence_translation") is False
 
     return render_template(
         "ai/sentence.html",
         sentence=sentence,
-        lang_id=request.args.get("lang", ""),
+        lang_id=langid,
         provider=provider,
         provider_label=(
             provider_info["label"]
@@ -154,6 +178,13 @@ def sentence_page():
             else service.providers_fallback_label()
         ),
         configured=configured,
+        disabled=disabled,
+        disabled_reason=(
+            "AI sentence translation is turned off for this language.  "
+            "Turn it back on in Language settings."
+            if disabled
+            else ""
+        ),
         settings_url="/settings/index",
     )
 
@@ -161,22 +192,68 @@ def sentence_page():
 @bp.route("/translate", methods=["POST"])
 def translate():
     """
-    Stream the translation as SSE: text events, then done, or error.
+    Stream one structured sentence analysis as SSE.
 
-    Errors are events, not HTTP failures: the frame navigates once and
-    the page's JS keeps rendering the same document.
+    Events: meta (provider/model/cached), text (raw JSON deltas, so the
+    page can grow the translation string while the model is still
+    writing), result (the parsed object, or a plain-text fallback),
+    done, or error.  Errors stay in-band so the iframe keeps its document.
     """
     payload = request.get_json(silent=True) or request.form
     sentence = service.clean_sentence(payload.get("q", ""))
     langid = payload.get("lang", "")
     source_lang, target_lang = _language_context(langid)
+    feature_on = _language_feature_enabled(langid, "ai_sentence_translation")
 
     def generate():
         try:
+            if feature_on is False:
+                raise AiError(
+                    "AI sentence translation is turned off for this "
+                    "language.  Turn it on in Language settings.",
+                    "unsupported",
+                )
+            ready = service.grammar_ready(service.selected_provider() or None)
+            model = ready["model"]
+            cached = service.sentence_cached_result(
+                sentence, model, source_lang, target_lang
+            )
+            if cached is not None:
+                yield _sse(
+                    "meta",
+                    {
+                        "provider": ready["provider"],
+                        "model": model,
+                        "cached": True,
+                    },
+                )
+                yield _sse("result", {"result": cached})
+                yield _sse("done", {})
+                return
+
+            yield _sse(
+                "meta",
+                {
+                    "provider": ready["provider"],
+                    "model": model,
+                    "cached": False,
+                },
+            )
+            parts = []
             for chunk in service.translate_stream(
-                service.selected_provider(), sentence, source_lang, target_lang
+                ready["provider"], sentence, source_lang, target_lang
             ):
+                parts.append(chunk)
                 yield _sse("text", {"text": chunk})
+            full = "".join(parts)
+            parsed = service.parse_sentence_json(full)
+            if parsed is None:
+                yield _sse("result", {"fallback": True, "text": full.strip()})
+            else:
+                service.store_sentence_result(
+                    sentence, model, source_lang, target_lang, parsed
+                )
+                yield _sse("result", {"result": parsed})
             yield _sse("done", {})
         except AiError as e:
             yield _sse("error", {"kind": e.kind, "message": e.message})
@@ -245,9 +322,16 @@ def grammar_analyze():
     langid = payload.get("lang", "")
     source_lang, target_lang = _grammar_language_context(langid)
     requested_provider = (payload.get("provider") or "").strip()
+    feature_on = _language_feature_enabled(langid, "ai_grammar_analysis")
 
     def generate():
         try:
+            if feature_on is False:
+                raise AiError(
+                    "AI grammar analysis is turned off for this language.  "
+                    "Turn it on in Language settings.",
+                    "unsupported",
+                )
             ready = service.grammar_ready(requested_provider or None)
             provider = ready["provider"]
             model = ready["model"]

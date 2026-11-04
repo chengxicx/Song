@@ -333,37 +333,28 @@
 
     <tr>
       <td>
-        <h2 id="ai-sentence">{{ t('AI sentence translation') }}</h2>
+        <h2 id="ai-provider">{{ t('AI provider (API key)') }}</h2>
       </td>
     </tr>
     <tr>
       <td>
-        {{ t('The reader Sentence tab translates through the official OpenAI or Anthropic API.  Choose the provider here and add its API key in the Grammar section below; the same key serves sentence translation and grammar analysis.  Keys stay on this server, encrypted, and only a mask is shown.') }}
-      </td>
-      <td>
-        <label for="ai_provider_select">{{ t('Provider used by the reader Sentence tab') }}</label>
-        <select id="ai_provider_select" class="form-control" style="max-width: 22rem;" onchange="ai_set_provider();">
-          <option value="">{{ t('Not configured') }}</option>
-          {% for p in ai_providers.providers %}
-          <option value="{{ p.provider }}">{{ p.label }}</option>
-          {% endfor %}
-        </select>
-        <div id="ai_provider_message" style="margin-top: 6px;"></div>
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        <h2 id="ai-grammar">{{ t('AI grammar analysis (API key)') }}</h2>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        {{ t('The reader Grammar panel can analyze the selected sentence through the official OpenAI or Anthropic API.  Enable one provider here; its key is shared with the Sentence tab when you choose it in the provider selector above.  Keys stay on this server, encrypted, and only a mask is shown.') }}
+        {{ t('Add one OpenAI or Anthropic API key here; the same provider serves both sentence translation in the reader Sentence tab and grammar analysis in the Grammar panel, so you only configure it once.  Keys stay on this server, encrypted, and only a mask is shown.') }}
+        <div style="margin-top: 6px;">
+          <a href="/language/index">{{ t('Open Language settings') }}</a>
+          {{ t('to choose which AI features each language uses.') }}
+        </div>
+        {% if ai_providers.conflict %}
+        <div class="flash-notice-narrow" style="margin-top: 8px;">
+          {{ t('Your old settings chose') }} <b>{{ ai_providers.conflict.sentence_label }}</b>
+          {{ t('for sentence translation and') }} <b>{{ ai_providers.conflict.grammar_label }}</b>
+          {{ t('for grammar analysis.') }} <b>{{ ai_providers.conflict.grammar_label }}</b>
+          {{ t('is now used for both; save a provider below to make this explicit.') }}
+        </div>
+        {% endif %}
       </td>
       <td>
         <div id="ai_grammar_box">
-          {% for p in ai_grammar_providers.providers %}
+          {% for p in ai_providers.providers %}
           <details class="ai-grammar-provider" data-provider="{{ p.provider }}" style="margin-bottom: 8px;">
             <summary>
               <strong>{{ p.label }}</strong>
@@ -380,7 +371,7 @@
                 <input type="checkbox" id="ai_grammar_enabled_{{ p.provider }}"
                        {% if p.enabled %}checked{% endif %}
                        onchange="ai_grammar_save('{{ p.provider }}'); return false;">
-                {{ t('Enable for grammar analysis') }}
+                {{ t('Use this provider for sentence translation and grammar analysis') }}
               </label>
               <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px;">
                 <input type="text" id="ai_grammar_base_url_{{ p.provider }}" class="form-control"
@@ -919,48 +910,6 @@
   document.addEventListener('DOMContentLoaded', whisperRefresh);
   {% endif %}
 
-  /* AI sentence translation provider selection (API keys live below). */
-
-  function ai_apply_status(data) {
-    const select = document.getElementById('ai_provider_select');
-    if (select) select.value = data.selected || '';
-  }
-
-  function ai_refresh_status() {
-    fetch('/ai/status')
-      .then(r => r.json())
-      .then(ai_apply_status)
-      .catch(() => {
-        const el = document.getElementById('ai_provider_message');
-        if (el) el.textContent = I18N.t('Could not load AI provider status.');
-      });
-  }
-
-  function ai_set_provider(provider) {
-    const select = document.getElementById('ai_provider_select');
-    const value = (provider === undefined) ? select.value : provider;
-    fetch('/ai/provider', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'provider=' + encodeURIComponent(value),
-    })
-      .then(r => r.json().then(d => ({ ok: r.ok, data: d })))
-      .then(({ ok, data }) => {
-        if (!ok) {
-          const el = document.getElementById('ai_provider_message');
-          if (el) el.textContent = data.message || I18N.t('Could not save the provider.');
-          return;
-        }
-        ai_apply_status(data);
-        const el = document.getElementById('ai_provider_message');
-        if (el) el.textContent = value ? I18N.t('Saved.') : '';
-      })
-      .catch(() => {
-        const el = document.getElementById('ai_provider_message');
-        if (el) el.textContent = I18N.t('Could not save the provider.');
-      });
-  }
-
   function ai_grammar_card(provider) {
     return document.querySelector('.ai-grammar-provider[data-provider="' + provider + '"]');
   }
@@ -1064,7 +1013,6 @@
       .catch(() => ai_grammar_msg(provider, I18N.t('Could not reach the server.'), false));
   }
 
-  document.addEventListener('DOMContentLoaded', ai_refresh_status);
   document.addEventListener('DOMContentLoaded', ai_grammar_refresh_status);
 
 </script>

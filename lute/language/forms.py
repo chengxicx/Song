@@ -133,6 +133,30 @@ class LanguageForm(FlaskForm):
         choices=[("en", "English"), ("zh", "中文"), ("ko", "한국어")],
         default="en",
     )
+    # Which AI features this language may use.  The API key and model
+    # are configured once in Settings; these switches decide whether the
+    # reader's Sentence tab and the Grammar panel show AI at all.  Both
+    # default on, matching the behaviour before the switches existed.
+    ai_sentence_translation = BooleanField(
+        "AI sentence translation",
+        default=True,
+        render_kw={
+            "title": (
+                "Offer the AI entry in the reader's Sentence tab for this "
+                "language.  The AI provider is configured once in Settings."
+            )
+        },
+    )
+    ai_grammar_analysis = BooleanField(
+        "AI grammar analysis",
+        default=True,
+        render_kw={
+            "title": (
+                "Use AI in this language's Grammar panel.  Turning it off "
+                "hides the AI section; the grammar library still works."
+            )
+        },
+    )
     # --- Local (MDX) dictionaries.
     # Local dictionaries are ordinary rows in the dictionary list above
     # (type "Local"; the URL is a pool file name -- the pool is a folder

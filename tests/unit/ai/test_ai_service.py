@@ -226,7 +226,8 @@ def test_openai_request_body_headers_and_sse(monkeypatch, app_context):
     assert captured["json"]["model"] == "gpt-4o-mini"
     assert captured["json"]["stream"] is True
     assert captured["json"]["messages"][0]["role"] == "system"
-    assert captured["json"]["messages"][1]["content"] == "Bonjour"
+    assert "translation" in captured["json"]["messages"][0]["content"]
+    assert captured["json"]["messages"][1]["content"].endswith("Bonjour")
     assert TOKEN not in json.dumps(captured["json"])
 
 
@@ -256,8 +257,8 @@ def test_anthropic_request_body_headers_and_sse(monkeypatch, app_context):
     assert captured["json"]["model"] == "claude-sonnet-4-5"
     assert captured["json"]["max_tokens"] >= 1
     assert captured["json"]["stream"] is True
-    assert captured["json"]["system"]
-    assert captured["json"]["messages"][0]["content"] == "Hello"
+    assert "translation" in captured["json"]["system"]
+    assert captured["json"]["messages"][0]["content"].endswith("Hello")
     assert TOKEN not in json.dumps(captured["json"])
 
 
@@ -613,3 +614,96 @@ def test_a_new_cache_entry_round_trips_the_translation(app_context):
     service.store_grammar_result("sentence one.", "m", "Japanese", "Chinese", result)
     cached = service.grammar_cached_result("sentence one.", "m", "Japanese", "Chinese")
     assert cached["translation"] == "但房间里只有我一个人。"
+
+
+def test_one_provider_serves_sentence_translation_and_grammar(app_context):
+    "Saving a provider in one place selects it for both features."
+    service.save_grammar_config("openai", token=TOKEN, enabled=True)
+    assert service.selected_provider() == "openai"
+    assert service.selected_grammar_provider() == "openai"
+
+
+def test_legacy_single_key_is_still_read(app_context):
+    "An account that never saved ai_provider keeps its old choice."
+    repository = UserSettingRepository(db.session)
+    repository.set_dynamic_value("ai_sentence_provider", "openai")
+    db.session.commit()
+    assert service.selected_provider() == "openai"
+    assert service.selected_grammar_provider() == "openai"
+
+
+def test_conflicting_legacy_keys_prefer_the_enabled_grammar_card(app_context):
+    "The two old choices disagree: grammar wins and the clash is reported."
+    repository = UserSettingRepository(db.session)
+    repository.set_dynamic_value("ai_sentence_provider", "openai")
+    repository.set_dynamic_value("ai_grammar_provider", "anthropic")
+    db.session.commit()
+
+    assert service.selected_provider() == "anthropic"
+    conflict = service.provider_conflict()
+    assert conflict["sentence"] == "openai"
+    assert conflict["grammar"] == "anthropic"
+    assert conflict["selected"] == "anthropic"
+    assert "OpenAI" in conflict["sentence_label"]
+
+
+def test_saved_canonical_choice_beats_the_legacy_keys(app_context):
+    "Once ai_provider exists it is authoritative, including an empty value."
+    repository = UserSettingRepository(db.session)
+    repository.set_dynamic_value("ai_sentence_provider", "openai")
+    repository.set_dynamic_value("ai_grammar_provider", "anthropic")
+    repository.set_dynamic_value("ai_provider", "")
+    db.session.commit()
+
+    assert service.selected_provider() == ""
+    assert service.provider_conflict() is None
+
+    service.set_selected_provider("openai")
+    db.session.commit()
+    assert service.selected_provider() == "openai"
+
+
+def test_sentence_prompt_asks_for_the_five_structured_fields():
+    "translation is first, then the analysis blocks, all in the target language."
+    prompt = service.build_translation_system_prompt("Japanese", "Simplified Chinese")
+    order = [
+        prompt.index('"translation"'),
+        prompt.index('"segments"'),
+        prompt.index('"grammar"'),
+        prompt.index('"context"'),
+        prompt.index('"examples"'),
+    ]
+    assert order == sorted(order)
+    assert "Simplified Chinese" in prompt
+    assert "2 to 3" in prompt
+    assert "cover the whole sentence" in prompt
+
+
+def test_parse_sentence_json_tolerates_fences_and_partial_objects():
+    "Fenced JSON is unwrapped; a translation-only object still renders."
+    fenced = """```json
+{"translation":"但房间里只有我一个人。","segments":[{"part":"でも","reading":"","meaning":"但是","role":"接续词"}]}
+```"""
+    data = service.parse_sentence_json(fenced)
+    assert data["translation"] == "但房间里只有我一个人。"
+    assert data["segments"][0]["part"] == "でも"
+
+    partial = service.parse_sentence_json('{"translation":"Hello there."}')
+    assert partial["translation"] == "Hello there."
+
+
+def test_parse_sentence_json_returns_none_for_plain_text():
+    "Plain prose becomes the single-line fallback in the UI."
+    assert service.parse_sentence_json("Bonjour le monde.") is None
+    assert service.parse_sentence_json("") is None
+    assert service.parse_sentence_json('{"error":"unexpected"}') is None
+
+
+def test_sentence_cache_uses_a_v2_key_and_round_trips(app_context):
+    "Structured results are cached under the versioned key."
+    result = {"translation": "Hello.", "segments": [], "examples": []}
+    service.store_sentence_result("Bonjour.", "m", "French", "English", result)
+    key = service.sentence_cache_key("Bonjour.", "m", "French", "English")
+    assert key.startswith("ai_sentence_cache_v2_")
+    cached = service.sentence_cached_result("Bonjour.", "m", "French", "English")
+    assert cached["translation"] == "Hello."

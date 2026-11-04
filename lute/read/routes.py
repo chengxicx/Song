@@ -713,10 +713,14 @@ def _sentence_dicts_for(lang):
     """
     Sentence-mode tabs for one language.
 
-    Lute's own /ai/sentence frame is put first.  The AI tab is always
-    present, even before an API provider is configured, so the reader
-    sees setup guidance rather than a dead iframe.
+    Lute's own /ai/sentence frame is put first while the language allows
+    AI translation; it is always present before an API provider is
+    configured so the reader sees setup guidance rather than a dead
+    iframe.  A language with "AI sentence translation" unchecked gets
+    only its dictionary tabs.
     """
+    if getattr(lang, "ai_sentence_translation", True) is False:
+        return list(lang.sentence_dict_uris)
     ai_tab = {
         "url": f"/ai/sentence?lang={lang.id}&q=[LUTE]",
         "dicttype": "embeddedhtml",
@@ -817,6 +821,9 @@ def _render_book_page(book, pagenum, track_page_open=True):
         series_prev=series["prev"],
         series_next=series["next"],
         sentence_dict_uris=_sentence_dicts_for(lang),
+        ai_grammar_enabled=(
+            getattr(lang, "ai_grammar_analysis", True) is not False
+        ),
         page_num=pagenum,
         page_count=book.page_count,
         show_highlights=show_highlights,

@@ -112,6 +112,14 @@ class Language(
     # Display language for grammar analysis results ("en" default, "zh" Chinese).
     grammar_translate_lang = db.Column("LgGrammarTranslateLang", db.String(20))
 
+    # Which AI features this language may use.  Both default on so
+    # existing languages keep working after the migration; the reader
+    # turns them off per language in the Language form.
+    ai_sentence_translation = db.Column(
+        "LgAiSentenceTranslation", db.Boolean, default=True
+    )
+    ai_grammar_analysis = db.Column("LgAiGrammarAnalysis", db.Boolean, default=True)
+
     # Grammar-panel groups the reader hides for this language: a
     # pipe-delimited list of level tokens (JLPT N5..N1, TOPIK bands,
     # CEFR A1..C2) and the Japanese aggregate keys (basic_forms,
@@ -171,6 +179,8 @@ class Language(
         self.kiwi_join_compound_nouns = False
         self.term_popup_show_dict_gloss = True
         self.term_translation_source = "online"
+        self.ai_sentence_translation = True
+        self.ai_grammar_analysis = True
 
     def __repr__(self):
         return f"<Language {self.id} '{self.name}'>"
