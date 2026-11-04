@@ -644,7 +644,7 @@ def _api_response_error(resp, label, token, url=""):
     if status in (401, 403):
         return AiError(
             f"{label} rejected the API key (HTTP {status}{tail}). "
-            "Check the key in Settings.",
+            "Check the key, Base URL and model name in Settings.",
             "auth",
         )
     if status == 429:
