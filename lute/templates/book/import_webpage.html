@@ -298,10 +298,10 @@
       <label class="ilbl"></label>
       <div class="ictrl" id="whisper_panel">
         <span id="whisper_missing" style="display: none;">
-          {{ t("Whisper isn't installed on this server yet — install it (and pre-download models) under <a href=\"/settings\">Settings → Whisper (auto-subtitles)</a>.") }}
+          {{ t("Whisper isn't installed on this server yet — install it (and pre-download models) under <a href=\"/settings\">Settings → Speech-to-text (auto-subtitles)</a>.") }}
         </span>
         <span id="sensevoice_missing" style="display: none;">
-          {{ t("SenseVoice isn't installed on this server yet — set it up (and pre-download the model) under <a href=\"/settings\">Settings → Whisper (auto-subtitles)</a>.") }}
+          {{ t("SenseVoice isn't installed on this server yet — set it up (and pre-download the model) under <a href=\"/settings\">Settings → Speech-to-text (auto-subtitles)</a>.") }}
         </span>
         <span id="whisper_progress" style="display: none;">
           <span id="whisper_status_text" class="import-status-text"></span>
@@ -413,10 +413,10 @@
       <label class="ilbl"></label>
       <div class="ictrl" id="video_panel">
         <span id="video_whisper_missing" style="display: none;">
-          {{ t("Whisper isn't installed on this server yet — install it (and pre-download models) under <a href=\"/settings\">Settings → Whisper (auto-subtitles)</a>.") }}
+          {{ t("Whisper isn't installed on this server yet — install it (and pre-download models) under <a href=\"/settings\">Settings → Speech-to-text (auto-subtitles)</a>.") }}
         </span>
         <span id="video_sensevoice_missing" style="display: none;">
-          {{ t("SenseVoice isn't installed on this server yet — set it up (and pre-download the model) under <a href=\"/settings\">Settings → Whisper (auto-subtitles)</a>.") }}
+          {{ t("SenseVoice isn't installed on this server yet — set it up (and pre-download the model) under <a href=\"/settings\">Settings → Speech-to-text (auto-subtitles)</a>.") }}
         </span>
         <span id="video_whisper_progress" style="display: none;">
           <span id="video_status_text" class="import-status-text"></span>
@@ -953,7 +953,7 @@
     // media posts to /whisper/prepare and the page polls the task until
     // the book exists.  An explicitly provided subtitle always wins and
     // the plain import path runs.  Package/model management lives in
-    // Settings -> Whisper (auto-subtitles).
+    // Settings -> Speech-to-text (auto-subtitles).
     const sensevoiceLangIds = new Set({{ sensevoice_lang_ids|safe }}.map(String));
     let engineStatus = null; // /whisper/models payload until the check answers.
     // Factories register here so the /whisper/models answer can refresh
@@ -1183,7 +1183,7 @@
     // Shared submit-time validation: media source, language, and (when
     // transcribing) that the picked engine is actually installed.
     const engineNotReadyMsg = function () {
-      return I18N.t('The selected transcription engine is not installed on this server yet -- set it up under Settings -> Whisper (auto-subtitles).');
+      return I18N.t('The selected transcription engine is not installed on this server yet -- set it up under Settings -> Speech-to-text (auto-subtitles).');
     };
 
     mp3Form.on('submit', function (e) {

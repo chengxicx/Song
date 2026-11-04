@@ -612,7 +612,7 @@ def _run_task(  # pylint: disable=too-many-arguments,too-many-positional-argumen
                     if not sensevoice.installed():
                         raise RuntimeError(
                             "SenseVoice isn't installed -- set it up under "
-                            "Settings -> Whisper (auto-subtitles)."
+                            "Settings -> Speech-to-text (auto-subtitles)."
                         )
                     _set_state(
                         task_id,

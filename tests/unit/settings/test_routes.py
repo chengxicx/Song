@@ -20,3 +20,13 @@ def test_set_unknown_key_reports_failure_instead_of_500(client):
     assert resp.status_code == 404
     assert resp.json["result"] == "failure"
     assert "shadowing_show_buttons" in resp.json["message"]
+
+
+def test_speech_to_text_section_title_is_engine_neutral(client):
+    "The section now manages several engines, so it is not named Whisper."
+    body = client.get("/settings/index").get_data(as_text=True)
+    assert "Speech-to-text (auto-subtitles)" in body
+    assert "Whisper (auto-subtitles)" not in body
+    # Engine prefixes keep the two kinds of rows apart at a glance.
+    assert "faster-whisper · " in body
+    assert "sherpa-onnx" in body
