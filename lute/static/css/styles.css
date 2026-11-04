@@ -6752,4 +6752,77 @@ span.textitem.shadow-miss {
     font-size: 0.88em;
 }
 
+/* Settings page: the Local dictionaries (MDX) pool (see
+   static/js/dict-settings.js).  One compact row per dictionary: the
+   name and its entries/size are visible, provenance folds away behind
+   Details (and the row's hover title), and the actions stay quiet
+   until the row is hovered or focused. */
+.dict-settings__item {
+    border-bottom: 1px solid #e5e5e5;
+}
+.dict-settings__row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 0;
+}
+.dict-settings__main {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.dict-settings__title {
+    font-weight: 600;
+    font-size: 0.95em;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.dict-settings__summary {
+    font-size: 0.78em;
+    line-height: 1.35;
+    color: #666;
+}
+.dict-settings__actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    opacity: 0.55;
+}
+.dict-settings__row:hover .dict-settings__actions,
+.dict-settings__row:focus-within .dict-settings__actions {
+    opacity: 1;
+}
+.dict-settings__more,
+.dict-settings__remove {
+    background: none;
+    border: none;
+    padding: 2px 6px;
+    cursor: pointer;
+    font-size: 0.78em;
+    color: #888;
+}
+.dict-settings__more:hover {
+    color: #333;
+    text-decoration: underline;
+}
+.dict-settings__remove:hover {
+    color: #b00;
+    text-decoration: underline;
+}
+.dict-settings__more:focus-visible,
+.dict-settings__remove:focus-visible {
+    outline: 2px solid var(--link-color, #007aff);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+.dict-settings__body {
+    font-size: 0.78em;
+    color: #888;
+    line-height: 1.5;
+    padding: 0 0 6px 2px;
+    word-break: break-all;
+}
+
 

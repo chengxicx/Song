@@ -292,6 +292,12 @@ def status(filename=None):
     meta = _read_metadata(filename)
     for key in ("source", "entries", "terms", "imported_at"):
         info[key] = meta.get(key)
+    # This field is display-only (the settings list's "imported from"),
+    # so decode a percent-encoded upload name once here rather than
+    # showing "moji%b4%c7%ca%e9:...".  The raw value stays in the
+    # sidecar; the pool file name (info["filename"]) is still the
+    # identifier every client uses.
+    info["source"] = _percent_decoded(info["source"] or "") or None
     info["title"] = _display_title(meta, name)
     return info
 
