@@ -5350,53 +5350,60 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
 .grammar-item--TOPIK34, .grammar-group--TOPIK34 { --g-accent: #f08c00; }
 .grammar-item--TOPIK56, .grammar-group--TOPIK56 { --g-accent: #e64980; }
 
+/* Two rows, not one.  A 640px reading pane cannot hold the scope control,
+   the title, the count, the library link and the close button on one line:
+   the title used to wrap to two lines and the right-hand items were pushed
+   outside the pane (scrollWidth 790 against clientWidth 640), clipping the
+   library link and the close button.  Title/count/library/close share the
+   first row; the scope control gets its own row underneath. */
 .grammar-analysis-panel__header {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    grid-template-areas:
+        "title badge library close"
+        "scopes scopes scopes scopes";
     align-items: center;
-    gap: 8px;
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--g-rule);
-    background: linear-gradient(
-        180deg,
-        color-mix(in srgb, var(--g-accent-soft) 45%, var(--background-color, #fff)),
-        var(--background-color, #fff)
-    );
+    gap: 7px 8px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--g-card-border);
+    background: var(--background-color, #fff);
 }
 
 .grammar-analysis-panel__title {
-    flex: 1;
-    font-size: 1.12em;
+    grid-area: title;
+    min-width: 0;
+    font-size: 1.2em;
     font-weight: 700;
-    letter-spacing: 0.01em;
+    letter-spacing: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .grammar-analysis-panel__badge {
-    /* A pill never splits its own text.  The header is a single flex row and
-       the control and the library link both take a fixed slice of it, so the
-       badge is squeezed to 75px on a half-width pane (1280x720) -- without
-       this it breaks "2 points" across two lines inside the rounded border,
-       which reads as a rendering bug.  It is the title that gives way
-       instead. */
+    /* The count is metadata: a neutral chip, not a second accent pill
+       competing with the title and the scope control. */
+    grid-area: badge;
     flex: none;
     white-space: nowrap;
-    font-size: 0.85em;
-    font-weight: 700;
-    color: var(--g-accent);
-    border: 1px solid currentColor;
+    font-size: 0.8em;
+    font-weight: 600;
+    color: var(--g-text-2);
+    border: 1px solid var(--g-card-border);
     border-radius: 999px;
-    padding: 1px 9px;
-    opacity: 0.95;
+    padding: 1px 8px;
 }
 
 .grammar-analysis-panel__close {
+    grid-area: close;
     border: none;
     background: transparent;
     color: var(--font-color, #000);
-    font-size: 1.5em;
+    font-size: 1.35em;
     line-height: 1;
     cursor: pointer;
     padding: 0 3px;
-    opacity: 0.55;
+    opacity: 0.5;
     border-radius: 4px;
 }
 .grammar-analysis-panel__close:hover {
@@ -5405,17 +5412,19 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
 
 /* Link to the grammar library from the panel header. */
 .grammar-analysis-panel__library {
+    grid-area: library;
     flex: none;
-    font-size: 0.85em;
+    font-size: 0.82em;
     font-weight: 600;
     color: var(--g-accent);
     text-decoration: none;
-    border: 1px solid var(--g-accent-line);
+    border: 1px solid var(--g-card-border);
     border-radius: 999px;
     padding: 1px 9px;
     white-space: nowrap;
 }
 .grammar-analysis-panel__library:hover {
+    border-color: var(--g-accent-line);
     background: var(--g-accent-soft);
 }
 
@@ -5427,6 +5436,9 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
    The panel title already says "grammar", so each button carries only its
    own scope word.  Three buttons reading "... grammar" each was noise. */
 .grammar-analysis-panel__scopes {
+    grid-area: scopes;
+    justify-self: start;
+    max-width: 100%;
     display: inline-flex;
     flex: none;
     border: 1px solid var(--g-accent-line);
@@ -5734,6 +5746,129 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     margin-top: 2px;
     font-size: 0.92em;
     color: var(--g-text-2);
+}
+
+/* ---- Reading-panel card refinements ---------------------------------
+   The panel is a narrow column, so its cards get a tighter vertical rhythm
+   and one frame per card.  Scope every selector to .grammar-analysis-panel
+   so the roomier shared card styles stay untouched on the grammar-library
+   pages, which reuse the same markup. */
+
+/* A level is a quiet label, not a table row: the full-width rule under it
+   was a second divider directly above each card. */
+.grammar-analysis-panel .grammar-group__head {
+    top: -12px;
+    gap: 6px;
+    padding: 4px 0 2px;
+    border-bottom: 0;
+}
+.grammar-analysis-panel .grammar-group__level {
+    font-size: 0.82em;
+}
+.grammar-analysis-panel .grammar-group__count {
+    font-size: 0.74em;
+}
+
+.grammar-analysis-panel .grammar-item {
+    padding: 12px 14px;
+}
+/* The active card already has an accent border and tint; the extra 2px
+   outer ring made it a double frame. */
+.grammar-analysis-panel .grammar-item--active {
+    box-shadow: none;
+}
+.grammar-analysis-panel .grammar-item__name {
+    font-size: 1.06em;
+}
+
+/* The gloss is the point of the card: raise it out of the muted metadata
+   colour and keep a comfortable measure. */
+.grammar-analysis-panel .grammar-item__desc {
+    margin-top: 6px;
+    font-size: 1em;
+    line-height: 1.55;
+    color: color-mix(in srgb, var(--font-color, #000) 82%, transparent);
+    max-width: 74ch;
+}
+.grammar-analysis-panel .grammar-item__formation {
+    font-size: 0.84em;
+    line-height: 1.5;
+    padding: 3px 8px;
+    background: color-mix(in srgb, var(--font-color, #000) 3%, transparent);
+}
+/* Long explanations: readable line height, muted but not dim, and a line
+   measure that stops at ~68 characters instead of running the full card. */
+.grammar-analysis-panel .grammar-item__detail,
+.grammar-analysis-panel .grammar-item__notes {
+    max-width: 68ch;
+    line-height: 1.65;
+    color: color-mix(in srgb, var(--font-color, #000) 72%, transparent);
+}
+.grammar-analysis-panel .grammar-item__detail {
+    margin-top: 7px;
+    font-size: 0.92em;
+}
+.grammar-analysis-panel .grammar-item__notes {
+    margin-top: 7px;
+    font-size: 0.9em;
+}
+.grammar-analysis-panel .grammar-item__reftr {
+    line-height: 1.5;
+}
+
+/* Draw one rule for the whole example group instead of a grey box with its
+   own left bar around every sentence -- two or three stacked boxes inside
+   one card was the noisiest part of the block. */
+.grammar-analysis-panel .grammar-item__examples {
+    margin-top: 10px;
+    gap: 6px;
+    padding-left: 10px;
+    border-left: 2px solid var(--g-accent-line);
+}
+.grammar-analysis-panel .grammar-item__example {
+    padding: 0;
+    border-left: 0;
+    border-radius: 0;
+    background: transparent;
+    line-height: 1.55;
+}
+
+/* At phone widths the title row can still overrun the pane.  Put the
+   library link on its own line and trim the segment padding so the
+   segmented control never scrolls sideways. */
+@media (max-width: 480px) {
+    .grammar-analysis-panel__header {
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        grid-template-areas:
+            "title badge close"
+            "scopes scopes scopes"
+            "library library library";
+        row-gap: 6px;
+    }
+    .grammar-analysis-panel__library {
+        justify-self: start;
+    }
+    .grammar-analysis-panel__body {
+        padding: 10px 12px 16px;
+    }
+    .grammar-analysis-panel .grammar-item {
+        padding: 11px 12px;
+    }
+}
+
+@media (max-width: 420px) {
+    .grammar-analysis-panel__scope {
+        padding: 2px 6px;
+        font-size: 0.72em;
+    }
+}
+
+/* The 320px edge: the point count is already repeated in every level
+   header, so drop the aggregate badge and keep the full title on one line. */
+@media (max-width: 340px) {
+    .grammar-analysis-panel__badge {
+        display: none;
+    }
 }
 
 /* Grammar examples must never carry a TTS speaker (nothing to read
