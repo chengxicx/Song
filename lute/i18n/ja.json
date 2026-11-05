@@ -873,5 +873,13 @@
   "Naskh": "ナスフ体",
   "System fonts": "システムフォント",
   "Browse system fonts": "システムフォントを読み込む",
-  "Could not read the system fonts": "システムフォントを読み込めませんでした"
+  "Could not read the system fonts": "システムフォントを読み込めませんでした",
+  "Word card images": "単語カード画像",
+  "Word card image size": "単語カード画像のサイズ",
+  "400px (smallest)": "400px（最小）",
+  "800px": "800px",
+  "1200px": "1200px",
+  "Keep original": "元画像を保持",
+  "New word card images are saved as one WebP file whose longest edge is capped at this size.  Smaller images are never enlarged.": "新しい単語カード画像は、長辺をこのサイズに収めた WebP 1 ファイルとして保存されます。小さい画像は拡大されません。",
+  "Keep original stores the downloaded file unchanged plus a 400px thumbnail (the old two-file behaviour).  Existing images are not changed.": "「元画像を保持」はダウンロードしたファイルをそのまま保存し、400px のサムネイルも別途作成します（従来の 2 ファイル方式）。既存の画像は変更されません。"
 }

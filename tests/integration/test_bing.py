@@ -127,6 +127,14 @@ def _use_tmp_userimages(app, monkeypatch, tmp_path):
     return path
 
 
+def _set_image_size(app, value):
+    "Set the word card image size tier for this test."
+    from lute.settings.current import current_settings
+
+    with app.app_context():
+        current_settings()["word_image_max_edge"] = value
+
+
 def _image_bytes(fmt="JPEG", size=(1200, 800)):
     "Encoded test image, independent of the .jpeg file name used on disk."
     image = Image.new("RGB", size, (20, 110, 190))
@@ -162,8 +170,9 @@ def _assert_thumbnail(original_path):
 
 
 def test_bing_save_creates_webp_thumbnail(client, app, monkeypatch, tmp_path):
-    "Saving a Bing image leaves the original alone and derives a thumbnail."
+    "Keep original: the downloaded file plus a derived thumbnail."
     userimages = _use_tmp_userimages(app, monkeypatch, tmp_path)
+    _set_image_size(app, "original")
     content = _image_bytes("JPEG")
     resp = _post_bing_save(client, content)
     assert resp.status_code == 200
@@ -180,6 +189,7 @@ def test_bing_save_creates_webp_thumbnail(client, app, monkeypatch, tmp_path):
 def test_bing_save_handles_png_content_named_jpeg(client, app, monkeypatch, tmp_path):
     "A .jpeg file name does not stop Pillow from decoding PNG bytes."
     userimages = _use_tmp_userimages(app, monkeypatch, tmp_path)
+    _set_image_size(app, "original")
     resp = _post_bing_save(client, _image_bytes("PNG"))
     assert resp.status_code == 200
 
@@ -189,8 +199,9 @@ def test_bing_save_handles_png_content_named_jpeg(client, app, monkeypatch, tmp_
 
 
 def test_manual_upload_creates_thumbnail(client, app, monkeypatch, tmp_path):
-    "Manual/paste uploads go through the same thumbnail path."
+    "Keep original: manual/paste uploads go through the same thumbnail path."
     userimages = _use_tmp_userimages(app, monkeypatch, tmp_path)
+    _set_image_size(app, "original")
     resp = client.post(
         "/bing/manual_image_post",
         data={
@@ -210,11 +221,94 @@ def test_manual_upload_creates_thumbnail(client, app, monkeypatch, tmp_path):
     _assert_thumbnail(original_path)
 
 
+def _assert_one_single_file(lang_dir, data):
+    "The tier-mode response names one file, and that is all that is stored."
+    files = sorted(p.name for p in lang_dir.iterdir())
+    assert files == [data["filename"]]
+    assert "_wc" in data["filename"]
+    assert not data["filename"].endswith("_thumb.webp")
+    return lang_dir / data["filename"]
+
+
+@pytest.mark.parametrize(
+    "tier,expected_size",
+    [("400", (400, 267)), ("800", (800, 533)), ("1200", (1200, 800))],
+)
+def test_bing_save_stores_one_capped_webp(
+    client, app, monkeypatch, tmp_path, tier, expected_size
+):
+    "Each size tier writes a single WebP, and the thumb URL is that file."
+    userimages = _use_tmp_userimages(app, monkeypatch, tmp_path)
+    _set_image_size(app, tier)
+    resp = _post_bing_save(client, _image_bytes("JPEG", (3000, 2000)))
+    assert resp.status_code == 200
+
+    data = resp.get_json()
+    path = _assert_one_single_file(userimages / "1", data)
+    with Image.open(path) as image:
+        assert image.format == "WEBP"
+        assert image.size == expected_size
+
+    # Popups and the term form ask for /thumb/<filename>; it must be the
+    # same stored file, not a missing derived thumbnail.
+    assert data["thumb_url"] == data["url"]
+    thumb_resp = client.get(f"/userimages/1/thumb/{data['filename']}")
+    assert thumb_resp.status_code == 200
+    assert thumb_resp.mimetype == "image/webp"
+    assert thumb_resp.data == path.read_bytes()
+
+
+@pytest.mark.parametrize("tier", ["400", "800", "1200"])
+def test_small_image_is_not_enlarged(
+    client, app, monkeypatch, tmp_path, tier
+):
+    "A 300x200 source stays 300x200 and never grows on disk."
+    userimages = _use_tmp_userimages(app, monkeypatch, tmp_path)
+    _set_image_size(app, tier)
+    content = _image_bytes("JPEG", (300, 200))
+    resp = _post_bing_save(client, content)
+    assert resp.status_code == 200
+
+    data = resp.get_json()
+    path = _assert_one_single_file(userimages / "1", data)
+    with Image.open(path) as image:
+        assert image.size == (300, 200)
+    assert path.stat().st_size <= len(content)
+
+
+def test_manual_uploads_share_the_single_file_logic(
+    client, app, monkeypatch, tmp_path
+):
+    "Term form uploads and image search manual uploads hit the same logic."
+    userimages = _use_tmp_userimages(app, monkeypatch, tmp_path)
+    resp = client.post(
+        "/bing/manual_image_post",
+        data={
+            "text": "gato",
+            "langid": "1",
+            "manual_image_file": (
+                io.BytesIO(_image_bytes("JPEG", (3000, 2000))),
+                "pasted.jpg",
+            ),
+        },
+        content_type="multipart/form-data",
+    )
+    assert resp.status_code == 200
+
+    data = resp.get_json()
+    path = _assert_one_single_file(userimages / "1", data)
+    with Image.open(path) as image:
+        assert image.format == "WEBP"
+        assert image.size == (400, 267)
+    assert data["thumb_url"] == data["url"]
+
+
 def test_undecodable_image_saves_and_falls_back(
     client, app, monkeypatch, tmp_path, caplog
 ):
-    "Bad bytes must not block saving; there is just no thumbnail."
+    "Keep original: bad bytes must not block saving; there is no thumbnail."
     userimages = _use_tmp_userimages(app, monkeypatch, tmp_path)
+    _set_image_size(app, "original")
     resp = _post_bing_save(client, b"this is not an image")
     assert resp.status_code == 200
 

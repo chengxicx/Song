@@ -953,5 +953,13 @@
   "Voice": "语态",
   "Aspect": "体",
   "Tense · voice · aspect": "时态 · 语态 · 体",
-  "Pitfalls": "易错点"
+  "Pitfalls": "易错点",
+  "Word card images": "词卡图片",
+  "Word card image size": "词卡图片尺寸",
+  "400px (smallest)": "400px（最小）",
+  "800px": "800px",
+  "1200px": "1200px",
+  "Keep original": "保留原图",
+  "New word card images are saved as one WebP file whose longest edge is capped at this size.  Smaller images are never enlarged.": "新词卡图片只保存一份 WebP 文件，长边不超过该尺寸；较小的图片不会被放大。",
+  "Keep original stores the downloaded file unchanged plus a 400px thumbnail (the old two-file behaviour).  Existing images are not changed.": "「保留原图」会原样保存下载的文件，并另存一份 400px 缩略图（旧的两种文件行为）。已有图片不会被改动。"
 }
