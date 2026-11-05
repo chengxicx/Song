@@ -686,34 +686,152 @@ _SENTENCE_CACHE_PREFIX = "ai_sentence_cache_"
 _SENTENCE_CACHE_VERSION = "v2_"
 
 
+def _strip_json_fences(text):
+    "Remove ```json / ``` markers without touching quotes inside strings."
+    raw = (text or "").strip()
+    if "```" not in raw:
+        return raw
+    raw = re.sub(r"```[a-zA-Z0-9_-]*", "", raw)
+    return raw.strip()
+
+
+def _close_json_fragment(raw):
+    """
+    Close an object that was cut off mid-stream.
+
+    The model is asked to keep ``translation`` first, but a slow or
+    truncated stream can stop inside a string, after a colon, or with
+    open arrays.  Appending the missing quote and closers usually turns
+    that prefix into valid JSON, so the reader still gets the structured
+    card instead of a wall of text.
+    """
+    start = raw.find("{")
+    if start < 0:
+        return ""
+    text = raw[start:]
+    out = []
+    stack = []
+    in_string = False
+    escaped = False
+    for ch in text:
+        out.append(ch)
+        if in_string:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == '"':
+                in_string = False
+        else:
+            if ch == '"':
+                in_string = True
+            elif ch in "{[":
+                stack.append(ch)
+            elif ch in "}]":
+                if stack:
+                    stack.pop()
+    if in_string:
+        out.append('"')
+    repaired = "".join(out).rstrip()
+    # A dangling comma or key colon cannot be closed as-is.
+    while repaired.endswith(","):
+        repaired = repaired[:-1].rstrip()
+    if repaired.endswith(":"):
+        repaired += " null"
+    for opener in reversed(stack):
+        repaired += "}" if opener == "{" else "]"
+    return repaired
+
+
 def parse_sentence_json(text):
     """
     Pull the structured translation out of a model reply.
 
-    Same tolerance as parse_grammar_json: markdown fences and chatter are
-    ignored, and a reply with at least one expected key is accepted so a
-    partially-filled object still renders.  Returns None for plain prose,
-    which the UI shows as the translation text.
+    Tolerates markdown fences, leading/trailing chatter, a truncated tail
+    (missing ``}``/``]``/quote), and returns a dict with at least one
+    expected key so a partially-filled object still renders.  Returns
+    None for prose or a reply that cannot be repaired.
     """
-    raw = (text or "").strip()
+    raw = _strip_json_fences(text)
     if not raw:
         return None
-    if raw.startswith("```"):
-        raw = re.sub(r"^```[a-zA-Z0-9_-]*\s*", "", raw)
-        raw = re.sub(r"\s*```$", "", raw).strip()
     start = raw.find("{")
+    if start < 0:
+        return None
     end = raw.rfind("}")
-    if start < 0 or end <= start:
-        return None
+    candidate = raw[start : end + 1] if end > start else raw[start:]
+    candidates = [candidate]
+    repaired = _close_json_fragment(candidate)
+    if repaired and repaired != candidate:
+        candidates.append(repaired)
+    # Drop a trailing incomplete element and close the rest: covers
+    # cut-offs in the middle of a bare token, which the quote fixer
+    # cannot rescue.
+    last_comma = candidate.rfind(",")
+    while last_comma > 0:
+        tail = _close_json_fragment(candidate[:last_comma])
+        if tail:
+            candidates.append(tail)
+        last_comma = candidate.rfind(",", 0, last_comma)
+        if len(candidates) > 8:
+            break
+    for item in candidates:
+        try:
+            data = json.loads(item)
+        except (TypeError, ValueError):
+            continue
+        if isinstance(data, dict) and any(k in data for k in _SENTENCE_JSON_KEYS):
+            return data
+    return None
+
+
+def _unescape_json_string(value):
+    "Decode the escapes of one quoted JSON string body, even if cut off."
     try:
-        data = json.loads(raw[start : end + 1])
+        return json.loads('"' + value + '"')
     except (TypeError, ValueError):
-        return None
-    if not isinstance(data, dict):
-        return None
-    if not any(key in data for key in _SENTENCE_JSON_KEYS):
-        return None
-    return data
+        pass
+    value = value.rstrip("\\")
+    try:
+        return json.loads('"' + value + '"')
+    except (TypeError, ValueError):
+        return value
+
+
+def extract_sentence_translation(text):
+    "The ``translation`` string from a raw reply, even if it is cut off."
+    raw = _strip_json_fences(text)
+    match = re.search(r'"translation"\s*:\s*"((?:[^"\\]|\\.)*)', raw)
+    if not match:
+        return ""
+    return _unescape_json_string(match.group(1)).strip()
+
+
+def sentence_fallback_text(text):
+    """
+    Readable text for a reply that did not parse.
+
+    Never returns the raw JSON blob: it prefers the translation field,
+    accepts plain prose, and otherwise gives an explicit retry message.
+    """
+    raw = _strip_json_fences(text)
+    translation = extract_sentence_translation(raw)
+    if translation:
+        return translation
+    stripped = raw.strip()
+    if not stripped:
+        return ""
+    looks_structured = (
+        stripped[0] in "{["
+        or '"translation"' in stripped
+        or '"segments"' in stripped
+    )
+    if looks_structured:
+        return (
+            "AI returned an unparsable response, please retry. "
+            "(The model reply was not valid JSON.)"
+        )
+    return stripped
 
 
 def sentence_cache_key(sentence, model, source_lang="", target_lang=""):

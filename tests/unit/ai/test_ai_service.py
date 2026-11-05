@@ -989,6 +989,49 @@ def test_parse_sentence_json_tolerates_fences_and_partial_objects():
     assert partial["translation"] == "Hello there."
 
 
+def test_parse_sentence_json_repairs_a_truncated_tail():
+    "A stream cut off mid-array still yields the leading translation."
+    text = (
+        '{"translation":"Hello there.","segments":'
+        '[{"part":"Hello","meaning":"你好"}'
+    )
+    data = service.parse_sentence_json(text)
+    assert data["translation"] == "Hello there."
+    assert data["segments"][0]["part"] == "Hello"
+
+    # Also repair an object cut off inside a string.
+    text = '{"translation":"Hello the'
+    data = service.parse_sentence_json(text)
+    assert data["translation"] == "Hello the"
+
+
+def test_parse_sentence_json_ignores_surrounding_chatter():
+    "Explanations before/after the object do not prevent parsing."
+    text = """Sure, here is the JSON:
+```json
+{"translation":"Hello.","segments":[]}
+```
+Hope that helps."""
+    data = service.parse_sentence_json(text)
+    assert data["translation"] == "Hello."
+
+
+def test_sentence_fallback_never_returns_raw_json():
+    "Unparsable JSON becomes its translation, or a readable retry prompt."
+    broken = '{"segments":[{"part": Hello], "translation": "Hello there."'
+    assert service.parse_sentence_json(broken) is None
+    assert service.sentence_fallback_text(broken) == "Hello there."
+
+    no_translation = '{"segments":[{"part": Hello] }'
+    readable = service.sentence_fallback_text(no_translation)
+    assert "unparsable" in readable
+    assert '"segments"' not in readable
+    assert readable.strip() != no_translation
+
+    plain = "Bonjour le monde."
+    assert service.sentence_fallback_text(plain) == plain
+
+
 def test_parse_sentence_json_returns_none_for_plain_text():
     "Plain prose becomes the single-line fallback in the UI."
     assert service.parse_sentence_json("Bonjour le monde.") is None

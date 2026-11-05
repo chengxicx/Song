@@ -46,6 +46,7 @@
   "AI grammar analysis (API key)": "AI 语法分析（API 密钥）",
   "AI grammar analysis is turned off for this language in Language settings.": "该语言已在语言设置中关闭 AI 语法分析。",
   "AI provider (API key)": "AI 服务商（API 密钥）",
+  "AI returned an unparsable response, please retry.": "AI 返回了无法解析的响应，请重试。",
   "AI sentence translation": "AI 句译",
   "AI sentence translation is turned off for this language": "该语言已关闭 AI 句译",
   "AI sentence translation is turned off for this language in Language settings.": "该语言已在语言设置中关闭 AI 句译。",

@@ -296,8 +296,20 @@ def translate():
             full = "".join(parts)
             parsed = service.parse_sentence_json(full)
             if parsed is None:
-                yield _sse("result", {"fallback": True, "text": full.strip()})
+                # Never send the raw reply as body text: prefer its
+                # translation field, otherwise a readable retry message.
+                readable = service.sentence_fallback_text(full)
+                if not readable:
+                    readable = (
+                        "AI returned an unparsable response, please retry."
+                    )
+                yield _sse(
+                    "result",
+                    {"fallback": True, "text": readable, "unparsable": True},
+                )
             else:
+                # Only a parsed result is cached, so an unparsable reply
+                # can never be served again from the cache.
                 service.store_sentence_result(
                     sentence, model, source_lang, target_lang, parsed
                 )
