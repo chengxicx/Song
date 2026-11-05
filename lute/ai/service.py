@@ -15,6 +15,7 @@ Nothing here ever returns or logs the raw API key.
 import hashlib
 import json
 import re
+import uuid
 from urllib.parse import urlparse
 
 import requests
@@ -29,6 +30,16 @@ from lute.ai.crypto import decrypt, encrypt
 AI_PROVIDER_SETTING_KEY = "ai_provider"
 PROVIDER_SETTING_KEY = "ai_sentence_provider"
 GRAMMAR_PROVIDER_SETTING_KEY = "ai_grammar_provider"
+
+# The provider list: one JSON array in the per-user settings table.  The
+# old single-provider keys above are never deleted; they are read once by
+# the migration below and then kept as a read-only fallback for old
+# accounts.  Entries look like:
+#   {"id", "name", "format", "base_url", "model", "api_key", "is_default"}
+# ``api_key`` holds the same ``v1:`` encrypted blob as before.
+AI_PROVIDERS_SETTING_KEY = "ai_providers"
+PROVIDER_FORMATS = ("openai", "anthropic")
+_FORMAT_LABELS = {"openai": "OpenAI", "anthropic": "Anthropic"}
 
 
 class AiError(Exception):
@@ -64,7 +75,16 @@ def _set(key, value):
 
 
 def provider_def(provider):
-    return _API_PROVIDERS.get(provider)
+    "The display block for one provider entry, or None."
+    state = provider_status(provider)
+    if state is None:
+        return None
+    return {
+        "id": state["provider"],
+        "label": state["label"],
+        "format": state["format"],
+        "model": state["model"],
+    }
 
 
 def providers_fallback_label():
@@ -78,25 +98,22 @@ def _raw_setting(key):
 
 
 def _legacy_provider(key):
-    "A provider id still valid from the per-feature keys, or ''."
+    "A provider format still valid from the per-feature keys, or ''."
     p = (_raw_setting(key) or "").strip()
-    return p if p in _API_PROVIDERS else ""
+    return p if p in PROVIDER_FORMATS else ""
 
 
-def provider_choice():
+def _legacy_selected_provider():
     """
-    The single provider used by both AI features, or ''.
+    The old single choice, exactly as the pre-list code resolved it.
 
-    ``ai_provider`` is authoritative once it has been saved (an empty
-    value means the user turned every provider off).  Accounts that have
-    never saved it fall back to the old per-feature keys; when those
-    disagree, the provider enabled for grammar analysis wins because
-    that is the card the settings page showed as "enabled".
+    ``ai_provider`` is authoritative once saved; otherwise the old
+    per-feature keys apply and grammar wins when they disagree.
     """
     canonical = _raw_setting(AI_PROVIDER_SETTING_KEY)
     if canonical is not None:
         p = canonical.strip()
-        return p if p in _API_PROVIDERS else ""
+        return p if p in PROVIDER_FORMATS else ""
     sentence = _legacy_provider(PROVIDER_SETTING_KEY)
     grammar = _legacy_provider(GRAMMAR_PROVIDER_SETTING_KEY)
     if grammar and sentence and grammar != sentence:
@@ -104,25 +121,190 @@ def provider_choice():
     return grammar or sentence
 
 
-def provider_conflict():
-    """
-    The old keys still disagree and ``ai_provider`` was never saved.
+def _legacy_enabled_providers():
+    "Every old card that was switched on, one or two of them."
+    canonical = _raw_setting(AI_PROVIDER_SETTING_KEY)
+    if canonical is not None:
+        p = canonical.strip()
+        return {p} if p in PROVIDER_FORMATS else set()
+    return {
+        p
+        for p in (
+            _legacy_provider(PROVIDER_SETTING_KEY),
+            _legacy_provider(GRAMMAR_PROVIDER_SETTING_KEY),
+        )
+        if p
+    }
 
-    Returned for the settings page so it can explain why one of the two
-    saved choices won, instead of silently dropping the other.
+
+def _new_entry_id(existing_ids):
+    "A stable short id that is not in the list yet."
+    for _ in range(20):
+        candidate = uuid.uuid4().hex[:8]
+        if candidate not in existing_ids:
+            return candidate
+    return uuid.uuid4().hex[:12]
+
+
+def _save_entries(entries):
+    "Persist the whole provider list; commits the session."
+    _set(AI_PROVIDERS_SETTING_KEY, json.dumps(entries, ensure_ascii=False))
+
+
+def ensure_provider_migration():
     """
-    if _raw_setting(AI_PROVIDER_SETTING_KEY) is not None:
-        return None
-    sentence = _legacy_provider(PROVIDER_SETTING_KEY)
-    grammar = _legacy_provider(GRAMMAR_PROVIDER_SETTING_KEY)
-    if sentence and grammar and sentence != grammar:
-        return {
-            "sentence": sentence,
-            "grammar": grammar,
-            "selected": grammar,
-            "sentence_label": _API_PROVIDERS[sentence]["label"],
-            "grammar_label": _API_PROVIDERS[grammar]["label"],
-        }
+    Convert the old OpenAI/Anthropic cards into list entries once.
+
+    The old keys are never deleted.  The new ``ai_providers`` key itself
+    is the migration marker: even an empty list is written, so this
+    never runs twice.  Cards without a key, or that were not switched
+    on, produce no entry; the old enabled choice becomes the default
+    (grammar wins when the old per-feature keys disagree).
+    """
+    if _raw_setting(AI_PROVIDERS_SETTING_KEY) is not None:
+        return
+    chosen = _legacy_selected_provider()
+    enabled = _legacy_enabled_providers()
+    if chosen:
+        enabled.add(chosen)
+    entries = []
+    for fmt in PROVIDER_FORMATS:
+        if fmt not in enabled:
+            continue
+        token_blob = _get(_api_key_key(fmt))
+        if not token_blob or not decrypt(token_blob):
+            continue
+        p = _API_PROVIDERS[fmt]
+        model = _get(_api_model_key(fmt)) or p["default_model"]
+        raw_base = _get(_api_base_url_key(fmt)) or p["default_base_url"]
+        try:
+            base_url = normalize_base_url(raw_base, p["default_base_url"])
+        except AiError:
+            base_url = p["default_base_url"]
+        entries.append(
+            {
+                "id": fmt,
+                "name": model,
+                "format": fmt,
+                "base_url": base_url,
+                "model": model,
+                "api_key": token_blob,
+                "is_default": fmt == chosen,
+            }
+        )
+    if entries and not any(e["is_default"] for e in entries):
+        entries[0]["is_default"] = True
+    _save_entries(entries)
+
+
+def _stored_entries():
+    "The raw entries (encrypted keys included), after the migration."
+    ensure_provider_migration()
+    raw = _raw_setting(AI_PROVIDERS_SETTING_KEY) or "[]"
+    try:
+        data = json.loads(raw)
+    except (TypeError, ValueError):
+        data = []
+    entries = []
+    seen_ids = set()
+    for item in data if isinstance(data, list) else []:
+        if not isinstance(item, dict):
+            continue
+        fmt = (item.get("format") or "").strip().lower()
+        if fmt not in PROVIDER_FORMATS:
+            continue
+        entry_id = (item.get("id") or "").strip()
+        if not entry_id or entry_id in seen_ids:
+            entry_id = _new_entry_id(seen_ids)
+        seen_ids.add(entry_id)
+        model = (item.get("model") or "").strip()
+        entries.append(
+            {
+                "id": entry_id,
+                "name": (item.get("name") or "").strip() or model,
+                "format": fmt,
+                "base_url": (item.get("base_url") or "").strip(),
+                "model": model,
+                "api_key": item.get("api_key") or "",
+                "is_default": bool(item.get("is_default")),
+            }
+        )
+    return entries
+
+
+def _public_entry(entry):
+    "One entry as the UI sees it; the key itself never leaves the server."
+    token = decrypt(entry.get("api_key") or "")
+    return {
+        "id": entry["id"],
+        "name": entry["name"] or entry["model"],
+        "format": entry["format"],
+        "format_label": _FORMAT_LABELS[entry["format"]],
+        "base_url": entry["base_url"],
+        "model": entry["model"],
+        "configured": bool(token),
+        "masked": mask_token(token),
+        "is_default": bool(entry["is_default"]),
+    }
+
+
+def provider_entries():
+    "Every provider entry in display form, in list order."
+    default = default_provider_entry()
+    default_id = default["id"] if default else ""
+    result = []
+    for entry in _stored_entries():
+        public = _public_entry(entry)
+        public["is_default"] = entry["id"] == default_id
+        result.append(public)
+    return result
+
+
+def _configured(entry):
+    return bool(entry and decrypt(entry.get("api_key") or ""))
+
+
+def default_provider_entry():
+    "The default entry, or the first configured one if the flag is stale."
+    entries = _stored_entries()
+    for entry in entries:
+        if entry["is_default"] and _configured(entry):
+            return entry
+    for entry in entries:
+        if _configured(entry):
+            return entry
+    return None
+
+
+def resolve_provider_entry(value):
+    """
+    An entry id, a legacy ``openai``/``anthropic`` literal, or Default.
+
+    Old language pins used the literal format names; they now map to
+    the first entry of that format so existing rows keep working.
+    """
+    value = (value or "").strip()
+    entries = _stored_entries()
+    if not value:
+        return default_provider_entry()
+    for entry in entries:
+        if entry["id"] == value:
+            return entry
+    if value in PROVIDER_FORMATS:
+        for entry in entries:
+            if entry["format"] == value:
+                return entry
+    return None
+
+
+def provider_choice():
+    "The default provider's id, or '' when there is no usable entry."
+    entry = default_provider_entry()
+    return entry["id"] if entry else ""
+
+
+def provider_conflict():
+    "The old keys no longer disagree: the migration resolved them once."
     return None
 
 
@@ -132,11 +314,18 @@ def selected_provider():
 
 
 def set_selected_provider(provider):
-    "Persist the shared provider choice; unknown ones are refused."
-    provider = (provider or "").strip()
-    if provider and provider not in _API_PROVIDERS:
+    "Make one entry the default; unknown ids and formats are refused."
+    entries = _stored_entries()
+    target = resolve_provider_entry(provider)
+    if (provider or "").strip() and target is None:
         raise AiError(f"Unknown AI provider: {provider}", "unconfigured")
-    _set(AI_PROVIDER_SETTING_KEY, provider)
+    for entry in entries:
+        entry["is_default"] = bool(target and entry["id"] == target["id"])
+    if not any(e["is_default"] for e in entries):
+        configured = [e for e in entries if _configured(e)]
+        if configured:
+            configured[0]["is_default"] = True
+    _save_entries(entries)
 
 
 def mask_token(token):
@@ -150,45 +339,93 @@ def mask_token(token):
 
 def provider_status(provider):
     "Everything the settings page may display about one provider."
-    state = grammar_provider_status(provider)
-    if state is None:
+    entry = resolve_provider_entry(provider)
+    if entry is None:
         return None
-    state.update(
-        {
-            "kind": "api",
-            "supported": True,
-            "steps": [],
-            "unsupported_reason": "",
-        }
-    )
-    return state
+    p = _API_PROVIDERS[entry["format"]]
+    token = decrypt(entry["api_key"])
+    return {
+        "provider": entry["id"],
+        "id": entry["id"],
+        "name": entry["name"],
+        "format": entry["format"],
+        "format_label": _FORMAT_LABELS[entry["format"]],
+        "label": p["label"],
+        "configured": bool(token),
+        "masked": mask_token(token),
+        "enabled": bool(entry["is_default"]),
+        "base_url": entry["base_url"],
+        "default_base_url": p["default_base_url"],
+        "base_url_hint": p["base_url_hint"],
+        "model": entry["model"],
+        "default_model": p["default_model"],
+        "model_hint": p["model_hint"],
+        "credential_label": p["credential_label"],
+        "credential_hint": p["credential_hint"],
+        "login_url": p["login_url"],
+        "kind": "api",
+        "supported": True,
+        "steps": [],
+        "unsupported_reason": "",
+    }
 
 
 def all_status():
     "Status for the settings page, plus the current provider choice."
     return {
         "selected": selected_provider(),
-        "providers": [provider_status(p) for p in _API_PROVIDERS],
-        "conflict": provider_conflict(),
+        "providers": [provider_status(e["id"]) for e in _stored_entries()],
+        "entries": provider_entries(),
+        "conflict": None,
     }
+
+
+def _entry_menu_label(entry):
+    """
+    ``Name · Model``, or ``Format · Model`` when the name is the model.
+
+    The name defaults to the model, so the format is the useful prefix
+    until the user renames the entry.
+    """
+    if entry["name"] and entry["name"] != entry["model"]:
+        return f"{entry['name']} · {entry['model']}"
+    return f"{entry['format_label']} · {entry['model']}"
 
 
 def ai_provider_choices():
     """
     The per-language sentence provider menu.
 
-    "" is Default -- follow the provider enabled in Settings, exactly
-    the behaviour every existing language keeps -- and each provider
-    with a key configured follows, labelled with its model.  A provider
-    without a key is not offered, since it could not be used anyway.
+    "" is Default -- follow the default entry in Settings, exactly the
+    behaviour every existing language keeps -- and every entry follows,
+    in list order.  A keyless entry is marked so the user can see why
+    saving it as a pin is refused.
     """
     choices = [("", "Default (use the enabled provider in Settings)")]
-    for provider, p in _API_PROVIDERS.items():
-        state = grammar_provider_status(provider)
-        if state and state["configured"]:
-            label = p["label"].replace(" (API key)", "")
-            choices.append((provider, f"{label} · {state['model']}"))
+    for entry in provider_entries():
+        label = _entry_menu_label(entry)
+        if not entry["configured"]:
+            label += " (no API key)"
+        choices.append((entry["id"], label))
     return choices
+
+
+def resolve_language_pin(pin):
+    """
+    Normalize a stored/legacy language pin to an entry id.
+
+    ``openai``/``anthropic`` literals map to the first configured entry
+    of that format; anything unknown or unusable becomes Default ("").
+    Used when the Language form is rendered and submitted, so old rows
+    keep their intent instead of silently falling back.
+    """
+    pin = (pin or "").strip()
+    if not pin:
+        return ""
+    entry = resolve_provider_entry(pin)
+    if entry is not None and _configured(entry):
+        return entry["id"]
+    return ""
 
 
 def sentence_provider(language):
@@ -196,16 +433,186 @@ def sentence_provider(language):
     The provider a language's sentence translation should use.
 
     A language may pin one on its AI dictionary row.  The pin is only
-    honoured while that provider still has a key configured: clearing
-    a key in Settings must never break the reader, so the shared choice
-    takes over again.
+    honoured while that entry still has a key: clearing a key in
+    Settings must never break the reader, so the default entry takes
+    over again.
     """
     pinned = (getattr(language, "ai_sentence_provider", "") or "").strip()
-    if pinned in _API_PROVIDERS:
-        state = grammar_provider_status(pinned)
-        if state and state["configured"]:
-            return pinned
-    return selected_provider()
+    entry = resolve_provider_entry(pinned) if pinned else None
+    if entry is not None and _configured(entry):
+        return entry["id"]
+    return provider_choice()
+
+
+def normalize_provider_entries(raw_entries):
+    """
+    Validate and normalize submitted provider entries.
+
+    Returns the list ready to store (keys encrypted).  Raises AiError
+    with a user-facing message for anything the settings page should
+    refuse.  Existing entries keep their key when a row leaves the key
+    field blank, so the masked value never has to be retyped.
+    """
+    if not isinstance(raw_entries, list):
+        raise AiError("The AI provider list is not valid.", "config")
+    existing = {e["id"]: e for e in _stored_entries()}
+    used_ids = set()
+    used_names = set()
+    entries = []
+    for item in raw_entries:
+        if not isinstance(item, dict):
+            raise AiError("The AI provider list is not valid.", "config")
+        fmt = (item.get("format") or "").strip().lower()
+        if fmt not in PROVIDER_FORMATS:
+            raise AiError(
+                "Each AI provider needs a Format (OpenAI or Anthropic).",
+                "config",
+            )
+        label = _FORMAT_LABELS[fmt]
+        base_raw = (item.get("base_url") or "").strip()
+        if not base_raw:
+            raise AiError(f"The {label} Base URL is required.", "config")
+        try:
+            base_url = normalize_base_url(
+                base_raw, _API_PROVIDERS[fmt]["default_base_url"]
+            )
+        except AiError as e:
+            raise AiError(f"{label}: {e.message}", "config") from e
+        model = (item.get("model") or "").strip()
+        if not model:
+            raise AiError(f"The {label} Model is required.", "config")
+        entry_id = (item.get("id") or "").strip()
+        if entry_id not in existing or entry_id in used_ids:
+            entry_id = _new_entry_id(used_ids)
+        used_ids.add(entry_id)
+        key_text = (item.get("api_key") or "").strip()
+        if key_text.lower().startswith("bearer "):
+            key_text = key_text[7:].strip()
+        old = existing.get(entry_id)
+        blob = encrypt(key_text) if key_text else (old or {}).get("api_key", "")
+        name = (item.get("name") or "").strip() or model
+        unique_name = name
+        suffix = 2
+        while unique_name.lower() in used_names:
+            unique_name = f"{name} {suffix}"
+            suffix += 1
+        used_names.add(unique_name.lower())
+        entries.append(
+            {
+                "id": entry_id,
+                "name": unique_name,
+                "format": fmt,
+                "base_url": base_url,
+                "model": model,
+                "api_key": blob,
+                "is_default": bool(item.get("is_default")),
+            }
+        )
+
+    defaults = [e for e in entries if e["is_default"]]
+    if len(defaults) > 1:
+        raise AiError("Only one provider can be the default.", "config")
+    if defaults and not _configured(defaults[0]):
+        raise AiError(
+            f'"{defaults[0]["name"]}" has no API key, so it cannot be the '
+            "default provider.",
+            "config",
+        )
+    if not any(e["is_default"] for e in entries):
+        configured = [e for e in entries if _configured(e)]
+        if configured:
+            configured[0]["is_default"] = True
+    return entries
+
+
+def parse_provider_entries_json(text):
+    "Decode the hidden settings field; '' means an empty list."
+    text = (text or "").strip()
+    if not text:
+        return []
+    try:
+        data = json.loads(text)
+    except (TypeError, ValueError) as e:
+        raise AiError("The AI provider list is not valid.", "config") from e
+    if not isinstance(data, list):
+        raise AiError("The AI provider list is not valid.", "config")
+    return data
+
+
+def _prune_language_pins(entries):
+    """
+    Keep language pins pointing at real entries.
+
+    A deleted entry (or a stale legacy literal) becomes Default, so no
+    language is left with a dangling reference and the reader falls
+    back to the default provider automatically.
+    """
+    from lute.models.language import (  # pylint: disable=import-outside-toplevel
+        AI_DICT_TYPE,
+        Language,
+    )
+
+    entry_ids = {e["id"] for e in entries}
+    first_by_format = {}
+    for entry in entries:
+        first_by_format.setdefault(entry["format"], entry["id"])
+    changed = False
+    for lang in db.session.query(Language).all():
+        for row in lang.dictionaries:
+            if row.dicttype != AI_DICT_TYPE:
+                continue
+            pin = (row.ai_provider or "").strip()
+            if not pin or pin in entry_ids:
+                continue
+            row.ai_provider = first_by_format.get(pin, "")
+            changed = True
+    if changed:
+        db.session.commit()
+
+
+def public_entries_from_raw(raw_entries):
+    """
+    Display rows for an invalid submission, without echoing any key.
+
+    The settings page re-renders after a validation error; this keeps
+    the rows the user typed while replacing every credential with a
+    mask (or nothing at all for an unsaved new key).
+    """
+    existing = {e["id"]: e for e in _stored_entries()}
+    out = []
+    for item in raw_entries if isinstance(raw_entries, list) else []:
+        if not isinstance(item, dict):
+            continue
+        fmt = (item.get("format") or "").strip().lower()
+        if fmt not in PROVIDER_FORMATS:
+            continue
+        key_text = (item.get("api_key") or "").strip()
+        stored = decrypt((existing.get((item.get("id") or "").strip()) or {}).get(
+            "api_key", ""
+        ))
+        out.append(
+            {
+                "id": (item.get("id") or "").strip(),
+                "name": (item.get("name") or "").strip()
+                or (item.get("model") or "").strip(),
+                "format": fmt,
+                "format_label": _FORMAT_LABELS[fmt],
+                "base_url": (item.get("base_url") or "").strip(),
+                "model": (item.get("model") or "").strip(),
+                "configured": bool(key_text or stored),
+                "masked": "••••" if key_text else mask_token(stored),
+                "is_default": bool(item.get("is_default")),
+            }
+        )
+    return out
+
+
+def save_provider_entries(raw_entries):
+    "Replace the whole list, then repair any language pins."
+    entries = normalize_provider_entries(raw_entries)
+    _save_entries(entries)
+    _prune_language_pins(entries)
+    return provider_entries()
 
 
 # ---------------------------------------------------------------------
@@ -363,8 +770,8 @@ def translate_stream(provider, sentence, source_lang="", target_lang=""):
     Raises AiError (auth/rate/timeout/upstream) on failure; the route
     turns those into an SSE error event.
     """
-    provider = provider or selected_provider()
-    if not provider:
+    ready = grammar_ready(provider)
+    if not ready:
         raise AiError(
             "No AI provider is configured. Add an OpenAI or Anthropic API "
             "key in Settings.",
@@ -375,10 +782,9 @@ def translate_stream(provider, sentence, source_lang="", target_lang=""):
     if sentence == "":
         raise AiError("No sentence text was passed to the translator.", "upstream")
 
-    ready = grammar_ready(provider)
     system_prompt = build_translation_system_prompt(source_lang, target_lang)
     user_prompt = build_translation_user_prompt(sentence, source_lang)
-    if ready["provider"] == "openai":
+    if ready["format"] == "openai":
         yield from _openai_stream(
             ready["base_url"],
             ready["token"],
@@ -499,30 +905,12 @@ def _api_model_key(provider):
 
 
 def selected_grammar_provider():
-    "The Grammar panel's provider: the same single choice as the Sentence tab."
+    "The Grammar panel's provider: the default entry."
     return provider_choice()
 
 
 def _set_grammar_provider(provider):
-    provider = (provider or "").strip()
-    if provider and provider not in _API_PROVIDERS:
-        raise AiError(f"Unknown AI provider: {provider}", "unsupported")
-    _set(AI_PROVIDER_SETTING_KEY, provider)
-
-
-def _api_token(provider):
-    return decrypt(_get(_api_key_key(provider)))
-
-
-def _api_base_url(provider):
-    p = _API_PROVIDERS[provider]
-    raw = _get(_api_base_url_key(provider)) or p["default_base_url"]
-    return normalize_base_url(raw, p["default_base_url"])
-
-
-def _api_model(provider):
-    p = _API_PROVIDERS[provider]
-    return _get(_api_model_key(provider)) or p["default_model"]
+    set_selected_provider(provider)
 
 
 def normalize_base_url(raw, default=""):
@@ -572,113 +960,131 @@ def api_endpoint(base_url, provider):
 
 def grammar_provider_status(provider):
     "Everything the settings page may display; never the raw API key."
-    p = _API_PROVIDERS.get(provider)
-    if p is None:
-        return None
-    token = _api_token(provider)
-    selected = selected_provider()
-    return {
-        "provider": provider,
-        "label": p["label"],
-        "configured": bool(token),
-        "masked": mask_token(token),
-        "enabled": selected == provider,
-        "base_url": _api_base_url(provider),
-        "default_base_url": p["default_base_url"],
-        "base_url_hint": p["base_url_hint"],
-        "model": _api_model(provider),
-        "default_model": p["default_model"],
-        "model_hint": p["model_hint"],
-        "credential_label": p["credential_label"],
-        "credential_hint": p["credential_hint"],
-        "login_url": p["login_url"],
-    }
+    return provider_status(provider)
 
 
 def all_grammar_status():
-    "Backward-compatible alias for the single provider block."
+    "Backward-compatible alias for the provider list block."
     return all_status()
+
+
+def _legacy_entry_for_format(fmt, entries=None):
+    "The entry a legacy ``openai``/``anthropic`` card points at, or None."
+    for entry in entries if entries is not None else _stored_entries():
+        if entry["id"] == fmt or entry["format"] == fmt:
+            return entry
+    return None
 
 
 def save_grammar_config(provider, token=None, base_url=None, model=None, enabled=None):
     """
-    Save one API provider's key (encrypted), Base URL and model.
+    Save one entry's key (encrypted), Base URL and model.
 
-    ``enabled`` is optional: True selects this provider for both AI
-    features, False deselects it (only when it was selected).  The key
-    itself is never echoed back.
+    Kept for the old two-card API: ``provider`` is ``openai`` or
+    ``anthropic``, and the first entry of that format is updated (or a
+    new one is created).  ``enabled`` True makes it the default; False
+    promotes another configured entry when this one was the default.
+    The key itself is never echoed back.
     """
     if provider not in _API_PROVIDERS:
         raise AiError(f"Unknown AI provider: {provider}", "unsupported")
+    entries = _stored_entries()
+    entry = _legacy_entry_for_format(provider, entries)
+    if entry is None:
+        p = _API_PROVIDERS[provider]
+        entry = {
+            "id": provider,
+            "name": p["default_model"],
+            "format": provider,
+            "base_url": p["default_base_url"],
+            "model": p["default_model"],
+            "api_key": "",
+            "is_default": False,
+        }
+        entries.append(entry)
+    p = _API_PROVIDERS[entry["format"]]
     if base_url is not None:
-        _set(
-            _api_base_url_key(provider),
-            normalize_base_url(base_url, _API_PROVIDERS[provider]["default_base_url"]),
-        )
+        entry["base_url"] = normalize_base_url(base_url, p["default_base_url"])
     if model is not None:
         model = (model or "").strip()
         if model:
-            _set(_api_model_key(provider), model)
+            entry["model"] = model
+            if entry["name"] == p["default_model"]:
+                entry["name"] = model
     if token is not None:
         token = (token or "").strip()
         if token.lower().startswith("bearer "):
             token = token[7:].strip()
         if token:
-            _set(_api_key_key(provider), encrypt(token))
+            entry["api_key"] = encrypt(token)
 
     if enabled:
-        if not _api_token(provider):
+        if not _configured(entry):
             raise AiError(
-                f"{_API_PROVIDERS[provider]['label']} needs an API key before "
-                f"it can be enabled.",
+                f"{p['label']} needs an API key before it can be enabled.",
                 "config",
             )
-        _set_grammar_provider(provider)
-    elif enabled is False and selected_grammar_provider() == provider:
-        _set_grammar_provider("")
-
-    return grammar_provider_status(provider)
+        for other in entries:
+            other["is_default"] = False
+        entry["is_default"] = True
+    elif enabled is False and entry["is_default"]:
+        entry["is_default"] = False
+        for other in entries:
+            if _configured(other):
+                other["is_default"] = True
+                break
+    _save_entries(entries)
+    return grammar_provider_status(entry["id"])
 
 
 def clear_grammar_config(provider):
-    "Forget the stored API key; also deselect the provider if selected."
+    "Forget one entry's stored API key; move the default if it was this one."
     if provider not in _API_PROVIDERS:
         raise AiError(f"Unknown AI provider: {provider}", "unsupported")
-    _set(_api_key_key(provider), "")
-    if selected_grammar_provider() == provider:
-        _set_grammar_provider("")
-    return grammar_provider_status(provider)
+    entries = _stored_entries()
+    entry = _legacy_entry_for_format(provider, entries)
+    if entry is None:
+        return None
+    entry["api_key"] = ""
+    if entry["is_default"]:
+        entry["is_default"] = False
+        for other in entries:
+            if _configured(other):
+                other["is_default"] = True
+                break
+    _save_entries(entries)
+    return grammar_provider_status(entry["id"])
 
 
 def grammar_ready(provider=None):
     """
     Resolve and validate the provider for one analysis.
 
-    Returns the internal call context (including the decrypted key).  Callers
-    must never serialize this dict.
+    An empty argument means the default entry.  Returns the internal
+    call context (including the decrypted key).  Callers must never
+    serialize this dict.
     """
-    provider = (provider or "").strip() or selected_provider()
-    if not provider:
+    entry = resolve_provider_entry(provider)
+    if entry is None:
         raise AiError(
-            "No AI provider is enabled. Add an OpenAI or Anthropic API key "
-            "in Settings.",
+            "No AI provider is configured. Add an OpenAI or Anthropic API "
+            "key in Settings.",
             "unconfigured",
         )
-    p = _API_PROVIDERS.get(provider)
-    if p is None:
-        raise AiError(f"Unknown AI provider: {provider}", "unsupported")
-    token = _api_token(provider)
+    token = decrypt(entry["api_key"])
     if not token:
         raise AiError(
-            f"{p['label']} has no API key yet. Add one in Settings.",
+            f"{entry['name']} has no API key yet. Add one in Settings.",
             "unconfigured",
         )
+    p = _API_PROVIDERS[entry["format"]]
     return {
-        "provider": provider,
+        "provider": entry["id"],
+        "format": entry["format"],
         "label": p["label"],
         "token": token,
-        "base_url": _api_base_url(provider),
-        "model": _api_model(provider),
+        "base_url": normalize_base_url(entry["base_url"], p["default_base_url"]),
+        "model": entry["model"],
     }
 
 
@@ -1176,7 +1582,7 @@ def grammar_stream(provider, sentence, source_lang="", target_lang=""):
         raise AiError("There is no sentence to analyze.", "upstream")
     system_prompt = build_grammar_system_prompt(source_lang, target_lang)
     user_prompt = build_grammar_user_prompt(sentence, source_lang)
-    if ready["provider"] == "openai":
+    if ready["format"] == "openai":
         yield from _openai_stream(
             ready["base_url"],
             ready["token"],
@@ -1194,28 +1600,41 @@ def grammar_stream(provider, sentence, source_lang="", target_lang=""):
     )
 
 
-def test_grammar_connection(provider):
-    "Round-trip a tiny prompt; never returns the reply or the key."
+def test_provider_connection(fmt, base_url, model, token="", entry_id=""):
+    """
+    Round-trip a tiny prompt against unsaved settings.
+
+    Used by the settings page's Test button, which must work before the
+    row is saved.  A blank token falls back to the stored key for
+    ``entry_id``.  The reply and the key are never returned; failures
+    carry the upstream's own redacted message.
+    """
     try:
-        ready = grammar_ready(provider)
+        fmt = (fmt or "").strip().lower()
+        if fmt not in _API_PROVIDERS:
+            raise AiError("Choose OpenAI or Anthropic first.", "config")
+        token = (token or "").strip()
+        if token.lower().startswith("bearer "):
+            token = token[7:].strip()
+        if not token and entry_id:
+            token = decrypt((_find_raw_entry(entry_id) or {}).get("api_key", ""))
+        if not token:
+            return {"ok": False, "message": "Add an API key before testing."}
+        model = (model or "").strip()
+        if not model:
+            raise AiError("The Model is required.", "config")
+        base_url = normalize_base_url(
+            base_url, _API_PROVIDERS[fmt]["default_base_url"]
+        )
         system_prompt = "Reply with the single word OK."
         user_prompt = "OK"
-        if ready["provider"] == "openai":
+        if fmt == "openai":
             chunks = _openai_stream(
-                ready["base_url"],
-                ready["token"],
-                ready["model"],
-                system_prompt,
-                user_prompt,
+                base_url, token, model, system_prompt, user_prompt
             )
         else:
             chunks = _anthropic_stream(
-                ready["base_url"],
-                ready["token"],
-                ready["model"],
-                system_prompt,
-                user_prompt,
-                max_tokens=16,
+                base_url, token, model, system_prompt, user_prompt, max_tokens=16
             )
         seen = ""
         for chunk in chunks:
@@ -1229,3 +1648,28 @@ def test_grammar_connection(provider):
         return {"ok": False, "message": e.message}
     except Exception as e:  # pylint: disable=broad-exception-caught
         return {"ok": False, "message": f"Connection failed ({type(e).__name__})."}
+
+
+def _find_raw_entry(entry_id):
+    "One stored entry by id, or None."
+    for entry in _stored_entries():
+        if entry["id"] == (entry_id or "").strip():
+            return entry
+    return None
+
+
+def test_grammar_connection(provider):
+    "Round-trip a tiny prompt for a saved entry; never returns key or reply."
+    entry = resolve_provider_entry(provider)
+    if entry is None:
+        return {
+            "ok": False,
+            "message": "No AI provider is configured. Add one in Settings.",
+        }
+    return test_provider_connection(
+        entry["format"],
+        entry["base_url"],
+        entry["model"],
+        token=decrypt(entry["api_key"]),
+        entry_id=entry["id"],
+    )

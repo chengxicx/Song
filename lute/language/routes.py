@@ -95,11 +95,21 @@ def _set_ai_provider_choices(form):
     """
     from lute.ai.service import (  # pylint: disable=import-outside-toplevel
         ai_provider_choices,
+        resolve_language_pin,
     )
 
     choices = ai_provider_choices()
     for entry in form.dictionaries:
         entry.ai_provider.choices = choices
+        # Old rows pinned the literal openai/anthropic.  Map that to the
+        # current entry id so the select shows the right option and a
+        # save round-trips it, rather than clearing it by accident.
+        current = entry.ai_provider.data
+        resolved = resolve_language_pin(current) if current else ""
+        # Leave unknown/forged values untouched so validation rejects
+        # them -- only a usable legacy literal is rewritten.
+        if resolved:
+            entry.ai_provider.data = resolved
 
 
 def _handle_form(language, form) -> bool:

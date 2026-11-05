@@ -71,26 +71,45 @@ def edit_settings():
         form.backup_dir.render_kw = kw
 
     repo = UserSettingRepository(db.session)
+    provider_error = None
     if form.validate_on_submit():
-        # Update the settings in the database
-        can_edit_server = is_admin_request()
-        for field in form:
-            if field.id in ("csrf_token", "submit"):
-                continue
-            if field.id in SERVER_LEVEL_KEYS and not can_edit_server:
-                # Not rendered for this user, so the POST carries no
-                # value; writing it now would store the WTForms default
-                # (None / "core" / "C") over the real one.
-                continue
-            val = field.data
-            if isinstance(field, BooleanField):
-                val = "1" if val else "0"
-            repo.set_value(field.id, val)
-        db.session.commit()
-        refresh_global_settings(db.session)
+        from lute.ai import service as ai_service  # pylint: disable=import-outside-toplevel
+        from lute.ai.service import AiError  # pylint: disable=import-outside-toplevel
 
-        flash(t("Settings updated"), "success")
-        return redirect("/")
+        # The provider list is not one settings row: it is replaced as a
+        # whole.  Do it before the other settings so a bad list leaves
+        # everything untouched and the page shows the error.
+        if "ai_providers_json" in request.form:
+            try:
+                ai_service.save_provider_entries(
+                    ai_service.parse_provider_entries_json(
+                        form.ai_providers_json.data
+                    )
+                )
+            except AiError as e:
+                flash(e.message, "danger")
+                provider_error = e
+
+        if provider_error is None:
+            # Update the settings in the database
+            can_edit_server = is_admin_request()
+            for field in form:
+                if field.id in ("csrf_token", "submit", "ai_providers_json"):
+                    continue
+                if field.id in SERVER_LEVEL_KEYS and not can_edit_server:
+                    # Not rendered for this user, so the POST carries no
+                    # value; writing it now would store the WTForms default
+                    # (None / "core" / "C") over the real one.
+                    continue
+                val = field.data
+                if isinstance(field, BooleanField):
+                    val = "1" if val else "0"
+                repo.set_value(field.id, val)
+            db.session.commit()
+            refresh_global_settings(db.session)
+
+            flash(t("Settings updated"), "success")
+            return redirect("/")
 
     # Load current settings from the database
     repo = UserSettingRepository(db.session)
@@ -108,12 +127,35 @@ def edit_settings():
             str_val = str(field.data or "")
             field.data = 1 if str_val in true_vals else 0
 
+    import json  # pylint: disable=import-outside-toplevel
+
     from lute.ai.service import all_status as ai_all_status
+    from lute.ai.service import provider_entries  # pylint: disable=import-outside-toplevel
+    from lute.ai.service import public_entries_from_raw  # pylint: disable=import-outside-toplevel
+    from lute.ai.service import parse_provider_entries_json  # pylint: disable=import-outside-toplevel
+    from lute.ai.service import AiError  # pylint: disable=import-outside-toplevel
+
+    ai_entries = provider_entries()
+    has_provider_error = bool(
+        provider_error or form.errors.get("ai_providers_json")
+    )
+    if has_provider_error and request.method == "POST":
+        # Keep the rows the user typed, but never their plaintext key.
+        try:
+            raw = parse_provider_entries_json(
+                request.form.get("ai_providers_json", "")
+            )
+            ai_entries = public_entries_from_raw(raw)
+        except AiError:
+            ai_entries = provider_entries()
+    form.ai_providers_json.data = json.dumps(ai_entries, ensure_ascii=False)
 
     return render_template(
         "settings/form.html",
         form=form,
         ai_providers=ai_all_status(),
+        ai_entries=ai_entries,
+        ai_entries_json=form.ai_providers_json.data,
     )
 
 

@@ -107,6 +107,27 @@ def grammar_test(provider):
     return jsonify(result)
 
 
+@bp.route("/providers/test", methods=["POST"])
+def provider_test():
+    """
+    Test one settings row, saved or not.
+
+    The settings page sends the row's current format/base URL/model/key
+    straight from the browser, so a typo can be checked before saving.
+    A blank key falls back to the stored one for an existing row; the
+    response never carries the key or the model's reply.
+    """
+    payload = request.get_json(silent=True) or request.form
+    result = service.test_provider_connection(
+        payload.get("format"),
+        payload.get("base_url"),
+        payload.get("model"),
+        payload.get("api_key") or payload.get("token") or "",
+        payload.get("id") or "",
+    )
+    return jsonify(result)
+
+
 # ---------------------------------------------------------------------
 # Sentence translation
 # ---------------------------------------------------------------------
@@ -352,7 +373,6 @@ def grammar_analyze():
     sentence = service.clean_sentence(payload.get("q", ""))
     langid = payload.get("lang", "")
     source_lang, target_lang = _grammar_language_context(langid)
-    requested_provider = (payload.get("provider") or "").strip()
     feature_on = _language_feature_enabled(langid, "ai_grammar_analysis")
 
     def generate():
@@ -363,7 +383,9 @@ def grammar_analyze():
                     "Turn it on in Language settings.",
                     "unsupported",
                 )
-            ready = service.grammar_ready(requested_provider or None)
+            # Grammar analysis always follows Settings' default entry;
+            # per-language pins are only for sentence translation.
+            ready = service.grammar_ready(None)
             provider = ready["provider"]
             model = ready["model"]
             cached = service.grammar_cached_result(
