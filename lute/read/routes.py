@@ -37,7 +37,7 @@ from lute.read.grammar_analysis_service import (
 from lute.read import grammar_precompute
 from lute.read.forms import TextForm
 from lute.read import bilibili_stream
-from lute.i18n import t
+from lute.i18n import t, current_language
 from lute.dict import service as dict_service
 from lute.dict import gloss_format
 from lute.term.model import Repository
@@ -1237,11 +1237,52 @@ def start_reading(bookid, pagenum):
             )
         return render_template("read/epub_page.html", **ctx)
     paragraphs = service.start_reading(book, pagenum)
+    _queue_ai_prefetch(book, paragraphs)
     return render_template(
         "read/page_content.html",
         paragraphs=paragraphs,
         page_cue_map=_page_cue_line_map(book, pagenum),
     )
+
+
+def _queue_ai_prefetch(book, paragraphs):
+    """
+    Warm the first few sentences of the page for the AI panel.
+
+    Best-effort and fire-and-forget: any failure (no provider, disabled
+    in Settings, a busy rate limit) is silent and the reader is never
+    delayed.  Only the first paragraph's sentences are used, so the
+    prefetch is one batched request.
+    """
+    try:
+        from lute.ai import prefetch as ai_prefetch
+        from lute.ai import service as ai_service
+
+        lang = book.language
+        if lang is None or not ai_service.prefetch_enabled():
+            return
+        wanted = ai_service.prefetch_count()
+        texts = []
+        for para in paragraphs:
+            for sentence in para:
+                text = "".join(item.text for item in sentence).strip()
+                if text:
+                    texts.append(text)
+                if len(texts) >= wanted:
+                    break
+            if len(texts) >= wanted:
+                break
+        ai_prefetch.schedule(
+            current_scope_key(),
+            book.id,
+            lang.id,
+            texts,
+            (lang.name or ""),
+            ai_service.target_language_name(lang, current_language()),
+        )
+    except Exception:  # pylint: disable=broad-exception-caught
+        # A prefetch must never break the reading page.
+        pass
 
 
 @bp.route("/update_start_date/<int:bookid>/<int:pagenum>", methods=["GET", "POST"])

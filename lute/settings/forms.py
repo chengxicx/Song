@@ -50,6 +50,17 @@ class UserSettingsForm(FlaskForm):
     # other setting is written, then stored by the route.
     ai_providers_json = HiddenField(lazy_t("AI provider (API key)"))
 
+    # Background prefetch: on by default, four sentences from the current
+    # page, so clicking one of them opens a stored result instantly.
+    ai_prefetch_enabled = BooleanField(
+        lazy_t("Prefetch the next sentences in the background"), default="1"
+    )
+    ai_prefetch_count = SelectField(
+        lazy_t("Sentences to prefetch per page"),
+        choices=[(str(i), str(i)) for i in range(1, 6)],
+        default="4",
+    )
+
     image_size_choices = [
         ("400", lazy_t("400px (smallest)")),
         ("800", lazy_t("800px")),
