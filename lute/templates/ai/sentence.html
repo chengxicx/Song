@@ -133,6 +133,43 @@
         margin: 0 0 0.5rem 0;
       }
       .ai-guidance .ai-source { margin-top: 0.8rem; }
+      .ai-state {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0 0 0.5rem 0;
+        font-size: 0.85rem;
+        line-height: 1.4;
+        color: color-mix(in srgb, var(--font-color, #888) 70%, transparent);
+      }
+      .ai-state .ai-dot {
+        width: 0.55rem;
+        height: 0.55rem;
+        border-radius: 50%;
+        background: color-mix(in srgb, var(--font-color, #888) 45%, transparent);
+        flex: none;
+      }
+      .ai-state[data-state="queued"] .ai-dot,
+      .ai-state[data-state="cooling"] .ai-dot,
+      .ai-state[data-state="waiting_structure"] .ai-dot {
+        animation: ai-pulse 1.1s ease-in-out infinite;
+      }
+      @keyframes ai-pulse {
+        0%, 100% { opacity: 0.35; }
+        50% { opacity: 1; }
+      }
+      .ai-badge {
+        display: inline-block;
+        margin-left: auto;
+        padding: 0.05rem 0.4rem;
+        border-radius: 999px;
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: color-mix(in srgb, var(--btn-accent, #2f6fdb) 85%, var(--font-color, #333));
+        background: color-mix(in srgb, var(--btn-accent, #2f6fdb) 14%, transparent);
+      }
     </style>
   </head>
   <body>
@@ -144,13 +181,19 @@
     </div>
     {% elif configured %}
     <div class="ai-card">
-      <div class="ai-eyebrow">{{ provider_label }}</div>
+      <div class="ai-eyebrow">
+        <span>{{ provider_label }}</span>
+        <span id="ai-badge" class="ai-badge" hidden></span>
+      </div>
       <div class="ai-source">{{ sentence }}</div>
+      <div id="ai-state" class="ai-state" data-state="" hidden>
+        <span class="ai-dot"></span><span id="ai-state-text"></span>
+      </div>
       <div id="ai-result" class="ai-result" aria-live="polite"></div>
       <div id="ai-sections" class="ai-sections"></div>
       <div id="ai-error" class="ai-error" hidden></div>
       <div class="ai-actions">
-        <button type="button" id="ai-retry" class="btn btn-secondary">
+        <button type="button" id="ai-retry" class="btn btn-secondary" hidden>
           {{ t('Retry') }}
         </button>
         <a href="{{ settings_url }}" target="_top">{{ t('AI settings') }}</a>
@@ -161,6 +204,11 @@
         var TEXT = {{ sentence|tojson }};
         var LANG = {{ lang_id|tojson }};
         var UNPARSABLE = {{ t('AI returned an unparsable response, please retry.')|tojson }};
+        var MSG_WAITING = {{ t('Organizing the word-by-word notes and grammar')|tojson }};
+        var MSG_QUEUED = {{ t('Queued: %(n)s request(s) ahead, about %(s)s s')|tojson }};
+        var MSG_COOLING = {{ t('Rate limit reached; retrying automatically in %(s)s s')|tojson }};
+        var BADGE_SAVED = {{ t('Saved')|tojson }};
+        var BADGE_CACHED = {{ t('Cached')|tojson }};
         var LABELS = {
           segments: {{ t('Word-by-word')|tojson }},
           part: {{ t('Part')|tojson }},
@@ -175,11 +223,118 @@
         var sectionsEl = document.getElementById('ai-sections');
         var errorEl = document.getElementById('ai-error');
         var retryEl = document.getElementById('ai-retry');
+        var stateEl = document.getElementById('ai-state');
+        var stateTextEl = document.getElementById('ai-state-text');
+        var badgeEl = document.getElementById('ai-badge');
         var streamBuffer = '';
+        var stateTimer = null;
+
+        function clearStateTimer() {
+          if (stateTimer) {
+            clearInterval(stateTimer);
+            stateTimer = null;
+          }
+        }
+
+        function hideState() {
+          clearStateTimer();
+          stateEl.hidden = true;
+          stateEl.dataset.state = '';
+          stateTextEl.textContent = '';
+        }
+
+        function paintState(kind, paint) {
+          stateEl.dataset.state = kind;
+          stateEl.hidden = false;
+          // Retry only appears for fallback/error states; while the
+          // server is working or waiting, there is nothing to retry.
+          retryEl.hidden = true;
+          retryEl.disabled = true;
+          paint();
+        }
+
+        function startCountdown(kind, seconds, paint) {
+          clearStateTimer();
+          var deadline = Date.now() + Math.max(0, seconds || 0) * 1000;
+          function tick() {
+            var remain = Math.max(0, Math.round((deadline - Date.now()) / 1000));
+            paint(remain);
+          }
+          paintState(kind, tick);
+          stateTimer = setInterval(tick, 1000);
+        }
+
+        function startElapsed(kind, paint) {
+          clearStateTimer();
+          var started = Date.now();
+          function tick() {
+            paint(Math.max(0, Math.round((Date.now() - started) / 1000)));
+          }
+          paintState(kind, tick);
+          stateTimer = setInterval(tick, 1000);
+        }
+
+        function formatCount(template, values) {
+          return template.replace(/%(n|s)s/g, function (_, key) {
+            return String(values[key] || 0);
+          });
+        }
+
+        function handleState(data) {
+          var kind = data.state || '';
+          if (kind === 'streaming') {
+            hideState();
+            badgeEl.hidden = true;
+            retryEl.hidden = true;
+            retryEl.disabled = true;
+            return;
+          }
+          if (kind === 'waiting_structure') {
+            badgeEl.hidden = true;
+            startElapsed(kind, function (seconds) {
+              stateTextEl.textContent = MSG_WAITING + '… (' + seconds + ' s)';
+            });
+            return;
+          }
+          if (kind === 'queued') {
+            badgeEl.hidden = true;
+            startCountdown(kind, data.eta || 0, function (remain) {
+              stateTextEl.textContent = formatCount(MSG_QUEUED, {
+                n: data.ahead || 0,
+                s: remain
+              });
+            });
+            return;
+          }
+          if (kind === 'cooling') {
+            badgeEl.hidden = true;
+            startCountdown(kind, data.cooling || data.eta || 0, function (remain) {
+              stateTextEl.textContent = formatCount(MSG_COOLING, { s: remain });
+            });
+            return;
+          }
+          if (kind === 'cached') {
+            hideState();
+            badgeEl.textContent =
+              data.saved_from === 'legacy-ttl' ? BADGE_CACHED : BADGE_SAVED;
+            badgeEl.hidden = false;
+            retryEl.hidden = true;
+            return;
+          }
+          if (kind === 'fallback' || kind === 'error') {
+            hideState();
+            badgeEl.hidden = true;
+            retryEl.hidden = false;
+            retryEl.disabled = false;
+          }
+        }
 
         function showError(message) {
+          hideState();
+          badgeEl.hidden = true;
           errorEl.textContent = message;
           errorEl.hidden = false;
+          retryEl.hidden = false;
           retryEl.disabled = false;
         }
 
@@ -384,12 +539,15 @@
           if (!dataLines.length) return;
           var data;
           try { data = JSON.parse(dataLines.join('\n')); } catch (e) { return; }
-          if (eventName === 'text' && data.text) {
+          if (eventName === 'state') {
+            handleState(data);
+          } else if (eventName === 'text' && data.text) {
             streamBuffer += data.text;
             var partial = partialTranslation(streamBuffer);
             if (partial) resultEl.textContent = partial;
           } else if (eventName === 'result') {
             if (data.result) {
+              hideState();
               renderResult(data.result);
             } else {
               sectionsEl.textContent = '';
@@ -402,6 +560,7 @@
           } else if (eventName === 'error') {
             showError(data.message || '{{ t("Translation failed.") }}');
           } else if (eventName === 'done') {
+            if (stateEl.dataset.state === 'waiting_structure') hideState();
             retryEl.disabled = false;
           }
         }
@@ -412,6 +571,9 @@
           streamBuffer = '';
           errorEl.hidden = true;
           errorEl.textContent = '';
+          hideState();
+          badgeEl.hidden = true;
+          retryEl.hidden = true;
           retryEl.disabled = true;
           try {
             var resp = await fetch('/ai/translate', {

@@ -49,6 +49,11 @@ SERVER_LEVEL_KEYS = frozenset(
     {"mecab_path", "japanese_sudachi_dict", "japanese_sudachi_mode"}
 )
 
+# Keys that are created on first save instead of pre-existing in the
+# settings table, so the very first POST must not be rejected by the
+# "unknown key" guard.
+DYNAMIC_KEYS = frozenset({"ai_prefetch_enabled", "ai_prefetch_count"})
+
 
 @bp.route("/index", methods=["GET", "POST"])
 def edit_settings():
@@ -104,7 +109,10 @@ def edit_settings():
                 val = field.data
                 if isinstance(field, BooleanField):
                     val = "1" if val else "0"
-                repo.set_value(field.id, val)
+                if field.id in DYNAMIC_KEYS:
+                    repo.set_dynamic_value(field.id, val)
+                else:
+                    repo.set_value(field.id, val)
             db.session.commit()
             refresh_global_settings(db.session)
 

@@ -15,14 +15,19 @@ Nothing here ever returns or logs the raw API key.
 import hashlib
 import json
 import re
+import time
 import uuid
+from datetime import datetime
 from urllib.parse import urlparse
 
 import requests
 
 from lute.db import db
+from lute.models.ai_result import AiResult
 from lute.models.repositories import UserSettingRepository
+from lute.models.setting import UserSetting
 from lute.ai.crypto import decrypt, encrypt
+from lute.ai.limiter import DEFAULT_RPM, INTERACTIVE, LIMITER, normalize_rpm
 
 # One choice serves both the reader Sentence tab and the Grammar panel.
 # The old per-feature keys are still read as a fallback so existing
@@ -41,6 +46,45 @@ AI_PROVIDERS_SETTING_KEY = "ai_providers"
 PROVIDER_FORMATS = ("openai", "anthropic")
 _FORMAT_LABELS = {"openai": "OpenAI", "anthropic": "Anthropic"}
 
+# Background prefetch: on by default, four sentences at a time.
+AI_PREFETCH_SETTING_KEY = "ai_prefetch_enabled"
+AI_PREFETCH_COUNT_KEY = "ai_prefetch_count"
+PREFETCH_DEFAULT_COUNT = 4
+PREFETCH_MAX_COUNT = 5
+
+# Persistent result store: one-time migration of the old settings TTL
+# entries, kept as a flag in the settings table.
+AI_RESULTS_MIGRATION_KEY = "ai_results_migrated_v1"
+RESULT_TYPE_SENTENCE = "sentence"
+RESULT_TYPE_GRAMMAR = "grammar"
+
+# The target language name used in prompts and in the persistent key.
+# Both the reader panel and the background prefetch must resolve it the
+# same way, or a prefetched sentence would miss when the reader clicks.
+UI_LANGUAGE_NAMES = {
+    "en": "English",
+    "zh": "Simplified Chinese",
+    "ja": "Japanese",
+    "ko": "Korean",
+    "fr": "French",
+    "de": "German",
+    "es": "Spanish",
+    "ru": "Russian",
+}
+
+
+def target_language_name(lang, ui_language=""):
+    "The language AI output is written in, for one Language row."
+    for code in (
+        getattr(lang, "grammar_translate_lang", ""),
+        getattr(lang, "translate_target_lang", ""),
+        ui_language,
+    ):
+        code = (code or "").strip()
+        if code in UI_LANGUAGE_NAMES:
+            return UI_LANGUAGE_NAMES[code]
+    return "English"
+
 
 class AiError(Exception):
     """
@@ -50,10 +94,11 @@ class AiError(Exception):
     timeout, upstream, so the page can phrase the message precisely.
     """
 
-    def __init__(self, message, kind="upstream"):
+    def __init__(self, message, kind="upstream", retry_after=None):
         super().__init__(message)
         self.message = message
         self.kind = kind
+        self.retry_after = retry_after
 
 
 # ---------------------------------------------------------------------
@@ -72,6 +117,33 @@ def _get(key):
 def _set(key, value):
     _repo().set_dynamic_value(key, value or "")
     db.session.commit()
+
+
+def prefetch_enabled():
+    "Background prefetch is on unless the user switched it off."
+    raw = _raw_setting(AI_PREFETCH_SETTING_KEY)
+    if raw is None:
+        return True
+    return str(raw).strip().lower() in ("1", "true", "on", "yes")
+
+
+def prefetch_count():
+    "How many sentences to warm; 1..5, four by default."
+    raw = _raw_setting(AI_PREFETCH_COUNT_KEY)
+    try:
+        count = int(raw)
+    except (TypeError, ValueError):
+        return PREFETCH_DEFAULT_COUNT
+    return max(1, min(PREFETCH_MAX_COUNT, count))
+
+
+def queue_status():
+    "Every entry's queue/cooling state for the settings page and /ai/queue."
+    out = []
+    for entry in provider_entries():
+        snapshot = LIMITER.snapshot(entry["id"], entry["rpm"])
+        out.append({"id": entry["id"], "name": entry["name"], **snapshot})
+    return out
 
 
 def provider_def(provider):
@@ -190,6 +262,7 @@ def ensure_provider_migration():
                 "model": model,
                 "api_key": token_blob,
                 "is_default": fmt == chosen,
+                "rpm": DEFAULT_RPM,
             }
         )
     if entries and not any(e["is_default"] for e in entries):
@@ -227,6 +300,7 @@ def _stored_entries():
                 "model": model,
                 "api_key": item.get("api_key") or "",
                 "is_default": bool(item.get("is_default")),
+                "rpm": normalize_rpm(item.get("rpm")),
             }
         )
     return entries
@@ -245,6 +319,7 @@ def _public_entry(entry):
         "configured": bool(token),
         "masked": mask_token(token),
         "is_default": bool(entry["is_default"]),
+        "rpm": normalize_rpm(entry.get("rpm")),
     }
 
 
@@ -354,6 +429,7 @@ def provider_status(provider):
         "configured": bool(token),
         "masked": mask_token(token),
         "enabled": bool(entry["is_default"]),
+        "rpm": normalize_rpm(entry.get("rpm")),
         "base_url": entry["base_url"],
         "default_base_url": p["default_base_url"],
         "base_url_hint": p["base_url_hint"],
@@ -444,6 +520,17 @@ def sentence_provider(language):
     return provider_choice()
 
 
+def sentence_provider_for_language_id(lang_id):
+    "The sentence provider for a language id (background prefetch path)."
+    from lute.models.language import Language  # pylint: disable=import-outside-toplevel
+
+    try:
+        lang = db.session.get(Language, int(lang_id))
+    except (TypeError, ValueError):
+        lang = None
+    return sentence_provider(lang)
+
+
 def normalize_provider_entries(raw_entries):
     """
     Validate and normalize submitted provider entries.
@@ -506,6 +593,9 @@ def normalize_provider_entries(raw_entries):
                 "model": model,
                 "api_key": blob,
                 "is_default": bool(item.get("is_default")),
+                "rpm": normalize_rpm(
+                    item.get("rpm"), (old or {}).get("rpm") or DEFAULT_RPM
+                ),
             }
         )
 
@@ -602,6 +692,7 @@ def public_entries_from_raw(raw_entries):
                 "configured": bool(key_text or stored),
                 "masked": "••••" if key_text else mask_token(stored),
                 "is_default": bool(item.get("is_default")),
+                "rpm": normalize_rpm(item.get("rpm")),
             }
         )
     return out
@@ -807,6 +898,14 @@ def extract_sentence_translation(text):
     return _unescape_json_string(match.group(1)).strip()
 
 
+_TRANSLATION_CLOSED_RE = re.compile(r'"translation"\s*:\s*"(?:[^"\\]|\\.)*"')
+
+
+def translation_complete(text):
+    "True once the translation string has arrived in full."
+    return bool(_TRANSLATION_CLOSED_RE.search(_strip_json_fences(text or "")))
+
+
 def sentence_fallback_text(text):
     """
     Readable text for a reply that did not parse.
@@ -848,9 +947,276 @@ def sentence_cache_key(sentence, model, source_lang="", target_lang=""):
     return _SENTENCE_CACHE_PREFIX + _SENTENCE_CACHE_VERSION + digest
 
 
-def sentence_cached_result(sentence, model, source_lang="", target_lang=""):
+def result_key(result_type, sentence, target_lang="", provider_id="", model=""):
+    """
+    Stable key for the persistent result table.
+
+    Sentence, target language, provider entry, model and the result type
+    all participate, so switching any of them yields a different row and
+    results coexist instead of overwriting each other.
+    """
+    raw = "\x1f".join(
+        [
+            result_type or "",
+            clean_sentence(sentence),
+            (target_lang or "").strip(),
+            provider_id or "",
+            model or "",
+        ]
+    )
+    return hashlib.sha1(raw.encode("utf-8")).hexdigest()
+
+
+def _result_row(key):
+    "One stored row or None; database errors are treated as a cache miss."
+    if not key:
+        return None
+    try:
+        return db.session.query(AiResult).filter_by(key=key).one_or_none()
+    except Exception:  # pylint: disable=broad-exception-caught
+        db.session.rollback()
+        return None
+
+
+def _decoded_row(row, wanted_keys):
+    "A row's JSON dict if it looks like the expected result shape."
+    if row is None:
+        return None
+    try:
+        data = json.loads(row.result_json or "")
+    except (TypeError, ValueError):
+        return None
+    if not isinstance(data, dict):
+        return None
+    if wanted_keys and not any(key in data for key in wanted_keys):
+        return None
+    return data
+
+
+def _latest_any_model(result_type, sentence, target_lang, wanted_keys):
+    """
+    The newest stored result for this sentence and target language.
+
+    Imported explanations carry a different model name than the live
+    provider, so an exact provider/model key would never find them.  This
+    step makes an import immediately usable by the reading panel.
+    """
+    try:
+        rows = (
+            db.session.query(AiResult)
+            .filter(
+                AiResult.result_type == result_type,
+                AiResult.sentence == clean_sentence(sentence),
+                AiResult.target_lang == (target_lang or "").strip(),
+            )
+            .order_by(AiResult.updated_at.desc(), AiResult.id.desc())
+            .limit(5)
+            .all()
+        )
+    except Exception:  # pylint: disable=broad-exception-caught
+        db.session.rollback()
+        return None, None
+    for row in rows:
+        data = _decoded_row(row, wanted_keys)
+        if data is not None:
+            return data, row
+    return None, None
+
+
+def stored_result(
+    result_type,
+    sentence,
+    provider_id="",
+    model="",
+    target_lang="",
+    legacy_key="",
+    wanted_keys=(),
+    meta=None,
+):
+    """
+    Read a result in this order: exact provider/model row, any model for
+    the same sentence and target language (newest first, imports win),
+    then the old TTL key.
+
+    ``meta`` receives ``saved_from`` so the panel can show Live, Prefetched,
+    Saved or Imported without another lookup.  Migrated rows keep the old
+    setting key as their primary key; ``legacy_key`` still finds them.
+    """
+    key = result_key(result_type, sentence, target_lang, provider_id, model)
+    row = _result_row(key)
+    data = _decoded_row(row, wanted_keys)
+    if data is None:
+        data, row = _latest_any_model(
+            result_type, sentence, target_lang, wanted_keys
+        )
+    if data is None and legacy_key:
+        row = _result_row(legacy_key)
+        data = _decoded_row(row, wanted_keys)
+    if data is None:
+        return None
+    if meta is not None:
+        meta["saved_from"] = (row.source if row is not None else "") or ""
+    try:
+        row.hit_count = (row.hit_count or 0) + 1
+        db.session.commit()
+    except Exception:  # pylint: disable=broad-exception-caught
+        db.session.rollback()
+    return data
+
+
+def save_result(
+    result_type,
+    sentence,
+    result,
+    provider_id="",
+    model="",
+    target_lang="",
+    book_id=None,
+    lang_id=None,
+    source="live",
+    token_usage=None,
+):
+    """
+    Insert or update one persistent result.
+
+    Cache writes never break the caller: a failed write is rolled back and
+    reported as False.
+    """
+    key = result_key(result_type, sentence, target_lang, provider_id, model)
+    payload = json.dumps(result, ensure_ascii=False)
+    try:
+        row = _result_row(key)
+        if row is None:
+            row = AiResult(
+                key=key,
+                result_type=result_type,
+                sentence=clean_sentence(sentence),
+                result_json=payload,
+                provider_id=provider_id or "",
+                model=model or "",
+                target_lang=(target_lang or "").strip(),
+                source=source or "live",
+                book_id=book_id,
+                lang_id=lang_id,
+                token_usage=(
+                    json.dumps(token_usage, ensure_ascii=False)
+                    if token_usage
+                    else None
+                ),
+                created_at=datetime.now(),
+                updated_at=datetime.now(),
+            )
+            db.session.add(row)
+        else:
+            row.result_json = payload
+            row.provider_id = provider_id or ""
+            row.model = model or ""
+            row.target_lang = (target_lang or "").strip()
+            row.source = source or "live"
+            row.book_id = book_id if book_id is not None else row.book_id
+            row.lang_id = lang_id if lang_id is not None else row.lang_id
+            if token_usage:
+                row.token_usage = json.dumps(token_usage, ensure_ascii=False)
+            row.updated_at = datetime.now()
+        db.session.commit()
+        return True
+    except Exception:  # pylint: disable=broad-exception-caught
+        db.session.rollback()
+        return False
+
+
+def ensure_results_migration():
+    """
+    Copy the old settings TTL entries into the result table once.
+
+    The old row key becomes the primary key, so a later lookup can still
+    find it through ``legacy_key``.  Old settings entries are kept; the
+    flag below makes this a one-time job per database.
+    """
+    if _get(AI_RESULTS_MIGRATION_KEY):
+        return 0
+    prefixes = (
+        (_SENTENCE_CACHE_PREFIX, RESULT_TYPE_SENTENCE, _SENTENCE_JSON_KEYS),
+        (_GRAMMAR_CACHE_PREFIX, RESULT_TYPE_GRAMMAR, _GRAMMAR_JSON_KEYS),
+    )
+    migrated = 0
+    try:
+        for prefix, result_type, wanted in prefixes:
+            rows = (
+                db.session.query(UserSetting)
+                .filter(UserSetting.key.like(prefix + "%"))
+                .all()
+            )
+            for setting in rows:
+                if _result_row(setting.key) is not None:
+                    continue
+                try:
+                    data = json.loads(setting.value or "")
+                except (TypeError, ValueError):
+                    continue
+                if not isinstance(data, dict) or not any(
+                    key in data for key in wanted
+                ):
+                    continue
+                now = datetime.now()
+                db.session.add(
+                    AiResult(
+                        key=setting.key,
+                        result_type=result_type,
+                        sentence="",
+                        result_json=json.dumps(data, ensure_ascii=False),
+                        provider_id="",
+                        model="",
+                        target_lang="",
+                        source="legacy",
+                        token_usage=None,
+                        created_at=now,
+                        updated_at=now,
+                    )
+                )
+                migrated += 1
+        _set(AI_RESULTS_MIGRATION_KEY, "1")
+    except Exception:  # pylint: disable=broad-exception-caught
+        db.session.rollback()
+    return migrated
+
+
+def delete_results(book_id=None, lang_id=None, result_type=None):
+    "Delete results by book or language; returns the number removed."
+    try:
+        query = db.session.query(AiResult)
+        if book_id is not None:
+            query = query.filter(AiResult.book_id == int(book_id))
+        if lang_id is not None:
+            query = query.filter(AiResult.lang_id == int(lang_id))
+        if result_type:
+            query = query.filter(AiResult.result_type == result_type)
+        count = query.delete(synchronize_session=False)
+        db.session.commit()
+        return count
+    except Exception:  # pylint: disable=broad-exception-caught
+        db.session.rollback()
+        return 0
+
+
+def sentence_cached_result(
+    sentence, model, source_lang="", target_lang="", provider_id="", meta=None
+):
     "A previously stored structured result, or None."
-    value = _get(sentence_cache_key(sentence, model, source_lang, target_lang))
+    legacy = sentence_cache_key(sentence, model, source_lang, target_lang)
+    data = stored_result(
+        RESULT_TYPE_SENTENCE,
+        sentence,
+        provider_id=provider_id,
+        model=model,
+        target_lang=target_lang,
+        legacy_key=legacy,
+        wanted_keys=_SENTENCE_JSON_KEYS,
+        meta=meta,
+    )
+    if data is not None:
+        return data
+    value = _get(legacy)
     if not value:
         return None
     try:
@@ -861,19 +1227,46 @@ def sentence_cached_result(sentence, model, source_lang="", target_lang=""):
         return None
     if not any(key in data for key in _SENTENCE_JSON_KEYS):
         return None
+    if meta is not None:
+        meta["saved_from"] = "legacy-ttl"
+    # Upgrade this old TTL row on the way out.
+    save_result(
+        RESULT_TYPE_SENTENCE,
+        sentence,
+        data,
+        provider_id=provider_id,
+        model=model,
+        target_lang=target_lang,
+        source="legacy-ttl",
+    )
     return data
 
 
-def store_sentence_result(sentence, model, source_lang, target_lang, result):
+def store_sentence_result(
+    sentence,
+    model,
+    source_lang,
+    target_lang,
+    result,
+    provider_id="",
+    book_id=None,
+    lang_id=None,
+    source="live",
+    token_usage=None,
+):
     "Persist one parsed result so the same sentence is not billed twice."
-    try:
-        _set(
-            sentence_cache_key(sentence, model, source_lang, target_lang),
-            json.dumps(result, ensure_ascii=False),
-        )
-    except Exception:  # pylint: disable=broad-exception-caught
-        # A failed cache write must not break the reader's result.
-        db.session.rollback()
+    save_result(
+        RESULT_TYPE_SENTENCE,
+        sentence,
+        result,
+        provider_id=provider_id,
+        model=model,
+        target_lang=target_lang,
+        book_id=book_id,
+        lang_id=lang_id,
+        source=source,
+        token_usage=token_usage,
+    )
 
 
 # ---------------------------------------------------------------------
@@ -881,12 +1274,13 @@ def store_sentence_result(sentence, model, source_lang, target_lang, result):
 # ---------------------------------------------------------------------
 
 
-def translate_stream(provider, sentence, source_lang="", target_lang=""):
+def translate_stream(provider, sentence, source_lang="", target_lang="", usage=None):
     """
     Yield translation text chunks from the selected API provider.
 
-    Raises AiError (auth/rate/timeout/upstream) on failure; the route
-    turns those into an SSE error event.
+    ``usage`` is an optional dict filled with the upstream token counts
+    when the gateway sends them.  Raises AiError (auth/rate/timeout/
+    upstream) on failure; the route turns those into an SSE error event.
     """
     ready = grammar_ready(provider)
     if not ready:
@@ -909,6 +1303,7 @@ def translate_stream(provider, sentence, source_lang="", target_lang=""):
             ready["model"],
             system_prompt,
             user_prompt,
+            usage=usage,
         )
         return
     yield from _anthropic_stream(
@@ -917,6 +1312,7 @@ def translate_stream(provider, sentence, source_lang="", target_lang=""):
         ready["model"],
         system_prompt,
         user_prompt,
+        usage=usage,
     )
 
 
@@ -1118,6 +1514,7 @@ def save_grammar_config(provider, token=None, base_url=None, model=None, enabled
             "model": p["default_model"],
             "api_key": "",
             "is_default": False,
+            "rpm": DEFAULT_RPM,
         }
         entries.append(entry)
     p = _API_PROVIDERS[entry["format"]]
@@ -1203,6 +1600,7 @@ def grammar_ready(provider=None):
         "token": token,
         "base_url": normalize_base_url(entry["base_url"], p["default_base_url"]),
         "model": entry["model"],
+        "rpm": normalize_rpm(entry.get("rpm")),
     }
 
 
@@ -1311,11 +1709,26 @@ def _drop_legacy_grammar_cache(sentence, model, source_lang="", target_lang=""):
         db.session.rollback()
 
 
-def grammar_cached_result(sentence, model, source_lang="", target_lang=""):
+def grammar_cached_result(
+    sentence, model, source_lang="", target_lang="", provider_id="", meta=None
+):
     "A previously stored structured result, or None."
-    value = _get(grammar_cache_key(sentence, model, source_lang, target_lang))
+    legacy = grammar_cache_key(sentence, model, source_lang, target_lang)
+    data = stored_result(
+        RESULT_TYPE_GRAMMAR,
+        sentence,
+        provider_id=provider_id,
+        model=model,
+        target_lang=target_lang,
+        legacy_key=legacy,
+        wanted_keys=_GRAMMAR_JSON_KEYS,
+        meta=meta,
+    )
+    if data is not None:
+        return data
+    _drop_legacy_grammar_cache(sentence, model, source_lang, target_lang)
+    value = _get(legacy)
     if not value:
-        _drop_legacy_grammar_cache(sentence, model, source_lang, target_lang)
         return None
     try:
         data = json.loads(value)
@@ -1325,19 +1738,45 @@ def grammar_cached_result(sentence, model, source_lang="", target_lang=""):
         return None
     if not any(key in data for key in _GRAMMAR_JSON_KEYS):
         return None
+    if meta is not None:
+        meta["saved_from"] = "legacy-ttl"
+    save_result(
+        RESULT_TYPE_GRAMMAR,
+        sentence,
+        data,
+        provider_id=provider_id,
+        model=model,
+        target_lang=target_lang,
+        source="legacy-ttl",
+    )
     return data
 
 
-def store_grammar_result(sentence, model, source_lang, target_lang, result):
+def store_grammar_result(
+    sentence,
+    model,
+    source_lang,
+    target_lang,
+    result,
+    provider_id="",
+    book_id=None,
+    lang_id=None,
+    source="live",
+    token_usage=None,
+):
     "Persist one parsed result so the same sentence is not billed twice."
-    try:
-        _set(
-            grammar_cache_key(sentence, model, source_lang, target_lang),
-            json.dumps(result, ensure_ascii=False),
-        )
-    except Exception:  # pylint: disable=broad-exception-caught
-        # A failed cache write must not break the reader's result.
-        db.session.rollback()
+    save_result(
+        RESULT_TYPE_GRAMMAR,
+        sentence,
+        result,
+        provider_id=provider_id,
+        model=model,
+        target_lang=target_lang,
+        book_id=book_id,
+        lang_id=lang_id,
+        source=source,
+        token_usage=token_usage,
+    )
 
 
 _UPSTREAM_DETAIL_LIMIT = 200
@@ -1441,10 +1880,16 @@ def _api_response_error(resp, label, token, url=""):
             "auth",
         )
     if status == 429:
+        retry_after = None
+        try:
+            retry_after = int(float(resp.headers.get("Retry-After", "")))
+        except (TypeError, ValueError):
+            retry_after = None
         return AiError(
             f"{label} is rate-limiting this key (HTTP 429{tail}). "
             "Wait a moment and try again.",
             "rate",
+            retry_after=retry_after,
         )
     if status == 404:
         where = f" for {url}" if url else ""
@@ -1540,7 +1985,19 @@ def _anthropic_text_from_payload(data):
 _STREAM_FALLBACK_KINDS = ("upstream", "config")
 
 
-def _openai_read(url, headers, payload, label, token):
+def _capture_usage(data, usage):
+    "Record a usage block the gateway happened to send."
+    if usage is None or not isinstance(data, dict):
+        return
+    block = data.get("usage")
+    if not isinstance(block, dict):
+        message = data.get("message")
+        block = message.get("usage") if isinstance(message, dict) else None
+    if isinstance(block, dict):
+        usage["usage"] = block
+
+
+def _openai_read(url, headers, payload, label, token, usage=None):
     "One streamed request; yields text chunks from deltas or a JSON body."
     resp = _api_post(url, headers, payload, label, stream=True)
     try:
@@ -1548,11 +2005,14 @@ def _openai_read(url, headers, payload, label, token):
             raise _api_response_error(resp, label, token, url)
         content_type = (resp.headers.get("Content-Type") or "").lower()
         if "text/event-stream" not in content_type:
-            text = _text_from_payload(_response_json(resp, label))
+            data = _response_json(resp, label)
+            _capture_usage(data, usage)
+            text = _text_from_payload(data)
             if text:
                 yield text
             return
         for data in _iter_sse_payloads(resp):
+            _capture_usage(data, usage)
             text = _text_from_payload(data)
             if text:
                 yield text
@@ -1560,18 +2020,22 @@ def _openai_read(url, headers, payload, label, token):
         resp.close()
 
 
-def _openai_plain(url, headers, payload, label, token):
+def _openai_plain(url, headers, payload, label, token, usage=None):
     "One non-streamed request; returns the whole reply."
     resp = _api_post(url, headers, payload, label, stream=False)
     try:
         if resp.status_code != 200:
             raise _api_response_error(resp, label, token, url)
-        return _text_from_payload(_response_json(resp, label))
+        data = _response_json(resp, label)
+        _capture_usage(data, usage)
+        return _text_from_payload(data)
     finally:
         resp.close()
 
 
-def _openai_stream(base_url, token, model, system_prompt, user_prompt):
+def _openai_stream(
+    base_url, token, model, system_prompt, user_prompt, usage=None
+):
     """
     POST /chat/completions and parse choices[0].delta.content.
 
@@ -1590,6 +2054,7 @@ def _openai_stream(base_url, token, model, system_prompt, user_prompt):
     payload = {
         "model": model,
         "stream": True,
+        "stream_options": {"include_usage": True},
         "temperature": 0.2,
         "messages": [
             {"role": "system", "content": system_prompt},
@@ -1598,7 +2063,7 @@ def _openai_stream(base_url, token, model, system_prompt, user_prompt):
     }
     emitted = False
     try:
-        for text in _openai_read(url, headers, payload, label, token):
+        for text in _openai_read(url, headers, payload, label, token, usage=usage):
             emitted = True
             yield text
         return
@@ -1607,12 +2072,13 @@ def _openai_stream(base_url, token, model, system_prompt, user_prompt):
             raise
     plain = dict(payload)
     plain["stream"] = False
-    text = _openai_plain(url, headers, plain, label, token)
+    plain.pop("stream_options", None)
+    text = _openai_plain(url, headers, plain, label, token, usage=usage)
     if text:
         yield text
 
 
-def _anthropic_read(url, headers, payload, label, token):
+def _anthropic_read(url, headers, payload, label, token, usage=None):
     "One streamed request; yields content_block_delta text or a JSON body."
     resp = _api_post(url, headers, payload, label, stream=True)
     try:
@@ -1620,11 +2086,14 @@ def _anthropic_read(url, headers, payload, label, token):
             raise _api_response_error(resp, label, token, url)
         content_type = (resp.headers.get("Content-Type") or "").lower()
         if "text/event-stream" not in content_type:
-            text = _anthropic_text_from_payload(_response_json(resp, label))
+            data = _response_json(resp, label)
+            _capture_usage(data, usage)
+            text = _anthropic_text_from_payload(data)
             if text:
                 yield text
             return
         for data in _iter_sse_payloads(resp):
+            _capture_usage(data, usage)
             event_type = data.get("type")
             if event_type == "error":
                 raise AiError(f"{label} reported an upstream error.", "upstream")
@@ -1640,19 +2109,21 @@ def _anthropic_read(url, headers, payload, label, token):
         resp.close()
 
 
-def _anthropic_plain(url, headers, payload, label, token):
+def _anthropic_plain(url, headers, payload, label, token, usage=None):
     "One non-streamed request; returns the whole reply."
     resp = _api_post(url, headers, payload, label, stream=False)
     try:
         if resp.status_code != 200:
             raise _api_response_error(resp, label, token, url)
-        return _anthropic_text_from_payload(_response_json(resp, label))
+        data = _response_json(resp, label)
+        _capture_usage(data, usage)
+        return _anthropic_text_from_payload(data)
     finally:
         resp.close()
 
 
 def _anthropic_stream(
-    base_url, token, model, system_prompt, user_prompt, max_tokens=None
+    base_url, token, model, system_prompt, user_prompt, max_tokens=None, usage=None
 ):
     """
     POST /messages and parse content_block_delta.delta.text.
@@ -1678,7 +2149,7 @@ def _anthropic_stream(
     }
     emitted = False
     try:
-        for text in _anthropic_read(url, headers, payload, label, token):
+        for text in _anthropic_read(url, headers, payload, label, token, usage=usage):
             emitted = True
             yield text
         return
@@ -1687,12 +2158,12 @@ def _anthropic_stream(
             raise
     plain = dict(payload)
     plain["stream"] = False
-    text = _anthropic_plain(url, headers, plain, label, token)
+    text = _anthropic_plain(url, headers, plain, label, token, usage=usage)
     if text:
         yield text
 
 
-def grammar_stream(provider, sentence, source_lang="", target_lang=""):
+def grammar_stream(provider, sentence, source_lang="", target_lang="", usage=None):
     "Stream one grammar analysis; yields raw model text chunks."
     ready = grammar_ready(provider)
     sentence = clean_sentence(sentence)
@@ -1707,6 +2178,7 @@ def grammar_stream(provider, sentence, source_lang="", target_lang=""):
             ready["model"],
             system_prompt,
             user_prompt,
+            usage=usage,
         )
         return
     yield from _anthropic_stream(
@@ -1715,7 +2187,159 @@ def grammar_stream(provider, sentence, source_lang="", target_lang=""):
         ready["model"],
         system_prompt,
         user_prompt,
+        usage=usage,
     )
+
+
+# ---------------------------------------------------------------------
+# Batched translation for the background prefetch
+# ---------------------------------------------------------------------
+
+
+def build_batch_system_prompt(source_lang="", target_lang=""):
+    "One system prompt for a whole paragraph's worth of sentences."
+    source = (source_lang or "").strip() or "the source language"
+    target = (target_lang or "").strip() or "English"
+    return (
+        "You are a precise sentence-analysis engine. "
+        f"The sentences are written in {source}. Explain them in {target}.\n"
+        "Return ONLY one JSON array, with no markdown fences, preamble or "
+        "trailing commentary. One object per input sentence, in the same "
+        "order, with exactly these keys:\n"
+        '[{"translation":"",'
+        '"segments":[{"part":"","meaning":"","role":""}],'
+        '"grammar":[{"point":"","explanation":"","fragment":""}],'
+        '"context":"",'
+        '"examples":[{"source":"","translation":""}]}]\n'
+        "Rules:\n"
+        f"- translation: a natural, fluent translation of the whole "
+        f"sentence into {target}.\n"
+        "- segments: word-by-word meanings; quote the source part verbatim.\n"
+        "- grammar: the key grammar points and the exact fragments they "
+        "govern.\n"
+        "- context: a short note on usage or nuance.\n"
+        "- examples: up to two short example sentences with translations.\n"
+        f"- Every explanatory string must be in {target}; quotes stay in "
+        f"{source}.\n"
+        "- The array length must equal the number of sentences."
+    )
+
+
+def build_batch_user_prompt(sentences, source_lang=""):
+    "The numbered sentence list for one batched request."
+    source = (source_lang or "").strip() or "unknown"
+    return "\n\n".join(
+        f"Sentence {index + 1} ({source}):\n{clean_sentence(sentence)}"
+        for index, sentence in enumerate(sentences)
+    )
+
+
+def parse_batch_json(text):
+    "A list of result objects from a batched reply, or []."
+    raw = _strip_json_fences(text or "")
+    start = raw.find("[")
+    end = raw.rfind("]")
+    data = None
+    if start >= 0 and end > start:
+        try:
+            data = json.loads(raw[start : end + 1])
+        except (TypeError, ValueError):
+            data = None
+    if data is None:
+        try:
+            parsed = json.loads(raw)
+        except (TypeError, ValueError):
+            return []
+        if isinstance(parsed, dict) and isinstance(parsed.get("results"), list):
+            data = parsed["results"]
+    if not isinstance(data, list):
+        return []
+    return [item for item in data if isinstance(item, dict)]
+
+
+def _openai_complete(base_url, token, model, system_prompt, user_prompt, usage=None):
+    "One non-streamed chat completion; returns the whole reply."
+    label = _API_PROVIDERS["openai"]["label"]
+    url = api_endpoint(base_url, "openai")
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    }
+    payload = {
+        "model": model,
+        "temperature": 0.2,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+    }
+    return _openai_plain(url, headers, payload, label, token, usage=usage)
+
+
+def _anthropic_complete(
+    base_url, token, model, system_prompt, user_prompt, usage=None
+):
+    "One non-streamed Messages call; returns the whole reply."
+    label = _API_PROVIDERS["anthropic"]["label"]
+    url = api_endpoint(base_url, "anthropic")
+    headers = {
+        "x-api-key": token,
+        "anthropic-version": _ANTHROPIC_VERSION,
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    }
+    payload = {
+        "model": model,
+        "max_tokens": _ANTHROPIC_MAX_TOKENS,
+        "temperature": 0.2,
+        "system": system_prompt,
+        "messages": [{"role": "user", "content": user_prompt}],
+    }
+    return _anthropic_plain(url, headers, payload, label, token, usage=usage)
+
+
+def translate_batch(provider, sentences, source_lang="", target_lang="", usage=None):
+    """
+    Translate and structure several sentences in one request.
+
+    Returns ``(ready, results)`` where results is a list of
+    ``(sentence, parsed_object)`` pairs.  The system prompt is sent once.
+    """
+    ready = grammar_ready(provider)
+    sentences = [clean_sentence(s) for s in sentences if clean_sentence(s)]
+    if not sentences:
+        return ready, []
+    system_prompt = build_batch_system_prompt(source_lang, target_lang)
+    user_prompt = build_batch_user_prompt(sentences, source_lang)
+    if ready["format"] == "openai":
+        reply = _openai_complete(
+            ready["base_url"],
+            ready["token"],
+            ready["model"],
+            system_prompt,
+            user_prompt,
+            usage=usage,
+        )
+    else:
+        reply = _anthropic_complete(
+            ready["base_url"],
+            ready["token"],
+            ready["model"],
+            system_prompt,
+            user_prompt,
+            usage=usage,
+        )
+    parsed = parse_batch_json(reply)
+    results = []
+    for index, sentence in enumerate(sentences):
+        item = parsed[index] if index < len(parsed) else None
+        if item is None:
+            continue
+        if not isinstance(item.get("translation"), str):
+            continue
+        results.append((sentence, item))
+    return ready, results
 
 
 def test_provider_connection(fmt, base_url, model, token="", entry_id=""):
@@ -1744,6 +2368,15 @@ def test_provider_connection(fmt, base_url, model, token="", entry_id=""):
         base_url = normalize_base_url(
             base_url, _API_PROVIDERS[fmt]["default_base_url"]
         )
+        # Connection tests are outbound requests too: they wait in the
+        # same per-entry bucket, so a test cannot be used to exceed the
+        # provider's rpm.
+        saved = _find_raw_entry(entry_id) if entry_id else None
+        rpm = normalize_rpm((saved or {}).get("rpm"))
+        bucket_key = entry_id or hashlib.sha1(
+            f"{fmt}|{base_url}|{model}".encode("utf-8")
+        ).hexdigest()[:12]
+        LIMITER.acquire(bucket_key, rpm, priority=INTERACTIVE)
         system_prompt = "Reply with the single word OK."
         user_prompt = "OK"
         if fmt == "openai":
@@ -1763,6 +2396,8 @@ def test_provider_connection(fmt, base_url, model, token="", entry_id=""):
             return {"ok": True, "message": "The provider answered."}
         return {"ok": False, "message": "The provider returned an empty reply."}
     except AiError as e:
+        if e.kind == "rate" and entry_id:
+            LIMITER.cool(entry_id, 60)
         return {"ok": False, "message": e.message}
     except Exception as e:  # pylint: disable=broad-exception-caught
         return {"ok": False, "message": f"Connection failed ({type(e).__name__})."}

@@ -7,6 +7,7 @@ unconfigured account must get setup guidance, never a dead iframe or a
 third-party web-chat link.
 """
 
+import io
 import json
 import re
 
@@ -119,6 +120,7 @@ def test_translate_unparsable_reply_sends_only_readable_text(
     assert '"unparsable": true' in result_part
     assert "Hello there." in result_part
     assert '"segments"' not in result_part
+    assert '"state": "fallback"' in body
 
 
 def test_translate_fallback_is_not_cached(monkeypatch, app_context, client):
@@ -562,7 +564,7 @@ def test_translate_uses_the_pinned_provider_and_grammar_keeps_the_global(
 
     monkeypatch.setattr(
         "lute.ai.service.translate_stream",
-        lambda provider, sentence, source, target: iter(["Bonjour."]),
+        lambda provider, sentence, source, target, usage=None: iter(["Bonjour."]),
     )
     body = client.post(
         "/ai/translate", json={"q": "A pinned-provider sentence.", "lang": english.id}
@@ -573,7 +575,7 @@ def test_translate_uses_the_pinned_provider_and_grammar_keeps_the_global(
 
     monkeypatch.setattr(
         "lute.ai.service.grammar_stream",
-        lambda provider, sentence, source, target: iter(["{}"]),
+        lambda provider, sentence, source, target, usage=None: iter(["{}"]),
     )
     body = client.post(
         "/ai/grammar/analyze", json={"q": "A pinned-provider sentence.", "lang": english.id}
@@ -615,6 +617,205 @@ def test_language_form_offers_japanese_and_other_ai_languages(app_context):
     assert LanguageForm().grammar_translate_lang.label.text == (
         "AI analysis & translation language"
     )
+
+
+# ---------------------------------------------------------------------
+# Panel state events
+# ---------------------------------------------------------------------
+
+
+def _fake_ticket(state, ahead=0, eta=0, cooling=0):
+    return {"state": state, "ahead": ahead, "eta": eta, "cooling": cooling}
+
+
+class _FakeLimiter:
+    "A limiter whose first poll reports the requested state."
+
+    def __init__(self, states):
+        self._states = list(states)
+
+    def reserve(self, provider_id, priority):  # pylint: disable=unused-argument
+        return "ticket"
+
+    def poll(self, ticket, rpm):  # pylint: disable=unused-argument
+        if self._states:
+            return self._states.pop(0)
+        return _fake_ticket("granted")
+
+    def cancel(self, ticket):  # pylint: disable=unused-argument
+        pass
+
+    def cool(self, provider_id, seconds):  # pylint: disable=unused-argument
+        pass
+
+
+def test_repeated_sentence_is_reported_as_cached(monkeypatch, app_context, client):
+    "The second identical request sends a cached state, not text."
+    _configure(client)
+    good = json.dumps({"translation": "Hello.", "segments": []})
+    monkeypatch.setattr(
+        "lute.ai.service.requests.post",
+        lambda *a, **k: FakeResponse(
+            lines=_sse({"choices": [{"delta": {"content": good}}]})
+        ),
+    )
+    first = client.post("/ai/translate", json={"q": "Hello"}).get_data(as_text=True)
+    assert '"result"' in first
+
+    second = client.post("/ai/translate", json={"q": "Hello"}).get_data(as_text=True)
+    assert '"state": "cached"' in second
+    assert '"saved_from": "live"' in second
+    assert "event: text" not in second
+
+
+def test_waiting_structure_state_precedes_the_result(monkeypatch, app_context, client):
+    "Translation closed but JSON still open: the panel waits for structure."
+    _configure(client)
+    monkeypatch.setattr(
+        "lute.ai.service.requests.post",
+        lambda *a, **k: FakeResponse(
+            lines=_sse(
+                {
+                    "choices": [
+                        {
+                            "delta": {
+                                "content": 'Prose first "translation": "Hello." text '
+                            }
+                        }
+                    ]
+                },
+                {"choices": [{"delta": {"content": '{"translation": "Hello.", "segments": []}'}}]},
+            )
+        ),
+    )
+    body = client.post("/ai/translate", json={"q": "Hello"}).get_data(as_text=True)
+    assert '"state": "waiting_structure"' in body
+    waiting_at = body.index("waiting_structure")
+    result_at = body.index("event: result")
+    assert waiting_at < result_at
+
+
+def test_queued_state_reports_the_number_ahead(monkeypatch, app_context, client):
+    "A rate-limited request announces its queue position before streaming."
+    _configure(client)
+    limiter = _FakeLimiter([_fake_ticket("queued", ahead=2, eta=6)])
+    monkeypatch.setattr("lute.ai.routes.LIMITER", limiter)
+    monkeypatch.setattr(
+        "lute.ai.service.requests.post",
+        lambda *a, **k: FakeResponse(
+            lines=_sse({"choices": [{"delta": {"content": "Bonjour"}}]})
+        ),
+    )
+    body = client.post("/ai/translate", json={"q": "Hello"}).get_data(as_text=True)
+    assert '"state": "queued"' in body
+    assert '"ahead": 2' in body
+    assert "event: text" in body
+
+
+def test_cooling_state_is_reported_before_retrying(monkeypatch, app_context, client):
+    "An entry in cooldown shows the cooling state, then streams."
+    _configure(client)
+    limiter = _FakeLimiter([_fake_ticket("cooling", ahead=0, eta=45, cooling=45)])
+    monkeypatch.setattr("lute.ai.routes.LIMITER", limiter)
+    monkeypatch.setattr(
+        "lute.ai.service.requests.post",
+        lambda *a, **k: FakeResponse(
+            lines=_sse({"choices": [{"delta": {"content": "Bonjour"}}]})
+        ),
+    )
+    body = client.post("/ai/translate", json={"q": "Hello"}).get_data(as_text=True)
+    assert '"state": "cooling"' in body
+    assert '"cooling": 45' in body
+    assert "event: text" in body
+
+
+def test_429_backoff_emits_cooling_then_succeeds(monkeypatch, app_context, client):
+    "A 429 waits (2s), reports cooling, then retries the same request."
+    _configure(client)
+    responses = [
+        FakeResponse(status_code=429, body=json.dumps({"error": "slow down"})),
+        FakeResponse(lines=_sse({"choices": [{"delta": {"content": "Bonjour"}}]})),
+    ]
+
+    def fake_post(*args, **kwargs):  # pylint: disable=unused-argument
+        response = responses.pop(0)
+        if response.status_code == 429:
+            response.headers["Retry-After"] = "2"
+        return response
+
+    monkeypatch.setattr("lute.ai.service.requests.post", fake_post)
+    monkeypatch.setattr("lute.ai.routes._sleep", lambda seconds: None)
+    body = client.post("/ai/translate", json={"q": "Hello"}).get_data(as_text=True)
+    assert '"state": "cooling"' in body
+    assert "event: text" in body
+    assert "Bonjour" in body
+
+
+def test_queue_endpoint_exposes_each_entry(app_context, client):
+    "The panel can poll queue length and cooldown per provider entry."
+    _configure(client)
+    data = client.get("/ai/queue").get_json()
+    entry = data["entries"][0]
+    assert entry["id"] == "openai"
+    assert entry["rpm"] == 20
+    assert entry["queued"] == 0
+    assert entry["cooling"] == 0
+
+
+def test_results_delete_endpoint(app_context, client):
+    "Stored results can be removed by book without automatic expiry."
+    service.save_result(
+        service.RESULT_TYPE_SENTENCE,
+        "Hello.",
+        {"translation": "Bonjour."},
+        provider_id="p",
+        model="m",
+        target_lang="fr",
+        book_id=7,
+    )
+    resp = client.post("/ai/results/delete", json={"book_id": 7})
+    assert resp.get_json() == {"ok": True, "removed": 1}
+    assert client.post("/ai/results/delete", json={}).status_code == 400
+
+
+def test_library_import_and_export_endpoints(app_context, client, english):
+    "Upload a JSON file through the API and export the stored explanations."
+    from lute.models.book import Sentence
+
+    book = make_book("Library", "placeholder", english)
+    db.session.add(book)
+    db.session.commit()
+    db.session.add(
+        Sentence(tx_id=book.texts[0].id, order=1, text_content="Hello there, friend.")
+    )
+    db.session.commit()
+
+    payload = {
+        "version": 1,
+        "book_id": book.id,
+        "lang_id": english.id,
+        "target_lang": "zh",
+        "model": "outside-ai",
+        "items": [{"sentence": "Hello there friend", "translation": "你好，朋友。"}],
+    }
+    data = {
+        "file": (io.BytesIO(json.dumps(payload).encode("utf-8")), "explanations.json"),
+    }
+    resp = client.post(
+        "/ai/library/import", data=data, content_type="multipart/form-data"
+    )
+    assert resp.status_code == 200
+    report = resp.get_json()
+    assert report["ok"] is True
+    assert report["added"] == 1
+    assert report["levels"]["punct"] == 1
+
+    export = client.get(f"/ai/library/export?book_id={book.id}")
+    assert export.status_code == 200
+    exported = json.loads(export.get_data(as_text=True))
+    assert exported["items"][0]["translation"] == "你好，朋友。"
+    assert client.get("/ai/library/export").status_code == 400
+    assert client.post("/ai/library/import", data={}).status_code == 400
 
 
 def test_language_edit_form_renders_the_russian_option(app_context, client, english):
