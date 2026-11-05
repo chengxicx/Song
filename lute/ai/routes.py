@@ -117,12 +117,17 @@ def _sse(event, data):
     return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
 
 
+def _language(langid):
+    "The language for an id, or None when it cannot be resolved."
+    try:
+        return db.session.get(Language, int(langid))
+    except (TypeError, ValueError):
+        return None
+
+
 def _language_context(langid):
     "Source/target names for the prompt, tolerating a missing language."
-    try:
-        lang = db.session.get(Language, int(langid))
-    except (TypeError, ValueError):
-        lang = None
+    lang = _language(langid)
     if lang is None:
         return "", ""
     return (lang.name or "", _language_target_name(lang))
@@ -180,7 +185,7 @@ def sentence_page():
     """
     sentence = service.clean_sentence(request.args.get("q", ""))
     langid = request.args.get("lang", "")
-    provider = service.selected_provider()
+    provider = service.sentence_provider(_language(langid))
     provider_info = service.provider_def(provider) if provider else None
     state = service.provider_status(provider) if provider else None
     configured = bool(state and state["configured"])
@@ -223,6 +228,9 @@ def translate():
     langid = payload.get("lang", "")
     source_lang, target_lang = _language_context(langid)
     feature_on = _language_feature_enabled(langid, "ai_sentence_translation")
+    # The AI dictionary row may pin a provider for this language; a pin
+    # whose key was removed falls back to the shared Settings choice.
+    provider = service.sentence_provider(_language(langid))
 
     def generate():
         try:
@@ -232,7 +240,7 @@ def translate():
                     "language.  Turn it on in Language settings.",
                     "unsupported",
                 )
-            ready = service.grammar_ready(service.selected_provider() or None)
+            ready = service.grammar_ready(provider or None)
             model = ready["model"]
             cached = service.sentence_cached_result(
                 sentence, model, source_lang, target_lang

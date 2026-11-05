@@ -65,9 +65,11 @@
             {{ dictionary.dicttype(class="dict-type", disabled=True) }}
             <input type="hidden" name="{{ dictionary.dicttype.name }}" value="AI">
             <input type="hidden" name="{{ dictionary.dicturi.name }}" value="{{ dictionary.dicturi.data }}">
-            <span title="{{ t('AI sentence translation tab: drag to set its position among the sentence dictionaries') }}">
-              {{ t('AI sentence translation') }}
-            </span>
+            {# The URL column holds the AI sentence tab's provider:
+               the row's URL is generated, so this select stands in the
+               same cell, with the same classes as every row's URL
+               control, so the left dropdowns line up with the others. #}
+            {{ dictionary.ai_provider(class="dict-uri form-control-narrower", title=t('Provider used by AI sentence translation')) }}
             {% if not form.ai_sentence_translation.data %}
             <span style="color:#a94442; font-size:0.85em;">
               {{ t('The AI switch above is off, so this row offers no tab.  It keeps its position for when you turn it back on.') }}
@@ -119,6 +121,14 @@
             <span class="remove-dict-entity" title="{{ t('Remove dictionary') }}">
               <img src="{{ vstatic('icn/minus-button.png') }}">
             </span>
+            {% else %}
+            {# The AI row keeps the same operations slot as every other
+               row -- it just has no buttons in it (it can't be tested or
+               removed).  Reserving the space keeps the row's total width
+               identical, so the URL column shrinks by the same amount and
+               the status/hide columns line up with the rows around it. #}
+            <span class="dict-ops-slot" style="margin-left: 20px;"></span>
+            <span class="dict-ops-slot"></span>
             {% endif %}
           </div>
           {% endfor %}

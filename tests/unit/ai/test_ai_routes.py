@@ -335,6 +335,96 @@ def test_sentence_target_language_uses_the_shared_ai_language(app_context, engli
     assert _language_context(english.id)[1] == "Russian"
 
 
+def test_sentence_provider_pin_falls_back_to_the_settings_choice(
+    app_context, client, english
+):
+    """
+    A language's AI row may pin a provider for sentence translation.
+    The pin only wins while that provider has a key; clearing it, or a
+    stale/unknown value, falls back to the shared Settings choice so the
+    reader never breaks.
+    """
+    from lute.ai import service
+    from lute.models.language import AI_DICT_TYPE
+
+    _configure(client, "openai")
+
+    def _pin(provider):
+        ai = next(d for d in english.dictionaries if d.dicttype == AI_DICT_TYPE)
+        ai.ai_provider = provider
+        db.session.commit()
+
+    _pin("anthropic")  # configured? no key yet
+    assert service.sentence_provider(english) == "openai"
+
+    service.save_grammar_config("anthropic", token="sk-ant-test")
+    assert service.sentence_provider(english) == "anthropic"
+
+    service.clear_grammar_config("anthropic")
+    assert service.sentence_provider(english) == "openai"
+
+    _pin("")
+    assert service.sentence_provider(english) == "openai"
+
+    _pin("gemini")
+    assert service.sentence_provider(english) == "openai"
+
+
+def test_translate_uses_the_pinned_provider_and_grammar_keeps_the_global(
+    monkeypatch, app_context, client, english
+):
+    "The pin is for sentence translation only; grammar analysis is unchanged."
+    from lute.ai import service
+    from lute.models.language import AI_DICT_TYPE
+
+    _configure(client, "openai")
+    service.save_grammar_config("anthropic", token="sk-ant-test")
+    ai = next(d for d in english.dictionaries if d.dicttype == AI_DICT_TYPE)
+    ai.ai_provider = "anthropic"
+    db.session.commit()
+
+    monkeypatch.setattr(
+        "lute.ai.service.translate_stream",
+        lambda provider, sentence, source, target: iter(["Bonjour."]),
+    )
+    body = client.post(
+        "/ai/translate", json={"q": "A pinned-provider sentence.", "lang": english.id}
+    ).get_data(as_text=True)
+    assert '"provider": "anthropic"' in body
+    assert "Bonjour." in body
+    assert TOKEN not in body
+
+    monkeypatch.setattr(
+        "lute.ai.service.grammar_stream",
+        lambda provider, sentence, source, target: iter(["{}"]),
+    )
+    body = client.post(
+        "/ai/grammar/analyze", json={"q": "A pinned-provider sentence.", "lang": english.id}
+    ).get_data(as_text=True)
+    assert '"provider": "openai"' in body
+    assert '"provider": "anthropic"' not in body
+
+
+def test_sentence_page_shows_the_pinned_provider(
+    app_context, client, english
+):
+    "The tab's setup label reflects the language's pinned provider."
+    from lute.ai import service
+    from lute.models.language import AI_DICT_TYPE
+
+    _configure(client, "openai")
+    service.save_grammar_config("anthropic", token="sk-ant-test")
+    ai = next(d for d in english.dictionaries if d.dicttype == AI_DICT_TYPE)
+    ai.ai_provider = "anthropic"
+    db.session.commit()
+
+    body = client.get(f"/ai/sentence?q=Bonjour&lang={english.id}").get_data(
+        as_text=True
+    )
+    assert "Anthropic (API key)" in body
+    assert "OpenAI (API key)" not in body
+
+
 def test_language_form_offers_japanese_and_other_ai_languages(app_context):
     "The shared AI language select is a fixed list, so prompts stay well-formed."
     from lute.language.forms import LanguageForm

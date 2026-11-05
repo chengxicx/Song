@@ -173,6 +173,41 @@ def all_status():
     }
 
 
+def ai_provider_choices():
+    """
+    The per-language sentence provider menu.
+
+    "" is Default -- follow the provider enabled in Settings, exactly
+    the behaviour every existing language keeps -- and each provider
+    with a key configured follows, labelled with its model.  A provider
+    without a key is not offered, since it could not be used anyway.
+    """
+    choices = [("", "Default (use the enabled provider in Settings)")]
+    for provider, p in _API_PROVIDERS.items():
+        state = grammar_provider_status(provider)
+        if state and state["configured"]:
+            label = p["label"].replace(" (API key)", "")
+            choices.append((provider, f"{label} · {state['model']}"))
+    return choices
+
+
+def sentence_provider(language):
+    """
+    The provider a language's sentence translation should use.
+
+    A language may pin one on its AI dictionary row.  The pin is only
+    honoured while that provider still has a key configured: clearing
+    a key in Settings must never break the reader, so the shared choice
+    takes over again.
+    """
+    pinned = (getattr(language, "ai_sentence_provider", "") or "").strip()
+    if pinned in _API_PROVIDERS:
+        state = grammar_provider_status(pinned)
+        if state and state["configured"]:
+            return pinned
+    return selected_provider()
+
+
 # ---------------------------------------------------------------------
 # Sentence text and prompt
 # ---------------------------------------------------------------------

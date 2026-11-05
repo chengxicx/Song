@@ -83,6 +83,25 @@ def _lock_dictionary_types(form):
             entry.dicttype.choices = ordinary
 
 
+def _set_ai_provider_choices(form):
+    """
+    Offer the configured providers on every row's provider select.
+
+    Only the AI row renders the control (it stands in for that row's
+    URL cell), but the choices live on the field so the AI row can show
+    them and the posted value round-trips; the other rows post nothing
+    and stay at Default.  Must run before validation, like the type
+    lock -- a provider with no key is not a valid pin.
+    """
+    from lute.ai.service import (  # pylint: disable=import-outside-toplevel
+        ai_provider_choices,
+    )
+
+    choices = ai_provider_choices()
+    for entry in form.dictionaries:
+        entry.ai_provider.choices = choices
+
+
 def _handle_form(language, form) -> bool:
     """
     Handle the language form processing.
@@ -259,6 +278,7 @@ def edit(langid):
     _ensure_tag_choices_include_current(form, language)
     _set_hidden_grammar_choices(form, language)
     _lock_dictionary_types(form)
+    _set_ai_provider_choices(form)
 
     if _handle_form(language, form):
         return redirect("/")
@@ -310,6 +330,7 @@ def new(langname):
     _ensure_tag_choices_include_current(form, language)
     _set_hidden_grammar_choices(form, language)
     _lock_dictionary_types(form)
+    _set_ai_provider_choices(form)
 
     if _handle_form(language, form):
         # New language, so show everything b/c user should re-choose

@@ -194,6 +194,26 @@ def _ai_block(html):
     return next(b for b in blocks if 'value="AI"' in b)
 
 
+def _dictionary_block(html, uri):
+    "The rendered row that carries one URL."
+    blocks = html.split('<div class="dict_entry')
+    return next(b for b in blocks if f'value="{uri}"' in b)
+
+
+def _uri_control(block):
+    "The tag rendered in a row's URL (second) column."
+    match = re.search(r"<(?:input|select)[^>]*class=\"dict-uri[^\"]*\"[^>]*>", block)
+    assert match is not None, f"no URL control in block: {block[:200]}"
+    return match.group(0)
+
+
+def _configure_provider(provider, token, model=None):
+    "Give one provider a key (and model) in Settings, as the settings page does."
+    from lute.ai.service import save_grammar_config
+
+    save_grammar_config(provider, token=token, model=model)
+
+
 def test_the_edit_form_shows_the_ai_row_with_a_drag_handle(
     client, app_context, empty_db
 ):
@@ -212,6 +232,110 @@ def test_the_edit_form_shows_the_ai_row_with_a_drag_handle(
     assert "remove-dict-entity" not in block, "the AI row cannot be removed"
     assert "test-dict-entity" not in block
     assert 'type="text"' not in block, "no editable URL for the AI row"
+
+
+def test_the_ai_rows_provider_select_uses_the_url_column(
+    client, app_context, empty_db
+):
+    """
+    The AI row has no URL input, so its provider select stands in that
+    cell with the same classes: the two left dropdowns then line up
+    with every ordinary row instead of shifting left.
+    """
+    _configure_provider("openai", "sk-openai-test")
+    _configure_provider("anthropic", "sk-ant-test")
+
+    lang = _language("AI provider layout", [])
+    sentence = _sentence_row("https://s.example.com/[LUTE]", 1)
+    _append(lang, sentence)
+    _append(lang, _ai_row(lang, 2))
+
+    html = client.get(f"/language/edit/{lang.id}").get_data(as_text=True)
+    ai_block = _ai_block(html)
+    plain_block = _dictionary_block(html, "https://s.example.com/[LUTE]")
+
+    ai_control = _uri_control(ai_block)
+    plain_control = _uri_control(plain_block)
+    assert ai_control.startswith("<select"), ai_control
+    assert "dictionaries-" in ai_control and "-ai_provider" in ai_control
+    assert 'class="dict-uri form-control-narrower"' in ai_control
+    assert 'class="dict-uri form-control-narrower"' in plain_control
+
+    # The row keeps the same operations slot as ordinary rows, but with
+    # no test/remove buttons in it, so every flex child adds up to the
+    # same width and the columns line up.
+    assert ai_block.count('class="dict-ops-slot"') == 2
+    assert "test-dict-entity" not in ai_block
+    assert "remove-dict-entity" not in ai_block
+
+    # Both provider choices are offered, labelled with their model, and
+    # Default keeps the old behaviour for every existing language.
+    assert "Default (use the enabled provider in Settings)" in ai_block
+    assert "OpenAI · gpt-4o-mini" in ai_block
+    assert "Anthropic · claude-sonnet-4-5" in ai_block
+
+
+def test_saving_the_ai_rows_provider_choice_is_read_back(
+    client, app_context, empty_db
+):
+    _configure_provider("anthropic", "sk-ant-test")
+    lang = _language("AI provider save", [])
+    _append(lang, _terms_row(1))
+    _append(lang, _sentence_row("https://s.example.com/[LUTE]", 2))
+    _append(lang, _ai_row(lang, 3))
+
+    rows = [
+        ("terms", "embeddedhtml", "https://term.example.com/[LUTE]", 1, True),
+        ("sentences", "embeddedhtml", "https://s.example.com/[LUTE]", 2, True),
+        ("sentences", "AI", _ai_url(lang), 3, True),
+    ]
+    data = _form_data(lang, rows, **{"dictionaries-2-ai_provider": "anthropic"})
+    response = client.post(f"/language/edit/{lang.id}", data=data)
+    assert response.status_code == 302
+
+    reloaded = _reload(lang)
+    ai = next(d for d in reloaded.dictionaries if d.dicttype == AI_DICT_TYPE)
+    assert ai.ai_provider == "anthropic"
+    assert reloaded.ai_sentence_provider == "anthropic"
+    assert _ai_url(reloaded) in _sentence_urls(reloaded)
+
+
+def test_a_provider_without_a_key_or_on_another_row_is_a_form_error(
+    client, app_context, empty_db
+):
+    "Only a configured provider, pinned on the AI row, is accepted."
+    _configure_provider("openai", "sk-openai-test")
+
+    lang = _language("AI provider invalid", [])
+    _append(lang, _terms_row(1))
+    _append(lang, _sentence_row("https://s.example.com/[LUTE]", 2))
+    _append(lang, _ai_row(lang, 3))
+
+    rows = [
+        ("terms", "embeddedhtml", "https://term.example.com/[LUTE]", 1, True),
+        ("sentences", "embeddedhtml", "https://s.example.com/[LUTE]", 2, True),
+        ("sentences", "AI", _ai_url(lang), 3, True),
+    ]
+    # anthropic has no key, gemini is not a provider at all.
+    for value in ("anthropic", "gemini"):
+        data = _form_data(lang, rows, **{"dictionaries-2-ai_provider": value})
+        response = client.post(f"/language/edit/{lang.id}", data=data)
+        assert response.status_code == 200
+        body = response.get_data(as_text=True)
+        assert value in body
+        assert "is not an AI provider configured in Settings." in body
+
+    # A configured provider still cannot be pinned on an ordinary row.
+    data = _form_data(lang, rows, **{"dictionaries-1-ai_provider": "openai"})
+    response = client.post(f"/language/edit/{lang.id}", data=data)
+    assert response.status_code == 200
+    assert "is not an AI provider configured in Settings." in (
+        response.get_data(as_text=True)
+    )
+
+    reloaded = _reload(lang)
+    ai = next(d for d in reloaded.dictionaries if d.dicttype == AI_DICT_TYPE)
+    assert ai.ai_provider == ""
 
 
 def test_the_form_says_so_when_the_switch_is_off(client, app_context, empty_db):

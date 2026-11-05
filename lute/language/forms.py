@@ -70,6 +70,19 @@ class LanguageDictionaryForm(Form):
         "Hide",
         render_kw={"title": "Keep this dictionary but hide its tab"},
     )
+    # The provider the AI sentence tab uses; "" follows the shared
+    # Settings choice.  The template renders this only in the AI row
+    # (in the URL column), so other rows post nothing and stay at "".
+    # Choices are installed per request by the language routes, and
+    # validation checks them against the configured providers rather
+    # than trusting the posted value.
+    ai_provider = SelectField(
+        "AI provider",
+        choices=[("", "Default (use the enabled provider in Settings)")],
+        default="",
+        validate_choice=False,
+        render_kw={"title": "Provider used by AI sentence translation"},
+    )
     sort_order = IntegerField("Sort", render_kw={"style": "display: none"})
 
 
@@ -287,6 +300,24 @@ class LanguageForm(FlaskForm):
             if d.get("usefor", "") != "sentences":
                 raise ValidationError(
                     "The AI dictionary row can only be used for Sentences."
+                )
+
+        # The sentence provider is a per-language pin on the AI row.
+        # Only a provider that currently has a key configured can be
+        # pinned -- a stale or forged value would leave the reader with
+        # an unusable tab, so it is refused here as a form error.
+        from lute.ai.service import (  # pylint: disable=import-outside-toplevel
+            ai_provider_choices,
+        )
+
+        configured = {key for key, _ in ai_provider_choices() if key}
+        for d in self.dictionaries.data:
+            provider = (d.get("ai_provider") or "").strip()
+            if provider and (
+                d.get("dicttype") != AI_DICT_TYPE or provider not in configured
+            ):
+                raise ValidationError(
+                    f'"{provider}" is not an AI provider configured in Settings.'
                 )
 
         term_dicts = _get_actives("terms")
