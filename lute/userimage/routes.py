@@ -6,7 +6,11 @@ import os
 from flask import Blueprint, abort, send_from_directory, current_app
 from lute.db import db
 from lute.models.language import Language
-from lute.userimage.service import ensure_thumbnail, thumbnail_path_for
+from lute.userimage.service import (
+    display_mimetype,
+    ensure_thumbnail,
+    thumbnail_path_for,
+)
 
 bp = Blueprint("userimages", __name__, url_prefix="/userimages")
 
@@ -86,7 +90,9 @@ def get_thumbnail(lgid, f):
 
     if os.path.isfile(thumb_path):
         return _send_cached(
-            directory, os.path.basename(thumb_path), mimetype="image/webp"
+            directory,
+            os.path.basename(thumb_path),
+            mimetype=display_mimetype(thumb_path),
         )
 
     if os.path.isfile(original_path):

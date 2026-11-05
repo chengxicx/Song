@@ -107,6 +107,30 @@
 
     <tr>
       <td>
+        <h2>{{ t('Word card images') }}</h2>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        {{ form.word_image_max_edge.label }}
+        <img
+          id="about_word_image_max_edge" style="margin-right:10px;"
+          src="{{ vstatic('icn/question-balloon.png') }}"
+          title="{{ t('Click for details') }}"
+          onclick="$('#word_image_max_edge_help').toggle();"
+          />
+        <blockquote id="word_image_max_edge_help" style="width:60%; display: none;">
+          <p>{{ t('New word card images are saved as one WebP file whose longest edge is capped at this size.  Smaller images are never enlarged.') }}</p>
+          <p>{{ t('Keep original stores the downloaded file unchanged plus a 400px thumbnail (the old two-file behaviour).  Existing images are not changed.') }}</p>
+        </blockquote>
+      </td>
+      <td>
+        {{ form.word_image_max_edge }}
+      </td>
+    </tr>
+
+    <tr>
+      <td>
         <h2>{{ t('Behaviour') }}</h2>
       </td>
     </tr>

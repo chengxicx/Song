@@ -138,6 +138,9 @@ def add_default_user_settings(session, default_user_backup_path):
         "ui_language": "en",
         "custom_styles": "/* Custom css to modify Lute's appearance. */",
         "show_highlights": True,
+        # Word card images: longest edge cap, or "original" to keep the
+        # downloaded file plus a derived thumbnail (old behaviour).
+        "word_image_max_edge": "400",
         "current_language_id": 0,
         # Home page series aggregation:
         "book_series_tags": "",

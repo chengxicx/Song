@@ -8,7 +8,6 @@ import hashlib
 import ipaddress
 import re
 import socket
-import tempfile
 import urllib.request
 import json
 from urllib.parse import urlsplit
@@ -23,7 +22,12 @@ from flask import (
 )
 from lute.db import db
 from lute.models.language import Language
-from lute.userimage.service import ensure_thumbnail
+from lute.userimage.service import (
+    current_image_max_edge,
+    full_url,
+    save_image,
+    thumbnail_url,
+)
 
 bp = Blueprint("bing", __name__, url_prefix="/bing")
 
@@ -115,18 +119,6 @@ def _fetch_image_bytes(src):
     if len(data) > _MAX_IMAGE_BYTES:
         raise UnsafeImageUrl("Image is too large")
     return data
-
-
-def _write_image(destfile, data):
-    "Write the image through a temp file so a failure leaves no partial file."
-    fd, temp_path = tempfile.mkstemp(dir=os.path.dirname(destfile), suffix=".img.tmp")
-    try:
-        with os.fdopen(fd, "wb") as out_file:
-            out_file.write(data)
-        os.replace(temp_path, destfile)
-    finally:
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
 
 
 def _validated_langid(raw):
@@ -266,8 +258,8 @@ def bing_search(langid, text, searchstring):
     return jsonify(ret)
 
 
-def _get_dir_and_filename(langid, text):
-    "Make a directory if needed, return [dir, filename]"
+def _get_dir_and_stem(langid, text):
+    "Make a directory if needed, return [dir, file name stem]"
     # env_config is the user-scoped proxy (multi-user isolation).
     root = os.path.realpath(current_app.env_config.userimagespath)
     image_dir = os.path.join(root, str(langid))
@@ -281,8 +273,16 @@ def _get_dir_and_filename(langid, text):
     now = datetime.datetime.now()
     timestamp = now.strftime("%Y%m%d_%H%M%S%f")[:-3]
     hash_part = hashlib.md5(text.encode()).hexdigest()[:8]
-    filename = f"{timestamp}_{hash_part}.jpeg"
-    return [image_dir, filename]
+    return [image_dir, f"{timestamp}_{hash_part}"]
+
+
+def _save_response(langid, filename):
+    "The JSON shared by both save routes."
+    return {
+        "url": full_url(langid, filename),
+        "thumb_url": thumbnail_url(langid, filename),
+        "filename": filename,
+    }
 
 
 def _bad_langid_response():
@@ -314,21 +314,16 @@ def bing_save():
         return jsonify({"reason": f"Could not download image: {e}"}), 502
 
     try:
-        imgdir, filename = _get_dir_and_filename(langid, text)
-        destfile = os.path.join(imgdir, filename)
-        _write_image(destfile, content)
+        imgdir, stem = _get_dir_and_stem(langid, text)
+        filename, _path = save_image(
+            imgdir, stem, content, current_image_max_edge()
+        )
     except UnsafeImageUrl as e:
         return jsonify({"reason": str(e)}), 400
     except OSError as e:
         return jsonify({"reason": f"Could not save image: {e}"}), 500
 
-    ensure_thumbnail(destfile)
-    ret = {
-        "url": f"/userimages/{langid}/{filename}",
-        "thumb_url": f"/userimages/{langid}/thumb/{filename}",
-        "filename": filename,
-    }
-    return jsonify(ret)
+    return jsonify(_save_response(langid, filename))
 
 
 @bp.route("/manual_image_post", methods=["POST"])
@@ -351,16 +346,13 @@ def manual_image_post():
         return Response("No selected file", status=400)
 
     try:
-        imgdir, filename = _get_dir_and_filename(langid, text)
+        imgdir, stem = _get_dir_and_stem(langid, text)
+        filename, _path = save_image(
+            imgdir, stem, f.read(), current_image_max_edge()
+        )
     except UnsafeImageUrl as e:
         return jsonify({"reason": str(e)}), 400
-    destfile = os.path.join(imgdir, filename)
-    f.save(destfile)
-    ensure_thumbnail(destfile)
+    except OSError as e:
+        return jsonify({"reason": f"Could not save image: {e}"}), 500
 
-    ret = {
-        "url": f"/userimages/{langid}/{filename}",
-        "thumb_url": f"/userimages/{langid}/thumb/{filename}",
-        "filename": filename,
-    }
-    return jsonify(ret)
+    return jsonify(_save_response(langid, filename))

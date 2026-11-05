@@ -873,5 +873,13 @@
   "Naskh": "나스흐체",
   "System fonts": "시스템 글꼴",
   "Browse system fonts": "시스템 글꼴 불러오기",
-  "Could not read the system fonts": "시스템 글꼴을 읽을 수 없습니다"
+  "Could not read the system fonts": "시스템 글꼴을 읽을 수 없습니다",
+  "Word card images": "단어 카드 이미지",
+  "Word card image size": "단어 카드 이미지 크기",
+  "400px (smallest)": "400px(최소)",
+  "800px": "800px",
+  "1200px": "1200px",
+  "Keep original": "원본 유지",
+  "New word card images are saved as one WebP file whose longest edge is capped at this size.  Smaller images are never enlarged.": "새 단어 카드 이미지는 긴 변이 이 크기로 제한된 WebP 파일 하나로 저장됩니다. 작은 이미지는 확대되지 않습니다.",
+  "Keep original stores the downloaded file unchanged plus a 400px thumbnail (the old two-file behaviour).  Existing images are not changed.": "“원본 유지”는 내려받은 파일을 그대로 저장하고 400px 축소본을 따로 만듭니다(예전의 두 파일 방식). 기존 이미지는 변경되지 않습니다."
 }

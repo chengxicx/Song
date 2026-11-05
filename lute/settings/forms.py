@@ -38,6 +38,18 @@ class UserSettingsForm(FlaskForm):
     custom_styles = TextAreaField(lazy_t("Custom styles"))
     show_highlights = BooleanField(lazy_t("Highlight terms by status"))
 
+    image_size_choices = [
+        ("400", lazy_t("400px (smallest)")),
+        ("800", lazy_t("800px")),
+        ("1200", lazy_t("1200px")),
+        ("original", lazy_t("Keep original")),
+    ]
+    word_image_max_edge = SelectField(
+        lazy_t("Word card image size"),
+        choices=image_size_choices,
+        default="400",
+    )
+
     open_popup_in_new_tab = BooleanField(lazy_t("Open popup in new tab"))
     stop_audio_on_term_form_open = BooleanField(lazy_t("Stop audio on term form open"))
     show_streak_on_home = BooleanField(lazy_t("Show reading streak on home page"))
