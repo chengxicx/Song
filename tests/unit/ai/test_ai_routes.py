@@ -100,6 +100,52 @@ def test_translate_streams_text_events(monkeypatch, app_context, client):
     assert TOKEN not in body
 
 
+def test_translate_unparsable_reply_sends_only_readable_text(
+    monkeypatch, app_context, client
+):
+    "A broken JSON reply never reaches the panel as raw JSON."
+    _configure(client)
+    broken = '{"segments":[{"part": Hello], "translation": "Hello there."'
+    monkeypatch.setattr(
+        "lute.ai.service.requests.post",
+        lambda *a, **k: FakeResponse(
+            lines=_sse({"choices": [{"delta": {"content": broken}}]})
+        ),
+    )
+    body = client.post("/ai/translate", json={"q": "Hello"}).get_data(as_text=True)
+    result_part = body.split("event: result", 1)[1]
+    assert '"fallback": true' in result_part
+    assert '"unparsable": true' in result_part
+    assert "Hello there." in result_part
+    assert '"segments"' not in result_part
+
+
+def test_translate_fallback_is_not_cached(monkeypatch, app_context, client):
+    "The next request after a fallback must hit the provider again."
+    _configure(client)
+    broken = '{"segments":[{"part": Hello], "translation": "Broken."'
+    monkeypatch.setattr(
+        "lute.ai.service.requests.post",
+        lambda *a, **k: FakeResponse(
+            lines=_sse({"choices": [{"delta": {"content": broken}}]})
+        ),
+    )
+    first = client.post("/ai/translate", json={"q": "Hello"}).get_data(as_text=True)
+    assert '"fallback": true' in first
+
+    good = json.dumps({"translation": "Good.", "segments": []})
+    monkeypatch.setattr(
+        "lute.ai.service.requests.post",
+        lambda *a, **k: FakeResponse(
+            lines=_sse({"choices": [{"delta": {"content": good}}]})
+        ),
+    )
+    second = client.post("/ai/translate", json={"q": "Hello"}).get_data(as_text=True)
+    assert '"result"' in second
+    assert "Good." in second
+    assert '"fallback": true' not in second
+
+
 def test_translate_unconfigured_is_an_error_event(app_context, client):
     "No key means readable guidance inside the SSE stream."
     body = client.post("/ai/translate", json={"q": "Hello"}).get_data(as_text=True)

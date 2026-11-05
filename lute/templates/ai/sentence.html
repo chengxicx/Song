@@ -160,6 +160,7 @@
       (function () {
         var TEXT = {{ sentence|tojson }};
         var LANG = {{ lang_id|tojson }};
+        var UNPARSABLE = {{ t('AI returned an unparsable response, please retry.')|tojson }};
         var LABELS = {
           segments: {{ t('Word-by-word')|tojson }},
           part: {{ t('Part')|tojson }},
@@ -220,6 +221,14 @@
             }
           }
           return out;
+        }
+
+        function looksLikeJson(text) {
+          var trimmed = (text || '').replace(/^\s+/, '');
+          if (!trimmed) return false;
+          if (trimmed.charAt(0) === '{' || trimmed.charAt(0) === '[') return true;
+          return trimmed.indexOf('"translation"') >= 0 ||
+            trimmed.indexOf('"segments"') >= 0;
         }
 
         function section(title) {
@@ -384,7 +393,11 @@
               renderResult(data.result);
             } else {
               sectionsEl.textContent = '';
-              resultEl.textContent = data.text || partialTranslation(streamBuffer);
+              var fallback = data.translation || data.text ||
+                partialTranslation(streamBuffer);
+              // A fallback must read like a translation, never a JSON blob.
+              if (looksLikeJson(fallback)) fallback = UNPARSABLE;
+              resultEl.textContent = fallback;
             }
           } else if (eventName === 'error') {
             showError(data.message || '{{ t("Translation failed.") }}');

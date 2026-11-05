@@ -39,6 +39,7 @@
   "<b>SudachiPy</b> is an alternative Japanese morphological analyzer, independent of MeCab.  It offers three dictionary sizes: <b>Small</b> (fastest, basic vocabulary), <b>Core</b> (balanced, recommended), and <b>Full</b> (largest, most coverage).": "<b>SudachiPy</b> は MeCab とは独立した、もう一つの日本語形態素解析器です。辞書サイズは 3 種類：<b>スモール</b>（最速・基本語彙）、<b>コア</b>（バランス型・推奨）、<b>フル</b>（最大・最高カバー率）。",
   "?  The phone app can no longer download it, and any language using it loses its dictionary gloss.": "？スマホアプリはそれをダウンロードできなくなり、それを使う言語は辞書の訳を失います。",
   "A (shortest)": "A（最短）",
+  "AI returned an unparsable response, please retry.": "AIが解析できない応答を返しました。もう一度お試しください。",
   "API key": "APIキー",
   "About": "このアプリについて",
   "About Song": "Song について",
