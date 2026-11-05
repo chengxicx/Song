@@ -1394,8 +1394,19 @@ def epub_render(bookid, pagenum):
 
 @bp.route("/empty", methods=["GET"])
 def empty():
-    "Show an empty/blank page."
-    return ""
+    """
+    Show an empty/blank page.
+
+    This is the word form's and the dictionary frames' "nothing selected"
+    document.  Returning an empty body left the frame's canvas at the
+    browser default, which paints white: in the dark theme the top of the
+    right pane became a plain white block after a second click closed the
+    term form.  The page loads the current theme so the frame paints the
+    themed background (dark or light) and never a white block, while
+    staying empty enough for the form populate to write into it.
+    """
+    return render_template("read/empty.html")
+
 
 
 @bp.route("/grammar_analysis/<int:bookid>/<int:pagenum>", methods=["GET"])
