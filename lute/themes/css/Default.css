@@ -53,6 +53,9 @@ body {
   /* 暗色下 #ddd 会成为整个表单最亮的东西；Dark_slate / Dusk 也是这么做的 */
   --form-border-color: rgba(255, 255, 255, 0.15);
 
+  /* Native widgets (select option popups, scrollbars) follow this. */
+  color-scheme: dark;
+
   /* Links and menu text (consumed by styles.css guard-var rules). */
   --link-color: #0a84ff;
   --menu-link-color: #8e8e93;

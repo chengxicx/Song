@@ -8,6 +8,7 @@ third-party web-chat link.
 """
 
 import json
+import re
 
 import pytest
 
@@ -324,6 +325,22 @@ def test_settings_page_lists_provider_entries(app_context, client):
         assert removed not in body.lower()
     assert TOKEN not in body
     assert "••••••7890" in body
+
+
+def test_provider_row_card_uses_theme_tokens(app_context, client):
+    "The row card must not paint a literal light background on a dark theme."
+    _configure(client)
+    body = client.get("/settings/index").get_data(as_text=True)
+    block = body.split('id="ai_provider_box"', 1)[1].split("</style>", 1)[0]
+    rule = re.search(
+        r"#ai_provider_rows \.ai-provider-row \{(.*?)\}", block, re.DOTALL
+    )
+    assert rule is not None, "the provider card rule is gone"
+    body_of_rule = rule.group(1)
+    assert "var(--panel-bg" in body_of_rule or "color-mix" in body_of_rule
+    assert "var(--form-border-color" in body_of_rule
+    for light in ("#fafafa", "#ffffff", "white"):
+        assert light not in body_of_rule.lower()
 
 
 def test_settings_page_migrates_legacy_dual_cards(app_context, client):
