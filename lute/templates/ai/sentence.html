@@ -17,6 +17,10 @@
         padding: 1.1rem 1.4rem 1.4rem;
       }
       .ai-card { max-width: 46rem; }
+      /* The .btn and .ai-state rules below set their own display, which
+         beats the UA sheet's [hidden] { display: none }; without this the
+         Retry button and the empty state row stay visible. */
+      .ai-card [hidden] { display: none; }
       .ai-eyebrow {
         display: flex;
         align-items: center;
@@ -275,7 +279,7 @@
         }
 
         function formatCount(template, values) {
-          return template.replace(/%(n|s)s/g, function (_, key) {
+          return template.replace(/%\((n|s)\)s/g, function (_, key) {
             return String(values[key] || 0);
           });
         }
