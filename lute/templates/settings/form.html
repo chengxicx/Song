@@ -362,70 +362,80 @@
     </tr>
     <tr>
       <td>
-        {{ t('Add one OpenAI or Anthropic API key here; the same provider serves both sentence translation in the reader Sentence tab and grammar analysis in the Grammar panel, so you only configure it once.  Keys stay on this server, encrypted, and only a mask is shown.') }}
+        {{ t('Add one or more AI providers here.  The default provider is used for grammar analysis and, unless a language pins another one, for sentence translation in the reader.  A language can pick its own provider on its AI dictionary row in Language settings.  Keys stay on this server, encrypted, and only a mask is shown.') }}
         <div style="margin-top: 6px;">
           <a href="/language/index">{{ t('Open Language settings') }}</a>
           {{ t('to choose which AI features each language uses.') }}
         </div>
-        {% if ai_providers.conflict %}
-        <div class="flash-notice-narrow" style="margin-top: 8px;">
-          {{ t('Your old settings chose') }} <b>{{ ai_providers.conflict.sentence_label }}</b>
-          {{ t('for sentence translation and') }} <b>{{ ai_providers.conflict.grammar_label }}</b>
-          {{ t('for grammar analysis.') }} <b>{{ ai_providers.conflict.grammar_label }}</b>
-          {{ t('is now used for both; save a provider below to make this explicit.') }}
-        </div>
-        {% endif %}
       </td>
       <td>
-        <div id="ai_grammar_box">
-          {% for p in ai_providers.providers %}
-          <details class="ai-grammar-provider" data-provider="{{ p.provider }}" style="margin-bottom: 8px;">
-            <summary>
-              <strong>{{ p.label }}</strong>
-              <span data-role="state">
-                {% if p.enabled %}
-                  {% if p.configured %}{{ t('enabled') }} · {{ p.masked }}{% else %}{{ t('enabled') }} · {{ t('no key') }}{% endif %}
-                {% elif p.configured %}
-                  {{ t('key saved') }} {{ p.masked }}
-                {% else %}{{ t('not configured') }}{% endif %}
-              </span>
-            </summary>
-            <div style="margin-top: 8px;">
-              <label style="display: inline-flex; align-items: center; gap: 6px;">
-                <input type="checkbox" id="ai_grammar_enabled_{{ p.provider }}"
-                       {% if p.enabled %}checked{% endif %}
-                       onchange="ai_grammar_save('{{ p.provider }}'); return false;">
-                {{ t('Use this provider for sentence translation and grammar analysis') }}
-              </label>
-              <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px;">
-                <input type="text" id="ai_grammar_base_url_{{ p.provider }}" class="form-control"
-                       autocomplete="off" spellcheck="false" style="max-width: 22rem;"
-                       value="{{ p.base_url }}" placeholder="{{ p.base_url_hint }}">
-                <input type="password" id="ai_grammar_token_{{ p.provider }}" class="form-control"
-                       autocomplete="off" spellcheck="false" style="max-width: 20rem;"
-                       placeholder="{{ p.credential_label }}: {{ p.credential_hint }}">
-                <input type="text" id="ai_grammar_model_{{ p.provider }}" class="form-control"
-                       autocomplete="off" spellcheck="false" style="max-width: 13rem;"
-                       value="{{ p.model }}" placeholder="{{ p.model_hint }}">
+        <div id="ai_provider_box">
+          <style>
+            #ai_provider_rows .ai-provider-row { border: 1px solid #d7d7d7; border-radius: 6px; padding: 10px; margin-bottom: 10px; background: #fafafa; }
+            #ai_provider_rows .ai-provider-grid { display: grid; grid-template-columns: 9rem minmax(16rem, 1.6fr) minmax(11rem, 1fr) 9rem 9rem; gap: 8px; align-items: end; }
+            #ai_provider_rows .ai-provider-field { display: flex; flex-direction: column; min-width: 0; }
+            #ai_provider_rows .ai-provider-field > span { font-size: 0.85em; color: #555; margin-bottom: 2px; }
+            #ai_provider_rows .ai-provider-field .form-control { width: 100%; box-sizing: border-box; }
+            #ai_provider_rows .ai-provider-key-note { font-size: 0.78em; color: #777; margin-top: 2px; }
+            #ai_provider_rows .ai-provider-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 8px; }
+            #ai_provider_rows .ai-provider-default-wrap { display: inline-flex; gap: 5px; align-items: center; margin-right: auto; white-space: nowrap; }
+            #ai_provider_rows .ai-provider-message { font-size: 0.88em; min-width: 10rem; }
+          </style>
+          <div id="ai_provider_rows">
+            {% for e in ai_entries %}
+            <div class="ai-provider-row" data-id="{{ e.id }}"
+                 data-configured="{{ '1' if e.configured else '0' }}"
+                 data-format="{{ e.format }}">
+              <div class="ai-provider-grid">
+                <label class="ai-provider-field">
+                  <span>{{ t('Format') }}</span>
+                  <select class="form-control ai-provider-format">
+                    <option value="openai" {% if e.format == 'openai' %}selected{% endif %}>OpenAI</option>
+                    <option value="anthropic" {% if e.format == 'anthropic' %}selected{% endif %}>Anthropic</option>
+                  </select>
+                </label>
+                <label class="ai-provider-field">
+                  <span>{{ t('Base URL') }}</span>
+                  <input type="text" class="form-control ai-provider-base-url"
+                         autocomplete="off" spellcheck="false" value="{{ e.base_url }}">
+                </label>
+                <label class="ai-provider-field">
+                  <span>{{ t('API key') }}</span>
+                  <input type="password" class="form-control ai-provider-key"
+                         autocomplete="off" spellcheck="false"
+                         placeholder="{{ e.masked if e.configured else '' }}">
+                  {% if e.configured %}
+                  <span class="ai-provider-key-note">{{ t('Leave blank to keep the saved key.') }}</span>
+                  {% endif %}
+                </label>
+                <label class="ai-provider-field">
+                  <span>{{ t('Model') }}</span>
+                  <input type="text" class="form-control ai-provider-model"
+                         autocomplete="off" spellcheck="false" value="{{ e.model }}">
+                </label>
+                <label class="ai-provider-field">
+                  <span>{{ t('Name (optional)') }}</span>
+                  <input type="text" class="form-control ai-provider-name"
+                         autocomplete="off" spellcheck="false" value="{{ e.name }}">
+                </label>
               </div>
-              <div style="margin-top: 8px;">
-                <button type="button" class="btn btn-secondary" onclick="ai_grammar_save('{{ p.provider }}'); return false;">
-                  {{ t('Save') }}
-                </button>
-                <button type="button" class="btn btn-secondary" onclick="ai_grammar_test('{{ p.provider }}'); return false;">
-                  {{ t('Test connection') }}
-                </button>
-                <button type="button" class="btn btn-danger" onclick="ai_grammar_clear('{{ p.provider }}'); return false;">
-                  {{ t('Clear key') }}
-                </button>
-                <a href="{{ p.login_url }}" target="_blank" rel="noopener" style="margin-left: 8px;">
-                  {{ t('Get an API key') }}
-                </a>
+              <div class="ai-provider-actions">
+                <label class="ai-provider-default-wrap">
+                  <input type="radio" name="ai_provider_default" class="ai-provider-default"
+                         {% if e.is_default %}checked{% endif %}>
+                  {{ t('Use as default') }}
+                </label>
+                <button type="button" class="btn btn-secondary ai-provider-test">{{ t('Test connection') }}</button>
+                <button type="button" class="btn btn-danger ai-provider-delete">{{ t('Delete') }}</button>
+                <span class="ai-provider-message" data-role="message"></span>
               </div>
-              <div data-role="message" style="margin-top: 6px;"></div>
             </div>
-          </details>
-          {% endfor %}
+            {% endfor %}
+          </div>
+          <div id="ai_provider_empty" class="muted" style="margin-bottom: 8px;{% if ai_entries %} display: none;{% endif %}">
+            {{ t('No AI provider yet. Add one to use sentence translation and grammar analysis.') }}
+          </div>
+          <button type="button" id="ai_provider_add" class="btn btn-secondary">+ {{ t('Add provider') }}</button>
         </div>
       </td>
     </tr>
@@ -934,110 +944,173 @@
   document.addEventListener('DOMContentLoaded', whisperRefresh);
   {% endif %}
 
-  function ai_grammar_card(provider) {
-    return document.querySelector('.ai-grammar-provider[data-provider="' + provider + '"]');
-  }
+  (function () {
+    const rowsEl = document.getElementById('ai_provider_rows');
+    if (!rowsEl) return;
+    const emptyEl = document.getElementById('ai_provider_empty');
+    const addBtn = document.getElementById('ai_provider_add');
+    const formEl = rowsEl.closest('form');
+    const hiddenEl = document.querySelector('input[name="ai_providers_json"]');
+    const DEFAULTS = {
+      openai: 'https://api.openai.com/v1',
+      anthropic: 'https://api.anthropic.com',
+    };
 
-  function ai_grammar_msg(provider, text, ok) {
-    const card = ai_grammar_card(provider);
-    if (!card) return;
-    const box = card.querySelector('[data-role="message"]');
-    if (!box) return;
-    box.textContent = text;
-    box.style.color = ok ? 'green' : '#b3261e';
-  }
-
-  function ai_grammar_state_text(p) {
-    if (p.enabled) {
-      return p.configured
-        ? I18N.t('enabled') + ' · ' + p.masked
-        : I18N.t('enabled') + ' · ' + I18N.t('no key');
+    function rows() {
+      return Array.from(rowsEl.querySelectorAll('.ai-provider-row'));
     }
-    return p.configured
-      ? I18N.t('key saved') + ' ' + p.masked
-      : I18N.t('not configured');
-  }
 
-  function ai_grammar_apply_status(data) {
-    (data.providers || []).forEach(function (p) {
-      const card = ai_grammar_card(p.provider);
-      if (!card) return;
-      const state = card.querySelector('[data-role="state"]');
-      if (state) state.textContent = ai_grammar_state_text(p);
-      const enabledEl = document.getElementById('ai_grammar_enabled_' + p.provider);
-      if (enabledEl) enabledEl.checked = !!p.enabled;
-      const baseEl = document.getElementById('ai_grammar_base_url_' + p.provider);
-      if (baseEl) baseEl.value = p.base_url || p.default_base_url || '';
-      const modelEl = document.getElementById('ai_grammar_model_' + p.provider);
-      if (modelEl) modelEl.value = p.model || p.default_model || '';
-    });
-  }
+    function part(row, cls) {
+      return row.querySelector('.' + cls);
+    }
 
-  function ai_grammar_refresh_status() {
-    fetch('/ai/grammar/status')
-      .then(r => r.json())
-      .then(ai_grammar_apply_status)
-      .catch(() => {
-        const box = document.getElementById('ai_grammar_box');
-        if (box) box.textContent = I18N.t('Could not load AI provider status.');
+    function rowData(row) {
+      return {
+        id: row.dataset.id || '',
+        format: part(row, 'ai-provider-format').value,
+        base_url: part(row, 'ai-provider-base-url').value.trim(),
+        api_key: part(row, 'ai-provider-key').value.trim(),
+        model: part(row, 'ai-provider-model').value.trim(),
+        name: part(row, 'ai-provider-name').value.trim(),
+        is_default: part(row, 'ai-provider-default').checked,
+      };
+    }
+
+    function allData() {
+      return rows().map(rowData);
+    }
+
+    function syncHidden() {
+      if (hiddenEl) hiddenEl.value = JSON.stringify(allData());
+    }
+
+    function showMessage(row, text, ok) {
+      const box = row.querySelector('[data-role="message"]');
+      if (!box) return;
+      box.textContent = text;
+      box.style.color = ok ? 'green' : '#b3261e';
+    }
+
+    function updateEmpty() {
+      if (emptyEl) emptyEl.style.display = rows().length ? 'none' : 'block';
+    }
+
+    function ensureOneDefault() {
+      const rs = rows();
+      const checked = rs.filter(r => part(r, 'ai-provider-default').checked);
+      if (checked.length > 1) {
+        checked.slice(1).forEach(r => { part(r, 'ai-provider-default').checked = false; });
+      }
+    }
+
+    function afterDefaultChange(row) {
+      if (!part(row, 'ai-provider-default').checked) return;
+      rows().forEach(function (r) {
+        if (r !== row) part(r, 'ai-provider-default').checked = false;
       });
-  }
+    }
 
-  function ai_grammar_save(provider) {
-    const tokenEl = document.getElementById('ai_grammar_token_' + provider);
-    const baseEl = document.getElementById('ai_grammar_base_url_' + provider);
-    const modelEl = document.getElementById('ai_grammar_model_' + provider);
-    const enabledEl = document.getElementById('ai_grammar_enabled_' + provider);
-    const body = 'token=' + encodeURIComponent(tokenEl ? tokenEl.value : '') +
-                 '&base_url=' + encodeURIComponent(baseEl ? baseEl.value : '') +
-                 '&model=' + encodeURIComponent(modelEl ? modelEl.value : '') +
-                 '&enabled=' + (enabledEl && enabledEl.checked ? '1' : '0');
-    ai_grammar_msg(provider, I18N.t('Saving…'), true);
-    fetch('/ai/grammar/config/' + provider, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: body,
-    })
-      .then(r => r.json().then(d => ({ ok: r.ok, data: d })))
-      .then(({ ok, data }) => {
-        if (!ok) {
-          ai_grammar_msg(provider, data.message || I18N.t('Could not save.'), false);
-          ai_grammar_refresh_status();
-          return;
+    function makeRow(entry) {
+      const row = document.createElement('div');
+      row.className = 'ai-provider-row';
+      row.dataset.id = entry.id || '';
+      row.dataset.configured = entry.configured ? '1' : '0';
+      row.dataset.format = entry.format || 'openai';
+      row.innerHTML =
+        '<div class="ai-provider-grid">' +
+        '  <label class="ai-provider-field"><span>' + I18N.t('Format') + '</span>' +
+        '    <select class="form-control ai-provider-format">' +
+        '      <option value="openai">OpenAI</option>' +
+        '      <option value="anthropic">Anthropic</option>' +
+        '    </select></label>' +
+        '  <label class="ai-provider-field"><span>' + I18N.t('Base URL') + '</span>' +
+        '    <input type="text" class="form-control ai-provider-base-url" autocomplete="off" spellcheck="false"></label>' +
+        '  <label class="ai-provider-field"><span>' + I18N.t('API key') + '</span>' +
+        '    <input type="password" class="form-control ai-provider-key" autocomplete="off" spellcheck="false"></label>' +
+        '  <label class="ai-provider-field"><span>' + I18N.t('Model') + '</span>' +
+        '    <input type="text" class="form-control ai-provider-model" autocomplete="off" spellcheck="false"></label>' +
+        '  <label class="ai-provider-field"><span>' + I18N.t('Name (optional)') + '</span>' +
+        '    <input type="text" class="form-control ai-provider-name" autocomplete="off" spellcheck="false"></label>' +
+        '</div>' +
+        '<div class="ai-provider-actions">' +
+        '  <label class="ai-provider-default-wrap">' +
+        '    <input type="radio" name="ai_provider_default" class="ai-provider-default"> ' +
+        I18N.t('Use as default') + '</label>' +
+        '  <button type="button" class="btn btn-secondary ai-provider-test">' + I18N.t('Test connection') + '</button>' +
+        '  <button type="button" class="btn btn-danger ai-provider-delete">' + I18N.t('Delete') + '</button>' +
+        '  <span class="ai-provider-message" data-role="message"></span>' +
+        '</div>';
+      part(row, 'ai-provider-format').value = entry.format || 'openai';
+      part(row, 'ai-provider-base-url').value = entry.base_url || DEFAULTS[entry.format || 'openai'];
+      part(row, 'ai-provider-model').value = entry.model || '';
+      part(row, 'ai-provider-name').value = entry.name || '';
+      part(row, 'ai-provider-default').checked = !!entry.is_default;
+      return row;
+    }
+
+    function addRow(entry) {
+      const row = makeRow(entry || {});
+      rowsEl.appendChild(row);
+      updateEmpty();
+      ensureOneDefault();
+      return row;
+    }
+
+    addBtn.addEventListener('click', function () {
+      const row = addRow({ format: 'openai', base_url: DEFAULTS.openai });
+      part(row, 'ai-provider-model').focus();
+    });
+
+    rowsEl.addEventListener('change', function (event) {
+      const target = event.target;
+      if (target.classList.contains('ai-provider-default')) {
+        afterDefaultChange(target.closest('.ai-provider-row'));
+        return;
+      }
+      if (target.classList.contains('ai-provider-format')) {
+        const row = target.closest('.ai-provider-row');
+        const base = part(row, 'ai-provider-base-url');
+        if (!base.value.trim() || base.value === DEFAULTS.openai ||
+            base.value === DEFAULTS.anthropic) {
+          base.value = DEFAULTS[target.value] || '';
         }
-        if (tokenEl) tokenEl.value = '';
-        ai_grammar_msg(provider, I18N.t('Saved.'), true);
-        ai_grammar_apply_status(data);
-      })
-      .catch(() => ai_grammar_msg(provider, I18N.t('Could not save.'), false));
-  }
+      }
+    });
 
-  function ai_grammar_clear(provider) {
-    if (!confirm(I18N.t('Forget the stored API key for this provider?'))) return;
-    fetch('/ai/grammar/clear/' + provider, { method: 'POST' })
-      .then(r => r.json().then(d => ({ ok: r.ok, data: d })))
-      .then(({ ok, data }) => {
-        if (!ok) {
-          ai_grammar_msg(provider, data.message || I18N.t('Could not clear.'), false);
-          return;
+    rowsEl.addEventListener('click', function (event) {
+      const target = event.target;
+      const row = target.closest('.ai-provider-row');
+      if (!row) return;
+      if (target.classList.contains('ai-provider-delete')) {
+        if (!confirm(I18N.t('Delete this provider?'))) return;
+        const wasDefault = part(row, 'ai-provider-default').checked;
+        row.remove();
+        updateEmpty();
+        if (wasDefault) {
+          const next = rows().find(function (r) {
+            return part(r, 'ai-provider-base-url').value.trim();
+          }) || rows()[0];
+          if (next) part(next, 'ai-provider-default').checked = true;
         }
-        const tokenEl = document.getElementById('ai_grammar_token_' + provider);
-        if (tokenEl) tokenEl.value = '';
-        ai_grammar_msg(provider, I18N.t('Key cleared.'), true);
-        ai_grammar_apply_status(data);
-      })
-      .catch(() => ai_grammar_msg(provider, I18N.t('Could not clear.'), false));
-  }
+        syncHidden();
+        return;
+      }
+      if (target.classList.contains('ai-provider-test')) {
+        showMessage(row, I18N.t('Testing the connection…'), true);
+        fetch('/ai/providers/test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(rowData(row)),
+        })
+          .then(r => r.json())
+          .then(d => showMessage(row, d.message || I18N.t('No result.'), !!d.ok))
+          .catch(() => showMessage(row, I18N.t('Could not reach the server.'), false));
+      }
+    });
 
-  function ai_grammar_test(provider) {
-    ai_grammar_msg(provider, I18N.t('Testing the connection…'), true);
-    fetch('/ai/grammar/test/' + provider, { method: 'POST' })
-      .then(r => r.json())
-      .then(d => ai_grammar_msg(provider, d.message || I18N.t('No result.'), !!d.ok))
-      .catch(() => ai_grammar_msg(provider, I18N.t('Could not reach the server.'), false));
-  }
-
-  document.addEventListener('DOMContentLoaded', ai_grammar_refresh_status);
+    if (formEl) formEl.addEventListener('submit', syncHidden);
+    updateEmpty();
+  })();
 
 </script>
 

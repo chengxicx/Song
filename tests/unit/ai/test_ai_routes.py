@@ -11,6 +11,7 @@ import json
 
 import pytest
 
+from lute.ai import service
 from lute.db import db
 from tests.utils import make_book
 
@@ -259,37 +260,150 @@ def test_grammar_analyze_unconfigured_and_auth_errors(monkeypatch, app_context, 
     assert TOKEN not in body
 
 
-def test_settings_page_has_one_section_and_two_api_cards(app_context, client):
-    "The old Sentence-provider selector is gone; only the two cards remain."
+def test_settings_page_lists_provider_entries(app_context, client):
+    "The section shows the saved entries, their masks and the add button."
     _configure(client)
     resp = client.get("/settings/index")
     assert resp.status_code == 200
     body = resp.get_data(as_text=True)
     assert "AI provider (API key)" in body
-    assert "Use this provider for sentence translation and grammar analysis" in body
-    assert "id=\"ai_provider_select\"" not in body
-    assert "Provider used by the reader Sentence tab" not in body
-    assert 'data-provider="openai"' in body
-    assert 'data-provider="anthropic"' in body
-    assert body.count('class="ai-grammar-provider"') == 2
+    assert 'id="ai_provider_rows"' in body
+    assert "Use as default" in body
+    assert "Add provider" in body
+    assert 'data-id="openai"' in body
+    assert body.count('class="ai-provider-row"') == 1
+    assert "ai-provider-test" in body
+    assert "ai-provider-delete" in body
     for removed in ("qwen", "deepseek", "chatgpt", "chat.qwen.ai"):
         assert removed not in body.lower()
     assert TOKEN not in body
     assert "••••••7890" in body
 
 
-def test_settings_page_explains_legacy_provider_conflict(app_context, client):
-    "Old sentence/grammar choices that disagree are explained, not hidden."
+def test_settings_page_migrates_legacy_dual_cards(app_context, client):
+    "Two old enabled cards become two rows; grammar's choice is the default."
     from lute.models.repositories import UserSettingRepository
 
     repository = UserSettingRepository(db.session)
     repository.set_dynamic_value("ai_sentence_provider", "openai")
     repository.set_dynamic_value("ai_grammar_provider", "anthropic")
+    repository.set_dynamic_value("ai_api_openai_token", service.encrypt(TOKEN))
+    repository.set_dynamic_value(
+        "ai_api_anthropic_token", service.encrypt("sk-ant-legacy")
+    )
     db.session.commit()
-
     body = client.get("/settings/index").get_data(as_text=True)
-    assert "Your old settings chose" in body
-    assert "is now used for both" in body
+    assert body.count('class="ai-provider-row"') == 2
+    assert "••••••7890" in body
+    # The legacy keys survive for older code to read.
+    assert repository.get_dynamic_value("ai_api_openai_token") is not None
+    assert repository.get_dynamic_value("ai_sentence_provider") == "openai"
+
+
+def _settings_post(ai_entries):
+    "A complete settings POST, using the stored values for the selects."
+    from lute.models.repositories import UserSettingRepository  # pylint: disable=import-outside-toplevel
+
+    repo = UserSettingRepository(db.session)
+    data = {
+        key: repo.get_value(key)
+        for key in (
+            "current_theme",
+            "ui_language",
+            "word_image_max_edge",
+            "japanese_dict",
+            "japanese_reading",
+            "japanese_sudachi_dict",
+            "japanese_sudachi_mode",
+        )
+    }
+    data.update(
+        {
+            "backup_count": "5",
+            "stats_calc_sample_size": "10",
+            "ankiconnect_url": "http://127.0.0.1:8765",
+            "ai_providers_json": json.dumps(ai_entries),
+        }
+    )
+    return data
+
+
+def test_settings_save_replaces_the_whole_provider_list(app_context, client):
+    "The hidden JSON field is the list; invalid rows abort the save."
+    entries = [
+        {
+            "format": "openai",
+            "name": "Main",
+            "base_url": "https://api.openai.com/v1",
+            "model": "gpt-4o-mini",
+            "api_key": TOKEN,
+            "is_default": True,
+        },
+        {
+            "format": "anthropic",
+            "base_url": "https://api.anthropic.com",
+            "model": "claude-sonnet-4-5",
+            "api_key": "",
+        },
+    ]
+    resp = client.post("/settings/index", data=_settings_post(entries))
+    assert resp.status_code == 302
+    saved = service.provider_entries()
+    assert len(saved) == 2
+    assert saved[0]["name"] == "Main"
+    assert saved[1]["configured"] is False
+
+    # A keyless row cannot be the default; nothing is written.
+    bad = [
+        {
+            "format": "anthropic",
+            "base_url": "https://api.anthropic.com",
+            "model": "claude-sonnet-4-5",
+            "api_key": "",
+            "is_default": True,
+        }
+    ]
+    resp = client.post("/settings/index", data=_settings_post(bad))
+    assert resp.status_code == 200
+    assert "cannot be the default provider" in resp.get_data(as_text=True)
+    assert len(service.provider_entries()) == 2
+
+
+def test_provider_test_endpoint_uses_unsaved_row(monkeypatch, app_context, client):
+    "Test connection works before saving and never echoes the key."
+    calls = []
+
+    def fake_post(url, headers=None, **kwargs):  # pylint: disable=unused-argument
+        calls.append(headers)
+        return FakeResponse(lines=_sse({"choices": [{"delta": {"content": "OK"}}]}))
+
+    monkeypatch.setattr("lute.ai.service.requests.post", fake_post)
+    resp = client.post(
+        "/ai/providers/test",
+        json={
+            "id": "",
+            "format": "openai",
+            "base_url": "https://api.openai.com/v1",
+            "model": "gpt-4o-mini",
+            "api_key": TOKEN,
+        },
+    )
+    data = resp.get_json()
+    assert data["ok"] is True
+    assert TOKEN not in resp.get_data(as_text=True)
+    assert calls
+
+    resp = client.post(
+        "/ai/providers/test",
+        json={
+            "format": "openai",
+            "base_url": "https://api.openai.com/v1",
+            "model": "gpt-4o-mini",
+            "api_key": "",
+        },
+    )
+    assert resp.get_json()["ok"] is False
+    assert "Add an API key" in resp.get_json()["message"]
 
 
 def test_read_page_uses_the_ai_tab(app_context, client, english):

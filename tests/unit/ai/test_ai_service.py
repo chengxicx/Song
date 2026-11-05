@@ -89,8 +89,9 @@ def test_crypto_roundtrip_and_tamper(app_context):
 def test_api_key_is_encrypted_at_rest_and_masked(app_context, openai_configured):
     "The raw key is not in the settings row and only a mask is exposed."
     repository = UserSettingRepository(db.session)
-    stored = repository.get_dynamic_value("ai_api_openai_token")
-    assert stored.startswith("v1:")
+    stored = repository.get_dynamic_value("ai_providers")
+    entry = json.loads(stored)[0]
+    assert entry["api_key"].startswith("v1:")
     assert TOKEN not in stored
 
     state = service.provider_status("openai")
@@ -624,43 +625,339 @@ def test_one_provider_serves_sentence_translation_and_grammar(app_context):
 
 
 def test_legacy_single_key_is_still_read(app_context):
-    "An account that never saved ai_provider keeps its old choice."
+    "An account with an old enabled card migrates into one entry."
     repository = UserSettingRepository(db.session)
     repository.set_dynamic_value("ai_sentence_provider", "openai")
+    repository.set_dynamic_value("ai_api_openai_token", service.encrypt(TOKEN))
     db.session.commit()
     assert service.selected_provider() == "openai"
     assert service.selected_grammar_provider() == "openai"
+    entries = service.provider_entries()
+    assert len(entries) == 1
+    assert entries[0]["format"] == "openai"
+    assert entries[0]["is_default"] is True
 
 
 def test_conflicting_legacy_keys_prefer_the_enabled_grammar_card(app_context):
-    "The two old choices disagree: grammar wins and the clash is reported."
+    "Both old cards were on: both become entries, grammar is the default."
     repository = UserSettingRepository(db.session)
     repository.set_dynamic_value("ai_sentence_provider", "openai")
     repository.set_dynamic_value("ai_grammar_provider", "anthropic")
+    repository.set_dynamic_value("ai_api_openai_token", service.encrypt(TOKEN))
+    repository.set_dynamic_value(
+        "ai_api_anthropic_token", service.encrypt("sk-ant-legacy")
+    )
     db.session.commit()
 
     assert service.selected_provider() == "anthropic"
-    conflict = service.provider_conflict()
-    assert conflict["sentence"] == "openai"
-    assert conflict["grammar"] == "anthropic"
-    assert conflict["selected"] == "anthropic"
-    assert "OpenAI" in conflict["sentence_label"]
+    entries = {e["format"]: e for e in service.provider_entries()}
+    assert set(entries) == {"openai", "anthropic"}
+    assert entries["anthropic"]["is_default"] is True
+    assert entries["openai"]["is_default"] is False
+    assert service.provider_conflict() is None
 
 
 def test_saved_canonical_choice_beats_the_legacy_keys(app_context):
-    "Once ai_provider exists it is authoritative, including an empty value."
+    "Once ai_provider is saved, the old per-feature keys are ignored."
     repository = UserSettingRepository(db.session)
     repository.set_dynamic_value("ai_sentence_provider", "openai")
     repository.set_dynamic_value("ai_grammar_provider", "anthropic")
     repository.set_dynamic_value("ai_provider", "")
+    repository.set_dynamic_value("ai_api_openai_token", service.encrypt(TOKEN))
     db.session.commit()
 
+    # Nothing was enabled in the old cards, so nothing migrates.
+    assert service.provider_entries() == []
     assert service.selected_provider() == ""
-    assert service.provider_conflict() is None
 
-    service.set_selected_provider("openai")
-    db.session.commit()
+    service.save_grammar_config("openai", token=TOKEN, enabled=True)
     assert service.selected_provider() == "openai"
+
+
+def test_multiple_entries_roundtrip_and_crud(app_context):
+    "The list stores several providers and can be edited as a whole."
+    saved = service.save_provider_entries(
+        [
+            {
+                "format": "openai",
+                "name": "Main",
+                "base_url": "https://api.openai.com/v1",
+                "model": "gpt-4o-mini",
+                "api_key": TOKEN,
+                "is_default": True,
+            },
+            {
+                "format": "anthropic",
+                "base_url": "https://api.anthropic.com",
+                "model": "claude-sonnet-4-5",
+                "api_key": "sk-ant-test",
+            },
+        ]
+    )
+    assert len(saved) == 2
+    assert saved[0]["name"] == "Main"
+    assert saved[1]["name"] == "claude-sonnet-4-5"
+    assert {e["format"] for e in saved} == {"openai", "anthropic"}
+    assert saved[0]["is_default"] is True
+    assert saved[1]["is_default"] is False
+    assert all(e["configured"] for e in saved)
+    assert saved[0]["masked"].endswith("7890")
+
+    raw = UserSettingRepository(db.session).get_dynamic_value("ai_providers")
+    assert TOKEN not in raw
+    assert "sk-ant-test" not in raw
+
+    second = saved[1]
+    updated = service.save_provider_entries(
+        [
+            {
+                "id": second["id"],
+                "format": "anthropic",
+                "name": "Claude",
+                "base_url": "https://api.anthropic.com",
+                "model": "claude-sonnet-4-5",
+                "api_key": "",
+            }
+        ]
+    )
+    assert len(updated) == 1
+    assert updated[0]["name"] == "Claude"
+    assert updated[0]["configured"] is True, "blank key keeps the stored one"
+    assert updated[0]["is_default"] is True, "the saved key is preselected"
+    ready = service.grammar_ready(updated[0]["id"])
+    assert ready["token"] == "sk-ant-test"
+
+
+def test_only_one_entry_can_be_the_default(app_context):
+    "Two default flags are refused, not silently resolved."
+    with pytest.raises(AiError) as exc:
+        service.save_provider_entries(
+            [
+                {
+                    "format": "openai",
+                    "base_url": "https://api.openai.com/v1",
+                    "model": "gpt-4o-mini",
+                    "api_key": TOKEN,
+                    "is_default": True,
+                },
+                {
+                    "format": "anthropic",
+                    "base_url": "https://api.anthropic.com",
+                    "model": "claude-sonnet-4-5",
+                    "api_key": "sk-ant-test",
+                    "is_default": True,
+                },
+            ]
+        )
+    assert exc.value.kind == "config"
+
+
+def test_deleting_the_default_reselects_the_first_configured(app_context):
+    "Removing the default row promotes the first remaining usable entry."
+    saved = service.save_provider_entries(
+        [
+            {
+                "format": "openai",
+                "base_url": "https://api.openai.com/v1",
+                "model": "gpt-4o-mini",
+                "api_key": TOKEN,
+                "is_default": True,
+            },
+            {
+                "format": "anthropic",
+                "base_url": "https://api.anthropic.com",
+                "model": "claude-sonnet-4-5",
+                "api_key": "sk-ant-test",
+            },
+        ]
+    )
+    remaining = service.save_provider_entries(
+        [{"id": saved[1]["id"], "format": "anthropic", "base_url": saved[1]["base_url"], "model": saved[1]["model"], "api_key": ""}]
+    )
+    assert len(remaining) == 1
+    assert remaining[0]["is_default"] is True
+    assert service.selected_provider() == remaining[0]["id"]
+    assert service.provider_entries()[0]["id"] == remaining[0]["id"]
+
+
+def test_a_keyless_entry_cannot_be_default_and_falls_back(app_context):
+    "Keyless rows are kept, but never selected for calls."
+    with pytest.raises(AiError) as exc:
+        service.save_provider_entries(
+            [
+                {
+                    "format": "anthropic",
+                    "base_url": "https://api.anthropic.com",
+                    "model": "claude-sonnet-4-5",
+                    "api_key": "",
+                    "is_default": True,
+                }
+            ]
+        )
+    assert exc.value.kind == "config"
+
+    saved = service.save_provider_entries(
+        [
+            {
+                "format": "openai",
+                "base_url": "https://api.openai.com/v1",
+                "model": "gpt-4o-mini",
+                "api_key": TOKEN,
+                "is_default": True,
+            },
+            {
+                "format": "anthropic",
+                "base_url": "https://api.anthropic.com",
+                "model": "claude-sonnet-4-5",
+                "api_key": "",
+            },
+        ]
+    )
+    keyless = [e for e in saved if not e["configured"]][0]
+    assert keyless["is_default"] is False
+    with pytest.raises(AiError) as exc:
+        service.grammar_ready(keyless["id"])
+    assert exc.value.kind == "unconfigured"
+    assert "no API key" in exc.value.message
+
+    class Pinned:
+        ai_sentence_provider = keyless["id"]
+
+    assert service.sentence_provider(Pinned()) == service.selected_provider()
+
+
+def test_forged_entry_ids_are_replaced_not_hijacked(app_context):
+    "A posted id that is not in the saved list becomes a fresh id."
+    service.save_provider_entries(
+        [
+            {
+                "format": "openai",
+                "base_url": "https://api.openai.com/v1",
+                "model": "gpt-4o-mini",
+                "api_key": TOKEN,
+                "is_default": True,
+            }
+        ]
+    )
+    original = service.provider_entries()[0]["id"]
+    forged = service.save_provider_entries(
+        [
+            {
+                "id": "made-up",
+                "format": "anthropic",
+                "base_url": "https://api.anthropic.com",
+                "model": "claude-sonnet-4-5",
+                "api_key": "sk-ant-test",
+            }
+        ]
+    )
+    assert forged[0]["id"] != "made-up"
+    assert forged[0]["id"] != original
+    assert service.provider_entries()[0]["format"] == "anthropic"
+
+
+def test_language_menu_lists_every_entry_id(app_context):
+    "The dropdown values are entry ids, labelled Name · Model."
+    service.save_provider_entries(
+        [
+            {
+                "format": "openai",
+                "name": "Agnes",
+                "base_url": "https://api.openai.com/v1",
+                "model": "agnes-2.5-flash",
+                "api_key": TOKEN,
+                "is_default": True,
+            },
+            {
+                "format": "anthropic",
+                "base_url": "https://api.anthropic.com",
+                "model": "claude-sonnet-4-5",
+                "api_key": "",
+            },
+        ]
+    )
+    choices = service.ai_provider_choices()
+    assert choices[0][0] == ""
+    assert "Default" in choices[0][1]
+    labels = [label for _, label in choices[1:]]
+    assert "Agnes · agnes-2.5-flash" in labels
+    assert any(
+        "claude-sonnet-4-5" in label and "no API key" in label
+        for label in labels
+    )
+    ids = [value for value, _ in choices[1:]]
+    assert service.provider_entries()[0]["id"] in ids
+    assert len(ids) == 2
+
+
+def test_language_pin_to_a_deleted_entry_becomes_default(app_context, english):
+    "Deleting a pinned entry clears the pin instead of leaving a dead id."
+    from lute.models.language import AI_DICT_TYPE
+
+    saved = service.save_provider_entries(
+        [
+            {
+                "format": "openai",
+                "base_url": "https://api.openai.com/v1",
+                "model": "gpt-4o-mini",
+                "api_key": TOKEN,
+                "is_default": True,
+            },
+            {
+                "format": "anthropic",
+                "base_url": "https://api.anthropic.com",
+                "model": "claude-sonnet-4-5",
+                "api_key": "sk-ant-test",
+            },
+        ]
+    )
+    pinned_id = saved[1]["id"]
+    ai_row = next(d for d in english.dictionaries if d.dicttype == AI_DICT_TYPE)
+    ai_row.ai_provider = pinned_id
+    db.session.commit()
+
+    service.save_provider_entries(
+        [
+            {
+                "id": saved[0]["id"],
+                "format": "openai",
+                "base_url": saved[0]["base_url"],
+                "model": saved[0]["model"],
+                "api_key": "",
+            }
+        ]
+    )
+    db.session.refresh(ai_row)
+    assert ai_row.ai_provider == ""
+    assert english.dictionaries == english.dictionaries  # sanity: row still there
+
+
+def test_a_legacy_literal_pin_maps_to_the_first_matching_entry(app_context, english):
+    "Old openai/anthropic pins keep working while an entry exists."
+    from lute.models.language import AI_DICT_TYPE
+
+    saved = service.save_provider_entries(
+        [
+            {
+                "format": "openai",
+                "base_url": "https://api.openai.com/v1",
+                "model": "gpt-4o-mini",
+                "api_key": TOKEN,
+                "is_default": True,
+            },
+            {
+                "format": "anthropic",
+                "base_url": "https://api.anthropic.com",
+                "model": "claude-sonnet-4-5",
+                "api_key": "sk-ant-test",
+            },
+        ]
+    )
+    ai_row = next(d for d in english.dictionaries if d.dicttype == AI_DICT_TYPE)
+    ai_row.ai_provider = "anthropic"
+    db.session.commit()
+    assert service.resolve_language_pin("anthropic") == saved[1]["id"]
+    assert service.sentence_provider(english) == saved[1]["id"]
 
 
 def test_sentence_prompt_asks_for_the_five_structured_fields():

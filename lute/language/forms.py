@@ -307,10 +307,12 @@ class LanguageForm(FlaskForm):
         # pinned -- a stale or forged value would leave the reader with
         # an unusable tab, so it is refused here as a form error.
         from lute.ai.service import (  # pylint: disable=import-outside-toplevel
-            ai_provider_choices,
+            provider_entries,
         )
 
-        configured = {key for key, _ in ai_provider_choices() if key}
+        configured = {
+            e["id"] for e in provider_entries() if e["configured"]
+        }
         for d in self.dictionaries.data:
             provider = (d.get("ai_provider") or "").strip()
             if provider and (
