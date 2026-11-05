@@ -141,6 +141,7 @@ class LanguageForm(FlaskForm):
             ("fr", "Français"),
             ("de", "Deutsch"),
             ("es", "Español"),
+            ("ru", "Русский"),
         ],
         default="en",
     )

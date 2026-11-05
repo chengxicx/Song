@@ -330,6 +330,10 @@ def test_sentence_target_language_uses_the_shared_ai_language(app_context, engli
     db.session.commit()
     assert _language_context(english.id)[1] == "French"
 
+    english.grammar_translate_lang = "ru"
+    db.session.commit()
+    assert _language_context(english.id)[1] == "Russian"
+
 
 def test_language_form_offers_japanese_and_other_ai_languages(app_context):
     "The shared AI language select is a fixed list, so prompts stay well-formed."
@@ -340,9 +344,16 @@ def test_language_form_offers_japanese_and_other_ai_languages(app_context):
     assert choices["zh"] == "中文"
     assert choices["en"] == "English"
     assert "fr" in choices and "de" in choices and "es" in choices
+    assert choices["ru"] == "Русский"
     assert LanguageForm().grammar_translate_lang.label.text == (
         "AI analysis & translation language"
     )
+
+
+def test_language_edit_form_renders_the_russian_option(app_context, client, english):
+    "The fixed list reaches the page the user edits, not just the Form class."
+    body = client.get(f"/language/edit/{english.id}").get_data(as_text=True)
+    assert 'value="ru">Русский</option>' in body
 
 
 def test_grammar_target_language_follows_the_language_setting(app_context, english):
