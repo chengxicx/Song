@@ -4011,7 +4011,7 @@ input[name='status']:disabled + label {
     }
 
     div#read_pane_right {
-        background-color: white;
+        background-color: var(--background-color, #fff);
         z-index: 1003;
         transform: translateY(100%);
         /* transition: all creates issues for drag resizing (laggy, slow)*/

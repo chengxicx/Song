@@ -680,7 +680,7 @@
     $.post("/term/delete/" + _current_term_id, function( data ) {
       if (EMBEDDED_IN_READING_FRAME) {
         window.parent.postMessage({ event: "LuteTermFormPosted" }, "*");
-        window.parent.document.getElementById('wordframeid').src = 'about:blank';
+        window.parent.document.getElementById('wordframeid').src = '/read/empty';
       }
       else {
         // If on term page, go to term listing
