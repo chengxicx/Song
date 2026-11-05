@@ -83,6 +83,13 @@ class LanguageDictionary(db.Model):
     # Kept configured but no tab in the reading page's dictionary strip:
     # for dictionaries that are rarely used but not worth re-entering.
     is_hidden = db.Column("LdIsHidden", db.Boolean, default=False)
+    # The provider this language's AI sentence tab should use ("" =
+    # Default, i.e. the provider enabled in Settings).  Only the AI row
+    # sets it; the reader falls back to the shared choice when empty or
+    # when that provider no longer has a key (see lute/ai/service.py).
+    ai_provider = db.Column(
+        "LdAiProvider", db.String(20), nullable=False, default=""
+    )
     sort_order = db.Column("LdSortOrder", db.SmallInteger, nullable=False)
 
 
@@ -364,9 +371,23 @@ class Language(
         row.dicturi = ai_sentence_url(self.id)
         row.is_active = True
         row.is_hidden = False
+        row.ai_provider = ""
         row.sort_order = 0
         self.dictionaries.insert(0, row)
         return True
+
+    @property
+    def ai_sentence_provider(self):
+        """
+        The provider pinned on this language's AI row, or "" for Default.
+
+        Only the AI row carries a provider, so the first AI row answers;
+        a language without one keeps the old shared-Settings behaviour.
+        """
+        for d in self.dictionaries:
+            if d.dicttype == AI_DICT_TYPE:
+                return (d.ai_provider or "").strip()
+        return ""
 
     @property
     def parser(self):

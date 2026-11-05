@@ -1827,6 +1827,24 @@ select.dict-uri.form-control-narrower {
     margin: 2px 0;
 }
 
+/* An empty stand-in for the row's actions slot (test/remove buttons).
+   The AI row has no buttons there, but the same slot width must still
+   be present -- and must not shrink -- so every row's flex children
+   add up to the same total and the columns line up. */
+.dict-ops-slot {
+    display: inline-block;
+    flex: 0 0 16px;
+    height: 20px;
+}
+
+/* The AI row's locked type dropdown has a single, short option, so its
+   automatic minimum width is narrower than the other rows' ("Pop-up
+   window" sets theirs).  Pin the declared 8rem width so the row's URL
+   column starts at the same x as every other row's. */
+#language .dict_entry select.dict-type:disabled {
+    flex-shrink: 0;
+}
+
 .formfieldcomment {
     font-size: 0.85em;
     font-style: italic;
