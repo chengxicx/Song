@@ -3022,9 +3022,12 @@ div.code pre {
    themes care about is painted by a higher-specificity rule of their own
    (#defaultLanguageSelect, .dt-length select, #dict-select:hover, ...).
    input[type="search"] is excluded on purpose -- that is DataTables'
-   search box, which the themes style themselves. */
+   search box, which the themes style themselves.  password fields are
+   included: the AI provider key input is the only one, and without this
+   it stayed a white UA field on the dark themes. */
 input[type="text"],
 input[type="url"],
+input[type="password"],
 textarea,
 select {
     background-color: var(--input-bg, #fff);

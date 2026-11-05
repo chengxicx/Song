@@ -371,15 +371,41 @@
       <td>
         <div id="ai_provider_box">
           <style>
-            #ai_provider_rows .ai-provider-row { border: 1px solid #d7d7d7; border-radius: 6px; padding: 10px; margin-bottom: 10px; background: #fafafa; }
+            /* Provider rows are cards like the other Settings sub-blocks, so
+               every colour comes from the shared tokens in styles.css (the
+               active theme supplies --background-color / --font-color /
+               --panel-bg / --form-border-color).  Do not hard-code white or
+               grey here: literal #fafafa / #555 stayed light on the dark
+               Default theme. */
+            #ai_provider_rows .ai-provider-row {
+              border: 1px solid var(--form-border-color, #ddd);
+              border-radius: var(--form-border-radius, 6px);
+              padding: 10px;
+              margin-bottom: 10px;
+              color: var(--font-color);
+              background-color: var(--panel-bg, transparent);
+              background-color: color-mix(in srgb, var(--font-color, #000) 5%, transparent);
+            }
             #ai_provider_rows .ai-provider-grid { display: grid; grid-template-columns: 9rem minmax(16rem, 1.6fr) minmax(11rem, 1fr) 9rem 9rem; gap: 8px; align-items: end; }
+            /* The five-column row needs ~54rem; below that it would push the
+               Settings table past the viewport.  Two columns keep every
+               field usable at tablet widths. */
+            @media (max-width: 1200px) {
+              #ai_provider_rows .ai-provider-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            }
             #ai_provider_rows .ai-provider-field { display: flex; flex-direction: column; min-width: 0; }
-            #ai_provider_rows .ai-provider-field > span { font-size: 0.85em; color: #555; margin-bottom: 2px; }
-            #ai_provider_rows .ai-provider-field .form-control { width: 100%; box-sizing: border-box; }
-            #ai_provider_rows .ai-provider-key-note { font-size: 0.78em; color: #777; margin-top: 2px; }
+            #ai_provider_rows .ai-provider-field > span { font-size: 0.85em; color: color-mix(in srgb, var(--font-color, #000) 64%, transparent); margin-bottom: 2px; }
+            #ai_provider_rows .ai-provider-field .form-control,
+            #ai_provider_rows .ai-provider-field .form-control:focus { border: 1px solid var(--form-border-color, #ccc); }
+            #ai_provider_rows .ai-provider-field .form-control { width: 100%; box-sizing: border-box; padding: 0.24rem 0.4rem; border-radius: var(--form-border-radius, 3px); background-color: var(--input-bg, #fff); color: var(--input-fg, var(--font-color, #000)); }
+            #ai_provider_rows .ai-provider-field .form-control:focus { outline: none; border-color: var(--btn-accent, #007aff); }
+            #ai_provider_rows .ai-provider-key-note { font-size: 0.78em; color: color-mix(in srgb, var(--font-color, #000) 55%, transparent); margin-top: 2px; }
             #ai_provider_rows .ai-provider-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 8px; }
             #ai_provider_rows .ai-provider-default-wrap { display: inline-flex; gap: 5px; align-items: center; margin-right: auto; white-space: nowrap; }
+            #ai_provider_rows .ai-provider-default-wrap input { margin: 0; }
             #ai_provider_rows .ai-provider-message { font-size: 0.88em; min-width: 10rem; }
+            #ai_provider_rows .ai-provider-message.is-ok { color: color-mix(in srgb, #37b24d 80%, var(--font-color, #000)); }
+            #ai_provider_rows .ai-provider-message.is-error { color: color-mix(in srgb, #e5484d 80%, var(--font-color, #000)); }
           </style>
           <div id="ai_provider_rows">
             {% for e in ai_entries %}
@@ -988,7 +1014,8 @@
       const box = row.querySelector('[data-role="message"]');
       if (!box) return;
       box.textContent = text;
-      box.style.color = ok ? 'green' : '#b3261e';
+      box.classList.toggle('is-ok', !!ok);
+      box.classList.toggle('is-error', !ok);
     }
 
     function updateEmpty() {
