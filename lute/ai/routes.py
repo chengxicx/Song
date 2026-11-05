@@ -307,6 +307,7 @@ _UI_LANGUAGE_NAMES = {
     "fr": "French",
     "de": "German",
     "es": "Spanish",
+    "ru": "Russian",
 }
 
 
