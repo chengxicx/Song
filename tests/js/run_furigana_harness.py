@@ -20,7 +20,10 @@ Checks, against the real lute-furigana.js:
      answered from the readings cache with no fetch, and the ruby lands
      in a microtask of the calling task -- before any paint, so it does
      not blink off;
-  8. a changed token set is a cache miss and fetches again.
+  8. a changed token set is a cache miss and fetches again;
+  9. invalidating the saved term drops only the batches holding it, so
+     the edited ruby refetches and updates while other paragraphs keep
+     their cached ruby; an unknown term text clears everything.
 """
 
 import pathlib
@@ -235,6 +238,88 @@ def main():
             "a changed token set is a cache miss (fetches again)",
             result == 1,
             " fetch_calls=%r" % (result,),
+        )
+
+        # --- 10. a term save invalidates only the batches holding it ---
+        # The saved word's pronunciation changed: its paragraph must
+        # refetch, while the other paragraph keeps its cached ruby (no
+        # fetch, and ruby present in the same microtask).
+        page.evaluate("window.__READINGS['音'] = 'おとの';")
+        result = page.evaluate(
+            """() => {
+              const t = document.getElementById('thetext');
+              t.innerHTML =
+                '<p><span class="textsentence" id="sent_1">' +
+                '<span class="textitem click word" data-paragraph-id="1" data-sentence-id="1" data-text="音">音</span>' +
+                '<span class="textitem">が</span>' +
+                '<span class="textitem click word" data-paragraph-id="1" data-sentence-id="1" data-text="カサカサ">カサカサ</span>' +
+                '<span class="textitem">ました</span>' +
+                '<span class="textitem click word" data-paragraph-id="1" data-sentence-id="1" data-text="聞こえ">聞こえ</span>' +
+                '</span></p>' +
+                '<p><span class="textsentence" id="sent_2">' +
+                '<span class="textitem click word" data-paragraph-id="2" data-sentence-id="2" data-text="夜">夜</span>' +
+                '<span class="textitem click word" data-paragraph-id="2" data-sentence-id="2" data-text="わたし">わたし</span>' +
+                '</span></p>';
+              window.lute_furigana_invalidate_term('音');
+              window.__fetch_calls = 0;
+              window.lute_furigana_annotate();
+              return Promise.resolve().then(() => {
+                const night = Array.from(t.querySelectorAll('span.word'))
+                  .find(s => s.getAttribute('data-text') === '夜');
+                const rb = night && night.querySelector('ruby');
+                return {
+                  fetch_calls: window.__fetch_calls,
+                  night_ruby_kept: !!(rb && rb.querySelector('rt').textContent === 'よる'),
+                };
+              });
+            }"""
+        )
+        page.wait_for_timeout(300)
+        after = page.evaluate(
+            """() => {
+              const song = Array.from(
+                document.querySelectorAll('#thetext span.word')
+              ).find(s => s.getAttribute('data-text') === '音');
+              const ruby = song && song.querySelector('ruby');
+              return {
+                fetch_calls: window.__fetch_calls,
+                reading: ruby && ruby.querySelector('rt')
+                  ? ruby.querySelector('rt').textContent : null,
+              };
+            }"""
+        )
+        check(
+            "a saved term refetches its paragraph only",
+            result["fetch_calls"] == 1
+            and result["night_ruby_kept"]
+            and after["fetch_calls"] == 1
+            and after["reading"] == "おとの",
+            " result=%r after=%r" % (result, after),
+        )
+
+        # --- 11. without the term text, the invalidation clears all ---
+        result = page.evaluate(
+            """() => {
+              const t = document.getElementById('thetext');
+              t.innerHTML =
+                '<p><span class="textsentence" id="sent_1">' +
+                '<span class="textitem click word" data-paragraph-id="1" data-sentence-id="1" data-text="音">音</span>' +
+                '</span></p>' +
+                '<p><span class="textsentence" id="sent_2">' +
+                '<span class="textitem click word" data-paragraph-id="2" data-sentence-id="2" data-text="夜">夜</span>' +
+                '</span></p>';
+              window.lute_furigana_invalidate_term(null);
+              window.__fetch_calls = 0;
+              window.lute_furigana_annotate();
+              return Promise.resolve().then(() => window.__fetch_calls);
+            }"""
+        )
+        page.wait_for_timeout(300)
+        after = page.evaluate("window.__fetch_calls")
+        check(
+            "an unknown term text clears every cached batch",
+            result == 2 and after == 2,
+            " in_task=%r after=%r" % (result, after),
         )
         browser.close()
 

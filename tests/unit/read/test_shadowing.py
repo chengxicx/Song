@@ -1011,6 +1011,84 @@ def test_annotate_tokens_no_full_text_skips_context_parse():
     assert lang.parser.context_calls == []
 
 
+def _db_backed_language(japanese, **kwargs):
+    "The duck-typed language above, wired to the real Japanese language row."
+    lang = _FakeLanguage([], parser_type="japanese", **kwargs)
+    lang.id = japanese.id
+    lang.get_lowercase = lang.parser.get_lowercase
+    return lang
+
+
+def test_annotate_tokens_saved_term_reading_wins(app_context, japanese):
+    """
+    A term's saved pronunciation drives the furigana.
+
+    The reading page's ruby asks this same annotate_tokens for readings;
+    the parser reads 天津駅 as あまつえき, but the term was corrected to
+    てんしんえき in the term form.  The body must show the saved value,
+    not the parser's guess (which is what the reading pane displayed
+    before this fix).
+    """
+    term = add_terms(japanese, ["天津駅"])[0]
+    term.romanization = "てんしんえき"
+    db.session.commit()
+
+    lang = _db_backed_language(
+        japanese,
+        readings={"天津駅": "あまつえき"},
+        context_readings=[("天津駅", "あまつえき")],
+    )
+    annotated = shadowing.annotate_tokens(
+        ["天津駅"], lang, full_text="天津駅へ行きました"
+    )
+    assert annotated == [{"text": "天津駅", "reading": "てんしんえき"}]
+
+
+def test_annotate_tokens_ktk_difference_is_not_an_edit(app_context, japanese):
+    """
+    A kana/katakana spelling difference is not a user edit: the saved
+    reading is the parser's reading in another script, so the contextual
+    reading keeps winning (changing the japanese_reading setting must not
+    switch every word to the old stored script).
+    """
+    term = add_terms(japanese, ["天津駅"])[0]
+    term.romanization = "アマツエキ"
+    db.session.commit()
+
+    lang = _db_backed_language(
+        japanese,
+        readings={"天津駅": "あまつえき"},
+        context_readings=[("天津駅", "あまつえき")],
+    )
+    annotated = shadowing.annotate_tokens(
+        ["天津駅"], lang, full_text="天津駅へ行きました"
+    )
+    assert annotated == [{"text": "天津駅", "reading": "あまつえき"}]
+
+
+def test_route_readings_returns_saved_term_reading(app_context, client, japanese):
+    "The furigana endpoint (/read/shadowing/readings) honours a saved reading."
+    from lute.settings.current import current_settings
+
+    current_settings()["japanese_reading"] = "hiragana"
+    term = add_terms(japanese, ["東京"])[0]
+    term.romanization = "とうきょうてい"
+    db.session.commit()
+
+    resp = client.post(
+        "/read/shadowing/readings",
+        json={
+            "language_id": japanese.id,
+            "tokens": ["東京"],
+            "full_text": "東京へ行く",
+        },
+    )
+    assert resp.status_code == 200
+    assert resp.get_json()["tokens"] == [
+        {"text": "東京", "reading": "とうきょうてい"}
+    ]
+
+
 def test_annotate_tokens_context_parse_error_falls_back_per_token():
     def _boom(_text):
         raise RuntimeError("parser broke")

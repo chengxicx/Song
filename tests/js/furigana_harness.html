@@ -22,6 +22,8 @@
     "カサカサ": "かさかさ",
     "わたし": "わたし",
   };
+  // The stub reads __READINGS at response time, so a test can change a
+  // word's reading before re-annotating to model a term save.
   window.fetch = function (url, opts) {
     window.__fetch_calls++;
     const body = JSON.parse(opts.body);

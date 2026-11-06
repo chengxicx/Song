@@ -557,6 +557,14 @@
       // just-saved term's form data has changed.
       luteClearTermFormPrefetchCache();
 
+      // The saved term's pronunciation may have changed.  The readings
+      // cache would otherwise replay the pre-save furigana for the
+      // refreshed paragraph; drop the batches holding this term so the
+      // body's ruby follows the save immediately.
+      if (window.lute_furigana_invalidate_term) {
+        window.lute_furigana_invalidate_term(savedTermText);
+      }
+
       $(".dictcontainer").css('display', 'none');
 
       // HTMX: swap the refreshed fragment into #thetext.  Re-marking of
