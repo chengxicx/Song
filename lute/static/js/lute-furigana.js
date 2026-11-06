@@ -74,6 +74,28 @@
   const reading_cache = new Map();
   const READING_CACHE_MAX = 128;
 
+  // A term save can change the term's stored pronunciation, so batches
+  // fetched before the save must not be replayed.  Only the batches
+  // containing the saved term are dropped: an edit in one paragraph
+  // doesn't make every paragraph on the page re-fetch (and blink).
+  // Unknown term text clears everything, which is the safe fallback
+  // for the save paths that don't post it.
+  window.lute_furigana_invalidate_term = function (termText) {
+    const wanted = (termText || "").replace(/\u200B/g, "").trim();
+    if (!wanted) {
+      reading_cache.clear();
+      return;
+    }
+    Array.from(reading_cache.keys()).forEach((key) => {
+      const body = key.slice(key.indexOf("\u0000") + 1);
+      try {
+        if (JSON.parse(body).includes(wanted)) reading_cache.delete(key);
+      } catch (e) {
+        reading_cache.delete(key);
+      }
+    });
+  };
+
   function annotate_paragraph(spans) {
     // Capture the display text up front: once a span is wrapped, its
     // textContent includes the reading, and dataset.text (the parser's
