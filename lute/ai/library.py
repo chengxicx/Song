@@ -134,12 +134,18 @@ def match_sentence(item_text, sentences):
 
 def _chars(stream, chunk_size=65536):
     "Yield characters without loading the whole upload into memory."
+    # Decode with an incremental decoder: a multi-byte UTF-8 char can
+    # straddle a chunk boundary, and decoding each chunk on its own
+    # with errors="replace" would turn it into U+FFFD garbage.
+    import codecs
+
+    decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
     while True:
         chunk = stream.read(chunk_size)
         if not chunk:
             return
         if isinstance(chunk, bytes):
-            chunk = chunk.decode("utf-8", errors="replace")
+            chunk = decoder.decode(chunk)
         for char in chunk:
             yield char
 
