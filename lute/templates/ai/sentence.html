@@ -122,11 +122,36 @@
         display: flex;
         flex-wrap: wrap;
         align-items: center;
+        justify-content: space-between;
         gap: 0.6rem;
         margin-top: 1rem;
         font-size: 0.85rem;
       }
-      .ai-actions a { color: inherit; }
+      .ai-nav-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 2rem;
+        padding: 0.25rem 0.5rem;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--font-color, inherit);
+        opacity: 0.45;
+        cursor: pointer;
+      }
+      .ai-nav-btn:hover:not(:disabled) {
+        opacity: 1;
+        background: rgba(128, 128, 128, 0.14);
+      }
+      .ai-nav-btn:disabled {
+        opacity: 0.15;
+        cursor: default;
+      }
+      .ai-nav-btn svg { display: block; }
+      @media (max-width: 864px) {
+        .ai-nav-btn { min-width: 1.7rem; padding: 0.2rem 0.35rem; }
+      }
       .ai-guidance {
         max-width: 46rem;
         font-size: 0.92rem;
@@ -174,6 +199,19 @@
         color: color-mix(in srgb, var(--btn-accent, #2f6fdb) 85%, var(--font-color, #333));
         background: color-mix(in srgb, var(--btn-accent, #2f6fdb) 14%, transparent);
       }
+      /* Settings stays reachable in the configured state, but as a quiet
+         link next to the provider badge -- not the large button at the
+         bottom of the panel. */
+      .ai-settings-link {
+        margin-left: 0.45rem;
+        color: inherit;
+        text-decoration: none;
+        text-transform: none;
+        letter-spacing: 0;
+        font-weight: 500;
+        opacity: 0.7;
+      }
+      .ai-settings-link:hover { opacity: 1; text-decoration: underline; }
     </style>
   </head>
   <body>
@@ -188,6 +226,7 @@
       <div class="ai-eyebrow">
         <span>{{ provider_label }}</span>
         <span id="ai-badge" class="ai-badge" hidden></span>
+        <a class="ai-settings-link" href="{{ settings_url }}" target="_top">{{ t('AI settings') }}</a>
       </div>
       <div class="ai-source">{{ sentence }}</div>
       <div id="ai-state" class="ai-state" data-state="" hidden>
@@ -197,10 +236,15 @@
       <div id="ai-sections" class="ai-sections"></div>
       <div id="ai-error" class="ai-error" hidden></div>
       <div class="ai-actions">
+        <button type="button" id="ai-prev" class="ai-nav-btn" title="{{ t('Previous sentence') }}" aria-label="{{ t('Previous sentence') }}" hidden>
+          <svg viewBox="7.5 3.5 15 25" width="14" height="24"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="20.5,4.5 9.5,15.5 19.5,27.5 "></polyline></svg>
+        </button>
         <button type="button" id="ai-retry" class="btn btn-secondary" hidden>
           {{ t('Retry') }}
         </button>
-        <a href="{{ settings_url }}" target="_top">{{ t('AI settings') }}</a>
+        <button type="button" id="ai-next" class="ai-nav-btn" title="{{ t('Next sentence') }}" aria-label="{{ t('Next sentence') }}" hidden>
+          <svg viewBox="7.5 3.5 15 25" width="14" height="24"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="9.5,4.5 20.5,15.5 10.5,27.5 "></polyline></svg>
+        </button>
       </div>
     </div>
     <script>
@@ -230,8 +274,72 @@
         var stateEl = document.getElementById('ai-state');
         var stateTextEl = document.getElementById('ai-state-text');
         var badgeEl = document.getElementById('ai-badge');
+        var navPrevEl = document.getElementById('ai-prev');
+        var navNextEl = document.getElementById('ai-next');
         var streamBuffer = '';
         var stateTimer = null;
+
+        // Sentence navigation belongs to the reading page: the arrows
+        // move the reader's current sentence, highlight it and rebuild
+        // the sentence-dictionary tabs for the next sentence.  In any
+        // other embedding (or standalone) they stay hidden.
+        var parentNav = null;
+        try {
+          if (window.parent && window.parent !== window &&
+              window.parent.LuteSentenceNav) {
+            parentNav = window.parent.LuteSentenceNav;
+          }
+        } catch (e) {
+          parentNav = null;
+        }
+        var navBusy = false;
+
+        function refreshNav() {
+          if (!parentNav) {
+            navPrevEl.hidden = true;
+            navNextEl.hidden = true;
+            return;
+          }
+          var st = null;
+          try { st = parentNav.state(); } catch (e) { st = null; }
+          // One sentence (or none) has no edges to move across.  At a
+          // sub-screen edge the arrows stay usable: the parent turns the
+          // screen/page to continue the sentence sequence.
+          var usable = st && st.index >= 0 &&
+            (st.count > 1 || st.hasPrev || st.hasNext);
+          if (!usable) {
+            navPrevEl.hidden = true;
+            navNextEl.hidden = true;
+            return;
+          }
+          navPrevEl.hidden = false;
+          navNextEl.hidden = false;
+          navPrevEl.disabled = navBusy || !st.hasPrev;
+          navNextEl.disabled = navBusy || !st.hasNext;
+        }
+
+        function stepNav(delta) {
+          if (!parentNav || navBusy) return;
+          navBusy = true;
+          refreshNav();
+          var moved = null;
+          try { moved = parentNav.step(delta, 'ai-sentence'); } catch (e) { moved = null; }
+          if (!moved) {
+            // Edge (or no current sentence): nothing moved, so let the
+            // reader try the other direction immediately.
+            navBusy = false;
+            refreshNav();
+            return;
+          }
+          // The parent debounces the tab rebuild; this frame is retired
+          // by it, so a late reply can never paint into this sentence.
+          // Re-enable only if this frame happens to survive.
+          setTimeout(function () { navBusy = false; refreshNav(); }, 400);
+        }
+
+        navPrevEl.addEventListener('click', function () { stepNav(-1); });
+        navNextEl.addEventListener('click', function () { stepNav(1); });
+        refreshNav();
 
         function clearStateTimer() {
           if (stateTimer) {

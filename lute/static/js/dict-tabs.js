@@ -479,7 +479,7 @@ function createLookupButtons(tab_count = 5, activateDictID = null) {
  * Toggling Sentence off (restoreTermLookupButtons, or opening another
  * word) rebuilds the term tabs.
  */
-function createSentenceLookupButtons(sentence, tab_count = 5) {
+function createSentenceLookupButtons(sentence, tab_count = 5, activateDictID = null) {
   const dicts = LUTE_SENTENCE_LOOKUP_DICTS;
   if ((sentence ?? '') == '' || dicts.length == 0)
     return false;
@@ -492,6 +492,17 @@ function createSentenceLookupButtons(sentence, tab_count = 5) {
   );
   if (active_term)
     LookupButton.lastTermDictID = active_term.dictID;
+
+  // The sentence panel's arrows move the whole strip to another
+  // sentence: keep the tab the reader is looking at (the AI row, for
+  // instance) instead of falling back to the first dictionary.
+  if (activateDictID == null && LookupButton.sentenceMode) {
+    const active_sentence = LookupButton.all.find(
+      b => b.is_active && b instanceof SentenceDictButton
+    );
+    if (active_sentence)
+      activateDictID = active_sentence.dictID;
+  }
 
   _teardownLookupButtons();
   LookupButton.sentenceMode = true;
@@ -506,10 +517,12 @@ function createSentenceLookupButtons(sentence, tab_count = 5) {
   });
   _layoutDictTabs(LookupButton.all, tab_count);
 
-  const first_button = LookupButton.all[0];
-  if (first_button) {
-    first_button.activate();
-    first_button.do_lookup();
+  const target_button = (activateDictID == null)
+    ? LookupButton.all[0]
+    : LookupButton.all.find(b => b.dictID === activateDictID) || LookupButton.all[0];
+  if (target_button) {
+    target_button.activate();
+    target_button.do_lookup();
   }
 
   const dictframes = document.getElementById("dictframes");
