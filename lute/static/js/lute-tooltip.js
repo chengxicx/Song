@@ -548,7 +548,11 @@ function show_term_edit_form(el) {
     const text = el.data('text') || el.text();
     const lid = parseInt(el.data('lang-id'));
     if (isNaN(lid)) return;
-    const sendtext = text.replace(/\//g, "LUTESLASH");
+    // "/" would break the path segment, so it keeps the old LUTESLASH
+    // placeholder; everything else (%, #, &, +, ?, spaces, quotes, CJK)
+    // has to be percent-encoded or nginx rejects the URL before Flask
+    // ever sees it (e.g. "99%" -> 400 Bad Request).
+    const sendtext = encodeURIComponent(text.replace(/\//g, "LUTESLASH"));
     _show_wordframe_url(`/read/termform/${lid}/${sendtext}`);
     return;
   }
@@ -621,8 +625,9 @@ function show_multiword_term_edit_form(selected) {
   if (text == "")
     return;
   const lid = parseInt(selected.eq(0).data('lang-id'));
-  // "/" in the term cause problems with routing, so hack a fix.
-  const sendtext = text.replace(/\//g, "LUTESLASH");
+  // "/" in the term cause problems with routing, so hack a fix; the
+  // remaining text still needs percent-encoding (see show_term_edit_form).
+  const sendtext = encodeURIComponent(text.replace(/\//g, "LUTESLASH"));
   _show_wordframe_url(`/read/termform/${lid}/${sendtext}`);
 }
 
