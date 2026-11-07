@@ -127,6 +127,14 @@
         margin-top: 1rem;
         font-size: 0.85rem;
       }
+      /* Retry (failure) and Regenerate (fresh result) share the middle
+         slot, so the sentence arrows stay at the two edges. */
+      .ai-action-group {
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+      }
       .ai-nav-btn {
         display: inline-flex;
         align-items: center;
@@ -179,6 +187,7 @@
         flex: none;
       }
       .ai-state[data-state="queued"] .ai-dot,
+      .ai-state[data-state="streaming"] .ai-dot,
       .ai-state[data-state="cooling"] .ai-dot,
       .ai-state[data-state="waiting_structure"] .ai-dot {
         animation: ai-pulse 1.1s ease-in-out infinite;
@@ -239,9 +248,14 @@
         <button type="button" id="ai-prev" class="ai-nav-btn" title="{{ t('Previous sentence') }}" aria-label="{{ t('Previous sentence') }}" hidden>
           <svg viewBox="7.5 3.5 15 25" width="14" height="24"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="20.5,4.5 9.5,15.5 19.5,27.5 "></polyline></svg>
         </button>
-        <button type="button" id="ai-retry" class="btn btn-secondary" hidden>
-          {{ t('Retry') }}
-        </button>
+        <span class="ai-action-group">
+          <button type="button" id="ai-retry" class="btn btn-secondary" hidden>
+            {{ t('Retry') }}
+          </button>
+          <button type="button" id="ai-regenerate" class="btn btn-secondary" hidden>
+            {{ t('Regenerate') }}
+          </button>
+        </span>
         <button type="button" id="ai-next" class="ai-nav-btn" title="{{ t('Next sentence') }}" aria-label="{{ t('Next sentence') }}" hidden>
           <svg viewBox="7.5 3.5 15 25" width="14" height="24"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="9.5,4.5 20.5,15.5 10.5,27.5 "></polyline></svg>
         </button>
@@ -255,8 +269,10 @@
         var MSG_WAITING = {{ t('Organizing the word-by-word notes and grammar')|tojson }};
         var MSG_QUEUED = {{ t('Queued: %(n)s request(s) ahead, about %(s)s s')|tojson }};
         var MSG_COOLING = {{ t('Rate limit reached; retrying automatically in %(s)s s')|tojson }};
+        var MSG_REGENERATING = {{ t('Regenerating')|tojson }};
         var BADGE_SAVED = {{ t('Saved')|tojson }};
         var BADGE_CACHED = {{ t('Cached')|tojson }};
+        var BADGE_REGENERATED = {{ t('Regenerated')|tojson }};
         var LABELS = {
           segments: {{ t('Word-by-word')|tojson }},
           part: {{ t('Part')|tojson }},
@@ -271,6 +287,7 @@
         var sectionsEl = document.getElementById('ai-sections');
         var errorEl = document.getElementById('ai-error');
         var retryEl = document.getElementById('ai-retry');
+        var regenEl = document.getElementById('ai-regenerate');
         var stateEl = document.getElementById('ai-state');
         var stateTextEl = document.getElementById('ai-state-text');
         var badgeEl = document.getElementById('ai-badge');
@@ -278,6 +295,18 @@
         var navNextEl = document.getElementById('ai-next');
         var streamBuffer = '';
         var stateTimer = null;
+        // Regenerate is a separate action from Retry: Retry belongs to
+        // the failure states, Regenerate to a result that did arrive.
+        // hasResult survives an in-flight regeneration so a failed
+        // rewrite leaves the previous analysis on screen.
+        var hasResult = false;
+        var running = false;
+        var forceRun = false;
+
+        function refreshRegen() {
+          regenEl.hidden = !hasResult || running;
+          regenEl.disabled = running;
+        }
 
         // Sentence navigation belongs to the reading page: the arrows
         // move the reader's current sentence, highlight it and rebuild
@@ -395,10 +424,20 @@
         function handleState(data) {
           var kind = data.state || '';
           if (kind === 'streaming') {
-            hideState();
             badgeEl.hidden = true;
             retryEl.hidden = true;
             retryEl.disabled = true;
+            if (forceRun) {
+              // A regeneration keeps the old analysis on screen, so
+              // the growing translation cannot double as the progress
+              // indicator.  The usual elapsed state row stands in.
+              startElapsed(kind, function (seconds) {
+                stateTextEl.textContent =
+                  MSG_REGENERATING + '… (' + seconds + ' s)';
+              });
+            } else {
+              hideState();
+            }
             return;
           }
           if (kind === 'waiting_structure') {
@@ -428,7 +467,11 @@
           if (kind === 'cached') {
             hideState();
             badgeEl.textContent =
-              data.saved_from === 'legacy-ttl' ? BADGE_CACHED : BADGE_SAVED;
+              data.saved_from === 'legacy-ttl'
+                ? BADGE_CACHED
+                : (data.saved_from === 'regenerate'
+                  ? BADGE_REGENERATED
+                  : BADGE_SAVED);
             badgeEl.hidden = false;
             retryEl.hidden = true;
             return;
@@ -655,12 +698,26 @@
             handleState(data);
           } else if (eventName === 'text' && data.text) {
             streamBuffer += data.text;
-            var partial = partialTranslation(streamBuffer);
+            // While regenerating, the previous analysis is still on
+            // screen: never paint the half-written replacement over it.
+            var partial = forceRun ? '' : partialTranslation(streamBuffer);
             if (partial) resultEl.textContent = partial;
           } else if (eventName === 'result') {
             if (data.result) {
               hideState();
               renderResult(data.result);
+              hasResult = true;
+              if (forceRun) {
+                badgeEl.textContent = BADGE_REGENERATED;
+                badgeEl.hidden = false;
+              }
+            } else if (forceRun) {
+              // A regeneration that could not be parsed keeps the old
+              // analysis instead of blanking the panel.
+              var failed = data.translation || data.text ||
+                partialTranslation(streamBuffer);
+              if (looksLikeJson(failed)) failed = UNPARSABLE;
+              showError(failed || UNPARSABLE);
             } else {
               sectionsEl.textContent = '';
               var fallback = data.translation || data.text ||
@@ -672,26 +729,34 @@
           } else if (eventName === 'error') {
             showError(data.message || '{{ t("Translation failed.") }}');
           } else if (eventName === 'done') {
-            if (stateEl.dataset.state === 'waiting_structure') hideState();
+            hideState();
             retryEl.disabled = false;
           }
+          refreshRegen();
         }
 
-        async function run() {
-          resultEl.textContent = '';
-          sectionsEl.textContent = '';
-          streamBuffer = '';
+        async function run(force) {
+          if (running) return;
+          running = true;
+          forceRun = !!force;
+          refreshRegen();
+          retryEl.hidden = true;
+          retryEl.disabled = true;
           errorEl.hidden = true;
           errorEl.textContent = '';
           hideState();
-          badgeEl.hidden = true;
-          retryEl.hidden = true;
-          retryEl.disabled = true;
+          streamBuffer = '';
+          if (!force) {
+            resultEl.textContent = '';
+            sectionsEl.textContent = '';
+            badgeEl.hidden = true;
+            hasResult = false;
+          }
           try {
             var resp = await fetch('/ai/translate', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ q: TEXT, lang: LANG })
+              body: JSON.stringify({ q: TEXT, lang: LANG, force: !!force })
             });
             if (!resp.ok || !resp.body) {
               throw new Error('HTTP ' + resp.status);
@@ -713,11 +778,15 @@
           } catch (e) {
             showError('{{ t("Could not reach the translator.") }} ' + e.message);
           }
+          running = false;
+          forceRun = false;
+          refreshRegen();
           retryEl.disabled = false;
         }
 
-        retryEl.addEventListener('click', run);
-        run();
+        retryEl.addEventListener('click', function () { run(false); });
+        regenEl.addEventListener('click', function () { run(true); });
+        run(false);
       })();
     </script>
     {% else %}

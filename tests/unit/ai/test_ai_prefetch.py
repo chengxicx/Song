@@ -109,6 +109,49 @@ def test_run_one_stores_results_with_the_prefetch_source(monkeypatch):
     assert stored[0]["provider_id"] == "p1"
 
 
+def test_run_one_does_not_replace_a_row_stored_during_the_batch(monkeypatch):
+    "A live Regenerate that finishes mid-batch must win."
+    stored = []
+    calls = {"n": 0}
+
+    def cached(*_args, **_kwargs):
+        calls["n"] += 1
+        # The first pass (pending check) sees no row for A. or B.; the
+        # second pass (just before storing) sees the live result.
+        return None if calls["n"] <= 2 else {"translation": "Fresh."}
+
+    monkeypatch.setattr(prefetch, "_is_current", lambda job: True)
+    monkeypatch.setattr(
+        service,
+        "sentence_provider_for_language_id",
+        lambda lang_id: "p1",
+    )
+    monkeypatch.setattr(
+        service,
+        "grammar_ready",
+        lambda provider: {"provider": "p1", "model": "m1", "rpm": 20},
+    )
+    monkeypatch.setattr(service, "sentence_cached_result", cached)
+    monkeypatch.setattr(LIMITER, "acquire", lambda *a, **k: True)
+    monkeypatch.setattr(
+        service,
+        "translate_batch",
+        lambda provider, sentences, source, target, usage=None: (
+            [],
+            [("A.", {"translation": "甲"}), ("B.", {"translation": "乙"})],
+        ),
+    )
+    monkeypatch.setattr(
+        service,
+        "store_sentence_result",
+        lambda *a, **k: stored.append(k),
+    )
+
+    prefetch._run_one(_job())  # pylint: disable=protected-access
+    assert stored == []
+    assert calls["n"] == 4
+
+
 def test_run_one_returns_silently_on_provider_failure(monkeypatch):
     monkeypatch.setattr(prefetch, "_is_current", lambda job: True)
     monkeypatch.setattr(
