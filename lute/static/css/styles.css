@@ -6591,6 +6591,13 @@ span.textitem.shadow-miss {
     border-radius: 4px;
     padding: 0 1px;
 }
+/* Punctuation in the practised sentence: shown as written, but neutral --
+   it is never scored, so it gets no verdict colour, no hover and no
+   click-to-hear affordance. */
+.shadow-punct {
+    color: var(--s-text-2);
+    cursor: default;
+}
 .shadow-tok.shadow-ok {
     border-bottom: 2px solid rgba(55, 178, 77, 0.75);
 }
