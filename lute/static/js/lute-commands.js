@@ -195,9 +195,16 @@ window.LuteSentenceNav = (function () {
     let lastSignature = null;
     let stableFrames = 0;
 
-    function signature(items) {
+    function signature() {
+      // Sent ids repeat across a page (they identify the paragraph's
+      // sentence slot), so the id text cannot tell screens apart: use
+      // the visibility mask over the full sentence list instead.
       return (
-        pageNum() + "|" + items.map(function (el) { return el.id; }).join(",")
+        pageNum() +
+        "|" +
+        sentences().map(function (el) {
+          return isVisible(el) ? "1" : "0";
+        }).join("")
       );
     }
 
@@ -211,7 +218,7 @@ window.LuteSentenceNav = (function () {
         (!marker.isConnected || !isVisible(marker)) &&
         items.length > 0;
       if (moved) {
-        const sig = signature(items);
+        const sig = signature();
         stableFrames = sig === lastSignature ? stableFrames + 1 : 0;
         lastSignature = sig;
         // Two identical frames: the split/render has finished hiding
