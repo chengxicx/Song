@@ -1930,6 +1930,19 @@ span.textsentence {
     font-size: 0%;
 }
 
+/* The sentence the AI panel is showing (static/js/lute-commands.js'
+   LuteSentenceNav).  A sentence span is font-size: 0%, so the underline
+   needs an explicit thickness like the playing line; the tint makes it
+   readable even when every word already carries a status colour. */
+#thetext .sentence-nav-current {
+    text-decoration: underline;
+    text-decoration-color: var(--btn-accent, #007aff);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+    background: color-mix(in srgb, var(--btn-accent, #007aff) 8%, transparent);
+    border-radius: 3px;
+}
+
 /* The line the player is reading, underlined in the page text itself so
    the reader can follow along there and not only in the player's
    subtitle strip.  Applied by static/js/lute-playing-line.js: to the
@@ -5943,6 +5956,47 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
 .grammar-ai__retry:disabled {
     opacity: 0.5;
     cursor: default;
+}
+/* Prev/next sentence arrows, matching the reading page's side arrows.
+   Hidden (but laid out as flex) when the panel has no sentence to move
+   from; [hidden] has to out-rank the display rule below. */
+.grammar-ai__nav {
+    display: inline-flex;
+    gap: 2px;
+    margin-right: 2px;
+}
+.grammar-ai__nav[hidden] {
+    display: none;
+}
+.grammar-ai__nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.55rem;
+    padding: 1px 4px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--font-color);
+    opacity: 0.5;
+    cursor: pointer;
+}
+.grammar-ai__nav-btn:hover:not(:disabled) {
+    opacity: 1;
+    background: rgba(128, 128, 128, 0.14);
+}
+.grammar-ai__nav-btn:disabled {
+    opacity: 0.2;
+    cursor: default;
+}
+.grammar-ai__nav-btn svg {
+    display: block;
+}
+@media (max-width: 864px) {
+    .grammar-ai__nav-btn {
+        min-width: 1.35rem;
+        padding: 0 2px;
+    }
 }
 .grammar-ai__raw {
     margin-top: 8px;
