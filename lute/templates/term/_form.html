@@ -307,9 +307,13 @@
       }
 
       const in_reading_frame = EMBEDDED_IN_READING_FRAME;
-      let url = `/term/editbytext/${langid}/${clickedTagText}`;
+      // Term text goes into a path segment: "/" keeps the LUTESLASH
+      // placeholder used by /read/termform, and the rest has to be
+      // percent-encoded (%, #, &, +, ?, spaces, quotes, CJK).
+      const encoded_tag = encodeURIComponent(clickedTagText.replace(/\//g, 'LUTESLASH'));
+      let url = `/term/editbytext/${langid}/${encoded_tag}`;
       if (in_reading_frame) {
-        url = `/read/termform/${langid}/${clickedTagText}`;
+        url = `/read/termform/${langid}/${encoded_tag}`;
       }
 
       // Manually post, tell the reading screen to update, then go to the url.

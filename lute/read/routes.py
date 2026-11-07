@@ -7,6 +7,7 @@ import json
 import math
 import os
 import uuid
+from urllib.parse import quote
 from flask import (
     Blueprint,
     current_app,
@@ -1662,7 +1663,10 @@ def _term_form_action(term):
     "The URL a term form POST goes back to, for the given term."
     if term.id:
         return f"/read/edit_term/{term.id}"
-    sendtext = (term.original_text or term.text or "").replace("/", "LUTESLASH")
+    # "/" would break the path segment, so it keeps the old LUTESLASH
+    # placeholder.  Everything else is percent-encoded: a raw % in a path
+    # is rejected by nginx (400 Bad Request) before Flask sees it.
+    sendtext = quote((term.original_text or term.text or "").replace("/", "LUTESLASH"), safe="")
     return f"/read/termform/{term.language_id}/{sendtext}"
 
 
