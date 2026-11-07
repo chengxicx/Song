@@ -483,6 +483,12 @@ def translate():
     payload = request.get_json(silent=True) or request.form
     sentence = service.clean_sentence(payload.get("q", ""))
     langid = payload.get("lang", "")
+    # The panel's own Regenerate button asks for a fresh provider reply;
+    # a plain request still answers from the stored result and never
+    # bills the provider twice.  The flag is only honoured for this
+    # request, so an ordinary reload goes back to the cache.
+    force = str(payload.get("force") or payload.get("regenerate") or "").strip().lower()
+    force = force in ("1", "true", "on", "yes")
     source_lang, target_lang = _language_context(langid)
     feature_on = _language_feature_enabled(langid, "ai_sentence_translation")
     book_id = _int_or_none(payload.get("book_id") or payload.get("book"))
@@ -503,14 +509,19 @@ def translate():
             ready = service.grammar_ready(provider or None)
             model = ready["model"]
             meta = {}
-            cached = service.sentence_cached_result(
-                sentence,
-                model,
-                source_lang,
-                target_lang,
-                ready["provider"],
-                meta=meta,
-            )
+            cached = None
+            if not force:
+                # A normal open reuses the stored result (live, prefetch
+                # or import).  Regenerate deliberately skips this lookup
+                # so the provider is asked again for the same sentence.
+                cached = service.sentence_cached_result(
+                    sentence,
+                    model,
+                    source_lang,
+                    target_lang,
+                    ready["provider"],
+                    meta=meta,
+                )
             if cached is not None:
                 yield _sse(
                     "state",
@@ -536,6 +547,7 @@ def translate():
                     "model": model,
                     "cached": False,
                     "rpm": ready.get("rpm"),
+                    "regenerated": force,
                 },
             )
             collected = {"text": ""}
@@ -587,7 +599,7 @@ def translate():
                     provider_id=ready["provider"],
                     book_id=book_id,
                     lang_id=lang_id,
-                    source="live",
+                    source="regenerate" if force else "live",
                     token_usage=usage.get("usage"),
                 )
                 yield _sse("result", {"result": parsed})

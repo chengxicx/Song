@@ -174,6 +174,13 @@ def _run_one(job):
     if not _is_current(job):
         return
     for sentence, parsed in results:
+        # A live request can finish while this batch is in flight.  If
+        # the reader already regenerated the sentence, keep that fresh
+        # row instead of replacing it with the background copy.
+        if service.sentence_cached_result(
+            sentence, model, job["source_lang"], target_lang, provider_id
+        ) is not None:
+            continue
         service.store_sentence_result(
             sentence,
             model,

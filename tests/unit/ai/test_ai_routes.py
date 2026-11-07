@@ -15,6 +15,7 @@ import pytest
 
 from lute.ai import service
 from lute.db import db
+from lute.models.ai_result import AiResult
 from tests.utils import make_book
 
 TOKEN = "sk-test-abcdef1234567890"
@@ -147,6 +148,95 @@ def test_translate_fallback_is_not_cached(monkeypatch, app_context, client):
     assert '"result"' in second
     assert "Good." in second
     assert '"fallback": true' not in second
+
+
+def test_translate_force_bypasses_cache_and_marks_the_row_regenerated(
+    monkeypatch, app_context, client
+):
+    "Regenerate asks the provider again even when a stored result exists."
+    _configure(client)
+
+    first = json.dumps({"translation": "First.", "segments": []})
+    monkeypatch.setattr(
+        "lute.ai.service.requests.post",
+        lambda *a, **k: FakeResponse(
+            lines=_sse({"choices": [{"delta": {"content": first}}]})
+        ),
+    )
+    body = client.post("/ai/translate", json={"q": "Hello"}).get_data(as_text=True)
+    assert "First." in body
+
+    cached = client.post("/ai/translate", json={"q": "Hello"}).get_data(as_text=True)
+    assert '"state": "cached"' in cached
+    assert "First." in cached
+
+    second = json.dumps({"translation": "Second.", "segments": []})
+    monkeypatch.setattr(
+        "lute.ai.service.requests.post",
+        lambda *a, **k: FakeResponse(
+            lines=_sse({"choices": [{"delta": {"content": second}}]})
+        ),
+    )
+    forced = client.post("/ai/translate", json={"q": "Hello", "force": True}).get_data(
+        as_text=True
+    )
+    assert "Second." in forced
+    assert '"regenerated": true' in forced
+    assert '"state": "cached"' not in forced
+
+    row = (
+        db.session.query(AiResult)
+        .filter_by(sentence="Hello", result_type="sentence")
+        .one()
+    )
+    assert row.source == "regenerate"
+
+    after = client.post("/ai/translate", json={"q": "Hello"}).get_data(as_text=True)
+    assert '"state": "cached"' in after
+    assert '"saved_from": "regenerate"' in after
+    assert "Second." in after
+
+
+def test_translate_force_failure_keeps_the_stored_result(
+    monkeypatch, app_context, client
+):
+    "A failed regeneration leaves the previous analysis in the cache."
+    _configure(client)
+
+    good = json.dumps({"translation": "Keep me.", "segments": []})
+    monkeypatch.setattr(
+        "lute.ai.service.requests.post",
+        lambda *a, **k: FakeResponse(
+            lines=_sse({"choices": [{"delta": {"content": good}}]})
+        ),
+    )
+    client.post("/ai/translate", json={"q": "Hello"}).get_data(as_text=True)
+
+    broken = '{"segments":[{"part": Hello], "translation": "Broken."'
+    monkeypatch.setattr(
+        "lute.ai.service.requests.post",
+        lambda *a, **k: FakeResponse(
+            lines=_sse({"choices": [{"delta": {"content": broken}}]})
+        ),
+    )
+    forced = client.post("/ai/translate", json={"q": "Hello", "force": True}).get_data(
+        as_text=True
+    )
+    assert '"fallback": true' in forced
+
+    after = client.post("/ai/translate", json={"q": "Hello"}).get_data(as_text=True)
+    assert '"state": "cached"' in after
+    assert "Keep me." in after
+    assert "Broken." not in after
+
+
+def test_sentence_page_shows_a_regenerate_button(app_context, client):
+    "The panel offers Regenerate next to the existing retry action."
+    _configure(client)
+    body = client.get("/ai/sentence?q=Bonjour&lang=2").get_data(as_text=True)
+    assert 'id="ai-retry"' in body
+    assert 'id="ai-regenerate"' in body
+    assert "Regenerate" in body
 
 
 def test_translate_unconfigured_is_an_error_event(app_context, client):
