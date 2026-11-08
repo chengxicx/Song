@@ -4841,20 +4841,15 @@ div#termimagesearch span img {
 
 /* ============================================================
    AI Explain column (share of a book's sentences that already
-   have a stored AI explanation).  A plain percentage, matching
-   the Progress column's label styling.
+   have a stored AI explanation).  The cell text uses the table's
+   normal font, like the Word count column; only the alignment
+   and no-wrap hints are column-specific.
    ============================================================ */
 #booktable td.col-aiexplain,
 #booktable th.col-aiexplain,
 .dt-scroll-headInner thead th.col-aiexplain {
     vertical-align: middle;
     white-space: nowrap;
-}
-.book-ai-explain {
-    font-size: 11px;
-    opacity: 0.7;
-    font-variant-numeric: tabular-nums;
-    cursor: default;
 }
 
 /* Series overview page (/book/series/<tag>). */

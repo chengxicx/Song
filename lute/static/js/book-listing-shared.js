@@ -70,7 +70,9 @@ let render_ai_explain = function (data, type, row, meta) {
   // Exact numerator/denominator for checking the percentage; no words,
   // so no translation is needed inside the attribute.
   const tip = `${explained} / ${sentences}`;
-  return `<span class="book-ai-explain" title="${tip}">${pct}%</span>`;
+  // Plain cell text, the same as the Word count column: no muted
+  // styling, the tooltip is the only extra.
+  return `<span title="${tip}">${pct}%</span>`;
 };
 
 /*
