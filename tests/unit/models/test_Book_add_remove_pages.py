@@ -40,6 +40,28 @@ def assert_remove(book, pagenum, expected, msg):
     assert_sql_result(sql, expected, msg)
 
 
+def test_page_lookups_do_not_load_the_whole_book(app_context, english):
+    """
+    A cold book counts and fetches one page from the database instead of
+    loading every page row just to measure or index the list.
+    """
+    b = make_book("hi", ["1", "2", "3"], english)
+    db.session.add(b)
+    db.session.commit()
+
+    db.session.expire_all()
+    assert "texts" not in b.__dict__, "collection should start cold"
+
+    assert b.page_count == 3
+    assert "texts" not in b.__dict__, "counting must not load the pages"
+
+    assert b.text_at_page(2).text == "2"
+    # Out-of-range pages clamp, exactly like indexing the loaded list.
+    assert b.text_at_page(0).text == "1"
+    assert b.text_at_page(9).text == "3"
+    assert "texts" not in b.__dict__, "one page must not load the pages"
+
+
 def test_can_add_page(app_context, english):
     "Add page before and after."
     b = make_book("hi", ["1", "2", "3"], english)
