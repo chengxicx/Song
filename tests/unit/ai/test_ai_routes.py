@@ -1045,3 +1045,39 @@ def test_sentence_tab_hides_ai_when_the_language_turns_it_off(
 
     page = client.get(f"/read/{book.id}").get_data(as_text=True)
     assert "/ai/sentence?lang=" not in page
+
+
+def test_sentence_page_adds_a_play_button_for_the_supported_language(
+    app_context, client, english
+):
+    "The source sentence gets a speaker button using the language tag."
+    _configure(client)
+    body = client.get(
+        f"/ai/sentence?q=Bonjour%20le%20monde&lang={english.id}"
+    ).get_data(as_text=True)
+    assert "js/tts.js" in body
+    assert 'var LANG_TAG = "en-US";' in body
+    assert "var TTS_SUPPORTED = true;" in body
+    assert 'data-tts-text="Bonjour le monde"' in body
+    assert 'class="ai-tts-btn"' in body
+
+
+def test_sentence_page_omits_the_play_button_without_a_language(
+    app_context, client
+):
+    "No language means no tag and no speaker button."
+    _configure(client)
+    body = client.get("/ai/sentence?q=Bonjour&lang=999").get_data(as_text=True)
+    assert 'var LANG_TAG = "";' in body
+    assert "var TTS_SUPPORTED = false;" in body
+    assert "data-tts-text=" not in body
+
+
+def test_voice_supported_only_for_languages_edge_tts_can_speak():
+    "Latin has no edge-tts voice, so it never gets a play button."
+    from lute.tts.routes import voice_supported_for_tag
+
+    assert voice_supported_for_tag("en-US") is True
+    assert voice_supported_for_tag("ja-JP") is True
+    assert voice_supported_for_tag("la") is False
+    assert voice_supported_for_tag("") is False

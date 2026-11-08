@@ -187,6 +187,19 @@ def voice_for_tag(tag):
     return voice or DEFAULT_VOICE
 
 
+def voice_supported_for_tag(tag):
+    """
+    True when /tts/ has a real voice for this tag, not the en-US fallback.
+
+    Uses the same lookup order as voice_for_tag: exact tag, then the
+    primary subtag.  Pages use this to hide a play button for a language
+    that edge-tts cannot voice (e.g. Latin).
+    """
+    if not tag:
+        return False
+    return tag in VOICE_MAP or primary_subtag(tag) in VOICE_MAP
+
+
 # edge-tts voice names look like "ja-JP-NanamiNeural" / "en-US-AriaNeural" /
 # "zh-HK-HiuMaanNeural": locale subtags followed by a personal name ending in
 # "Neural". Anything else is rejected outright -- the voice is interpolated

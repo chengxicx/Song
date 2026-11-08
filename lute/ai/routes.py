@@ -26,6 +26,7 @@ from lute.ai.service import AiError
 from lute.db import db
 from lute.i18n import current_language
 from lute.models.language import Language
+from lute.tts.routes import get_lang_code_for, voice_supported_for_tag
 
 bp = Blueprint("ai", __name__, url_prefix="/ai")
 
@@ -447,11 +448,18 @@ def sentence_page():
     state = service.provider_status(provider) if provider else None
     configured = bool(state and state["configured"])
     disabled = _language_feature_enabled(langid, "ai_sentence_translation") is False
+    # TTS uses the language's own tag (custom tts_lang first, else the
+    # name mapping); a language with no voice mapping gets no play button.
+    language = _language(langid)
+    lang_tag = get_lang_code_for(language) if language is not None else ""
+    tts_supported = voice_supported_for_tag(lang_tag)
 
     return render_template(
         "ai/sentence.html",
         sentence=sentence,
         lang_id=langid,
+        lang_tag=lang_tag,
+        tts_supported=tts_supported,
         provider=provider,
         provider_label=(
             provider_info["label"]

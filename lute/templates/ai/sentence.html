@@ -11,6 +11,7 @@
     {% if custom_styles %}
     <link rel="stylesheet" type="text/css" href="/theme/custom_styles?v={{ custom_styles_hash }}">
     {% endif %}
+    <script type="text/javascript" src="{{ vstatic('js/tts.js') }}" charset="utf-8" defer></script>
     <style>
       body {
         margin: 0;
@@ -41,6 +42,42 @@
         font-size: 0.95rem;
         line-height: 1.45;
         overflow-wrap: anywhere;
+      }
+      .ai-source-tts { position: relative; padding-right: 2.2rem; }
+      .ai-source .ai-tts-btn {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+      }
+      .ai-tts-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.1rem;
+        border: 0;
+        border-radius: 6px;
+        background: transparent;
+        color: inherit;
+        opacity: 0.55;
+        cursor: pointer;
+        vertical-align: middle;
+      }
+      .ai-tts-btn:hover,
+      .ai-tts-btn:focus-visible {
+        opacity: 1;
+        background: color-mix(in srgb, var(--font-color, #888) 14%, transparent);
+      }
+      .ai-tts-btn svg { display: block; }
+      .ai-tts-btn.is-playing {
+        opacity: 1;
+        color: var(--btn-accent, #2f6fdb);
+        animation: ai-tts-pulse 1.2s ease-in-out infinite;
+      }
+      .ai-tts-btn.tts-failed { color: #b3261e; }
+      .ai-example + .ai-tts-btn { margin-left: 0.35rem; }
+      @keyframes ai-tts-pulse {
+        0%, 100% { opacity: 0.55; }
+        50% { opacity: 1; }
       }
       .ai-result {
         font-size: 1.05rem;
@@ -237,7 +274,21 @@
         <span id="ai-badge" class="ai-badge" hidden></span>
         <a class="ai-settings-link" href="{{ settings_url }}" target="_top">{{ t('AI settings') }}</a>
       </div>
-      <div class="ai-source">{{ sentence }}</div>
+      <div class="ai-source{% if tts_supported and sentence %} ai-source-tts{% endif %}">
+        <span class="ai-source-text">{{ sentence }}</span>
+        {% if tts_supported and sentence %}
+        <button
+          type="button"
+          class="ai-tts-btn"
+          data-tts-text="{{ sentence }}"
+          title="{{ t('Play / pause') }}"
+          aria-label="{{ t('Play / pause') }}"
+          aria-pressed="false"
+        >
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M4 9v6h3.5L12 19V5L7.5 9H4z"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M15.5 8.8a4.5 4.5 0 0 1 0 6.4M18 6.5a8 8 0 0 1 0 11"/></svg>
+        </button>
+        {% endif %}
+      </div>
       <div id="ai-state" class="ai-state" data-state="" hidden>
         <span class="ai-dot"></span><span id="ai-state-text"></span>
       </div>
@@ -265,6 +316,10 @@
       (function () {
         var TEXT = {{ sentence|tojson }};
         var LANG = {{ lang_id|tojson }};
+        var LANG_TAG = {{ lang_tag|tojson }};
+        var TTS_SUPPORTED = {{ tts_supported|tojson }};
+        var PLAY_LABEL = {{ t('Play / pause')|tojson }};
+        var SPEAKER_ICON = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="currentColor" d="M4 9v6h3.5L12 19V5L7.5 9H4z"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M15.5 8.8a4.5 4.5 0 0 1 0 6.4M18 6.5a8 8 0 0 1 0 11"/></svg>';
         var UNPARSABLE = {{ t('AI returned an unparsable response, please retry.')|tojson }};
         var MSG_WAITING = {{ t('Organizing the word-by-word notes and grammar')|tojson }};
         var MSG_QUEUED = {{ t('Queued: %(n)s request(s) ahead, about %(s)s s')|tojson }};
@@ -641,6 +696,116 @@
           box.appendChild(p);
         }
 
+        // --- Sentence pronunciation ------------------------------------
+        // Reuses the reader's tts.js (browser SpeechSynthesis, with its
+        // server /tts/ fallback).  One button plays at a time; clicking
+        // the playing button stops it.
+        var ttsBtn = null;
+        var ttsAudio = null;
+        var ttsPoll = null;
+        var ttsStartGuard = null;
+
+        function ttsClear(btn) {
+          if (!btn) return;
+          btn.classList.remove('is-playing');
+          btn.setAttribute('aria-pressed', 'false');
+        }
+
+        function ttsStop() {
+          clearInterval(ttsPoll);
+          clearTimeout(ttsStartGuard);
+          ttsPoll = null;
+          ttsStartGuard = null;
+          if (ttsAudio) {
+            try { ttsAudio.pause(); } catch (e) {}
+            ttsAudio = null;
+          }
+          if ('speechSynthesis' in window) {
+            try { window.speechSynthesis.cancel(); } catch (e) {}
+          }
+          ttsClear(ttsBtn);
+          ttsBtn = null;
+        }
+
+        function ttsFail(btn) {
+          ttsClear(btn);
+          btn.classList.add('tts-failed');
+          setTimeout(function () { btn.classList.remove('tts-failed'); }, 1000);
+        }
+
+        function ttsPlay(btn, text) {
+          if (!LANG_TAG || !text) return;
+          if (btn === ttsBtn) {
+            ttsStop();
+            return;
+          }
+          ttsStop();
+          ttsBtn = btn;
+          btn.classList.add('is-playing');
+          btn.setAttribute('aria-pressed', 'true');
+
+          var started = false;
+          function onStarted() {
+            if (ttsBtn !== btn) return;
+            started = true;
+            btn.classList.add('is-playing');
+          }
+
+          if ('speechSynthesis' in window && typeof window.luteTtsSpeak === 'function') {
+            window.luteTtsSpeak(text, onStarted, LANG_TAG);
+            ttsPoll = setInterval(function () {
+              if (started && ttsBtn === btn && !window.speechSynthesis.speaking) {
+                ttsStop();
+              }
+            }, 250);
+          } else {
+            // No browser speech engine (or tts.js did not load): use the
+            // same single-sentence endpoint the reader falls back to.
+            var audio = new Audio('/tts/' + encodeURIComponent(LANG_TAG)
+              + '/' + encodeURIComponent(text));
+            ttsAudio = audio;
+            audio.addEventListener('playing', onStarted, { once: true });
+            audio.addEventListener('ended', function () {
+              if (ttsBtn === btn) ttsStop();
+            }, { once: true });
+            audio.addEventListener('error', function () {
+              if (ttsBtn === btn) { ttsStop(); ttsFail(btn); }
+            }, { once: true });
+            audio.play().catch(function () {
+              if (ttsBtn === btn) { ttsStop(); ttsFail(btn); }
+            });
+          }
+
+          // Nothing audible within 4s: clear the state and flash the
+          // button, which also covers a failed /tts/ synthesis.
+          ttsStartGuard = setTimeout(function () {
+            if (!started && ttsBtn === btn) {
+              ttsStop();
+              ttsFail(btn);
+            }
+          }, 4000);
+        }
+
+        function makeTtsButton(text) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'ai-tts-btn';
+          btn.title = PLAY_LABEL;
+          btn.setAttribute('aria-label', PLAY_LABEL);
+          btn.setAttribute('aria-pressed', 'false');
+          btn.innerHTML = SPEAKER_ICON;
+          btn.dataset.ttsText = text;
+          return btn;
+        }
+
+        document.addEventListener('click', function (e) {
+          var btn = e.target.closest ? e.target.closest('.ai-tts-btn') : null;
+          if (!btn) return;
+          e.stopPropagation();
+          var text = (btn.dataset.ttsText || '').trim();
+          if (text) ttsPlay(btn, text);
+        });
+
         function renderExamples(items) {
           if (!items.length) return;
           var box = section(LABELS.examples);
@@ -656,6 +821,9 @@
             s.className = 'ai-example';
             s.textContent = source;
             li.appendChild(s);
+            if (TTS_SUPPORTED && source) {
+              li.appendChild(makeTtsButton(source));
+            }
             if (translation) {
               var tr = document.createElement('span');
               tr.className = 'ai-example-translation';
