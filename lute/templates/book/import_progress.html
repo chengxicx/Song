@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ t('Importing…') }}{% endblock %}
+{% block header %}{{ t('Importing…') }}{% endblock %}
+
+{% block body %}
+<style>
+  .import-progress-box {
+    max-width: 640px; margin-top: 1.25rem; padding: 1.1rem 1.25rem;
+    background: var(--panel-bg, #fff); color: var(--font-color, #222);
+    border: 1px solid var(--form-border-color, #e3e8ef); border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+  .import-progress-track {
+    margin-top: .6rem; height: 8px; border-radius: 4px; overflow: hidden;
+    background: var(--panel-bg-2, rgba(0,0,0,.1));
+  }
+  .import-progress-bar {
+    height: 100%; width: 0%; border-radius: 4px;
+    background: #3d7ecc; transition: width .25s ease;
+  }
+  .import-status { margin: 0; line-height: 1.5; }
+  .import-progress-box a { display: none; margin-top: .9rem; }
+</style>
+
+<div class="import-progress-box">
+  <p class="import-status" id="import-status">{{ t('Importing…') }}</p>
+  <div class="import-progress-track">
+    <div class="import-progress-bar" id="import-progress-bar"></div>
+  </div>
+  <a class="btn btn-primary" id="import-back" href="/book/new">{{ t('Create new') }}</a>
+</div>
+
+<script type="text/javascript">
+  (function () {
+    var taskId = {{ task_id|tojson }};
+    var startedAt = Date.now();
+    var statusEl = document.getElementById('import-status');
+    var barEl = document.getElementById('import-progress-bar');
+    var backEl = document.getElementById('import-back');
+
+    function fmtDuration(secs) {
+      secs = Math.max(0, Math.round(secs));
+      var mins = Math.floor(secs / 60);
+      if (mins >= 60) return Math.floor(mins / 60) + ' h ' + (mins % 60) + ' min';
+      if (mins > 0) return mins + ' min';
+      return secs + ' s';
+    }
+
+    function fail(message) {
+      barEl.style.width = '0%';
+      statusEl.textContent = message;
+      statusEl.style.color = 'red';
+      backEl.style.display = 'inline-block';
+    }
+
+    function poll() {
+      fetch('/book/import/status/' + encodeURIComponent(taskId))
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d.state === 'finished' && d.book_id) {
+            barEl.style.width = '100%';
+            statusEl.textContent = I18N.t('Done! Opening the book…');
+            statusEl.style.color = 'green';
+            window.location.href = '/read/' + d.book_id + '/page/1';
+            return;
+          }
+          if (d.state === 'unknown') {
+            fail(I18N.t('Import failed.') + ' (' +
+              I18N.t('the task was lost, probably because the server restarted') + ')');
+            return;
+          }
+          if (d.state === 'error') {
+            fail(I18N.t('Import failed.') + ' ' + (d.error || ''));
+            return;
+          }
+          barEl.style.width = (d.percent || 5) + '%';
+          statusEl.textContent = (d.message || I18N.t('Importing…')) +
+            ' (' + fmtDuration((Date.now() - startedAt) / 1000) + ')';
+          statusEl.style.color = '';
+          setTimeout(poll, 2000);
+        })
+        .catch(function () { setTimeout(poll, 2000); }); // transient hiccup: keep polling
+    }
+
+    poll();
+  })();
+</script>
+{% endblock %}

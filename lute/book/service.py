@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from tempfile import TemporaryFile
 import requests
 from bs4 import BeautifulSoup
-from flask import current_app, flash
+from flask import current_app, flash, has_request_context
 from openepub import Epub, EpubError
 from pypdf import PdfReader
 from subtitle_parser import SrtParser
@@ -660,7 +660,10 @@ class FileTextExtraction:
             """
         }
         msg = messages.get(ext)
-        if msg is not None:
+        # Imports also run on the background task, where there is no
+        # request (and so no flash/session); the note is a nicety, not
+        # worth failing the import over.
+        if msg is not None and has_request_context():
             flash(msg, "notice")
 
         handlers = {
