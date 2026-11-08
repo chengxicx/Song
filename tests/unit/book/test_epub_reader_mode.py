@@ -139,6 +139,45 @@ def test_reader_mode_import_is_one_page_with_chapter_markup(
     ), "the extracted chapter must not live under the static folder"
 
 
+def test_divider_page_is_merged_into_the_chapter_markup(
+    app, app_context, english, client, tmp_path
+):
+    """
+    A heading-only part page is structure, not a chapter: reader mode
+    prepends its markup to the chapter it introduces and creates one
+    book, so the library has no one-line books.
+    """
+    app.config["EPUB_STATIC_ROOT"] = str(tmp_path / "static")
+    epub = make_epub(
+        {
+            "OEBPS/part.xhtml": "<html><body><h2>PART ONE</h2></body></html>",
+            "OEBPS/ch1.xhtml": "<html><body><p>Real text.</p></body></html>",
+        },
+        [("part", "part.xhtml"), ("ch1", "ch1.xhtml")],
+        nav_href="nav.xhtml",
+        nav_entries=[("part.xhtml", "Part One"), ("ch1.xhtml", "The Chapter")],
+    )
+    resp = _post(
+        client,
+        epub,
+        language_id=str(english.id),
+        epub_title="Divider Book",
+        epub_reader_mode="1",
+    )
+    body = resp.get_json()
+    assert body["imported"] == 1, body
+
+    book = db.session.query(DBBook).filter(DBBook.title.like("Divider Book%")).one()
+    assert book.title == "Divider Book 01 - The Chapter"
+    page_text = book.texts[0].text
+    assert page_text == "PART ONE\nReal text."
+
+    html = open(_package_path(app, book.epub_path), encoding="utf-8").read()
+    assert "PART ONE" in html
+    assert "Real text." in html
+    assert html.index("PART ONE") < html.index("Real text."), "reading order"
+
+
 def test_chapter_assets_are_served_from_the_data_directory(
     app, app_context, english, client, tmp_path
 ):
@@ -528,7 +567,14 @@ def test_reader_mode_import_writes_orig_stylesheet_and_manifest(
             encoding="utf-8",
         )
     )
-    assert manifest == [{"index": 0, "path": "OEBPS/ch1.xhtml", "viewport": None}]
+    assert manifest == [
+        {
+            "index": 0,
+            "path": "OEBPS/ch1.xhtml",
+            "parts": ["OEBPS/ch1.xhtml"],
+            "viewport": None,
+        }
+    ]
 
     # The reading fragment ships both URLs on the container.
     fragment = client.get(f"/read/start_reading/{book.id}/1").get_data(as_text=True)
@@ -606,8 +652,18 @@ def test_fixed_layout_chapter_gets_a_viewport_page_box(
         )
     )
     assert manifest == [
-        {"index": 0, "path": "OEBPS/fixed.xhtml", "viewport": "768x1024"},
-        {"index": 1, "path": "OEBPS/reflow.xhtml", "viewport": None},
+        {
+            "index": 0,
+            "path": "OEBPS/fixed.xhtml",
+            "parts": ["OEBPS/fixed.xhtml"],
+            "viewport": "768x1024",
+        },
+        {
+            "index": 1,
+            "path": "OEBPS/reflow.xhtml",
+            "parts": ["OEBPS/reflow.xhtml"],
+            "viewport": None,
+        },
     ]
 
 

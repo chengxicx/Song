@@ -167,3 +167,130 @@ def test_real_sample_file_hola_epub():
     assert len(data.chapters) >= 1
     all_text = "\n".join(c.text for c in data.chapters)
     assert "amigo" in all_text
+
+
+# ---------------------------------------------------------------------
+# Structural divider pages: a heading-only "PART ONE" page is structure,
+# not a chapter, and is folded into the chapter it introduces.
+# ---------------------------------------------------------------------
+
+
+def _divider_epub():
+    "EPUB with a title page, a part page, and one real chapter."
+    return make_epub(
+        {
+            "OEBPS/title.xhtml": make_epub_xhtml([], heading="CARRIE"),
+            "OEBPS/part.xhtml": make_epub_xhtml([], heading="PART ONE"),
+            "OEBPS/ch1.xhtml": make_epub_xhtml(
+                ["A real paragraph of text."], heading="Chapter One"
+            ),
+        },
+        [
+            ("title", "title.xhtml"),
+            ("part", "part.xhtml"),
+            ("ch1", "ch1.xhtml"),
+        ],
+        nav_href="nav.xhtml",
+        nav_entries=[
+            ("title.xhtml", "CARRIE"),
+            ("part.xhtml", "Part One"),
+            ("ch1.xhtml", "Chapter One"),
+        ],
+    )
+
+
+def test_heading_only_divider_pages_merge_into_the_next_chapter():
+    "Title page + part page chain into the first real chapter."
+    data = parse_epub(io.BytesIO(_divider_epub()))
+    assert len(data.chapters) == 1
+    chapter = data.chapters[0]
+    assert chapter.title == "Chapter One"
+    assert chapter.index == 0
+    assert chapter.text == "CARRIE\nPART ONE\nChapter One\nA real paragraph of text."
+    assert chapter.path == "OEBPS/ch1.xhtml"
+    assert chapter.parts == [
+        "OEBPS/title.xhtml",
+        "OEBPS/part.xhtml",
+        "OEBPS/ch1.xhtml",
+    ]
+
+
+def test_short_chapter_with_body_text_is_not_merged():
+    "A dedication is short but real: it stays its own chapter."
+    epub = make_epub(
+        {
+            "OEBPS/ded.xhtml": make_epub_xhtml(["For Tabby."], heading="Dedication"),
+            "OEBPS/ch1.xhtml": make_epub_xhtml(["Real text."], heading="Chapter One"),
+        },
+        [("ded", "ded.xhtml"), ("ch1", "ch1.xhtml")],
+    )
+    data = parse_epub(io.BytesIO(epub))
+    assert [c.title for c in data.chapters] == ["Dedication", "Chapter One"]
+    assert data.chapters[0].text == "Dedication\nFor Tabby."
+
+
+def test_long_heading_only_page_is_not_merged():
+    "A long all-heading document (a contents page) is not a divider."
+    long_heading = "A " + "very " * 20 + "long heading"
+    epub = make_epub(
+        {
+            "OEBPS/contents.xhtml": make_epub_xhtml([], heading=long_heading),
+            "OEBPS/ch1.xhtml": make_epub_xhtml(["Real text."]),
+        },
+        [("contents", "contents.xhtml"), ("ch1", "ch1.xhtml")],
+    )
+    data = parse_epub(io.BytesIO(epub))
+    assert len(data.chapters) == 2
+
+
+def test_trailing_divider_merges_into_the_previous_chapter():
+    "A divider with nothing after it joins the chapter before it."
+    epub = make_epub(
+        {
+            "OEBPS/ch1.xhtml": make_epub_xhtml(["Real text."], heading="Chapter One"),
+            "OEBPS/end.xhtml": make_epub_xhtml([], heading="THE END"),
+        },
+        [("ch1", "ch1.xhtml"), ("end", "end.xhtml")],
+    )
+    data = parse_epub(io.BytesIO(epub))
+    assert len(data.chapters) == 1
+    assert data.chapters[0].text == "Chapter One\nReal text.\nTHE END"
+    assert data.chapters[0].parts == ["OEBPS/ch1.xhtml", "OEBPS/end.xhtml"]
+
+
+def test_fixed_layout_heading_page_is_not_merged():
+    "A fixed-layout page box is one screen; it keeps its own chapter."
+    fixed = (
+        '<html><head><meta name="viewport" content="width=600, height=800"/>'
+        "</head><body><h2>PART ONE</h2></body></html>"
+    )
+    epub = make_epub(
+        {
+            "OEBPS/part.xhtml": fixed,
+            "OEBPS/ch1.xhtml": make_epub_xhtml(["Real text."]),
+        },
+        [("part", "part.xhtml"), ("ch1", "ch1.xhtml")],
+    )
+    data = parse_epub(io.BytesIO(epub))
+    assert len(data.chapters) == 2
+
+
+def test_divider_before_fixed_layout_chapter_stays_separate():
+    "Merging into a pixel-sized page box would break that page."
+    fixed = (
+        '<html><head><meta name="viewport" content="width=600, height=800"/>'
+        '</head><body><div class="page"><img src="p1.jpg"/></div></body></html>'
+    )
+    epub = make_epub(
+        {
+            "OEBPS/part.xhtml": make_epub_xhtml([], heading="PART ONE"),
+            "OEBPS/fxl.xhtml": (
+                '<html><head><meta name="viewport" content="width=600, height=800"/>'
+                "</head><body><p>Boxed page text.</p></body></html>"
+            ),
+        },
+        [("part", "part.xhtml"), ("fxl", "fxl.xhtml")],
+    )
+    data = parse_epub(io.BytesIO(epub))
+    assert len(data.chapters) == 2
+    assert data.chapters[1].parts == ["OEBPS/fxl.xhtml"]

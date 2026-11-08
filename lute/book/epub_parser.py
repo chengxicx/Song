@@ -7,9 +7,12 @@ An EPUB file is a zip archive containing:
                             files, and the spine (the reading order)
   *.xhtml                -- the actual content
 
-One spine item is treated as one chapter.  Chapter titles come from
-the EPUB 3 nav document or the EPUB 2 toc.ncx when available, falling
-back to the first h1-h3 heading in the file, then "Chapter N".
+One spine item is treated as one chapter -- except a heading-only
+divider page ("PART ONE", a title page), which is folded into the
+chapter it introduces so the import has no one-line chapters.  Chapter
+titles come from the EPUB 3 nav document or the EPUB 2 toc.ncx when
+available, falling back to the first h1-h3 heading in the file, then
+"Chapter N".
 
 The package structure is parsed with the standard library (zipfile +
 ElementTree); BeautifulSoup (already a dependency) extracts the xhtml
@@ -55,6 +58,16 @@ _CONTAINER_TAGS = [
 ]
 _SKIP_TAGS = ["script", "style", "head", "template", "svg", "iframe", "noscript"]
 
+# A part/section divider page ("PART ONE", a title page) carries only
+# headings and almost no text.  Imported on its own it becomes a
+# one-line book, so it is folded into the chapter it introduces (see
+# _merge_structural_dividers).  The cap keeps a genuinely long
+# all-heading document -- a table of contents page, an index -- from
+# being swallowed; real short chapters (a dedication, a colophon) have
+# a paragraph, not just a heading, and never match.
+_DIVIDER_MAX_CHARS = 80
+_HEADING_TAGS = ("h1", "h2", "h3", "h4", "h5", "h6")
+
 _CONTENT_MEDIA_TYPES = ("application/xhtml+xml", "text/html")
 _NCX_MEDIA_TYPE = "application/x-dtbncx+xml"
 
@@ -77,7 +90,7 @@ def _flattened_text(el):
 class EpubChapter:
     "One chapter: 0-based position, its title, its text, and its zip path."
 
-    def __init__(self, index, title, text, path=None):
+    def __init__(self, index, title, text, path=None, parts=None, fixed_layout=False):
         self.index = index
         self.title = title
         self.text = text
@@ -85,6 +98,14 @@ class EpubChapter:
         # "OEBPS/text/chapter01.xhtml".  Used by the reader-mode import
         # to write the chapter's markup next to its (rewritten) assets.
         self.path = path
+        # Every source document that makes up the chapter, in reading
+        # order.  A structural divider page merged into this chapter
+        # comes first here; for a normal chapter it is just [path].
+        self.parts = parts or ([path] if path else [])
+        # Fixed-layout (EPUB FXL) chapters are pixel-sized page boxes;
+        # they are never merged with other documents (see
+        # _merge_structural_dividers).
+        self.fixed_layout = fixed_layout
 
 
 class EpubBookData:
@@ -291,6 +312,7 @@ def _chapters(
 ):  # pylint: disable=too-many-arguments,too-many-positional-arguments
     "Extract a chapter per readable spine content document."
     chapters = []
+    divider_flags = []
     for idref in spine_refs:
         item = manifest.get(idref)
         if item is None or "nav" in item["properties"]:
@@ -302,6 +324,8 @@ def _chapters(
         if content is None:
             continue
         soup = BeautifulSoup(content, "html.parser")
+        # Read before _prep_soup drops <head>, where the meta lives.
+        fixed_layout = _fixed_viewport(soup) is not None
         _prep_soup(soup)
         text = _extract_text(soup)
         if not text:
@@ -310,8 +334,72 @@ def _chapters(
             continue
         frag = (item["href"] or "").partition("#")[2]
         title = _chapter_title(soup, zip_path, frag, toc_map, len(chapters))
-        chapters.append(EpubChapter(len(chapters), title, text, zip_path))
-    return chapters
+        chapters.append(
+            EpubChapter(len(chapters), title, text, zip_path, fixed_layout=fixed_layout)
+        )
+        divider_flags.append(_is_structural_divider(soup, text, fixed_layout))
+    return _merge_structural_dividers(chapters, divider_flags)
+
+
+def _is_structural_divider(soup, text, fixed_layout):
+    """
+    True for a part/section divider page: a short document whose text is
+    only headings ("PART ONE", a book title page).  Those are structure
+    markers, not chapters -- imported alone they become one-line books.
+
+    Content with a paragraph (a dedication, a colophon) is short but
+    real and stays its own chapter, as does anything long enough to be
+    readable, and a fixed-layout page (one screen by definition).
+    Images are ignored: a divider page often carries an ornament.
+    """
+    if fixed_layout or not text or len(text) > _DIVIDER_MAX_CHARS:
+        return False
+    root = soup.body or soup
+    for node in root.find_all(string=True):
+        if str(node).strip() and node.find_parent(_HEADING_TAGS) is None:
+            return False
+    return True
+
+
+def _merge_structural_dividers(chapters, divider_flags):
+    """
+    Fold heading-only divider pages into the chapter they introduce.
+
+    A divider merges forward ("PART ONE" belongs with the text that
+    follows); one at the very end merges into the chapter before it.
+    Pending dividers chain, so a title page + part page + first chapter
+    become a single chapter.  The merged chapter keeps the content
+    chapter's title and gets the divider documents first in `parts`, so
+    the reader-mode import can render their markup in the same file.
+
+    A divider before a fixed-layout chapter stays on its own: prepending
+    content to a pixel-sized page box would break that page.
+    """
+    out = []
+    pending = []
+    for chapter, is_divider in zip(chapters, divider_flags):
+        if is_divider:
+            pending.append(chapter)
+            continue
+        if pending and chapter.fixed_layout:
+            out.extend(pending)
+            pending = []
+        if pending:
+            chapter.text = "\n".join([p.text for p in pending] + [chapter.text])
+            chapter.parts = [p.path for p in pending] + chapter.parts
+            pending = []
+        out.append(chapter)
+    if pending:
+        if out:
+            tail = out[-1]
+            tail.text = "\n".join([tail.text] + [p.text for p in pending])
+            tail.parts = tail.parts + [p.path for p in pending]
+        else:
+            # Nothing but divider pages: keep them rather than lose the file.
+            out = pending
+    for position, chapter in enumerate(out):
+        chapter.index = position
+    return out
 
 
 def _prep_soup(soup):
@@ -368,6 +456,32 @@ def _read_zip(zf, path, zip_names):
                 return zf.read(actual)
             except Exception:  # pylint: disable=broad-except
                 return None
+    return None
+
+
+# A viewport meta with both dimensions as plain pixel numbers marks a
+# fixed-layout page (EPUB FXL); `device-width` / percentages are the
+# reflowable spellings and never match.
+_VIEWPORT_RE = re.compile(
+    r"width\s*=\s*(\d+)\s*,\s*height\s*=\s*(\d+)\s*(?:,|$)"
+    r"|height\s*=\s*(\d+)\s*,\s*width\s*=\s*(\d+)\s*(?:,|$)",
+    re.I,
+)
+
+
+def _fixed_viewport(soup):
+    '"WxH" for a fixed-layout chapter document, else None.'
+    for meta in soup.find_all("meta"):
+        if (meta.get("name") or "").strip().lower() != "viewport":
+            continue
+        content = meta.get("content") or ""
+        m = _VIEWPORT_RE.search(content)
+        if not m:
+            continue
+        w = m.group(1) or m.group(4)
+        h = m.group(2) or m.group(3)
+        if int(w) > 0 and int(h) > 0:
+            return f"{w}x{h}"
     return None
 
 
