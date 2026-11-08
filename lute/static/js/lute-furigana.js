@@ -96,7 +96,11 @@
     });
   };
 
-  function annotate_paragraph(spans) {
+  // One paragraph's batch: its spans and the exact token list sent for
+  // them, captured before any ruby is applied.  A flat token list is both
+  // the request unit and the cache key (a term save invalidates only the
+  // paragraphs that contain it, see lute_furigana_invalidate_term).
+  function paragraph_group(spans) {
     // Capture the display text up front: once a span is wrapped, its
     // textContent includes the reading, and dataset.text (the parser's
     // canonical token) can drift from the display text after a term edit
@@ -105,43 +109,33 @@
     const tokens = spans.map((sp) => sp.dataset.text || sp.textContent.trim());
     const full_text = tokens.join("");
     const key = `${CONFIG.langId}\u0000${JSON.stringify(tokens)}`;
-    let pending = reading_cache.get(key);
-    if (!pending) {
-      pending = fetch("/read/shadowing/readings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          language_id: CONFIG.langId,
-          tokens: tokens,
-          full_text: full_text,
-        }),
-      }).then((r) => (r.ok ? r.json() : null));
-      // Cache successful responses only, so a failed batch stays
-      // retriable; FIFO eviction keeps a long reading session bounded.
-      pending.then((data) => {
-        if (!data || !Array.isArray(data.tokens)) return;
-        if (reading_cache.size >= READING_CACHE_MAX) {
-          reading_cache.delete(reading_cache.keys().next().value);
-        }
-        reading_cache.set(key, pending);
-      });
-    }
-    return pending
-      .then((data) => {
-        if (!data || !Array.isArray(data.tokens)) return;
-        spans.forEach((sp, i) => {
-          const entry = data.tokens[i];
-          if (!entry || entry.reading == null) return;
-          wrap_ruby(sp, captured[i], entry.reading);
-          sp.dataset.furigana = "1";
-        });
-      })
-      .catch(() => {})
-      .then(() => {
-        // Release the claim either way: on failure the span stays
-        // unannotated and unmarked, so a later pass retries it.
-        spans.forEach((sp) => in_flight.delete(sp));
-      });
+    return { spans, captured, tokens, full_text, key };
+  }
+
+  function draw_group(group, data) {
+    if (!data || !Array.isArray(data.tokens)) return;
+    group.spans.forEach((sp, i) => {
+      const entry = data.tokens[i];
+      if (!entry || entry.reading == null) return;
+      wrap_ruby(sp, group.captured[i], entry.reading);
+      sp.dataset.furigana = "1";
+    });
+  }
+
+  function release_group(group) {
+    group.spans.forEach((sp) => in_flight.delete(sp));
+  }
+
+  function cache_group(group, pending) {
+    // Cache successful responses only, so a failed batch stays
+    // retriable; FIFO eviction keeps a long reading session bounded.
+    pending.then((data) => {
+      if (!data || !Array.isArray(data.tokens)) return;
+      if (reading_cache.size >= READING_CACHE_MAX) {
+        reading_cache.delete(reading_cache.keys().next().value);
+      }
+      reading_cache.set(group.key, pending);
+    });
   }
 
   function annotate() {
@@ -162,16 +156,62 @@
       textDiv.querySelectorAll("span.word:not([data-furigana])")
     ).filter((sp) => !in_flight.has(sp));
     if (spans.length === 0) return;
-    // One request per paragraph: readings follow sentence context, and a
-    // paragraph is the natural batch a page breaks into.
-    const paras = new Map();
+    // Readings follow sentence context, so a paragraph is the unit we
+    // request and cache.  Every paragraph still on the page goes out in
+    // ONE request (each was its own POST before, and a page has several
+    // paragraphs); the ruby for each paragraph is then drawn from its
+    // own slice of the answer, so all of them land together instead of
+    // popping in paragraph by paragraph.
+    const byPid = new Map();
     spans.forEach((sp) => {
       in_flight.add(sp);
       const pid = sp.dataset.paragraphId || "0";
-      if (!paras.has(pid)) paras.set(pid, []);
-      paras.get(pid).push(sp);
+      if (!byPid.has(pid)) byPid.set(pid, []);
+      byPid.get(pid).push(sp);
     });
-    paras.forEach(annotate_paragraph);
+
+    const misses = [];
+    byPid.forEach((groupSpans) => {
+      const group = paragraph_group(groupSpans);
+      const cached = reading_cache.get(group.key);
+      if (cached) {
+        cached
+          .then((data) => draw_group(group, data))
+          .catch(() => {})
+          .then(() => release_group(group));
+        return;
+      }
+      misses.push(group);
+    });
+    if (misses.length === 0) return;
+
+    const batch = fetch("/read/shadowing/readings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        language_id: CONFIG.langId,
+        paragraphs: misses.map((g) => ({
+          tokens: g.tokens,
+          full_text: g.full_text,
+        })),
+      }),
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      // Failure releases every group unannotated and unmarked, so a later
+      // pass retries them.
+      .catch(() => null);
+
+    misses.forEach((group, i) => {
+      const one = batch.then((data) => {
+        if (!data || !Array.isArray(data.paragraphs)) return null;
+        return data.paragraphs[i] || null;
+      });
+      cache_group(group, one);
+      one
+        .then((data) => draw_group(group, data))
+        .catch(() => {})
+        .then(() => release_group(group));
+    });
   }
 
   // Called by the page_content fragment after every swap (read/

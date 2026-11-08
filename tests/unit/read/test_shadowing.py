@@ -944,6 +944,78 @@ def test_annotate_tokens_strips_zws_from_text():
     assert annotated == [{"text": "cat", "reading": None}]
 
 
+def test_annotate_paragraphs_looks_terms_up_once(monkeypatch):
+    "A page's paragraphs share one saved-reading query."
+    lang = _FakeLanguage(
+        [], parser_type="japanese", readings={"天気": "てんき"}
+    )
+    calls = []
+
+    def _stored(_language, tokens):
+        calls.append(list(tokens))
+        return {}
+
+    monkeypatch.setattr(shadowing, "_stored_term_readings", _stored)
+    annotated = shadowing.annotate_paragraphs(
+        [
+            {"tokens": ["天気", "は"], "full_text": "天気は"},
+            {"tokens": ["良い"], "full_text": "良い"},
+        ],
+        lang,
+    )
+    assert annotated == [
+        [{"text": "天気", "reading": "てんき"}, {"text": "は", "reading": None}],
+        [{"text": "良い", "reading": None}],
+    ]
+    assert calls == [["天気", "は", "良い"]]
+
+
+def test_readings_route_batches_paragraphs(app, client, app_context, english):
+    "One POST answers every paragraph, each in its own slice."
+    resp = client.post(
+        "/read/shadowing/readings",
+        json={
+            "language_id": english.id,
+            "paragraphs": [
+                {"tokens": ["The", "cat"], "full_text": "The cat"},
+                {"tokens": ["sat", "down"], "full_text": "sat down"},
+            ],
+        },
+    )
+    assert resp.status_code == 200
+    body = resp.get_json()
+    assert [p["tokens"] for p in body["paragraphs"]] == [
+        [{"text": "The", "reading": None}, {"text": "cat", "reading": None}],
+        [{"text": "sat", "reading": None}, {"text": "down", "reading": None}],
+    ]
+
+    # The old single-paragraph body keeps its old response shape.
+    resp = client.post(
+        "/read/shadowing/readings",
+        json={"language_id": english.id, "tokens": ["The", "cat"], "full_text": "The cat"},
+    )
+    assert resp.status_code == 200
+    body = resp.get_json()
+    assert body["tokens"] == [
+        {"text": "The", "reading": None},
+        {"text": "cat", "reading": None},
+    ]
+    assert "paragraphs" not in body
+
+
+def test_readings_route_rejects_a_bad_batch(app, client, app_context, english):
+    resp = client.post(
+        "/read/shadowing/readings",
+        json={"language_id": english.id, "paragraphs": [{"tokens": [1]}]},
+    )
+    assert resp.status_code == 400
+    resp = client.post(
+        "/read/shadowing/readings",
+        json={"language_id": english.id, "paragraphs": []},
+    )
+    assert resp.status_code == 400
+
+
 # The morphemes a Japanese parser would answer for 広い宇宙の数ある一つ
 # when it reads the whole sentence: 数 is かず here, and 一つ splits into
 # 一(ひと) + つ.

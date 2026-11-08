@@ -288,7 +288,7 @@ def _stored_term_readings(language, tokens):
     }
 
 
-def _apply_stored_readings(annotated, language):
+def _apply_stored_readings(annotated, language, stored=None):
     """
     Let a term's saved pronunciation win over the parser's guess.
 
@@ -302,8 +302,13 @@ def _apply_stored_readings(annotated, language):
     Unedited terms (saved == parser, whatever the hiragana/katakana/
     romaji setting) keep the contextual reading, so 一つ still reads
     ひとつ rather than the isolated いち + つ.
+
+    ``stored`` is the precomputed {token: saved reading} map; a batch
+    caller looks every paragraph's terms up in one query and passes it
+    here (see annotate_paragraphs).  None means look it up now.
     """
-    stored = _stored_term_readings(language, [e["text"] for e in annotated])
+    if stored is None:
+        stored = _stored_term_readings(language, [e["text"] for e in annotated])
     if not stored:
         return annotated
     japanese = is_japanese_language(language)
@@ -332,7 +337,7 @@ def _apply_stored_readings(annotated, language):
     return annotated
 
 
-def annotate_tokens(tokens, language, full_text=None):
+def annotate_tokens(tokens, language, full_text=None, stored_readings=None):
     """
     Pair each token with its pronunciation reading for the shadowing
     panel.
@@ -351,6 +356,9 @@ def annotate_tokens(tokens, language, full_text=None):
     per token -- word-level input already resolves most polyphones
     (银行 -> háng).  Languages without reading support yield
     reading=None, so the panel simply shows the plain word.
+
+    ``stored_readings`` lets a batch caller share one term lookup across
+    paragraphs (see annotate_paragraphs); None looks it up here.
     """
     cleaned = [{"text": _clean_token(t), "reading": None} for t in tokens]
     if not supports_readings(language):
@@ -365,7 +373,7 @@ def annotate_tokens(tokens, language, full_text=None):
         if morphs:
             aligned = _align_context_readings(tokens, morphs)
             if aligned is not None:
-                return _apply_stored_readings(aligned, language)
+                return _apply_stored_readings(aligned, language, stored_readings)
 
     out = []
     for entry in cleaned:
@@ -377,7 +385,32 @@ def annotate_tokens(tokens, language, full_text=None):
             except Exception:  # pylint: disable=broad-exception-caught
                 reading = None
         out.append({"text": text, "reading": (reading or "").strip() or None})
-    return _apply_stored_readings(out, language)
+    return _apply_stored_readings(out, language, stored_readings)
+
+
+def annotate_paragraphs(paragraphs, language):
+    """
+    Annotate several paragraphs in one call.
+
+    ``paragraphs`` is a list of {"tokens": [...], "full_text": str-or-None},
+    one entry per paragraph on the page.  Every paragraph's terms are
+    looked up in a single query (instead of one query per paragraph), and
+    each paragraph still gets its own contextual parse, so readings stay
+    sentence-aware.  Returns a list of token lists parallel to the input.
+    """
+    all_tokens = []
+    for para in paragraphs:
+        all_tokens.extend(para.get("tokens") or [])
+    stored = _stored_term_readings(language, all_tokens)
+    return [
+        annotate_tokens(
+            para.get("tokens") or [],
+            language,
+            full_text=para.get("full_text"),
+            stored_readings=stored,
+        )
+        for para in paragraphs
+    ]
 
 
 def _is_chinese_language(language):
