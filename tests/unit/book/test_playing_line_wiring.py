@@ -199,24 +199,30 @@ def test_the_reading_page_ships_the_cue_map():
     # on every page turn, so the map has to come with it.
     assert "page_cue_map" in html
 
-    # Every render of that fragment must hand the map over -- both routes
-    # render it, and each also has manga/pdf branches that render it with
-    # nothing to map.
+    # Every render of that fragment must hand the map over.  It is
+    # rendered through one slim helper (the reader renders it per page
+    # turn, so it bypasses the app-wide context processor); the helper
+    # is the single place that can pass the map on.
     routes = _read(_ROUTES)
-    renders = re.findall(
-        r'render_template\(\s*"read/page_content\.html".*?\)', routes, re.S
+    assert routes.count('"read/page_content.html"') == 1, (
+        "page_content.html must be rendered by exactly one helper,"
+        " or a render can ship without the map"
     )
-    assert len(renders) == routes.count('"read/page_content.html"'), (
-        "a read/page_content.html render was not matched by this test;"
-        " the pattern needs updating"
+    helper = re.search(
+        r"def _render_page_content.*?return template\.render\((.*?)\)",
+        routes,
+        re.S,
     )
-    for render in renders:
-        assert "page_cue_map" in render, (
-            "every read/page_content.html render must pass page_cue_map,"
-            f" or that page has no map: {render}"
-        )
-    assert any("page_cue_map=_page_cue_line_map(" in r for r in renders), (
-        "the text branches must derive the map from the book; the empty"
+    assert helper is not None, (
+        "the fragment render helper must be the one place that renders"
+        " read/page_content.html"
+    )
+    assert "paragraphs=" in helper.group(1)
+    assert "page_cue_map=" in helper.group(1), (
+        "the helper must pass page_cue_map, or that page has no map"
+    )
+    assert "_page_cue_line_map(" in routes, (
+        "the text branch must derive the map from the book; the empty"
         " list is for the manga/pdf branches, which have no cues"
     )
 
