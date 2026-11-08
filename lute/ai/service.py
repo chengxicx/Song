@@ -1056,11 +1056,12 @@ def stored_result(
         return None
     if meta is not None:
         meta["saved_from"] = (row.source if row is not None else "") or ""
-    try:
-        row.hit_count = (row.hit_count or 0) + 1
-        db.session.commit()
-    except Exception:  # pylint: disable=broad-exception-caught
-        db.session.rollback()
+    # Deliberately no bookkeeping write here.  This is the hot read path
+    # (the reader opens the sentence panel and the prefetch checks hits),
+    # and every hit used to UPDATE the row and COMMIT, opening a write
+    # transaction for what should be a pure read.  The old ``hit_count``
+    # column is never read for any decision; it only existed for its own
+    # counter, so it stays at 0 rather than costing a write per hit.
     return data
 
 
