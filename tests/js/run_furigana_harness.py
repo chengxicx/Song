@@ -4,11 +4,14 @@ Drive the furigana harness and assert the reading-pane annotation rules.
 Checks, against the real lute-furigana.js:
 
   1. the initial load's three entry points (DOMContentLoaded,
-     htmx:afterSwap, page_content's explicit call) fire one request per
-     paragraph, not one per entry point -- the production regression let
-     each pass re-read an already-wrapped span and wrap it again, so the
-     reading was appended to the base text ("音" became "音おと") and the
-     ruby sat above the wrong (longer) text;
+     htmx:afterSwap, page_content's explicit call) fire one batched
+     request, not one per entry point or per paragraph -- the production
+     regression let each pass re-read an already-wrapped span and wrap it
+     again, so the reading was appended to the base text ("音" became
+     "音おと") and the ruby sat above the wrong (longer) text;
+     the request's full_text is the paragraph's real text, punctuation
+     included (joining the word tokens turned 李：今日は into 李今日は
+     and made Sudachi read 今日 as こんにち);
   2. a kanji word gets exactly one ruby whose base is the word itself;
   3. a pure-katakana word (カサカサ) and a pure-kana word get no ruby --
      furigana is for kanji;
@@ -66,7 +69,7 @@ def main():
         page = browser.new_page(viewport={"width": 900, "height": 700})
         page.goto(HARNESS.as_uri())
 
-        # --- 1. three back-to-back entry points, one request each ---
+        # --- 1. three back-to-back entry points, one batched request ---
         # lute-furigana.js already annotated once on load (its readyState
         # branch), and that request is still in flight (the stub answers
         # after 150ms).  Fire the initial load's remaining entry points
@@ -74,8 +77,8 @@ def main():
         # targeting #thetext, then annotate again (page_content's
         # explicit call) -- so every pass sees the same unmarked spans,
         # exactly like the real page.  If claiming did not happen
-        # synchronously, each pass would add its own request per
-        # paragraph and re-wrap the already-wrapped spans.
+        # synchronously, each pass would add its own requests and re-wrap
+        # the already-wrapped spans.
         page.evaluate(
             """() => {
               window.lute_furigana_annotate();
@@ -88,9 +91,22 @@ def main():
         page.wait_for_timeout(400)
         calls = page.evaluate("window.__fetch_calls")
         check(
-            "load + three entry points -> still one request per paragraph (2)",
-            calls == 2,
+            "load + three entry points -> one batched request",
+            calls == 1,
             " fetch_calls=%r" % (calls,),
+        )
+
+        # --- 1b. the request carries the paragraph's real text ---
+        # The spans alone are not the text the parser saw: punctuation
+        # between them has to survive, or 李：今日は is sent as 李今日は
+        # and 今日 is read こんにち instead of きょう.
+        requests = page.evaluate("window.__requests")
+        para1 = requests[0]["paragraphs"][0]
+        check(
+            "the readings request keeps the paragraph punctuation",
+            para1["full_text"] == "音、カサカサが聞こえ"
+            and para1["tokens"] == ["音", "カサカサ", "聞こえ"],
+            " paragraph=%r" % (para1,),
         )
 
         # --- 2. kanji words: exactly one ruby, clean base ---
@@ -318,7 +334,7 @@ def main():
         after = page.evaluate("window.__fetch_calls")
         check(
             "an unknown term text clears every cached batch",
-            result == 2 and after == 2,
+            result == 1 and after == 1,
             " in_task=%r after=%r" % (result, after),
         )
         browser.close()

@@ -81,16 +81,11 @@ function shadowingSentences() {
 
 /* A furigana <rt> reading is part of textContent but is not text to
    read, send, or match: on a ruby-annotated page 普通's span reads
-   "普通ふつう" and every consumer would double the word.  Same strip as
-   tts.js's ttsPlainText. */
+   "普通ふつう" and every consumer would double the word.  The strip is
+   shared with lute-furigana.js so the panel and the ruby request
+   always describe the same sentence (see lute-plain-text.js). */
 function shadowingPlainText(node) {
-  if (!node) return "";
-  if (node.nodeType === 3) return node.textContent || "";
-  const clone = node.cloneNode(true);
-  if (clone.querySelectorAll) {
-    clone.querySelectorAll("rt, rp").forEach(function (el) { el.remove(); });
-  }
-  return clone.textContent || "";
+  return window.lutePlainText(node);
 }
 
 function shadowingLineText(el) {

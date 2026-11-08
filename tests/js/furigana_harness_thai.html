@@ -30,12 +30,22 @@
           reject(new Error("network down"));
           return;
         }
-        const tokens = body.tokens.map(function (t) {
-          return { text: t, reading: window.__READINGS[t] || null };
+        // The page sends a batch of paragraphs; keep the single-paragraph
+        // form working too (the endpoint still accepts it).
+        const asked = body.paragraphs || [body];
+        const paragraphs = asked.map(function (p) {
+          return {
+            tokens: p.tokens.map(function (t) {
+              return { text: t, reading: window.__READINGS[t] || null };
+            }),
+          };
         });
+        const payload = body.paragraphs
+          ? { paragraphs: paragraphs }
+          : { tokens: paragraphs[0].tokens };
         resolve({
           ok: true,
-          json: function () { return Promise.resolve({ tokens: tokens }); },
+          json: function () { return Promise.resolve(payload); },
         });
       }, 150);
     });
@@ -58,6 +68,7 @@
     </span>
   </p>
 </div>
+<script src="../../lute/static/js/lute-plain-text.js"></script>
 <script src="../../lute/static/js/lute-furigana.js"></script>
 </body>
 </html>

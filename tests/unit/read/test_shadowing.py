@@ -17,6 +17,7 @@ import pytest
 from lute.book import sensevoice
 from lute.db import db
 from lute.read import shadowing
+from lute.settings.current import current_settings
 
 from tests.utils import add_terms
 
@@ -1081,6 +1082,49 @@ def test_annotate_tokens_no_full_text_skips_context_parse():
     annotated = shadowing.annotate_tokens(["天気"], lang)
     assert annotated == [{"text": "天気", "reading": "てんき"}]
     assert lang.parser.context_calls == []
+
+
+def test_annotate_tokens_context_needs_the_real_sentence(monkeypatch):
+    """
+    Pin the page-vs-panel disagreement: the page built full_text by
+    joining the word tokens, which drops the punctuation between them.
+    李：今日は became 李今日は and Sudachi read 今日 as こんにち; the
+    real sentence 李：今日は休日なので、… reads きょう.
+    """
+    pytest.importorskip("sudachipy")
+    pytest.importorskip("sudachidict_core")
+    from lute.parse.sudachi_parser import JapaneseSudachiParser
+
+    if not JapaneseSudachiParser.is_supported():
+        pytest.skip("sudachipy and a sudachi dictionary are required")
+    monkeypatch.setitem(current_settings(), "japanese_reading", "hiragana")
+    monkeypatch.setitem(current_settings(), "japanese_sudachi_dict", "core")
+    monkeypatch.setitem(current_settings(), "japanese_sudachi_mode", "C")
+
+    class _SudachiLanguage:
+        parser_type = "japanese_sudachi"
+        name = "Japanese"
+        id = None
+        regexp_split_sentences = ".!?。？！"
+
+        def __init__(self):
+            self.parser = JapaneseSudachiParser()
+
+    lang = _SudachiLanguage()
+    sentence = "李：今日は休日なので、特に混んでいます。"
+    tokens = [
+        t.token for t in lang.parser.get_parsed_tokens(sentence, lang) if t.is_word
+    ]
+    assert "今日" in tokens
+
+    def today_reading(full_text):
+        annotated = shadowing.annotate_tokens(
+            tokens, lang, full_text=full_text, stored_readings={}
+        )
+        return [a["reading"] for a in annotated if a["text"] == "今日"][0]
+
+    assert today_reading(sentence) == "きょう"
+    assert today_reading("".join(tokens)) == "こんにち"
 
 
 def _db_backed_language(japanese, **kwargs):

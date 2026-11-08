@@ -96,6 +96,25 @@
     });
   };
 
+  // The paragraph's own text, punctuation included.  The word spans
+  // alone are not the text the parser read: joining their tokens drops
+  // the paragraph's commas, colons and full stops, so 李：今日は became
+  // 李今日は and Sudachi read 今日 as こんにち even though the real
+  // sentence reads きょう.  The range covers exactly this group's spans,
+  // so the punctuation between them survives; it also works in EPUB
+  // chapters, where the spans have no <p> to start from.
+  function group_text(spans) {
+    if (!spans.length) return "";
+    const range = document.createRange();
+    range.setStartBefore(spans[0]);
+    range.setEndAfter(spans[spans.length - 1]);
+    const fragment = range.cloneContents();
+    return (window.lutePlainText(fragment) || "")
+      .replace(/\u200B/g, "")
+      .replace(/🔊/g, "")
+      .trim();
+  }
+
   // One paragraph's batch: its spans and the exact token list sent for
   // them, captured before any ruby is applied.  A flat token list is both
   // the request unit and the cache key (a term save invalidates only the
@@ -107,7 +126,7 @@
     // re-renders it.
     const captured = spans.map((sp) => sp.textContent);
     const tokens = spans.map((sp) => sp.dataset.text || sp.textContent.trim());
-    const full_text = tokens.join("");
+    const full_text = group_text(spans);
     const key = `${CONFIG.langId}\u0000${JSON.stringify(tokens)}`;
     return { spans, captured, tokens, full_text, key };
   }

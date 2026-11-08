@@ -51,6 +51,10 @@
 <script type="text/javascript" src="{{ vstatic('js/tts-player.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/tts-ui.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/lute-recorder.js') }}" charset="utf-8" defer></script>
+{# Shared by lute-shadowing.js and lute-furigana.js: both describe the
+   same sentence, so the "strip readings and player chrome" rule lives in
+   one file (see lute-plain-text.js). #}
+<script type="text/javascript" src="{{ vstatic('js/lute-plain-text.js') }}" charset="utf-8" defer></script>
 <script type="text/javascript" src="{{ vstatic('js/lute-shadowing.js') }}" charset="utf-8" defer></script>
 {# Only loaded when furigana is on for this language: lute-furigana.js
    annotates unconditionally on load (its annotate() ignores
