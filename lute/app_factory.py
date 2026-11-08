@@ -31,7 +31,7 @@ from flask import (
     url_for,
 )
 from sqlalchemy.event import listens_for
-from sqlalchemy.pool import NullPool, Pool
+from sqlalchemy.pool import Pool, QueuePool
 from werkzeug.exceptions import NotFound
 
 from lute.config.app_config import AppConfig
@@ -461,6 +461,48 @@ def _load_or_create_secret_key(app_config):
     return new_key
 
 
+class _ScopeAwarePool(QueuePool):
+    """
+    QueuePool that stops pooling when multi-user mode is on.
+
+    Every user has their own sqlite file, and the mode can be switched
+    at runtime (lute/multiuser/switching.py), so a shared pool would
+    hand one user's connection to the next user's request.  On a mode
+    change the idle connections are dropped, and while multi-user mode
+    is on, checkouts create a fresh connection and checkins close it
+    instead of returning it to the pool -- NullPool behaviour at
+    request time, connection reuse only in single-user mode.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._multiuser = mu_store.enabled()
+
+    def _sync_mode(self):
+        multiuser = mu_store.enabled()
+        if multiuser != self._multiuser:
+            # Connections opened for the other mode target a different
+            # file (the base db was moved into a user dir, or back).
+            self.dispose()
+            self._multiuser = multiuser
+
+    def _do_get(self):
+        self._sync_mode()
+        if self._multiuser:
+            record = self._create_connection()
+            record.info["lute_multiuser"] = True
+            return record
+        return super()._do_get()
+
+    def _do_return_conn(self, record):
+        # A connection opened in multi-user mode belongs to one user's
+        # file; never let it be reused by another user.
+        if self._multiuser or record.info.get("lute_multiuser"):
+            record.close()
+            return
+        super()._do_return_conn(record)
+
+
 def _create_app(app_config, extra_config):
     """
     Create the app using the given configuration,
@@ -482,7 +524,13 @@ def _create_app(app_config, extra_config):
         if mu_store.enabled():
             username = mu_context.get_current_user()
             if username:
-                return sqlite3.connect(mu_paths.user_dbfilename(app_config, username))
+                return sqlite3.connect(
+                    mu_paths.user_dbfilename(app_config, username),
+                    # Pooled connections are checked out by one thread and
+                    # checked in by another; sqlite serializes access itself,
+                    # so the per-thread guard has to go.
+                    check_same_thread=False,
+                )
             raise RuntimeError(
                 "Multi-user mode is on, but no user scope is set for this "
                 "database access.  Boot-time code must run inside "
@@ -491,20 +539,27 @@ def _create_app(app_config, extra_config):
         # Single-user mode: the base db -- the LUTE_DB_URI override when a
         # test harness set one (e.g. the shared in-memory test db), else
         # the on-disk db file.
-        return app_config.sqlite3_connect()
+        return app_config.sqlite3_connect(check_same_thread=False)
 
     config = {
         "SECRET_KEY": _load_or_create_secret_key(app_config),
         "DATABASE": app_config.dbfilename,
         "ENV": app_config.env,
         # The URI only selects the sqlite dialect (the file: URI form of
-        # a LUTE_DB_URI override included); connections are opened per
-        # checkout by _connect_current_db, so no pooled connection can
-        # ever point at another user's db file.
+        # a LUTE_DB_URI override included); the actual connection is
+        # built by _connect_current_db (see SQLALCHEMY_ENGINE_OPTIONS).
         "SQLALCHEMY_DATABASE_URI": app_config.sqliteconnstring,
+        # Multi-user mode resolves the db file per checkout from the
+        # request scope, so the pool must never hand one user's connection
+        # to another user's request; _ScopeAwarePool stays a QueuePool in
+        # single-user mode (same file, reuse is safe and skips the per
+        # request connect + pragmas) and switches to per-request
+        # connections whenever the mode is on.
         "SQLALCHEMY_ENGINE_OPTIONS": {
             "creator": _connect_current_db,
-            "poolclass": NullPool,
+            "poolclass": _ScopeAwarePool,
+            "pool_size": 5,
+            "max_overflow": 5,
         },
         "DATAPATH": app_config.datapath,
         # Reader-mode EPUB packages are written under
@@ -588,6 +643,13 @@ def _create_app(app_config, extra_config):
             if has_app_context() and current_app.config.get("TESTING"):
                 dbapi_con.execute("pragma synchronous = off;")
                 dbapi_con.execute("pragma journal_mode = memory;")
+            else:
+                # WAL is a persistent property of the db file, but setting
+                # it here is what switches an existing rollback-journal file
+                # over.  busy_timeout first: the switch needs an exclusive
+                # lock if another connection is mid-transaction.
+                dbapi_con.execute("pragma busy_timeout = 5000;")
+                dbapi_con.execute("pragma journal_mode = wal;")
         except Exception:  # pylint: disable=broad-except
             pass
 

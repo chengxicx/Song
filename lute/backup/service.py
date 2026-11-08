@@ -183,14 +183,19 @@ class Service:
 
     def _create_db_backup(self, app_config, backupfile):
         "Make a backup."
+        # Use sqlite's backup API for file databases too: the db runs in
+        # WAL mode, so pages committed to <db>-wal are not in the .db file
+        # yet and a plain copy would snapshot an older database (or tear
+        # if a writer is active).
         if getattr(app_config, "db_uri", None):
             # In-memory db (test harness): no file to copy, so
             # materialize it with the sqlite backup API first.
-            with closing(app_config.sqlite3_connect()) as src:
-                with closing(sqlite3.connect(backupfile)) as dst:
-                    src.backup(dst)
+            src = app_config.sqlite3_connect()
         else:
-            shutil.copy(app_config.dbfilename, backupfile)
+            src = sqlite3.connect(app_config.dbfilename)
+        with closing(src):
+            with closing(sqlite3.connect(backupfile)) as dst:
+                src.backup(dst)
         f = f"{backupfile}.gz"
         with open(backupfile, "rb") as in_file, gzip.open(
             f, "wb", compresslevel=4
@@ -324,6 +329,23 @@ class Service:
     # Set by restore_backup(), checked in before_request handler.
     _engine_needs_reset = False
 
+    def _close_database_connections(self):
+        """
+        Return this request's connection and close idle pooled ones.
+
+        Called before the db file is replaced: a live or idle connection
+        still points at the old database, so the swap has to happen with
+        nothing checked out.
+        """
+        remove = getattr(self.session, "remove", None)
+        if remove is None:
+            self.session.close()
+        else:
+            remove()
+        bind = self.session.get_bind()
+        if bind is not None:
+            bind.dispose()
+
     def restore_backup(
         self, app_config, backup_file_path
     ):  # pylint: disable=too-many-locals
@@ -391,11 +413,28 @@ class Service:
             finally:
                 conn.close()
 
-            # Backup current database first (safety copy)
+            # Close connections before touching the files: a live or idle
+            # connection still points at the database being replaced.
+            self._close_database_connections()
+
+            # Safety copy first, through the sqlite backup API: pages
+            # committed since the last checkpoint still live in <db>-wal,
+            # so a raw copy here would silently lose them.
             safety_copy = (
                 current_db + ".pre_restore_" + datetime.now().strftime("%Y%m%d_%H%M%S")
             )
-            shutil.copy2(current_db, safety_copy)
+            with closing(sqlite3.connect(current_db)) as src, closing(
+                sqlite3.connect(safety_copy)
+            ) as dst:
+                src.backup(dst)
+
+            # Now drop the old WAL sidecars: they belong to the database
+            # just discarded, and sqlite would replay them onto the
+            # restored file.
+            for suffix in ("-wal", "-shm"):
+                sidecar = current_db + suffix
+                if os.path.exists(sidecar):
+                    os.remove(sidecar)
 
             # Replace current database with restored one
             shutil.copy2(db_file_to_restore, current_db)
