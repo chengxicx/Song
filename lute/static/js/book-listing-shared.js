@@ -52,6 +52,28 @@ let render_tag_list = function(data, type, row, meta) {
 };
 
 /*
+ * AI Explain column: share of the book's sentences that already have a
+ * stored AI sentence explanation.  Both figures come from the server
+ * (AiExplainPercent / AiExplainedCount / SentenceCount) so the column
+ * sorts in SQL; series aggregate rows report the summed share of their
+ * member books.  The tooltip carries the exact numerator/denominator.
+ */
+let render_ai_explain = function (data, type, row, meta) {
+  let pct = parseInt(row['AiExplainPercent'], 10);
+  if (isNaN(pct)) pct = 0;
+  pct = Math.max(0, Math.min(100, pct));
+  if (type !== 'display') {
+    return pct;
+  }
+  const explained = parseInt(row['AiExplainedCount']) || 0;
+  const sentences = parseInt(row['SentenceCount']) || 0;
+  // Exact numerator/denominator for checking the percentage; no words,
+  // so no translation is needed inside the attribute.
+  const tip = `${explained} / ${sentences}`;
+  return `<span class="book-ai-explain" title="${tip}">${pct}%</span>`;
+};
+
+/*
  * Progress column: how much of the book has been read, as a bar plus a
  * percentage.  The number comes from the server (ProgressPercent) so the
  * home table can sort on it in SQL; series aggregate rows report the

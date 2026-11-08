@@ -92,6 +92,51 @@ _BOOK_PROGRESS_SQL = """
 """
 
 
+# Sentences per book and how many of them already have an AI sentence
+# explanation, aggregated in one grouped subquery so the listing never
+# runs a query per row.
+#
+# The numerator matches airesults rows by sentence text, not book_id:
+# live panel lookups store the sentence without a book id (the panel is
+# opened from a dictionary URI that carries no book), while imports and
+# prefetch do set it.  airesults.sentence is the cleaned form (no
+# zero-width spaces, whitespace collapsed and trimmed, see
+# ai.service.clean_sentence), whereas sentences.SeText is the
+# zero-width-space-joined token form, hence the normalization on the
+# join.  Only result_type = 'sentence' counts; grammar results belong to
+# the separate grammar panel.
+_SENTENCE_STATS_SQL = """
+    LEFT OUTER JOIN (
+        SELECT t.TxBkID AS BkID,
+               COUNT(s.SeID) AS sentencecount,
+               COUNT(DISTINCT CASE WHEN ar.sentence IS NULL
+                                   THEN NULL ELSE s.SeID END) AS explainedcount
+        FROM texts t
+        INNER JOIN sentences s ON s.SeTxID = t.TxID
+        LEFT OUTER JOIN (
+            SELECT DISTINCT TRIM(sentence) AS sentence
+            FROM airesults
+            WHERE result_type = 'sentence'
+        ) ar ON ar.sentence = TRIM(REPLACE(s.SeText, char(8203), ''))
+        GROUP BY t.TxBkID
+    ) sentstats ON sentstats.BkID = b.BkID
+"""
+
+# Share of the book's sentences that have an AI explanation, 0-100.
+_AI_EXPLAIN_PERCENT_SQL = """
+    case
+      when COALESCE(sentstats.sentencecount, 0) <= 0 then 0
+      else min(
+        100,
+        cast(
+          COALESCE(sentstats.explainedcount, 0) * 100.0
+            / sentstats.sentencecount as integer
+        )
+      )
+    end
+"""
+
+
 # NOTE: this must be built at request time, not at module import.
 # The app factory imports this module before init_parser_plugins() runs,
 # so a module-level f-string would freeze the parser list *without* any
@@ -139,6 +184,9 @@ def _flat_base_sql(archived, extra_where=""):
         {difficulty_col["description"]} AS DifficultyDescription,
         case when completed_books.BkID is null then 0 else 1 end as IsCompleted,
         {_BOOK_PROGRESS_SQL} AS ProgressPercent,
+        COALESCE(sentstats.sentencecount, 0) AS SentenceCount,
+        COALESCE(sentstats.explainedcount, 0) AS AiExplainedCount,
+        {_AI_EXPLAIN_PERCENT_SQL} AS AiExplainPercent,
         b.BkBookType AS BookType,
         NULL as SeriesTag,
         NULL as SeriesBookCount,
@@ -152,6 +200,7 @@ def _flat_base_sql(archived, extra_where=""):
     {_TEXTCOUNTS_SQL}
     LEFT OUTER JOIN bookstats c on c.BkID = b.BkID
     {_READPAGES_SQL}
+    {_SENTENCE_STATS_SQL}
 
     LEFT OUTER JOIN (
         SELECT BtBkID as BkID, GROUP_CONCAT(T2Text, ', ') AS taglist
@@ -216,6 +265,15 @@ def _series_union_base_sql(archived, series_tags):
         CASE WHEN COALESCE(agg.bookcount, 0) <= 0 THEN 0
              ELSE CAST(COALESCE(agg.readcount, 0) * 100.0 / agg.bookcount AS INTEGER)
         END AS ProgressPercent,
+        /* Sentences and AI-explained sentences summed over the member
+           books, so the series row's percentage has the same meaning as
+           a single book's. */
+        agg.sentencecount AS SentenceCount,
+        agg.explainedcount AS AiExplainedCount,
+        CASE WHEN COALESCE(agg.sentencecount, 0) <= 0 THEN 0
+             ELSE MIN(100, CAST(COALESCE(agg.explainedcount, 0) * 100.0
+                                / agg.sentencecount AS INTEGER))
+        END AS AiExplainPercent,
         /* Series aggregate rows report 'series' so the frontend renders
            the aggregation icon in the Type column. */
         'series' AS BookType,
@@ -238,6 +296,8 @@ def _series_union_base_sql(archived, series_tags):
                      THEN c.manga_word_count ELSE textcounts.wc END
             ), 0) AS wordcount,
             SUM(CASE WHEN completed_books.BkID IS NULL THEN 0 ELSE 1 END) AS readcount,
+            COALESCE(SUM(sentstats.sentencecount), 0) AS sentencecount,
+            COALESCE(SUM(sentstats.explainedcount), 0) AS explainedcount,
             MAX(booklastopened.lastopeneddate) AS lastopened,
             SUM(COALESCE(c.distinctterms, 0)) AS distinctcount,
             SUM(COALESCE(c.distinctunknowns, 0)) AS unknowncount,
@@ -263,6 +323,7 @@ def _series_union_base_sql(archived, series_tags):
         {_LASTOPENED_SQL}
         {_TEXTCOUNTS_SQL}
         LEFT OUTER JOIN bookstats c on c.BkID = b.BkID
+        {_SENTENCE_STATS_SQL}
         {_COMPLETED_SQL}
         WHERE b.BkArchived = {archived}
         {_parser_criteria_sql()}

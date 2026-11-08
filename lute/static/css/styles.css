@@ -4575,10 +4575,11 @@ div#termimagesearch span img {
         display: none !important;
     }
 
-    /* Hide columns: Language, Words, Status */
+    /* Hide columns: Language, Words, Status, AI Explain */
     #booktable td.col-lang,
     #booktable td.col-words,
-    #booktable td.col-status {
+    #booktable td.col-status,
+    #booktable td.col-aiexplain {
         display: none !important;
     }
 
@@ -4836,6 +4837,24 @@ div#termimagesearch span img {
     font-size: 11px;
     opacity: 0.7;
     font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   AI Explain column (share of a book's sentences that already
+   have a stored AI explanation).  A plain percentage, matching
+   the Progress column's label styling.
+   ============================================================ */
+#booktable td.col-aiexplain,
+#booktable th.col-aiexplain,
+.dt-scroll-headInner thead th.col-aiexplain {
+    vertical-align: middle;
+    white-space: nowrap;
+}
+.book-ai-explain {
+    font-size: 11px;
+    opacity: 0.7;
+    font-variant-numeric: tabular-nums;
+    cursor: default;
 }
 
 /* Series overview page (/book/series/<tag>). */

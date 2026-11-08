@@ -191,6 +191,106 @@ def test_progress_percent_is_100_when_last_page_read(app_context, _dt_params, en
     assert _progress_by_title(_dt_params)["done"] == 100
 
 
+# ======================================================================
+# AI Explain column: share of a book's sentences that have a stored
+# AI sentence explanation (airesults, result_type='sentence').
+# ======================================================================
+
+from uuid import uuid4
+
+from lute.ai.service import clean_sentence
+from lute.models.ai_result import AiResult
+from lute.models.book import BookTag
+
+
+def _add_ai_result(sentence_text, result_type="sentence", book_id=None):
+    "Store an airesults row the way the app does (sentence text is cleaned)."
+    db.session.add(
+        AiResult(
+            key=f"test-{uuid4()}",
+            result_type=result_type,
+            book_id=book_id,
+            sentence=clean_sentence(sentence_text),
+            result_json="{}",
+        )
+    )
+
+
+def _ai_explain_row(title, params):
+    "The AI Explain fields for one book row."
+    d = get_data_tables_list(params, False, db.session)
+    rows = [r for r in d["data"] if r["BkTitle"] == title]
+    assert len(rows) == 1, f"expected one row for {title}"
+    r = rows[0]
+    return (r["SentenceCount"], r["AiExplainedCount"], r["AiExplainPercent"])
+
+
+def test_ai_explain_percent_zero_when_no_results(app_context, _dt_params, english):
+    "A book with no AI results reports 0%, not a blank cell."
+    b = make_book("no-ai", "First sentence.\n\nSecond sentence.", english)
+    b.texts[0].load_sentences()
+    db.session.add(b)
+    db.session.commit()
+    n = len(b.texts[0].sentences)
+    assert n > 0
+    assert _ai_explain_row("no-ai", _dt_params) == (n, 0, 0)
+
+
+def test_ai_explain_percent_counts_unique_sentences(app_context, _dt_params, english):
+    """
+    The numerator is the book's sentences with at least one stored
+    sentence explanation: duplicates (different model/target language)
+    count once, and grammar results never count.
+    """
+    b = make_book("half-ai", "First sentence.\n\nSecond sentence.", english)
+    b.texts[0].load_sentences()
+    db.session.add(b)
+    db.session.commit()
+    sents = b.texts[0].sentences
+    n = len(sents)
+    assert n >= 2
+
+    # Live panel results are stored without a book id, so matching must
+    # be by sentence text; the stored text drops the zero-width spaces
+    # that sentences.SeText carries between tokens.
+    _add_ai_result(sents[0].text_content)
+    _add_ai_result(sents[0].text_content)  # second model, same sentence
+    _add_ai_result(sents[1].text_content, result_type="grammar")
+    db.session.commit()
+
+    assert _ai_explain_row("half-ai", _dt_params) == (n, 1, (1 * 100) // n)
+
+
+def test_ai_explain_percent_for_series_row(app_context, _dt_params, english):
+    "A series row aggregates the member books' sentences and explanations."
+    b1 = make_book("Erin-ai-1", "One sentence.", english)
+    b2 = make_book("Erin-ai-2", "Another sentence.", english)
+    erin = BookTag.make_book_tag("Erin")
+    for b in (b1, b2):
+        b.texts[0].load_sentences()
+        b.book_tags.append(erin)
+        db.session.add(b)
+    db.session.commit()
+    s1 = b1.texts[0].sentences
+    s2 = b2.texts[0].sentences
+    total = len(s1) + len(s2)
+    assert total >= 2
+    _add_ai_result(s1[0].text_content)
+    db.session.commit()
+
+    _set_series_setting(db.session, ["Erin"])
+    d = get_data_tables_list(_dt_params, False, db.session)
+    rows = [r for r in d["data"] if r["SeriesTag"]]
+    assert len(rows) == 1
+    r = rows[0]
+    assert (r["SentenceCount"], r["AiExplainedCount"], r["AiExplainPercent"]) == (
+        total,
+        1,
+        (1 * 100) // total,
+    )
+    _set_series_setting(db.session, [])
+
+
 def test_manga_book_word_count_in_datatables(app_context, empty_db, _dt_params):
     "Manga books show WordCount from manga_word_count, not textcounts.wc."
     from lute.models.book import Book
