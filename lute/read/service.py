@@ -4,7 +4,7 @@ Reading helpers.
 
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 import functools
 from flask import current_app, url_for
 from bs4 import BeautifulSoup
@@ -33,6 +33,10 @@ from lute.userimage.service import full_url, thumbnail_url
 # Extraction is not cheap and users flip between pages often.  The
 # cache holds only positions, never terms or session objects.
 _pdf_page_words_cache = {}
+
+# The precision at which a page open is worth writing: TxStartDate is used
+# for last-opened ordering and reading-time stats, both second-granular.
+_ONE_SECOND = timedelta(seconds=1)
 
 
 def _extract_pdf_page_words(pdf_abs_path, pagenum):
@@ -472,7 +476,16 @@ class Service:
     def update_start_date(self, book, pagenum):
         "Lightweight update of text.start_date."
         text = book.text_at_page(pagenum)
-        text.start_date = datetime.utcnow()
+        now = datetime.utcnow()
+        if (
+            book.current_tx_id == text.id
+            and text.start_date is not None
+            and abs(now - text.start_date) < _ONE_SECOND
+        ):
+            # The unload beacon fired right after the page opened: the row
+            # already records this page, opened just now.  Nothing to write.
+            return
+        text.start_date = now
         book.current_tx_id = text.id
         self.session.add(text)
         self.session.add(book)
@@ -809,17 +822,14 @@ class Service:
         )
 
     def _get_reading_data(self, dbbook, pagenum, track_page_open=False):
-        "Get paragraphs, set text.start_date if needed."
+        "Get paragraphs, recording the page open when asked."
         text = dbbook.text_at_page(pagenum)
 
-        # Only load sentences if they don't already exist.
-        # load_sentences() re-parses the full text with the language
-        # parser (e.g. MeCab), which is expensive and redundant on
-        # every page load.  The reading page rendering uses TextItems
-        # from get_paragraphs(), not Sentence objects — sentences are
-        # only needed by Anki export and term detail views.
-        if not text.sentences:
-            text.load_sentences()
+        # No sentence parsing here.  The reader renders TextItems from
+        # get_paragraphs(), so the Sentence rows (an expensive full-page
+        # parser pass, e.g. MeCab) are only needed by Anki export and the
+        # term detail views, which load them on demand via
+        # Text.load_sentences() / the read_date setter.
 
         # Opening a page doesn't change any term statuses, so we do NOT
         # mark the book's stats stale here — that would force the home
@@ -828,12 +838,23 @@ class Service:
         # change, e.g. via set_unknowns_to_known / bulk_update_status.
 
         if track_page_open:
-            text.start_date = datetime.utcnow()
-            dbbook.current_tx_id = text.id
-
-        self.session.add(dbbook)
-        self.session.add(text)
-        self.session.commit()
+            # The only write path: remember when this page was opened and
+            # that it is the book's current page.  Skip the write when
+            # neither value would change -- re-opening the same page (or
+            # the beacon arriving right after the open) used to open a
+            # write transaction for an identical row.  Second granularity
+            # matches what the column is used for (last-opened ordering
+            # and reading-time stats).
+            now = datetime.utcnow()
+            changed = False
+            if text.start_date is None or abs(now - text.start_date) >= _ONE_SECOND:
+                text.start_date = now
+                changed = True
+            if dbbook.current_tx_id != text.id:
+                dbbook.current_tx_id = text.id
+                changed = True
+            if changed:
+                self.session.commit()
 
         lang = text.book.language
         rs = RenderService(self.session)

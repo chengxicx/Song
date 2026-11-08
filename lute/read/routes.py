@@ -1208,6 +1208,21 @@ def youtube_subtitle_words(bookid):
     return _gzip_if_accepted(resp)
 
 
+def _render_page_content(paragraphs, page_cue_map):
+    """
+    Render the reading-text fragment with only what it needs.
+
+    render_template() runs the app-wide context processor, which queries
+    the backup settings, scans the Language table, and reads + hashes the
+    theme css.  page_content.html (and the textitem.html it includes) uses
+    none of those, and the reader renders one fragment per page turn, so
+    render the template from the Jinja environment directly and skip those
+    queries and the disk read.
+    """
+    template = current_app.jinja_env.get_template("read/page_content.html")
+    return template.render(paragraphs=paragraphs, page_cue_map=page_cue_map)
+
+
 @bp.route("/start_reading/<int:bookid>/<int:pagenum>", methods=["GET"])
 def start_reading(bookid, pagenum):
     "Called by ajax.  Update the text.start_date, and render page."
@@ -1219,31 +1234,21 @@ def start_reading(bookid, pagenum):
     if (book.book_type or "") == "manga":
         ctx = service.manga_page_context(book, pagenum, True)
         if ctx is None:
-            return render_template(
-                "read/page_content.html", paragraphs=[], page_cue_map=[]
-            )
+            return _render_page_content([], [])
         return render_template("read/manga_page.html", **ctx)
     if (book.book_type or "") == "pdf":
         ctx = service.pdf_page_context(book, pagenum, True)
         if ctx is None:
-            return render_template(
-                "read/page_content.html", paragraphs=[], page_cue_map=[]
-            )
+            return _render_page_content([], [])
         return render_template("read/pdf_page.html", **ctx)
     if (book.book_type or "") == "epub":
         ctx = service.epub_page_context(book, pagenum, True)
         if ctx is None:
-            return render_template(
-                "read/page_content.html", paragraphs=[], page_cue_map=[]
-            )
+            return _render_page_content([], [])
         return render_template("read/epub_page.html", **ctx)
     paragraphs = service.start_reading(book, pagenum)
     _queue_ai_prefetch(book, paragraphs)
-    return render_template(
-        "read/page_content.html",
-        paragraphs=paragraphs,
-        page_cue_map=_page_cue_line_map(book, pagenum),
-    )
+    return _render_page_content(paragraphs, _page_cue_line_map(book, pagenum))
 
 
 def _queue_ai_prefetch(book, paragraphs):
@@ -1319,30 +1324,20 @@ def render_page_fragment(book, pagenum, track_page_open=False):
     if (book.book_type or "") == "manga":
         ctx = service.manga_page_context(book, pagenum, track_page_open)
         if ctx is None:
-            return render_template(
-                "read/page_content.html", paragraphs=[], page_cue_map=[]
-            )
+            return _render_page_content([], [])
         return render_template("read/manga_page.html", **ctx)
     if (book.book_type or "") == "pdf":
         ctx = service.pdf_page_context(book, pagenum, track_page_open)
         if ctx is None:
-            return render_template(
-                "read/page_content.html", paragraphs=[], page_cue_map=[]
-            )
+            return _render_page_content([], [])
         return render_template("read/pdf_page.html", **ctx)
     if (book.book_type or "") == "epub":
         ctx = service.epub_page_context(book, pagenum, track_page_open)
         if ctx is None:
-            return render_template(
-                "read/page_content.html", paragraphs=[], page_cue_map=[]
-            )
+            return _render_page_content([], [])
         return render_template("read/epub_page.html", **ctx)
     paragraphs = service.get_paragraphs(book, pagenum)
-    return render_template(
-        "read/page_content.html",
-        paragraphs=paragraphs,
-        page_cue_map=_page_cue_line_map(book, pagenum),
-    )
+    return _render_page_content(paragraphs, _page_cue_line_map(book, pagenum))
 
 
 _EPUB_LOOKS = ("original", "night", "theme")

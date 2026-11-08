@@ -188,8 +188,53 @@ def test_smoke_start_reading(english, app_context):
     assert_record_count_equals(sql_text_started, 0, "before start")
     service = Service(db.session)
     service.start_reading(dbbook, 1)
-    assert_record_count_equals(sql_sentence, 2, "after start")
+    # Opening a page records the open time but does not parse the page
+    # into Sentence rows: the reader renders TextItems, and sentences are
+    # only loaded on demand (when a page is marked read, or by Anki export
+    # and the term detail views).  Loading them on every open cost a full
+    # page parse and was never used by the reader.
+    assert_record_count_equals(sql_sentence, 0, "no sentences on open")
     assert_record_count_equals(sql_text_started, 1, "text after start")
+
+    service.mark_page_read(dbbook.id, 1, mark_rest_as_known=False)
+    assert_record_count_equals(sql_sentence, 2, "sentences when page is read")
+
+
+def test_refresh_reads_without_writing(english, app_context):
+    "A page refresh (get_paragraphs) must not record an open."
+    b = Book()
+    b.title = "blah"
+    b.language_id = english.id
+    b.text = "Here is some content."
+    r = Repository(db.session)
+    dbbook = r.add(b)
+    r.commit()
+
+    service = Service(db.session)
+    service.get_paragraphs(dbbook, 1)
+    assert_record_count_equals(
+        "select * from texts where TxStartDate is not null", 0, "no open recorded"
+    )
+
+
+def test_reopening_the_same_page_is_not_rewritten(english, app_context):
+    "The beacon/open right after an open does not cost another UPDATE."
+    b = Book()
+    b.title = "blah"
+    b.language_id = english.id
+    b.text = "Here is some content."
+    r = Repository(db.session)
+    dbbook = r.add(b)
+    r.commit()
+
+    service = Service(db.session)
+    service.start_reading(dbbook, 1)
+    text = dbbook.texts[0]
+    first = text.start_date
+    assert first is not None
+
+    service.start_reading(dbbook, 1)
+    assert text.start_date == first, "same page within a second is left untouched"
 
 
 def test_start_reading_creates_Terms_for_unknown_words(english, app_context):
