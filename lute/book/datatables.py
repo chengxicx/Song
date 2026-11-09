@@ -103,9 +103,27 @@ _BOOK_PROGRESS_SQL = """
 # zero-width spaces, whitespace collapsed and trimmed, see
 # ai.service.clean_sentence), whereas sentences.SeText is the
 # zero-width-space-joined token form, hence the normalization on the
-# join.  Only result_type = 'sentence' counts; grammar results belong to
-# the separate grammar panel.
-_SENTENCE_STATS_SQL = """
+# join: like clean_sentence, every whitespace character -- the fullwidth
+# U+3000 space CJK texts keep between words, tabs, newlines -- maps to a
+# plain space before the trim, and two collapse passes fold pairs of
+# spaces into one.  That covers whitespace runs up to four characters,
+# which is every run in practice; clean_sentence collapses runs of any
+# length, so a longer run would still stay unmatched.
+_SENTENCE_KEY_SQL = """
+    TRIM(
+        REPLACE(REPLACE(
+            REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
+                s.SeText, char(8203), ''),
+                char(12288), ' '),
+                char(9), ' '),
+                char(10), ' '),
+                char(13), ' '),
+            '  ', ' '),
+        '  ', ' ')
+    )
+"""
+
+_SENTENCE_STATS_SQL = f"""
     LEFT OUTER JOIN (
         SELECT t.TxBkID AS BkID,
                COUNT(s.SeID) AS sentencecount,
@@ -117,7 +135,7 @@ _SENTENCE_STATS_SQL = """
             SELECT DISTINCT TRIM(sentence) AS sentence
             FROM airesults
             WHERE result_type = 'sentence'
-        ) ar ON ar.sentence = TRIM(REPLACE(s.SeText, char(8203), ''))
+        ) ar ON ar.sentence = {_SENTENCE_KEY_SQL}
         GROUP BY t.TxBkID
     ) sentstats ON sentstats.BkID = b.BkID
 """

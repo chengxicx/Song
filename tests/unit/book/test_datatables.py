@@ -261,6 +261,33 @@ def test_ai_explain_percent_counts_unique_sentences(app_context, _dt_params, eng
     assert _ai_explain_row("half-ai", _dt_params) == (n, 1, (1 * 100) // n)
 
 
+def test_ai_explain_matches_fullwidth_space_sentences(
+    app_context, _dt_params, japanese
+):
+    """
+    Japanese texts keep fullwidth U+3000 spaces between words, and
+    sentences.SeText preserves them as tokens.  The AI panel stores the
+    sentence with clean_sentence, which maps U+3000 to a plain space, so
+    the listing's join must normalize SeText the same way or the stored
+    explanation never matches and the coverage reads too low.
+    """
+    b = make_book("fullwidth-ai", "どうぞ　よろしく　お願いします。", japanese)
+    b.texts[0].load_sentences()
+    db.session.add(b)
+    db.session.commit()
+    sents = b.texts[0].sentences
+    n = len(sents)
+    assert n >= 1
+    # The premise: the stored sentence form really does carry U+3000.
+    assert any("\u3000" in s.text_content for s in sents)
+
+    for s in sents:
+        _add_ai_result(s.text_content)
+    db.session.commit()
+
+    assert _ai_explain_row("fullwidth-ai", _dt_params) == (n, n, 100)
+
+
 def test_ai_explain_percent_for_series_row(app_context, _dt_params, english):
     "A series row aggregates the member books' sentences and explanations."
     b1 = make_book("Erin-ai-1", "One sentence.", english)
