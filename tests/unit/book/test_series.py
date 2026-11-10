@@ -214,3 +214,69 @@ def test_delete_series_route_includes_archived_books(app, app_context, english):
     assert resp.status_code == 302
     db.session.expire_all()
     assert db.session.query(DBBook).count() == 0, "archived series book deleted"
+
+
+# ---- Language scoping ------------------------------------------------
+# One tag text can be shared by several languages (e.g. the same Mini
+# Stories import for Arabic and German), and the home table renders one
+# series row per (tag, language).  The overview and the reader's
+# prev/next must therefore never mix languages.
+
+
+@pytest.fixture(name="_erin_in_two_languages")
+def fixture_erin_in_two_languages(app_context, english, german):
+    "Erin in English and German: two books each."
+    en1 = _mk_tagged_book("Erin-en-01", ["Erin"], english)
+    en2 = _mk_tagged_book("Erin-en-02", ["Erin"], english)
+    de1 = _mk_tagged_book("Erin-de-01", ["Erin"], german)
+    de2 = _mk_tagged_book("Erin-de-02", ["Erin"], german)
+    return en1, en2, de1, de2
+
+
+def test_overview_without_language_shows_all(app_context, _erin_in_two_languages):
+    "No lgid: unchanged behaviour, every language's books are listed."
+    vm = get_series_overview(db.session, "Erin")
+    assert vm["total_count"] == 4
+    assert vm["lgid"] is None
+
+
+def test_overview_scoped_to_one_language(app_context, _erin_in_two_languages, german):
+    "lgid restricts the overview to that language only."
+    vm = get_series_overview(db.session, "Erin", lgid=german.id)
+    assert [b["BkTitle"] for b in vm["books"]] == ["Erin-de-01", "Erin-de-02"]
+    assert vm["total_count"] == 2
+    assert vm["lgid"] == german.id
+
+
+def test_overview_scoped_to_language_with_no_books(
+    app_context, _erin_in_two_languages, arabic
+):
+    "A language without books carrying the tag gives the empty view."
+    assert get_series_overview(db.session, "Erin", lgid=arabic.id) is None
+
+
+def test_series_page_route_carries_language(
+    app, app_context, _erin_in_two_languages, german
+):
+    "GET /book/series/<tag>?lgid=<id> renders only that language's books."
+    client = app.test_client()
+    resp = client.get(f"/book/series/Erin?lgid={german.id}")
+    assert resp.status_code == 200
+    body = resp.data
+    assert b"Erin-de-01" in body
+    assert b"Erin-en-01" not in body, "other language must not leak in"
+
+
+def test_neighbours_stay_in_language(
+    app_context, _erin_in_two_languages, _erin_is_book_set
+):
+    "Reader prev/next never walks into another language sharing the tag."
+    en1, en2, de1, _de2 = _erin_in_two_languages
+    assert series_neighbours(db.session, en1) == {
+        "prev": None,
+        "next": {"id": en2.id, "title": "Erin-en-02"},
+    }
+    assert series_neighbours(db.session, de1) == {
+        "prev": None,
+        "next": {"id": _de2.id, "title": "Erin-de-02"},
+    }, "the German set starts at its own first volume"

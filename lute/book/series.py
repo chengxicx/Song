@@ -95,6 +95,10 @@ WHERE b.BkID in (
     inner join tags2 t2 on t2.T2ID = bt.BtT2ID
     where t2.T2Text = :tagtext
 )
+/* Optional language scope: a series row on the home table is already
+   per-language (see datatables._series_union_base_sql), so its overview
+   must not mix languages sharing the same tag text. */
+AND (:lgid IS NULL OR b.BkLgID = :lgid)
 ORDER BY b.BkArchived, b.BkTitle COLLATE NOCASE
 """
 
@@ -135,12 +139,16 @@ FROM books b
 INNER JOIN booktags bt ON bt.BtBkID = b.BkID
 INNER JOIN tags2 t2 ON t2.T2ID = bt.BtT2ID
 WHERE t2.T2Text = :tagtext
+/* Reader navigation stays inside the book's own language. */
+AND (:lgid IS NULL OR b.BkLgID = :lgid)
 """
 
 
-def _ordered_series_rows(session, tagtext):
+def _ordered_series_rows(session, tagtext, lgid=None):
     "Every book carrying the tag, in the overview page's display order."
-    rows = session.execute(db.text(_SERIES_ROWS_SQL), {"tagtext": tagtext}).fetchall()
+    rows = session.execute(
+        db.text(_SERIES_ROWS_SQL), {"tagtext": tagtext, "lgid": lgid}
+    ).fetchall()
     # Same natural re-sort the overview does: the SQL ORDER BY would put
     # "Ep 10" before "Ep 2".
     return sorted(rows, key=lambda r: (r.BkArchived, _natural_title_key(r.BkTitle)))
@@ -159,7 +167,9 @@ def series_neighbours(session, book):
     tagtext = series_tag_for_book(session, book)
     if tagtext is None:
         return {"prev": None, "next": None}
-    rows = _ordered_series_rows(session, tagtext)
+    # Same language only: a shared tag (e.g. "MiniStories" imported for
+    # several languages) must not walk the reader into another language.
+    rows = _ordered_series_rows(session, tagtext, book.language_id)
     idx = next((i for i, r in enumerate(rows) if r.BkID == book.id), None)
     if idx is None:
         return {"prev": None, "next": None}
@@ -173,15 +183,22 @@ def series_neighbours(session, book):
     }
 
 
-def get_series_overview(session, tagtext):
+def get_series_overview(session, tagtext, lgid=None):
     """
     View model for the series page, or None if no books carry the tag.
+
+    `lgid` optionally scopes the series to one language: the home table
+    renders one series row per (tag, language), and the tag alone can be
+    shared by several languages (e.g. Mini Stories imported in Arabic
+    and German), so the row's link must carry its language through.
 
     Each entry in `books` doubles as a row for the client-side
     DataTable on the overview page (BkID/BkTitle/... keys, mirroring
     the home book table's row shape), plus a few display-only fields.
     """
-    rows = session.execute(db.text(_SERIES_BOOKS_SQL), {"tagtext": tagtext}).fetchall()
+    rows = session.execute(
+        db.text(_SERIES_BOOKS_SQL), {"tagtext": tagtext, "lgid": lgid}
+    ).fetchall()
     # The SQL ORDER BY is lexicographic ("10." < "2."); re-sort naturally
     # so the continue target and no-JS fallback follow episode order.
     rows = sorted(rows, key=lambda r: (r.BkArchived, _natural_title_key(r.BkTitle)))
@@ -266,6 +283,7 @@ def get_series_overview(session, tagtext):
 
     return {
         "tag": tagtext,
+        "lgid": lgid,
         "book_count": active_count,
         "total_count": len(books),
         "read_count": read_count,

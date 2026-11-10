@@ -911,7 +911,13 @@
             msg += ' ' + data.failed + ' ' + I18N.t('failed.');
           }
           $('#epub-confirm-status').text(msg).css('color', 'green');
-          window.location.href = '/book/series/' + encodeURIComponent(data.series_tag);
+          // Scope the overview to the imported book's language: the same
+          // series tag can exist in more than one language.
+          let seriesUrl = '/book/series/' + encodeURIComponent(data.series_tag);
+          if (data.language_id) {
+            seriesUrl += '?lgid=' + encodeURIComponent(data.language_id);
+          }
+          window.location.href = seriesUrl;
         })
         .catch(() => {
           btn.prop('disabled', false);

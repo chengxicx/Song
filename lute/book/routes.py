@@ -159,8 +159,15 @@ def book_settings():
 
 @bp.route("/series/<tagtext>", methods=["GET"])
 def series(tagtext):
-    "Series overview: all books carrying the given tag."
-    data = get_series_overview(db.session, tagtext)
+    """
+    Series overview: all books carrying the given tag.
+
+    ?lgid=<id> scopes it to one language -- the home table renders one
+    series row per (tag, language), and a tag text can be shared by
+    several languages, so the row's link passes its language along.
+    """
+    lgid = request.args.get("lgid", type=int) or None
+    data = get_series_overview(db.session, tagtext, lgid=lgid)
     if data is None:
         flash(t("No books found with tag") + f" '{tagtext}'", "notice")
         return redirect("/", 302)
@@ -1016,6 +1023,9 @@ def import_epub():
             "imported": imported,
             "failed": failed,
             "series_tag": book_title,
+            # The overview must be scoped to this book's language: the
+            # tag text alone can be shared by several languages.
+            "language_id": language_id,
         }
     )
 

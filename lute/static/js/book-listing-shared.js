@@ -235,13 +235,17 @@ let render_book_title = function ( data, type, row, meta ) {
   if (type === 'sort' || type === 'filter') {
     return String(row['SeriesTag'] || row['BkTitle'] || '');
   }
-  // Series aggregate row: link to the series overview page.
+  // Series aggregate row: link to the series overview page.  A series
+  // row is one (tag, language) pair -- the same tag text can exist in
+  // several languages (e.g. Mini Stories) -- so carry the language.
   if (row['SeriesTag']) {
     const tag = encodeURIComponent(row['SeriesTag']);
+    const lgid = parseInt(row['LgID']);
+    const lgq = isNaN(lgid) ? '' : `?lgid=${lgid}`;
     const n = parseInt(row['SeriesBookCount']);
     const r = parseInt(row['SeriesReadCount']);
     return `<div class="series-titlebox">` +
-      `<a class="book-title series-title" href="/book/series/${tag}">${row['SeriesTag']}</a>` +
+      `<a class="book-title series-title" href="/book/series/${tag}${lgq}">${row['SeriesTag']}</a>` +
       `<div class="series-sub">${n} ${I18N.t('eps')} &middot; ${r}/${n} ${I18N.t('read')}</div>` +
       `</div>`;
   }
