@@ -3,6 +3,16 @@
 
 Feature changes:
 
+* Restoring a backup keeps the AI sentence translations and grammar
+  explanations.  A backup is the whole sqlite file, so it has always
+  carried the airesults table; the loss happened on restore, where
+  replacing the database discarded explanations generated after the
+  backup was taken (and backups older than the table had none at all).
+  Restore now merges the pre-restore rows into the restored database:
+  one row per result key, the pre-restore copy winning for a key it
+  shares with the backup, rows whose sentence isn't in the restored
+  library skipped instead of erroring, and the table created first when
+  an old backup has none.  The restore message reports the counts.
 * A homograph's term card shows a meaning instead of a menu of
   readings.  MOJi 辞書 keys one entry per reading and gives the bare
   spelling a stub that is nothing but "See also: 空く【あく】" lines, so

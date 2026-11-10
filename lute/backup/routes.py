@@ -115,7 +115,17 @@ def _do_restore(filepath):
 
     pre_restore_backup = service.create_pre_restore_backup(c, settings)
 
-    safety_copy = service.restore_backup(c, filepath)
+    safety_copy, ai_merge = service.restore_backup(c, filepath)
+
+    ai_merge_note = ""
+    if any(ai_merge.values()):
+        ai_merge_note = (
+            f" AI explanations from your previous database: "
+            f"{ai_merge['added']} merged in, "
+            f"{ai_merge['updated']} kept over the backup copy (same result key), "
+            f"{ai_merge['skipped']} skipped because their sentence is not in "
+            f"this backup."
+        )
 
     flash(
         f"Backup restored successfully! "
@@ -123,7 +133,8 @@ def _do_restore(filepath):
         f"(and a safety copy of your previous database was saved as: "
         f"{os.path.basename(safety_copy)}). "
         f"Note: The restored database has its own backup settings. "
-        f"Please check Settings → Backup directory to make sure it's correct.",
+        f"Please check Settings → Backup directory to make sure it's correct."
+        f"{ai_merge_note}",
         "notice",
     )
     return redirect("/")

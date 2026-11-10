@@ -128,11 +128,17 @@ def library_export():
     target_lang = request.args.get("target_lang", "")
     if not str(book_id).isdigit():
         return jsonify({"ok": False, "message": "book_id is required."}), 400
+    # ?match=online makes each sentence carry the result the reading
+    # panel's /ai/translate would stream from its cache.  The default
+    # keeps the original per-book export used by the web UI.
+    match_online = request.args.get("match", "").strip().lower() == "online"
     try:
+        service.ensure_results_migration()
         payload = library.export_book(
             int(book_id),
             lang_id=int(lang_id) if str(lang_id).isdigit() else None,
             target_lang=target_lang,
+            online_lookup=_online_lookup_factory() if match_online else None,
         )
     except (library.LibraryError, ValueError) as e:
         message = getattr(e, "message", str(e))
@@ -330,11 +336,16 @@ def _acquire_events(provider_id, rpm):
         LIMITER.cancel(ticket)
 
 
-def _stream_events(provider_id, rpm, chunks, collected, usage, mid_state=None):
+def _stream_events(
+    provider_id, rpm, chunks, collected, usage, mid_state=None, quiet=False
+):
     """
     Yield text/state events for one outbound request, transparently
     retrying 429s.  ``collected`` receives the full reply; ``usage`` the
     token counts when the upstream sends them.  Returns True on success.
+
+    ``quiet`` runs the same request without the per-chunk ``text`` events
+    (used by the silent retry, which must not repaint the panel).
     """
     failures = 0
     cooldowns = 0
@@ -343,12 +354,14 @@ def _stream_events(provider_id, rpm, chunks, collected, usage, mid_state=None):
         granted = yield from _acquire_events(provider_id, rpm)
         if not granted:
             return False
-        yield _sse("state", {"state": "streaming"})
+        if not quiet:
+            yield _sse("state", {"state": "streaming"})
         try:
             collected["text"] = ""
             for chunk in chunks():
                 collected["text"] += chunk
-                yield _sse("text", {"text": chunk})
+                if not quiet:
+                    yield _sse("text", {"text": chunk})
                 if mid_state is not None:
                     name = mid_state(collected["text"])
                     if name and name != seen_mid:
@@ -478,6 +491,66 @@ def sentence_page():
     )
 
 
+def _sentence_lookup_context(langid):
+    """
+    The exact provider context POST /ai/translate resolves for a language.
+
+    Both the streaming endpoint and the offline export call this, so
+    they cannot drift onto different providers/models/target languages.
+    """
+    provider = service.sentence_provider(_language(langid))
+    ready = service.grammar_ready(provider or None)
+    source_lang, target_lang = _language_context(langid)
+    return ready, source_lang, target_lang
+
+
+def _sentence_cached_result(sentence, ready, source_lang, target_lang, meta=None):
+    """The very same cache read /ai/translate does.  Pure read, no LLM."""
+    return service.sentence_cached_result(
+        sentence,
+        ready["model"],
+        source_lang,
+        target_lang,
+        ready["provider"],
+        meta=meta,
+    )
+
+
+def _online_lookup_factory():
+    """
+    A read-only ``online_lookup`` for export_book.
+
+    The panel's stored-result key does not include the book, so the row an
+    online read shows may live under a different book than the export.
+    Resolving each sentence through /ai/translate's own lookup makes the
+    downloaded explanation the same one the online panel would stream.
+    Context is resolved once per language (it decrypts the API key), and
+    any failure falls back to the book's own row instead of failing an
+    entire offline download.
+    """
+    contexts = {}
+
+    def lookup(sentence, lang_id):
+        if lang_id not in contexts:
+            try:
+                contexts[lang_id] = _sentence_lookup_context(lang_id)
+            except Exception:  # pylint: disable=broad-exception-caught
+                # No configured provider/key: keep the book's own rows.
+                contexts[lang_id] = None
+        context = contexts[lang_id]
+        if context is None:
+            return None
+        ready, source_lang, target_lang = context
+        try:
+            return _sentence_cached_result(
+                sentence, ready, source_lang, target_lang
+            )
+        except Exception:  # pylint: disable=broad-exception-caught
+            return None
+
+    return lookup
+
+
 @bp.route("/translate", methods=["POST"])
 def translate():
     """
@@ -497,13 +570,9 @@ def translate():
     # request, so an ordinary reload goes back to the cache.
     force = str(payload.get("force") or payload.get("regenerate") or "").strip().lower()
     force = force in ("1", "true", "on", "yes")
-    source_lang, target_lang = _language_context(langid)
     feature_on = _language_feature_enabled(langid, "ai_sentence_translation")
     book_id = _int_or_none(payload.get("book_id") or payload.get("book"))
     lang_id = _int_or_none(langid)
-    # The AI dictionary row may pin a provider for this language; a pin
-    # whose key was removed falls back to the shared Settings choice.
-    provider = service.sentence_provider(_language(langid))
 
     def generate():
         try:
@@ -514,7 +583,7 @@ def translate():
                     "unsupported",
                 )
             service.ensure_results_migration()
-            ready = service.grammar_ready(provider or None)
+            ready, source_lang, target_lang = _sentence_lookup_context(langid)
             model = ready["model"]
             meta = {}
             cached = None
@@ -522,13 +591,8 @@ def translate():
                 # A normal open reuses the stored result (live, prefetch
                 # or import).  Regenerate deliberately skips this lookup
                 # so the provider is asked again for the same sentence.
-                cached = service.sentence_cached_result(
-                    sentence,
-                    model,
-                    source_lang,
-                    target_lang,
-                    ready["provider"],
-                    meta=meta,
+                cached = _sentence_cached_result(
+                    sentence, ready, source_lang, target_lang, meta=meta
                 )
             if cached is not None:
                 yield _sse(
@@ -582,6 +646,42 @@ def translate():
             if not delivered:
                 return
             parsed = service.parse_sentence_json(collected["text"])
+            incomplete = []
+            if parsed is not None and service.sentence_context_is_label(
+                parsed.get("context")
+            ):
+                # A bare label ("课文叙述", "课堂对话") says nothing about
+                # this sentence: ask the provider once more, quietly (no
+                # text events, so the panel keeps what it already shows).
+                # Still a label afterwards -> keep the original result,
+                # mark it incomplete, and do not cache it.
+                yield _sse("state", {"state": "waiting_structure"})
+                retry_collected = {"text": ""}
+                retried = yield from _stream_events(
+                    ready["provider"],
+                    ready.get("rpm"),
+                    lambda: service.translate_stream(
+                        ready["provider"],
+                        sentence,
+                        source_lang,
+                        target_lang,
+                        usage=usage,
+                    ),
+                    retry_collected,
+                    usage,
+                    quiet=True,
+                )
+                second = (
+                    service.parse_sentence_json(retry_collected["text"])
+                    if retried
+                    else None
+                )
+                if second is not None and not service.sentence_context_is_label(
+                    second.get("context")
+                ):
+                    parsed = second
+                else:
+                    incomplete.append("context")
             if parsed is None:
                 # Never send the raw reply as body text: prefer its
                 # translation field, otherwise a readable retry message.
@@ -596,21 +696,23 @@ def translate():
                     {"fallback": True, "text": readable, "unparsable": True},
                 )
             else:
-                # Only a parsed result is stored, so an unparsable reply
-                # can never be served again from the cache.
-                service.store_sentence_result(
-                    sentence,
-                    model,
-                    source_lang,
-                    target_lang,
-                    parsed,
-                    provider_id=ready["provider"],
-                    book_id=book_id,
-                    lang_id=lang_id,
-                    source="regenerate" if force else "live",
-                    token_usage=usage.get("usage"),
-                )
-                yield _sse("result", {"result": parsed})
+                # Only a parsed result with a usable context is stored,
+                # so neither an unparsable reply nor a bare label can be
+                # served again from the cache.
+                if not incomplete:
+                    service.store_sentence_result(
+                        sentence,
+                        model,
+                        source_lang,
+                        target_lang,
+                        parsed,
+                        provider_id=ready["provider"],
+                        book_id=book_id,
+                        lang_id=lang_id,
+                        source="regenerate" if force else "live",
+                        token_usage=usage.get("usage"),
+                    )
+                yield _sse("result", {"result": parsed, "incomplete": incomplete})
             yield _sse("done", {})
         except AiError as e:
             yield _sse(

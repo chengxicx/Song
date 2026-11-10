@@ -1039,6 +1039,43 @@ def test_parse_sentence_json_returns_none_for_plain_text():
     assert service.parse_sentence_json('{"error":"unexpected"}') is None
 
 
+@pytest.mark.parametrize(
+    "context",
+    [
+        "课文叙述",
+        "课文对话",
+        "课堂对话",
+        "对话",
+        "叙述",
+        "练习",
+        "问答",
+        "narration",
+        "Dialogue.",
+        "textbook example",
+    ],
+)
+def test_sentence_context_is_label_flags_material_labels(context):
+    "A bare genre/material label says nothing about the sentence."
+    assert service.sentence_context_is_label(context)
+
+
+@pytest.mark.parametrize(
+    "context",
+    [
+        "",
+        None,
+        "ナレーション：主人公がバスを降りる場面。",
+        "初次见面，小李向日本同事介绍自己的国籍；对方刚问过「お国はどちらですか」。",
+        "哥哥出门前叮嘱弟弟把门锁好，弟弟在门口答应。",
+        "The narrator steps off a bus into the cold street.",
+        "narration of the scene",
+    ],
+)
+def test_sentence_context_is_label_keeps_real_context(context):
+    "A situation note, even a short one, is never rejected."
+    assert not service.sentence_context_is_label(context)
+
+
 def test_sentence_cache_uses_a_v2_key_and_round_trips(app_context):
     "Structured results are cached under the versioned key."
     result = {"translation": "Hello.", "segments": [], "examples": []}

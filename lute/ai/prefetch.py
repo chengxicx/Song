@@ -174,6 +174,11 @@ def _run_one(job):
     if not _is_current(job):
         return
     for sentence, parsed in results:
+        # A context that is only a material label ("课文叙述") is not a
+        # usable result: leave the sentence uncached so the next open
+        # asks the provider again instead of serving the label forever.
+        if service.sentence_context_is_label(parsed.get("context")):
+            continue
         # A live request can finish while this batch is in flight.  If
         # the reader already regenerated the sentence, keep that fresh
         # row instead of replacing it with the background copy.

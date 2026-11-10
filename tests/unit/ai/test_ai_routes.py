@@ -230,6 +230,71 @@ def test_translate_force_failure_keeps_the_stored_result(
     assert "Broken." not in after
 
 
+def test_translate_retries_once_when_the_context_is_a_bare_label(
+    monkeypatch, app_context, client
+):
+    "A label-only context triggers one silent retry; the good reply wins."
+    _configure(client)
+    replies = [
+        json.dumps(
+            {"translation": "Labelled.", "context": "课文叙述", "segments": []}
+        ),
+        json.dumps(
+            {
+                "translation": "Good.",
+                "context": "哥哥出门前叮嘱弟弟把门锁好，弟弟在门口答应。",
+                "segments": [],
+            }
+        ),
+    ]
+
+    def fake_post(*args, **kwargs):
+        payload = replies.pop(0)
+        return FakeResponse(lines=_sse({"choices": [{"delta": {"content": payload}}]}))
+
+    monkeypatch.setattr("lute.ai.service.requests.post", fake_post)
+    body = client.post("/ai/translate", json={"q": "Hello"}).get_data(as_text=True)
+    # The first attempt is streamed as partial text; the retry replaces
+    # it with the final result.
+    assert '"translation": "Good."' in body
+    assert '"incomplete": []' in body
+
+    row = (
+        db.session.query(AiResult)
+        .filter_by(sentence="Hello", result_type="sentence")
+        .one()
+    )
+    assert "哥哥出门前叮嘱弟弟把门锁好" in row.result_json
+
+
+def test_translate_label_context_after_the_retry_is_not_cached(
+    monkeypatch, app_context, client
+):
+    "Still a bare label: keep the result, mark it incomplete, store nothing."
+    _configure(client)
+    labelled = json.dumps(
+        {"translation": "Labelled.", "context": "课堂对话", "segments": []}
+    )
+    monkeypatch.setattr(
+        "lute.ai.service.requests.post",
+        lambda *a, **k: FakeResponse(
+            lines=_sse({"choices": [{"delta": {"content": labelled}}]})
+        ),
+    )
+    body = client.post("/ai/translate", json={"q": "Hello"}).get_data(as_text=True)
+    assert "Labelled." in body
+    assert '"incomplete": ["context"]' in body
+    assert (
+        db.session.query(AiResult)
+        .filter_by(sentence="Hello", result_type="sentence")
+        .count()
+        == 0
+    )
+
+    again = client.post("/ai/translate", json={"q": "Hello"}).get_data(as_text=True)
+    assert '"state": "cached"' not in again
+
+
 def test_sentence_page_shows_a_regenerate_button(app_context, client):
     "The panel offers Regenerate next to the existing retry action."
     _configure(client)
@@ -709,6 +774,8 @@ def test_language_form_offers_japanese_and_other_ai_languages(app_context):
     )
 
 
+
+
 # ---------------------------------------------------------------------
 # Panel state events
 # ---------------------------------------------------------------------
@@ -1081,3 +1148,68 @@ def test_voice_supported_only_for_languages_edge_tts_can_speak():
     assert voice_supported_for_tag("ja-JP") is True
     assert voice_supported_for_tag("la") is False
     assert voice_supported_for_tag("") is False
+
+
+def test_export_match_online_uses_the_translate_cache_lookup(
+    monkeypatch, app_context, client, english
+):
+    """?match=online goes through /ai/translate's own cache read.
+
+    The panel resolves an explanation by sentence + target language +
+    provider/model (not by book), so an offline download must use that
+    same lookup or it can show a different stored answer.  The plain
+    export used by the web UI keeps its per-book behaviour.
+    """
+    from lute.models.book import Sentence
+
+    _configure(client)
+    book = make_book("Offline", "placeholder", english)
+    db.session.add(book)
+    db.session.commit()
+    db.session.add(
+        Sentence(tx_id=book.texts[0].id, order=1, text_content="Hello there.")
+    )
+    db.session.commit()
+
+    payload = {
+        "version": 1,
+        "book_id": book.id,
+        "lang_id": english.id,
+        "target_lang": "zh",
+        "model": "outside-ai",
+        "items": [{"sentence": "Hello there.", "translation": "书里的译文"}],
+    }
+    data = {
+        "file": (io.BytesIO(json.dumps(payload).encode("utf-8")), "x.json"),
+    }
+    assert (
+        client.post(
+            "/ai/library/import", data=data, content_type="multipart/form-data"
+        ).status_code
+        == 200
+    )
+
+    calls = []
+
+    def fake_cache(sentence, ready, source_lang, target_lang, meta=None):
+        calls.append(sentence)
+        return {"translation": "联网看到的译文"}
+
+    monkeypatch.setattr("lute.ai.routes._sentence_cached_result", fake_cache)
+    monkeypatch.setattr(
+        "lute.ai.service.requests.post",
+        lambda *a, **k: pytest.fail("export must not call a provider"),
+    )
+
+    online = client.get(
+        f"/ai/library/export?book_id={book.id}&match=online"
+    ).get_json()
+    assert online["match"] == "online"
+    assert online["items"][0]["translation"] == "联网看到的译文"
+    assert calls == ["Hello there."]
+
+    calls.clear()
+    plain = client.get(f"/ai/library/export?book_id={book.id}").get_json()
+    assert plain["match"] == "book"
+    assert plain["items"][0]["translation"] == "书里的译文"
+    assert calls == []

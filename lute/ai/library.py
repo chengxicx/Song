@@ -306,8 +306,15 @@ def _validate_item(item):
         for key in ("segments", "grammar", "examples"):
             if key in item and not _is_str_list(item[key]):
                 raise ValueError(f"{key} must be a list of objects")
-        if "context" in item and not isinstance(item["context"], str):
-            raise ValueError("context must be a string")
+        context = item.get("context")
+        if context is not None:
+            if not isinstance(context, str):
+                raise ValueError("context must be a string")
+            if service.sentence_context_is_label(context):
+                raise ValueError(
+                    "context is only a material-type label (e.g. '课文叙述', "
+                    "'课堂对话'); describe the situation instead"
+                )
         result = {
             key: item[key]
             for key in service._SENTENCE_JSON_KEYS  # pylint: disable=protected-access
@@ -435,12 +442,22 @@ def import_file(stream, filename, target_lang="", overwrite=False):
 # ---------------------------------------------------------------------
 
 
-def export_book(book_id, lang_id=None, target_lang=None):
+def export_book(book_id, lang_id=None, target_lang=None, online_lookup=None):
     """
     Every stored explanation for one book, in the importable format.
 
     Rows are exported one per item with their own target_lang and kind,
     so a re-import round-trips even when several languages are present.
+
+    ``online_lookup(sentence, lang_id)`` is optional.  When given, a
+    sentence item carries the result that helper returns instead of the
+    book's own row.  The reading panel resolves a sentence's explanation
+    by sentence + target language + provider/model (never by book), so a
+    book export and an online read can otherwise pick two different rows
+    for the same sentence -- e.g. a per-book import versus a global
+    prefetch.  Passing the panel's own cache lookup here makes offline
+    downloads show exactly what an online reader sees.  The helper must
+    be a pure read; a ``None``/empty reply keeps the book's own row.
     """
     book = db.session.get(Book, int(book_id))
     if book is None:
@@ -452,6 +469,7 @@ def export_book(book_id, lang_id=None, target_lang=None):
         query = query.filter(AiResult.target_lang == target_lang)
     rows = query.order_by(AiResult.id).all()
 
+    resolved_lang_id = int(lang_id) if lang_id is not None else book.language_id
     items = []
     for row in rows:
         try:
@@ -460,6 +478,10 @@ def export_book(book_id, lang_id=None, target_lang=None):
             continue
         if not isinstance(payload, dict):
             continue
+        if online_lookup is not None and row.result_type == service.RESULT_TYPE_SENTENCE:
+            online = online_lookup(row.sentence, resolved_lang_id)
+            if isinstance(online, dict) and online:
+                payload = online
         item = {"sentence": row.sentence, "kind": row.result_type}
         item.update(payload)
         if row.target_lang:
@@ -471,8 +493,9 @@ def export_book(book_id, lang_id=None, target_lang=None):
         "version": 1,
         "book_id": book.id,
         "book_title": book.title,
-        "lang_id": int(lang_id) if lang_id is not None else book.language_id,
+        "lang_id": resolved_lang_id,
         "target_lang": target_lang or (langs[0] if len(langs) == 1 else "mixed"),
         "model": "mixed",
+        "match": "online" if online_lookup is not None else "book",
         "items": items,
     }

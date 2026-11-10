@@ -24,6 +24,54 @@ class BackupException(Exception):
     """
 
 
+# The AI result table, exactly as
+# lute/db/schema/migrations/20261105_create_ai_results.sql defines it.
+# Restore runs this first because a backup made before AI explanations
+# existed has no "airesults" table, and the merge below would otherwise
+# have nowhere to write.  Every statement is IF NOT EXISTS, so running it
+# on a db that already has the table is a no-op, and the pending
+# migration still records itself normally on the next request.
+_AI_RESULTS_SCHEMA_SQL = """
+CREATE TABLE IF NOT EXISTS "airesults" (
+       "id"           INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+       "key"          VARCHAR(255) NOT NULL,
+       "result_type"  VARCHAR(20) NOT NULL DEFAULT 'sentence',
+       "book_id"      INTEGER,
+       "lang_id"      INTEGER,
+       "sentence"     TEXT NOT NULL DEFAULT '',
+       "result_json"  TEXT NOT NULL DEFAULT '',
+       "provider_id"  VARCHAR(64) NOT NULL DEFAULT '',
+       "model"        VARCHAR(255) NOT NULL DEFAULT '',
+       "target_lang"  VARCHAR(64) NOT NULL DEFAULT '',
+       "source"       VARCHAR(20) NOT NULL DEFAULT 'live',
+       "token_usage"  TEXT,
+       "hit_count"    INTEGER NOT NULL DEFAULT 0,
+       "created_at"   DATETIME NOT NULL,
+       "updated_at"   DATETIME NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS "ix_airesults_key" ON "airesults" ("key");
+CREATE INDEX IF NOT EXISTS "ix_airesults_book_id" ON "airesults" ("book_id");
+CREATE INDEX IF NOT EXISTS "ix_airesults_lang_id" ON "airesults" ("lang_id");
+"""
+
+_AI_RESULT_COLUMNS = (
+    "key",
+    "result_type",
+    "book_id",
+    "lang_id",
+    "sentence",
+    "result_json",
+    "provider_id",
+    "model",
+    "target_lang",
+    "source",
+    "token_usage",
+    "hit_count",
+    "created_at",
+    "updated_at",
+)
+
+
 class DatabaseBackupFile:
     """
     A representation of a lute backup file to hold metadata attributes.
@@ -325,6 +373,109 @@ class Service:
             if re.match(r"(manual_)?lute_backup_", f)
         ]
 
+    def _merge_previous_ai_results(self, source_dbfilename, dbfilename):
+        """
+        Keep the AI explanations that existed before the restore.
+
+        A restore replaces the whole database, so explanations generated
+        since the backup was taken would otherwise disappear.  This reads
+        them from the pre-restore copy and writes them into the restored
+        database:
+
+        - one row per result key (the unique index), so the same
+          explanation is never duplicated;
+        - for an existing key the pre-restore row wins, so the newer
+          explanation is kept instead of the older copy from the backup;
+        - rows whose sentence no longer exists in the restored library
+          (cross-user or cross-book restores, edited books) are skipped
+          and counted instead of failing the restore;
+        - a missing "airesults" table (a backup made before AI results
+          existed) is created first.
+
+        Returns {"added", "updated", "skipped"} counts.  Best effort: a
+        database error leaves the restored database usable without the
+        merge.
+        """
+        from lute.ai.service import (  # pylint: disable=import-outside-toplevel
+            clean_sentence,
+        )
+
+        stats = {"added": 0, "updated": 0, "skipped": 0}
+        try:
+            src = sqlite3.connect(str(source_dbfilename))
+        except sqlite3.Error:
+            return stats
+        try:
+            src_columns = [r[1] for r in src.execute('PRAGMA table_info("airesults")')]
+            if not src_columns:
+                return stats
+            if set(_AI_RESULT_COLUMNS) - set(src_columns):
+                return stats
+            select_sql = f"SELECT {', '.join(_AI_RESULT_COLUMNS)} FROM airesults"
+            # Sentences that still exist after the restore, normalized
+            # the same way the AI code stores them.
+            wanted = set()
+            for row in src.execute(select_sql):
+                text = clean_sentence(row[_AI_RESULT_COLUMNS.index("sentence")])
+                if text:
+                    wanted.add(text)
+
+            dst = sqlite3.connect(str(dbfilename))
+            try:
+                dst.executescript(_AI_RESULTS_SCHEMA_SQL)
+                present = set()
+                for (text,) in dst.execute("SELECT SeText FROM sentences"):
+                    text = clean_sentence(text)
+                    if text in wanted:
+                        present.add(text)
+
+                insert_sql = (
+                    'INSERT INTO airesults ("key", result_type, book_id, lang_id, '
+                    "sentence, result_json, provider_id, model, target_lang, source, "
+                    "token_usage, hit_count, created_at, updated_at) VALUES "
+                    f"({', '.join(['?'] * len(_AI_RESULT_COLUMNS))})"
+                )
+                update_sql = (
+                    "UPDATE airesults SET result_type = ?, book_id = ?, "
+                    "lang_id = ?, sentence = ?, result_json = ?, "
+                    "provider_id = ?, model = ?, target_lang = ?, source = ?, "
+                    "token_usage = ?, hit_count = ?, created_at = ?, "
+                    'updated_at = ? WHERE "key" = ?'
+                )
+                for row in src.execute(select_sql):
+                    values = dict(zip(_AI_RESULT_COLUMNS, row))
+                    key = values["key"] or ""
+                    text = clean_sentence(values["sentence"])
+                    if not key or not text or text not in present:
+                        stats["skipped"] += 1
+                        continue
+                    try:
+                        exists = dst.execute(
+                            'SELECT 1 FROM airesults WHERE "key" = ?', (key,)
+                        ).fetchone()
+                        if exists:
+                            params = [
+                                values[c] for c in _AI_RESULT_COLUMNS if c != "key"
+                            ]
+                            dst.execute(update_sql, params + [key])
+                            stats["updated"] += 1
+                        else:
+                            dst.execute(
+                                insert_sql,
+                                [values[c] for c in _AI_RESULT_COLUMNS],
+                            )
+                            stats["added"] += 1
+                    except sqlite3.Error:
+                        stats["skipped"] += 1
+                dst.commit()
+            finally:
+                dst.close()
+        except sqlite3.Error:
+            return stats
+        finally:
+            src.close()
+        return stats
+
     # Module-level flag to signal that the engine needs resetting.
     # Set by restore_backup(), checked in before_request handler.
     _engine_needs_reset = False
@@ -354,6 +505,13 @@ class Service:
 
         backup_file_path can be either a .db.gz file or a .db file.
         DANGEROUS: this replaces the current database.
+
+        AI explanations are an exception: the rows from the database
+        being replaced are merged into the restored one (see
+        _merge_previous_ai_results), so a restore never loses explanations
+        generated after the backup was taken.
+
+        Returns ``(safety_copy_path, ai_merge_stats)``.
         """
 
         if not os.path.exists(backup_file_path):
@@ -439,6 +597,10 @@ class Service:
             # Replace current database with restored one
             shutil.copy2(db_file_to_restore, current_db)
 
+            # Keep the AI explanations generated since the backup: the
+            # pre-restore database lives in the safety copy above.
+            ai_merge = self._merge_previous_ai_results(safety_copy, current_db)
+
             # Add any missing default user settings to the restored db,
             # and preserve system-specific settings (backup_dir, mecab_path).
             self._add_missing_default_settings(
@@ -451,7 +613,7 @@ class Service:
             # Set flag so the next request will reset the engine cleanly.
             Service._engine_needs_reset = True
 
-            return safety_copy
+            return safety_copy, ai_merge
         finally:
             # Clean up temp dir
             if temp_dir and os.path.exists(temp_dir):

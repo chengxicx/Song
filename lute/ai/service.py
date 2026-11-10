@@ -754,8 +754,21 @@ def build_translation_system_prompt(source_lang="", target_lang=""):
         "quote the exact source fragment each point governs.\n"
         "- examples: 2 to 3 short source-language sentences with their "
         f"{target} translation, close to a learner's level.\n"
-        "- context: why this translation, the tone/register, and any "
-        "ambiguities a learner should know about.\n"
+        "- context: one or two sentences, in "
+        f"{target}, describing the situation this sentence belongs to: "
+        "who is speaking to whom, what is happening around it, what the "
+        "preceding and following lines are about, and what the speaker is "
+        "doing with it (asking, confirming, complaining, narrating a "
+        "scene, ...).  If the surrounding text is not given, infer the "
+        "situation from the sentence itself (speaker, listener, place, "
+        "purpose) rather than naming the kind of text.\n"
+        "- Never answer context with the material, genre or exercise type "
+        "alone.  Bare labels such as 'narration', 'dialogue', 'textbook "
+        "example', '课文叙述', '课堂对话' or '对话' are wrong answers: "
+        "they tell the reader nothing about this sentence.  A good "
+        "context reads like: 'The narrator has just stepped off a bus and "
+        "the wind catches his coat, marking the shift from the warm bus "
+        "to the cold street.'\n"
         "- Quote original fragments verbatim.\n"
         "- If a field does not apply, use an empty string or empty array, "
         "but keep every key."
@@ -874,6 +887,73 @@ def parse_sentence_json(text):
         if isinstance(data, dict) and any(k in data for k in _SENTENCE_JSON_KEYS):
             return data
     return None
+
+
+# Context must say something about the sentence itself.  The model likes
+# to fall back to the material type ("课文叙述", "课堂对话", "narration")
+# when it has no surrounding text, which is useless to a reader.  Such a
+# value is a short, punctuation-free string built only from these words.
+_CONTEXT_LABEL_WORDS = (
+    "书面语", "书面", "口语",
+    "课文", "课堂", "对话", "叙述", "练习", "问答", "会话", "例句",
+    "教材", "课本", "文章", "段落", "文段", "正文", "语境", "场景",
+    "文体", "体裁", "听力", "阅读", "材料", "内容", "课",
+)
+_CONTEXT_LABEL_WORDS = tuple(sorted(_CONTEXT_LABEL_WORDS, key=len, reverse=True))
+_CONTEXT_LABEL_PUNCT = "，。、；：！？,.!?;:\"'“”‘’()（）[]【】—–-…"
+_EN_CONTEXT_LABELS = {
+    "dialogue",
+    "dialog",
+    "narration",
+    "narrative",
+    "conversation",
+    "textbook",
+    "exercise",
+    "lesson",
+    "example",
+    "reading",
+    "listening",
+    "spoken",
+    "written",
+    "text",
+    "passage",
+    "sentence",
+}
+
+
+def _context_cjk_label_only(compact):
+    "True when every character of ``compact`` belongs to a label word."
+    if not compact or len(compact) > 10:
+        return False
+    if any(ch in _CONTEXT_LABEL_PUNCT for ch in compact):
+        return False
+    rest = compact
+    while rest:
+        match = next(
+            (word for word in _CONTEXT_LABEL_WORDS if rest.startswith(word)), None
+        )
+        if match is None:
+            return False
+        rest = rest[len(match) :]
+    return True
+
+
+def sentence_context_is_label(value):
+    """
+    True when ``context`` is only a material-type label, not a situation.
+
+    Examples that count: ``课文叙述``, ``课堂对话``, ``narration`` and
+    ``Dialogue.``; anything longer than a few words, or containing a
+    real sentence, is left alone so a genuine context is never rejected.
+    """
+    text = (value or "").strip()
+    if not text:
+        return False
+    compact = re.sub(r"\s+", "", text)
+    if _context_cjk_label_only(compact):
+        return True
+    words = re.findall(r"[a-z]+", text.lower())
+    return 0 < len(words) <= 3 and all(word in _EN_CONTEXT_LABELS for word in words)
 
 
 def _unescape_json_string(value):
@@ -2218,7 +2298,10 @@ def build_batch_system_prompt(source_lang="", target_lang=""):
         "- segments: word-by-word meanings; quote the source part verbatim.\n"
         "- grammar: the key grammar points and the exact fragments they "
         "govern.\n"
-        "- context: a short note on usage or nuance.\n"
+        "- context: one or two sentences explaining the situation: who is "
+        "speaking to whom, what is happening around this sentence, and what "
+        "the speaker is doing with it.  Never return a bare material/genre "
+        "label such as 'narration', 'dialogue', '课文叙述' or '课堂对话'.\n"
         "- examples: up to two short example sentences with translations.\n"
         f"- Every explanatory string must be in {target}; quotes stay in "
         f"{source}.\n"

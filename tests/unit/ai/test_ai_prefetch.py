@@ -152,6 +152,41 @@ def test_run_one_does_not_replace_a_row_stored_during_the_batch(monkeypatch):
     assert calls["n"] == 4
 
 
+def test_run_one_does_not_cache_a_label_only_context(monkeypatch):
+    "A bare '课文叙述' context is not a usable result; leave it uncached."
+    stored = []
+    monkeypatch.setattr(prefetch, "_is_current", lambda job: True)
+    monkeypatch.setattr(
+        service, "sentence_provider_for_language_id", lambda lang_id: "p1"
+    )
+    monkeypatch.setattr(
+        service,
+        "grammar_ready",
+        lambda provider: {"provider": "p1", "model": "m1", "rpm": 20},
+    )
+    monkeypatch.setattr(service, "sentence_cached_result", lambda *a, **k: None)
+    monkeypatch.setattr(LIMITER, "acquire", lambda *a, **k: True)
+    monkeypatch.setattr(
+        service,
+        "translate_batch",
+        lambda provider, sentences, source, target, usage=None: (
+            [],
+            [
+                ("A.", {"translation": "甲", "context": "课文叙述"}),
+                ("B.", {"translation": "乙", "context": "哥哥出门前叮嘱弟弟。"}),
+            ],
+        ),
+    )
+    monkeypatch.setattr(
+        service,
+        "store_sentence_result",
+        lambda *a, **k: stored.append({"sentence": a[0], **k}),
+    )
+
+    prefetch._run_one(_job())  # pylint: disable=protected-access
+    assert [row["sentence"] for row in stored] == ["B."]
+
+
 def test_run_one_returns_silently_on_provider_failure(monkeypatch):
     monkeypatch.setattr(prefetch, "_is_current", lambda job: True)
     monkeypatch.setattr(

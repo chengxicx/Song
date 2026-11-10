@@ -206,6 +206,20 @@ def test_invalid_items_are_reported_and_the_rest_import(
     assert "unknown kind" in report["errors"][0]["reason"]
 
 
+def test_context_that_is_only_a_material_label_is_refused(
+    app_context, empty_db, english
+):
+    "A bare '课文叙述' context must not be imported as a usable result."
+    book = _make_book(english)
+    items = [
+        _item("Hello there, friend.", "你好，朋友。", context="课文叙述"),
+    ]
+    report = _import(_wrapper(book, english.id, items))
+    assert report["added"] == 0
+    assert len(report["errors"]) == 1
+    assert "material-type label" in report["errors"][0]["reason"]
+
+
 def test_grammar_items_keep_their_kind(app_context, empty_db, english):
     book = _make_book(english)
     items = [
@@ -275,3 +289,45 @@ def test_import_never_touches_the_rate_limiter(
     after = LIMITER.snapshot("import-entry", 20)
     assert before["queued"] == after["queued"] == 0
     assert before["tokens"] == after["tokens"]
+
+
+# --- Offline export must match what an online reader sees -----------------
+
+
+def test_export_online_lookup_replaces_the_books_sentence_row(
+    app_context, empty_db, english
+):
+    "The panel resolves by sentence, not by book: export must do the same."
+    book = _make_book(english)
+    _import(_wrapper(book, english.id, [_item(SENTENCES[0], "书里的译文")]))
+
+    def lookup(sentence, lang_id):
+        assert sentence == SENTENCES[0]
+        assert lang_id == english.id
+        return {"translation": "联网看到的译文", "segments": [{"part": "Hello"}]}
+
+    exported = library.export_book(book.id, online_lookup=lookup)
+    assert exported["match"] == "online"
+    item = exported["items"][0]
+    assert item["translation"] == "联网看到的译文"
+    assert item["segments"] == [{"part": "Hello"}]
+    assert "书里的译文" not in json.dumps(exported, ensure_ascii=False)
+
+
+def test_export_online_lookup_miss_keeps_the_book_row(
+    app_context, empty_db, english
+):
+    "A sentence with no online hit still exports the book's own answer."
+    book = _make_book(english)
+    _import(_wrapper(book, english.id, [_item(SENTENCES[0], "书里的译文")]))
+    exported = library.export_book(book.id, online_lookup=lambda s, l: None)
+    assert exported["items"][0]["translation"] == "书里的译文"
+
+
+def test_export_default_stays_per_book(app_context, empty_db, english):
+    "The web UI's export is unchanged unless ?match=online is asked for."
+    book = _make_book(english)
+    _import(_wrapper(book, english.id, [_item(SENTENCES[0], "你好")]))
+    exported = library.export_book(book.id)
+    assert exported["match"] == "book"
+    assert exported["items"][0]["translation"] == "你好"
