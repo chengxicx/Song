@@ -75,6 +75,32 @@ body {
     --input-placeholder-color-focus: rgba(0, 0, 0, 0.25);
     --status-ign-bg: var(--background-color);  /* Ign (⊘) status button fill */
 
+    /* UI refresh: derived surface / edge / muted-text tokens.  Every
+       value is computed from tokens the themes already set, so the
+       color-only themes, the grayscale e-ink theme and uploaded themes
+       follow automatically.  No new requests, scripts or animations. */
+    --surface-1: var(--panel-bg, #fff);
+    --surface-2: color-mix(in srgb, var(--panel-bg, #fff) 92%, var(--font-color, #000));
+    --surface-3: color-mix(in srgb, var(--font-color, #000) 6%, var(--panel-bg, #fff));
+
+    --border-subtle: color-mix(in srgb, var(--font-color, #000) 12%, transparent);
+    --border-strong: color-mix(in srgb, var(--font-color, #000) 22%, transparent);
+    --text-muted: color-mix(in srgb, var(--font-color, #000) 60%, var(--background-color, #fff));
+
+    --accent-soft: color-mix(in srgb, var(--btn-accent, #007aff) 12%, transparent);
+    --focus-ring: color-mix(in srgb, var(--btn-accent, #007aff) 45%, transparent);
+    --tracking-tight: -0.01em;
+
+    /* Book-shelf difficulty chips: one hue, three lightness steps,
+       INDEPENDENT of --status-N-color (shared with the reading pane).
+       The gradient also carries a border and a text label, so the
+       state is never communicated by colour alone (grayscale safe). */
+    --chip-1: color-mix(in srgb, var(--btn-accent, #007aff) 10%, var(--panel-bg, #fff));
+    --chip-2: color-mix(in srgb, var(--btn-accent, #007aff) 18%, var(--panel-bg, #fff));
+    --chip-3: color-mix(in srgb, var(--btn-accent, #007aff) 26%, var(--panel-bg, #fff));
+    --chip-fg: var(--font-color, #000);
+    --chip-border: color-mix(in srgb, var(--btn-accent, #007aff) 32%, transparent);
+
     background-color: var(--background-color);
     color: var(--font-color);
 
@@ -180,10 +206,11 @@ p.version {
     list-style-type: none;
     margin: 0;
     padding: 10px;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: var(--surface-2);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
     z-index: 1000;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
 }
 
 .last-sub-menu {
@@ -191,8 +218,13 @@ p.version {
 }
 
 .sub-menu li {
-    margin: 10px 0;
+    margin: 3px 0;
     white-space: nowrap;
+}
+
+.sub-menu li + li {
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 3px;
 }
 
 /* Hover-open only where hover really exists.  On touch screens :hover
@@ -436,22 +468,24 @@ div.toolbar {
     font-weight: bold;
     font-size: 0.8rem;
     text-transform: uppercase;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--chip-border);
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
 }
 
 .new-word-easy {
-    background-color: #72da88;
-    color: #1a5f2a;
+    background-color: var(--chip-1);
+    color: var(--chip-fg);
 }
 
 .new-word-chal {
-    background-color: #ffd43b;
-    color: #7a6000;
+    background-color: var(--chip-2);
+    color: var(--chip-fg);
 }
 
 .new-word-hard {
-    background-color: #ff6b6b;
-    color: #8b1a1a;
+    background-color: var(--chip-3);
+    color: var(--chip-fg);
 }
 
 .book-action-dropdown {
@@ -469,11 +503,12 @@ div.toolbar {
 .book-action-dropdown-content {
     display: none;
     position: absolute;
-    background-color: #f9f9f9;
+    background-color: var(--surface-2);
+    border: 1px solid var(--border-subtle);
     min-width: 120px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
     z-index: 10001;
-    border-radius: 5px;
+    border-radius: 12px;
     padding: 5px;
 }
 
@@ -485,7 +520,7 @@ div.toolbar {
 }
 
 .book-action-dropdown-content a:hover {
-    background-color: #f0f0f0;
+    background-color: var(--accent-soft);
 }
 
 /* The dropdown content is shown/hidden only by the JS handler
@@ -590,10 +625,10 @@ div.toolbar {
     max-height: 320px;
     overflow-y: auto;
     padding: 6px;
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    background: #fff;
-    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 12px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+    background: var(--surface-2);
+    border: 1px solid var(--border-subtle);
 }
 .colvis-menu .colvis-item {
     display: flex;
@@ -608,7 +643,7 @@ div.toolbar {
     white-space: nowrap;
 }
 .colvis-menu .colvis-item:hover {
-    background-color: rgba(0,122,255,0.08);
+    background-color: var(--accent-soft);
 }
 .colvis-menu .colvis-item input[type="checkbox"] {
     margin: 0;
@@ -4233,7 +4268,7 @@ input[name='status']:disabled + label {
     z-index: 10;
     user-select: none;
     background-color: transparent;
-    border-right: 1px solid #dee2e6;
+    border-right: 1px solid var(--border-subtle);
     transition: background-color 0.15s ease;
   }
 
@@ -4241,8 +4276,8 @@ input[name='status']:disabled + label {
   #booktable .resize-handle:active,
   .dt-scroll-headInner .resize-handle:hover,
   .dt-scroll-headInner .resize-handle:active {
-    background-color: rgba(0, 120, 255, 0.3);
-    border-right: 1px solid rgba(0, 120, 255, 0.6);
+    background-color: var(--accent-soft);
+    border-right: 1px solid var(--btn-accent, #007aff);
   }
 
 #booktable col {
@@ -4254,7 +4289,7 @@ input[name='status']:disabled + label {
 }
 
 #booktable thead th {
-    border-right: 1px solid #dee2e6 !important;
+    border-right: 1px solid var(--border-subtle) !important;
 }
 
 #booktable thead th:last-child {
@@ -4262,7 +4297,7 @@ input[name='status']:disabled + label {
 }
 
 #booktable thead {
-    border-bottom: 2px solid #dee2e6;
+    border-bottom: 2px solid var(--border-strong);
 }
 
 #booktable td:nth-child(3),
@@ -4821,16 +4856,25 @@ div#termimagesearch span img {
     min-width: 30px;
     height: 8px;
     border-radius: 999px;
-    background-color: rgba(128, 128, 128, 0.22);
+    background-color: var(--surface-3);
+    box-shadow: inset 0 0 0 1px var(--border-subtle);
     overflow: hidden;
 }
 .book-progress-fill {
     height: 100%;
     border-radius: 999px;
-    background-color: #4c6ef5;
+    background-image: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--btn-accent, #007aff) 62%, var(--surface-1)),
+        var(--btn-accent, #007aff)
+    );
 }
 .book-progress-fill-complete {
-    background-color: #2f9e44;
+    background-image: linear-gradient(
+        90deg,
+        color-mix(in srgb, #2f9e44 62%, var(--surface-1)),
+        #2f9e44
+    );
 }
 .book-progress-pct {
     flex: 0 0 auto;
@@ -6921,4 +6965,70 @@ span.textitem.shadow-miss {
     word-break: break-all;
 }
 
+/* ============================================================
+   UI refresh — scoped additions for the top bar, book shelf and
+   settings form.  Kept at the end so equal-specificity legacy rules
+   above are superseded; themes load afterwards and still win where
+   they define a token-backed value.
+   ============================================================ */
 
+/* Scoped focus ring.  Deliberately NOT a global `* :focus-visible`:
+   the reading pane owns its tooltip and tap-feedback outlines. */
+.menu-bar :focus-visible,
+.sub-menu :focus-visible,
+.dt-container :focus-visible,
+.settingstable :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+/* Book shelf: card-ify the DataTables wrapper only.  Its generated
+   DOM and the DataTables JS are untouched. */
+div#booktable_wrapper.dt-container {
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 14px;
+}
+
+#booktable tbody tr:hover {
+    background-color: var(--surface-3);
+}
+
+/* Settings form: table structure unchanged, section headers become
+   quiet cards and the label column drops back to muted text. */
+.settingstable h2 {
+    background: var(--surface-2);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 9px 14px;
+    margin: 20px 0 10px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: var(--tracking-tight);
+    color: var(--font-color);
+}
+
+.settingstable td:first-child {
+    color: var(--text-muted);
+}
+
+.settingstable .form-control,
+.settingstable select,
+.settingstable textarea {
+    min-height: 34px;
+    border-radius: var(--form-border-radius, 3px);
+    border-color: var(--border-subtle);
+}
+
+/* Reduced motion: colour-only hovers fade to a fully static state.
+   The themes only declare their short transitions inside the
+   no-preference branch, so nothing animates here. */
+@media (prefers-reduced-motion: reduce) {
+    .menu-item > span,
+    .sub-menu li a,
+    .book-action-dropdown-content a,
+    .colvis-menu .colvis-item {
+        transition: none;
+    }
+}

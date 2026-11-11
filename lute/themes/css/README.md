@@ -59,7 +59,15 @@ The night look is always dark, whatever the theme is.
 
 
 Note: Default.css still carries many non-color rules (geometry,
-backdrop filters, DataTables control layout).  Those stay in the theme
-for now — moving them into styles.css would change the look of the
-other (color-only) themes, which is a product decision to make
-separately.
+DataTables control layout).  Those stay in the theme for now —
+moving them into styles.css would change the look of the other
+(color-only) themes, which is a product decision to make separately.
+
+The backdrop filters that used to live here (menu bar, sub-menu,
+colvis menu, book action dropdown) were removed: an opaque
+`--surface-*` layer plus a 1px `--border-subtle` edge reads cleaner
+and no longer keeps a compositing layer alive while scrolling.
+The extra surface / border / muted-text tokens appended to the
+`body` block in styles.css are all derived from tokens every theme
+already sets, so color-only themes, grayscale themes and uploaded
+themes follow automatically without being edited.
