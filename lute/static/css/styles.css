@@ -91,15 +91,17 @@ body {
     --focus-ring: color-mix(in srgb, var(--btn-accent, #007aff) 45%, transparent);
     --tracking-tight: -0.01em;
 
-    /* Book-shelf difficulty chips: one hue, three lightness steps,
-       INDEPENDENT of --status-N-color (shared with the reading pane).
-       The gradient also carries a border and a text label, so the
-       state is never communicated by colour alone (grayscale safe). */
-    --chip-1: color-mix(in srgb, var(--btn-accent, #007aff) 10%, var(--panel-bg, #fff));
-    --chip-2: color-mix(in srgb, var(--btn-accent, #007aff) 18%, var(--panel-bg, #fff));
-    --chip-3: color-mix(in srgb, var(--btn-accent, #007aff) 26%, var(--panel-bg, #fff));
+    /* Book-shelf difficulty chips: three distinct hues (easy / challenging
+       / hard), INDEPENDENT of --status-N-color (shared with the reading
+       pane).  Each hue is mixed into the theme's own panel colour so dark,
+       light and uploaded themes keep readable contrast; the badge also
+       carries a border and the EASY / CHAL / HARD label, so the state is
+       never communicated by colour alone (grayscale safe). */
+    --chip-1: color-mix(in srgb, #34c759 22%, var(--panel-bg, #fff));
+    --chip-2: color-mix(in srgb, #f0b429 26%, var(--panel-bg, #fff));
+    --chip-3: color-mix(in srgb, #f0616d 30%, var(--panel-bg, #fff));
     --chip-fg: var(--font-color, #000);
-    --chip-border: color-mix(in srgb, var(--btn-accent, #007aff) 32%, transparent);
+    --chip-border: color-mix(in srgb, var(--font-color, #000) 20%, transparent);
 
     background-color: var(--background-color);
     color: var(--font-color);
