@@ -5,6 +5,7 @@
       data-paragraph-id="{{ item.paragraph_number }}"
       data-sentence-id="{{ item.sentence_number }}"
       data-text="{{ item.text }}"
+      {% if item.display_text != item.text %}data-display-text="{{ item.display_text }}"{% endif %}
       data-status-class="{{ item.status_class }}"
       data-order="{{ item.index }}"
       {% if item.wo_id is not none -%}

@@ -596,32 +596,52 @@ function _hide_term_edit_form() {
   */
 }
 
+/**
+ * Build the ZWS-joined text sent to /read/termform for a multiword
+ * selection.  Exposed on window for the JS harness tests.
+ *
+ * A span's data-text is the parser's FULL token text -- that is what the
+ * term popup, hover TTS and furigana lookup need.  But when two saved
+ * terms overlap (e.g. のか and かな sharing か), the later TextItem
+ * renders only its un-covered tail (な) and is marked .overlapped,
+ * while data-text still says か\u200Bな.  Joining those full texts
+ * counts the shared か twice and creates a bogus term "...のかかな"
+ * that can never match the page.
+ *
+ * data-display-text (textitem.html, emitted only when it differs from
+ * data-text) is TextItem.display_text: the un-covered tail with its
+ * internal ZWS token boundaries intact.  Prefer it, and keep data-text
+ * as the fallback for every other span, so ordinary spans and any
+ * rendering path that doesn't emit the attribute behave exactly as
+ * before.
+ *
+ * Never use text() as the primary source: it drops internal ZWS, so a
+ * span displaying すれば but stored as すれ\u200Bば collapses to one
+ * token, breaking token_count and the highlight after save (see
+ * tests/unit/read/render/test_multiword_highlight.py).
+ */
+function luteMultiwordTermText(selected) {
+  const ZWS = '\u200B';
+  const textparts = selected.toArray().map((el) =>
+    el.getAttribute('data-display-text') ||
+    $(el).data('text') ||
+    $(el).text()
+  );
+  // Join with ZWS, not '', so the exact tokens the parser already
+  // produced for this sentence are preserved and sent to the backend
+  // as-is, instead of being collapsed into a flat string that then has
+  // to be re-parsed out of context. Context-sensitive parsers (e.g.
+  // MeCab for Japanese) can tokenize an isolated substring differently
+  // than they tokenize it within its original sentence, which was
+  // causing newly-created multiword terms to not match when reading.
+  return textparts.join(ZWS).trim();
+}
+window.luteMultiwordTermText = luteMultiwordTermText;
+
 function show_multiword_term_edit_form(selected) {
   if (selected.length == 0)
     return;
-  // Zero-width space: matches the separator Lute uses internally
-  // (see lute.models.term.Term) to mark token boundaries in
-  // multiword terms.
-  const ZWS = '\u200B';
-  // Use data('text') instead of text() to preserve the internal ZWS
-  // boundaries of multiword token spans. Each span's displayed text
-  // has ZWS stripped (see TextItem.html_display_text), but data-text
-  // holds the raw text with ZWS intact. Using text() would lose those
-  // internal boundaries, causing the created term's token_count to
-  // not match the actual parsed tokens on the page.
-  // Example: "すれば" displayed on screen may actually be stored as
-  // "すれ\u200Bば" (2 tokens). Using text() gives "すれば" (1 token),
-  // but data('text') gives "すれ\u200Bば" (2 tokens, correct).
-  const textparts = selected.toArray().map((el) => $(el).data('text') || $(el).text());
-  // Join with ZWS, not '', so the exact tokens the parser already
-  // produced for this sentence (i.e., the ones currently rendered
-  // on screen) are preserved and sent to the backend as-is, instead
-  // of being collapsed into a flat string that then has to be
-  // re-parsed out of context. Context-sensitive parsers (e.g. MeCab
-  // for Japanese) can tokenize an isolated substring differently
-  // than they tokenize it within its original sentence, which was
-  // causing newly-created multiword terms to not match when reading.
-  const text = textparts.join(ZWS).trim();
+  const text = luteMultiwordTermText(selected);
   if (text == "")
     return;
   const lid = parseInt(selected.eq(0).data('lang-id'));

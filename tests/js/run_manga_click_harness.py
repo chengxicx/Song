@@ -137,6 +137,21 @@ def main():
             len(spoken) >= 1 and spoken[0] == "です",
             " spoken=%r" % (spoken,),
         )
+
+        # --- 7. overlapped spans join displayed tokens, not full terms ---
+        zws = "\u200B"
+        checks = page.evaluate("window.__multiword_text_checks")
+        expected = zws.join(["some", " ", "data", " ", "here"])
+        check(
+            "overlapped selection does not duplicate the shared token",
+            checks["overlapped"] == expected,
+            " got=%r expected=%r" % (checks["overlapped"], expected),
+        )
+        check(
+            "span without data-display-text keeps ZWS token boundaries",
+            checks["fallback"] == "すれ" + zws + "ば",
+            " got=%r" % (checks["fallback"],),
+        )
         browser.close()
 
     print()

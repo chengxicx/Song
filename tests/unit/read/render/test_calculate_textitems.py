@@ -119,6 +119,43 @@ def test_overlapping_multiwords(english):
     assert_renderable_equals(english, data, words, expected, expected_displayed)
 
 
+def test_multiword_selection_uses_display_text_when_terms_overlap(english):
+    """
+    Regression for the reading pane's multiword selection.
+
+    lute-tooltip.js joins the selected spans to build the /read/termform
+    text.  A span's data-text holds the FULL term ("data here"), but an
+    overlapped span renders only its un-covered tail (" here").  Joining
+    the full texts counted the shared "data" twice and created a term
+    that could never match the page.  Joining display_text (what the new
+    data-display-text attribute carries) must give the visible tokens.
+    """
+    data = ["some", " ", "data", " ", "here", "."]
+    terms = [Term(english, t) for t in ("some data", "data here")]
+    # The two multiword term spans.  The trailing "." is a single-token
+    # item that is not part of the overlap under test.
+    tis = [
+        ti
+        for ti in get_textitems(make_tokens(data), terms, english)
+        if ti.token_count > 1
+    ]
+
+    zws = chr(0x200B)
+
+    def selected_tokens(attr):
+        "Tokens the JS would send, split back out at the ZWS boundaries."
+        return [tok for ti in tis for tok in getattr(ti, attr).split(zws)]
+
+    assert selected_tokens("display_text") == data[:-1]
+    assert "".join(selected_tokens("display_text")) == "some data here"
+    # Sanity: the on-screen text really is what we just reconstructed.
+    assert "".join(ti.html_display_text for ti in tis) == "some data here"
+    # The old data('text') join duplicated the shared token.
+    assert selected_tokens("text") == ["some", " ", "data", "data", " ", "here"]
+    # The template only emits data-display-text for the cut-off span.
+    assert [ti.display_text != ti.text for ti in tis] == [False, True]
+
+
 def test_multiwords_starting_at_same_location(english):
     """
     Test overlapping matches.
