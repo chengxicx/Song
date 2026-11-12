@@ -344,7 +344,10 @@ div.dt-container div.dt-layout-row:first-child {
    --------------------------------------------------------- */
 .dt-container, div.dt-container {
   margin-top: 16px !important;
-  padding: 0 24px !important;
+  /* No extra horizontal padding: .container already owns the 24px gutter
+     that .menu-bar uses.  A second inset here pushed the table 24px past
+     the top bar's left/right edges. */
+  padding: 0 !important;
 }
 
 table.dataTable, table {
@@ -357,6 +360,20 @@ table.dataTable, table {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03) !important;
   width: 100% !important;
 }
+/* DataTables' scrollX splits one table into a header table and a body
+   table.  The generic rule above gives both of them 12px corners and a
+   1px border, so their seam shows a doubled rounded frame.  Round only
+   the outer top/bottom corners and keep a single line at the seam. */
+div.dt-scroll-head table.dataTable {
+  border-radius: 12px 12px 0 0 !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+div.dt-scroll-body table.dataTable {
+  border-radius: 0 0 12px 12px !important;
+  border-top: none !important;
+}
+
 
 /* EPUB 书内表格是"书的一部分"，不是 UI 表格：上面的全局美化会涂穿到
    reader-mode 章节（书自己的表格排版——目录页、对照表——被换成 UI 卡片，
@@ -381,6 +398,15 @@ th {
   border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
   padding: 12px 16px !important;
 }
+/* Book listing headers must stay on one line: with 11 columns the narrow
+   ones (Type / AI Explain) otherwise wrap into truncated stubs.  scrollX
+   lets the table grow horizontally instead of crushing the labels. */
+#booktable thead th {
+  white-space: nowrap;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
 
 td {
   border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;

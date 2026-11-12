@@ -107,10 +107,14 @@ body {
     font: 100%/1.25 "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
 }
 
-/* Main container div for Lute site content. */
+/* Main container div for Lute site content.
+   Fixed gutters keep every page's content edge aligned with the top bar
+   (.menu-bar uses 24px horizontal padding).  A 95% width with auto margins
+   shifts by the vertical scrollbar width, leaving the right gutter ~15px
+   wider than the left one. */
 .container {
-    width: 95%;
-    margin: 0 auto;
+    width: auto;
+    margin: 0 24px;
     box-sizing: border-box;
 }
 
@@ -4533,6 +4537,7 @@ div#termimagesearch span img {
     /* Container fills the viewport on phones. */
     .container {
         width: 100%;
+        margin: 0;
         padding: 0 0.5rem;
         box-sizing: border-box;
     }
