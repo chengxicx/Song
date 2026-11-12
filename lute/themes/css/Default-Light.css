@@ -401,6 +401,10 @@ th {
 /* Book listing headers must stay on one line: with 11 columns the narrow
    ones (Type / AI Explain) otherwise wrap into truncated stubs.  scrollX
    lets the table grow horizontally instead of crushing the labels. */
+/* scrollX moves the visible header into a cloned table without an id,
+   so both the clone and the original body table must be targeted -- and
+   their padding must match or DataTables' column sizing drifts. */
+div.dt-scroll-head table.dataTable thead th,
 #booktable thead th {
   white-space: nowrap;
   padding-left: 10px !important;
