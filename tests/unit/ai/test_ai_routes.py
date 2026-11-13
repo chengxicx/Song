@@ -236,9 +236,7 @@ def test_translate_retries_once_when_the_context_is_a_bare_label(
     "A label-only context triggers one silent retry; the good reply wins."
     _configure(client)
     replies = [
-        json.dumps(
-            {"translation": "Labelled.", "context": "课文叙述", "segments": []}
-        ),
+        json.dumps({"translation": "Labelled.", "context": "课文叙述", "segments": []}),
         json.dumps(
             {
                 "translation": "Good.",
@@ -500,9 +498,7 @@ def test_provider_row_card_uses_theme_tokens(app_context, client):
     _configure(client)
     body = client.get("/settings/index").get_data(as_text=True)
     block = body.split('id="ai_provider_box"', 1)[1].split("</style>", 1)[0]
-    rule = re.search(
-        r"#ai_provider_rows \.ai-provider-row \{(.*?)\}", block, re.DOTALL
-    )
+    rule = re.search(r"#ai_provider_rows \.ai-provider-row \{(.*?)\}", block, re.DOTALL)
     assert rule is not None, "the provider card rule is gone"
     body_of_rule = rule.group(1)
     assert "var(--panel-bg" in body_of_rule or "color-mix" in body_of_rule
@@ -533,7 +529,9 @@ def test_settings_page_migrates_legacy_dual_cards(app_context, client):
 
 def _settings_post(ai_entries):
     "A complete settings POST, using the stored values for the selects."
-    from lute.models.repositories import UserSettingRepository  # pylint: disable=import-outside-toplevel
+    from lute.models.repositories import (
+        UserSettingRepository,
+    )  # pylint: disable=import-outside-toplevel
 
     repo = UserSettingRepository(db.session)
     data = {
@@ -744,15 +742,14 @@ def test_translate_uses_the_pinned_provider_and_grammar_keeps_the_global(
         lambda provider, sentence, source, target, usage=None: iter(["{}"]),
     )
     body = client.post(
-        "/ai/grammar/analyze", json={"q": "A pinned-provider sentence.", "lang": english.id}
+        "/ai/grammar/analyze",
+        json={"q": "A pinned-provider sentence.", "lang": english.id},
     ).get_data(as_text=True)
     assert '"provider": "openai"' in body
     assert '"provider": "anthropic"' not in body
 
 
-def test_sentence_page_shows_the_pinned_provider(
-    app_context, client, english
-):
+def test_sentence_page_shows_the_pinned_provider(app_context, client, english):
     "The tab's setup label reflects the language's pinned provider."
     from lute.ai import service
     from lute.models.language import AI_DICT_TYPE
@@ -783,8 +780,6 @@ def test_language_form_offers_japanese_and_other_ai_languages(app_context):
     assert LanguageForm().grammar_translate_lang.label.text == (
         "AI analysis & translation language"
     )
-
-
 
 
 # ---------------------------------------------------------------------
@@ -852,7 +847,15 @@ def test_waiting_structure_state_precedes_the_result(monkeypatch, app_context, c
                         }
                     ]
                 },
-                {"choices": [{"delta": {"content": '{"translation": "Hello.", "segments": []}'}}]},
+                {
+                    "choices": [
+                        {
+                            "delta": {
+                                "content": '{"translation": "Hello.", "segments": []}'
+                            }
+                        }
+                    ]
+                },
             )
         ),
     )
@@ -1021,7 +1024,13 @@ def test_translate_returns_the_structured_result(monkeypatch, app_context, clien
         "segments": [
             {"part": "Hello", "reading": "", "meaning": "你好", "role": "greeting"}
         ],
-        "grammar": [{"point": "compound", "explanation": "Two clauses.", "fragment": "Hello, world"}],
+        "grammar": [
+            {
+                "point": "compound",
+                "explanation": "Two clauses.",
+                "fragment": "Hello, world",
+            }
+        ],
         "context": "A neutral greeting.",
         "examples": [{"source": "Hello!", "translation": "你好！"}],
     }
@@ -1140,9 +1149,7 @@ def test_sentence_page_adds_a_play_button_for_the_supported_language(
     assert 'class="ai-tts-btn"' in body
 
 
-def test_sentence_page_omits_the_play_button_without_a_language(
-    app_context, client
-):
+def test_sentence_page_omits_the_play_button_without_a_language(app_context, client):
     "No language means no tag and no speaker button."
     _configure(client)
     body = client.get("/ai/sentence?q=Bonjour&lang=999").get_data(as_text=True)
@@ -1212,9 +1219,7 @@ def test_export_match_online_uses_the_translate_cache_lookup(
         lambda *a, **k: pytest.fail("export must not call a provider"),
     )
 
-    online = client.get(
-        f"/ai/library/export?book_id={book.id}&match=online"
-    ).get_json()
+    online = client.get(f"/ai/library/export?book_id={book.id}&match=online").get_json()
     assert online["match"] == "online"
     assert online["items"][0]["translation"] == "联网看到的译文"
     assert calls == ["Hello there."]

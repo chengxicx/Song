@@ -772,7 +772,15 @@ def test_deleting_the_default_reselects_the_first_configured(app_context):
         ]
     )
     remaining = service.save_provider_entries(
-        [{"id": saved[1]["id"], "format": "anthropic", "base_url": saved[1]["base_url"], "model": saved[1]["model"], "api_key": ""}]
+        [
+            {
+                "id": saved[1]["id"],
+                "format": "anthropic",
+                "base_url": saved[1]["base_url"],
+                "model": saved[1]["model"],
+                "api_key": "",
+            }
+        ]
     )
     assert len(remaining) == 1
     assert remaining[0]["is_default"] is True
@@ -882,8 +890,7 @@ def test_language_menu_lists_every_entry_id(app_context):
     labels = [label for _, label in choices[1:]]
     assert "Agnes · agnes-2.5-flash" in labels
     assert any(
-        "claude-sonnet-4-5" in label and "no API key" in label
-        for label in labels
+        "claude-sonnet-4-5" in label and "no API key" in label for label in labels
     )
     ids = [value for value, _ in choices[1:]]
     assert service.provider_entries()[0]["id"] in ids
@@ -992,8 +999,7 @@ def test_parse_sentence_json_tolerates_fences_and_partial_objects():
 def test_parse_sentence_json_repairs_a_truncated_tail():
     "A stream cut off mid-array still yields the leading translation."
     text = (
-        '{"translation":"Hello there.","segments":'
-        '[{"part":"Hello","meaning":"你好"}'
+        '{"translation":"Hello there.","segments":' '[{"part":"Hello","meaning":"你好"}'
     )
     data = service.parse_sentence_json(text)
     assert data["translation"] == "Hello there."

@@ -52,11 +52,15 @@ def test_only_the_first_four_sentences_are_queued(
     assert job["sentences"] == ["One.", "Two.", "Three.", "Four."]
 
 
-def test_a_new_page_replaces_the_queued_job(app_context):  # pylint: disable=unused-argument
+def test_a_new_page_replaces_the_queued_job(
+    app_context,
+):  # pylint: disable=unused-argument
     prefetch.schedule("u", 1, 2, ["Old."], "English", "Chinese")
     prefetch.schedule("u", 1, 2, ["New."], "English", "Chinese")
     assert prefetch.pending_count() == 1
-    assert prefetch._queue[0]["sentences"] == ["New."]  # pylint: disable=protected-access
+    assert prefetch._queue[0]["sentences"] == [
+        "New."
+    ]  # pylint: disable=protected-access
 
 
 def test_another_book_keeps_its_own_job(app_context):  # pylint: disable=unused-argument
@@ -65,7 +69,9 @@ def test_another_book_keeps_its_own_job(app_context):  # pylint: disable=unused-
     assert prefetch.pending_count() == 2
 
 
-def test_cancel_drops_the_queue_and_the_active_token(app_context):  # pylint: disable=unused-argument
+def test_cancel_drops_the_queue_and_the_active_token(
+    app_context,
+):  # pylint: disable=unused-argument
     prefetch.schedule("u", 1, 2, ["A."], "English", "Chinese")
     job = prefetch._queue[0]  # pylint: disable=protected-access
     prefetch.cancel("u", 1)

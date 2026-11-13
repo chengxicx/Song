@@ -465,7 +465,7 @@ function loadModule(path, exportSnippet) {
 
 /* ---------- the scenario runner ---------- */
 
-function runScenario(scenario, ttsPath, shadowingPath) {
+function runScenario(scenario, ttsPath, shadowingPath, plainTextPath) {
   (scenario.sentences || []).forEach(function (spec) {
     const p = new FakeEl("p");
     p.appendChild(buildSentence(spec));
@@ -501,6 +501,19 @@ function runScenario(scenario, ttsPath, shadowingPath) {
       },
     }`
   );
+
+  // lute-shadowing.js reads the practice sentence through
+  // window.lutePlainText, which the real page gets from lute-plain-text.js.
+  // Eval that production file rather than mirroring the rule here: the
+  // strip list (rt/rp and the sentence play button) is shared by the cue
+  // text and the shadowing text, and a second copy would silently drift.
+  // Callers that omit the path (e.g. JSC/osascript) fall back to the
+  // harness' equivalent ttsPlainText implementation.
+  if (plainTextPath) {
+    loadModule(plainTextPath, "{}");
+  } else {
+    window.lutePlainText = global.ttsPlainText;
+  }
 
   let shadowExports = null;
   if (shadowingPath) {
@@ -654,12 +667,13 @@ function runScenario(scenario, ttsPath, shadowingPath) {
 if (typeof process !== "undefined" && process.argv && process.argv[1]) {
   const ttsPath = process.argv[2];
   const shadowingPath = process.argv[3] || null;
+  const plainTextPath = process.argv[4] || null;
   const inputJson =
     typeof __INPUT_JSON__ === "string"
       ? __INPUT_JSON__
       : fsShimLike.readFileSync(0, "utf8");
   const out = JSON.stringify(
-    runScenario(JSON.parse(inputJson), ttsPath, shadowingPath)
+    runScenario(JSON.parse(inputJson), ttsPath, shadowingPath, plainTextPath)
   );
   if (typeof __EMIT__ === "function") __EMIT__(out);
   else process.stdout.write(out);

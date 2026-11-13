@@ -677,9 +677,9 @@ def public_entries_from_raw(raw_entries):
         if fmt not in PROVIDER_FORMATS:
             continue
         key_text = (item.get("api_key") or "").strip()
-        stored = decrypt((existing.get((item.get("id") or "").strip()) or {}).get(
-            "api_key", ""
-        ))
+        stored = decrypt(
+            (existing.get((item.get("id") or "").strip()) or {}).get("api_key", "")
+        )
         out.append(
             {
                 "id": (item.get("id") or "").strip(),
@@ -894,10 +894,32 @@ def parse_sentence_json(text):
 # when it has no surrounding text, which is useless to a reader.  Such a
 # value is a short, punctuation-free string built only from these words.
 _CONTEXT_LABEL_WORDS = (
-    "书面语", "书面", "口语",
-    "课文", "课堂", "对话", "叙述", "练习", "问答", "会话", "例句",
-    "教材", "课本", "文章", "段落", "文段", "正文", "语境", "场景",
-    "文体", "体裁", "听力", "阅读", "材料", "内容", "课",
+    "书面语",
+    "书面",
+    "口语",
+    "课文",
+    "课堂",
+    "对话",
+    "叙述",
+    "练习",
+    "问答",
+    "会话",
+    "例句",
+    "教材",
+    "课本",
+    "文章",
+    "段落",
+    "文段",
+    "正文",
+    "语境",
+    "场景",
+    "文体",
+    "体裁",
+    "听力",
+    "阅读",
+    "材料",
+    "内容",
+    "课",
 )
 _CONTEXT_LABEL_WORDS = tuple(sorted(_CONTEXT_LABEL_WORDS, key=len, reverse=True))
 _CONTEXT_LABEL_PUNCT = "，。、；：！？,.!?;:\"'“”‘’()（）[]【】—–-…"
@@ -1001,9 +1023,7 @@ def sentence_fallback_text(text):
     if not stripped:
         return ""
     looks_structured = (
-        stripped[0] in "{["
-        or '"translation"' in stripped
-        or '"segments"' in stripped
+        stripped[0] in "{[" or '"translation"' in stripped or '"segments"' in stripped
     )
     if looks_structured:
         return (
@@ -1126,9 +1146,7 @@ def stored_result(
     row = _result_row(key)
     data = _decoded_row(row, wanted_keys)
     if data is None:
-        data, row = _latest_any_model(
-            result_type, sentence, target_lang, wanted_keys
-        )
+        data, row = _latest_any_model(result_type, sentence, target_lang, wanted_keys)
     if data is None and legacy_key:
         row = _result_row(legacy_key)
         data = _decoded_row(row, wanted_keys)
@@ -1180,9 +1198,7 @@ def save_result(
                 book_id=book_id,
                 lang_id=lang_id,
                 token_usage=(
-                    json.dumps(token_usage, ensure_ascii=False)
-                    if token_usage
-                    else None
+                    json.dumps(token_usage, ensure_ascii=False) if token_usage else None
                 ),
                 created_at=datetime.now(),
                 updated_at=datetime.now(),
@@ -1235,9 +1251,7 @@ def ensure_results_migration():
                     data = json.loads(setting.value or "")
                 except (TypeError, ValueError):
                     continue
-                if not isinstance(data, dict) or not any(
-                    key in data for key in wanted
-                ):
+                if not isinstance(data, dict) or not any(key in data for key in wanted):
                     continue
                 now = datetime.now()
                 db.session.add(
@@ -2114,9 +2128,7 @@ def _openai_plain(url, headers, payload, label, token, usage=None):
         resp.close()
 
 
-def _openai_stream(
-    base_url, token, model, system_prompt, user_prompt, usage=None
-):
+def _openai_stream(base_url, token, model, system_prompt, user_prompt, usage=None):
     """
     POST /chat/completions and parse choices[0].delta.content.
 
@@ -2361,9 +2373,7 @@ def _openai_complete(base_url, token, model, system_prompt, user_prompt, usage=N
     return _openai_plain(url, headers, payload, label, token, usage=usage)
 
 
-def _anthropic_complete(
-    base_url, token, model, system_prompt, user_prompt, usage=None
-):
+def _anthropic_complete(base_url, token, model, system_prompt, user_prompt, usage=None):
     "One non-streamed Messages call; returns the whole reply."
     label = _API_PROVIDERS["anthropic"]["label"]
     url = api_endpoint(base_url, "anthropic")
@@ -2449,24 +2459,23 @@ def test_provider_connection(fmt, base_url, model, token="", entry_id=""):
         model = (model or "").strip()
         if not model:
             raise AiError("The Model is required.", "config")
-        base_url = normalize_base_url(
-            base_url, _API_PROVIDERS[fmt]["default_base_url"]
-        )
+        base_url = normalize_base_url(base_url, _API_PROVIDERS[fmt]["default_base_url"])
         # Connection tests are outbound requests too: they wait in the
         # same per-entry bucket, so a test cannot be used to exceed the
         # provider's rpm.
         saved = _find_raw_entry(entry_id) if entry_id else None
         rpm = normalize_rpm((saved or {}).get("rpm"))
-        bucket_key = entry_id or hashlib.sha1(
-            f"{fmt}|{base_url}|{model}".encode("utf-8")
-        ).hexdigest()[:12]
+        bucket_key = (
+            entry_id
+            or hashlib.sha1(f"{fmt}|{base_url}|{model}".encode("utf-8")).hexdigest()[
+                :12
+            ]
+        )
         LIMITER.acquire(bucket_key, rpm, priority=INTERACTIVE)
         system_prompt = "Reply with the single word OK."
         user_prompt = "OK"
         if fmt == "openai":
-            chunks = _openai_stream(
-                base_url, token, model, system_prompt, user_prompt
-            )
+            chunks = _openai_stream(base_url, token, model, system_prompt, user_prompt)
         else:
             chunks = _anthropic_stream(
                 base_url, token, model, system_prompt, user_prompt, max_tokens=16

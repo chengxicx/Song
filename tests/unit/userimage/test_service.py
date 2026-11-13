@@ -155,9 +155,7 @@ def test_save_image_tier_writes_one_webp_and_no_thumbnail(tmp_path):
     for tier, expected in big.items():
         directory = tmp_path / tier
         directory.mkdir()
-        filename, path = save_image(
-            str(directory), "a", _image_bytes(), int(tier)
-        )
+        filename, path = save_image(str(directory), "a", _image_bytes(), int(tier))
         stored = sorted(p.name for p in directory.iterdir())
         assert stored == [filename], f"{tier} must store exactly one file"
         assert filename == "a_wc.webp"

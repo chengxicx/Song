@@ -32,9 +32,7 @@ def _make_book(language, sentences=SENTENCES):
     db.session.commit()
     text = book.texts[0]
     for index, sentence in enumerate(sentences, start=1):
-        db.session.add(
-            Sentence(tx_id=text.id, order=index, text_content=sentence)
-        )
+        db.session.add(Sentence(tx_id=text.id, order=index, text_content=sentence))
     db.session.commit()
     return book
 
@@ -132,15 +130,11 @@ def test_import_matches_three_levels_and_reports_them(app_context, empty_db, eng
 
 def test_reimport_skips_then_overwrites(app_context, empty_db, english):
     book = _make_book(english)
-    original = _wrapper(
-        book, english.id, [_item("Hello there, friend.", "旧译文")]
-    )
+    original = _wrapper(book, english.id, [_item("Hello there, friend.", "旧译文")])
     report = _import(original)
     assert report["added"] == 1
 
-    report = _import(
-        _wrapper(book, english.id, [_item("Hello there, friend.", "旧译文")])
-    )
+    report = _import(_wrapper(book, english.id, [_item("Hello there, friend.", "旧译文")]))
     assert report["skipped"] == 1
     assert report["added"] == 0
 
@@ -157,7 +151,11 @@ def test_reimport_skips_then_overwrites(app_context, empty_db, english):
     # A live reader with its own provider/model still gets the import.
     meta = {}
     data = service.sentence_cached_result(
-        "Hello there, friend.", "gpt-4o-mini", "English", "zh", "live-entry",
+        "Hello there, friend.",
+        "gpt-4o-mini",
+        "English",
+        "zh",
+        "live-entry",
         meta=meta,
     )
     assert data["translation"] == "新译文"
@@ -188,9 +186,7 @@ def test_overwrite_replaces_a_live_row(app_context, empty_db, english):
     assert data["translation"] == "imported"
 
 
-def test_invalid_items_are_reported_and_the_rest_import(
-    app_context, empty_db, english
-):
+def test_invalid_items_are_reported_and_the_rest_import(app_context, empty_db, english):
     book = _make_book(english)
     items = [
         _item("Hello there, friend.", "好", kind="poetry"),
@@ -283,9 +279,7 @@ def test_import_never_touches_the_rate_limiter(
         lambda *a, **k: pytest.fail("import must not call a provider"),
     )
     before = LIMITER.snapshot("import-entry", 20)
-    _import(
-        _wrapper(book, english.id, [_item("Hello there, friend.", "好")])
-    )
+    _import(_wrapper(book, english.id, [_item("Hello there, friend.", "好")]))
     after = LIMITER.snapshot("import-entry", 20)
     assert before["queued"] == after["queued"] == 0
     assert before["tokens"] == after["tokens"]
@@ -314,9 +308,7 @@ def test_export_online_lookup_replaces_the_books_sentence_row(
     assert "书里的译文" not in json.dumps(exported, ensure_ascii=False)
 
 
-def test_export_online_lookup_miss_keeps_the_book_row(
-    app_context, empty_db, english
-):
+def test_export_online_lookup_miss_keeps_the_book_row(app_context, empty_db, english):
     "A sentence with no online hit still exports the book's own answer."
     book = _make_book(english)
     _import(_wrapper(book, english.id, [_item(SENTENCES[0], "书里的译文")]))

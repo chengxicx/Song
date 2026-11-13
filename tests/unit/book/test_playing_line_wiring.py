@@ -218,9 +218,9 @@ def test_the_reading_page_ships_the_cue_map():
         " read/page_content.html"
     )
     assert "paragraphs=" in helper.group(1)
-    assert "page_cue_map=" in helper.group(1), (
-        "the helper must pass page_cue_map, or that page has no map"
-    )
+    assert "page_cue_map=" in helper.group(
+        1
+    ), "the helper must pass page_cue_map, or that page has no map"
     assert "_page_cue_line_map(" in routes, (
         "the text branch must derive the map from the book; the empty"
         " list is for the manga/pdf branches, which have no cues"
