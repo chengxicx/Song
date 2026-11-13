@@ -632,4 +632,4 @@ Feature: User can actually read and stuff.
         Given I visit "/"
         When I set the book table filter to "Hola"
         Then the book table contains:
-            ; Hola; Spanish; ; 0%; 2; ; HARD 100%
+            ; Hola; Spanish; ; 0%; 0%; 2; ; HARD 100%

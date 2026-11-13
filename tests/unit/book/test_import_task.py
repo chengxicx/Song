@@ -222,6 +222,46 @@ def test_failed_import_removes_the_audio_copy(app, app_context, english, monkeyp
     assert not os.path.exists(os.path.join(app.env_config.useraudiopath, audio_name))
 
 
+def test_wiping_the_test_db_clears_finished_import_tasks(app, client, english):
+    """
+    A db wipe must also drop the in-process import queue.
+
+    Acceptance tests wipe the db before every scenario, and many scenarios
+    submit the same book.  A finished task stays reusable for 30 s to
+    protect against double clicks, so a stale entry would hand the next
+    scenario the previous task's book id -- a book the wipe deleted.  The
+    progress page then bounces off /read/<missing> to the home page and
+    the test times out waiting for the reader URL.
+    """
+
+    def _finished(_app, task_id, _book, _username):
+        import_task._set_state(  # pylint: disable=protected-access
+            task_id, "finished", percent=100, book_id=1
+        )
+
+    with patch.object(import_task, "_run_import", side_effect=_finished):
+        first_id, first_dup = import_task.start_import(
+            app, _book(english.id, title="Wiped book"), None
+        )
+        assert first_dup is False
+        assert _wait_for_terminal(first_id)["state"] == "finished"
+
+        reused_id, reused_dup = import_task.start_import(
+            app, _book(english.id, title="Wiped book"), None
+        )
+        assert reused_dup is True and reused_id == first_id
+
+        resp = client.get("/dev_api/wipe_db")
+        assert resp.status_code == 302
+        assert import_task.task_status(first_id) == {"state": "unknown"}
+
+        after_wipe_id, after_wipe_dup = import_task.start_import(
+            app, _book(english.id, title="Wiped book"), None
+        )
+        assert after_wipe_dup is False and after_wipe_id != first_id
+        assert _wait_for_terminal(after_wipe_id)["state"] == "finished"
+
+
 def test_status_endpoint_answers_unknown_for_an_unknown_task(client):
     resp = client.get("/book/import/status/does-not-exist")
     assert resp.get_json() == {"state": "unknown"}
