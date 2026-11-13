@@ -1449,13 +1449,16 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         ]
         if hotkey != hotkey.lower():
             event_parts.append("shiftKey: true")
-        script = f"""jQuery.event.trigger({{
-          {', '.join(event_parts)}
-        }});"""
+        # An arrow function (no trailing semicolon) is the form Playwright
+        # parses unambiguously.  jQuery.event.trigger fires a document-level
+        # event, so no element argument is needed -- passing the #thetext
+        # Locator made newer Playwright reject the call outright
+        # ("Attempting to serialize unexpected value: <Locator ...>").
+        script = f"""() => {{
+          jQuery.event.trigger({{ {', '.join(event_parts)} }});
+        }}"""
         # print(script, flush=True)
-        # pylint: disable=protected-access
-        el = self.page.locator("#thetext")
-        self.page.evaluate(script, el)
+        self.page.evaluate(script)
         time.sleep(0.2)  # Or it's too fast.
         # print(script)
 
