@@ -33,6 +33,11 @@ from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 # player without shipping an audio asset.
 _MP3_FRAME = bytes([0xFF, 0xFB, 0x90, 0x00]) + bytes(417 - 4)
 
+# Mirrors _NAV_TIMEOUT in conftest.py: a navigation/redirect readiness cap
+# (10 s), not a check.  The background-import progress page redirects to the
+# reader when the book exists, so the wait must be seconds, not milliseconds.
+_NAV_TIMEOUT = 10000
+
 
 def silent_mp3_bytes(frames=400):
     "Silent but playable MP3 audio; the default is ~10.4 seconds."
@@ -195,7 +200,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         on a progress page that redirects to the reader when the book
         exists; wait for that redirect so the next step sees the book.
         """
-        self.page.wait_for_url(re.compile(r"/read/\d+/page/1"), timeout=20)
+        self.page.wait_for_url(re.compile(r"/read/\d+/page/1"), timeout=_NAV_TIMEOUT)
 
     def make_book(self, title, text, langname):
         "Create a book with title, text, and languagename."
