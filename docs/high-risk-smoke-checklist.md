@@ -171,7 +171,7 @@ export PATH="$PWD/venv/bin:$PATH"
 
 所以：**任何账号**在该部署上播放 B 站书都会经这条隧道，媒体字节走的是出口机器的**上行带宽**，不是某个浏览器的。隧道断开时页面自动降级，不报错。
 
-**他人从 GitHub 部署不会自动形成隧道**：仓库里没有任何地址、端口或凭据（`git grep <server-ip>` 零命中，文档与脚本只用 `root@<server>` 占位）。未设 `LUTE_BILIBILI_PROXY` 时行为与改造前完全一致（`bilibili_proxies()` 返回 `None` → 直连），所以国内服务器、或没被风控的部署**什么都不用配**。
+**他人从 GitHub 部署不会自动形成隧道**：仓库里不提交任何真实地址、端口或凭据（文档与脚本统一用 `root@<server>` / `<prod-domain>` 占位，生产 IP 与域名只在本地笔记，不进仓库）。未设 `LUTE_BILIBILI_PROXY` 时行为与改造前完全一致（`bilibili_proxies()` 返回 `None` → 直连），所以国内服务器、或没被风控的部署**什么都不用配**。
 
 **降级态的不变式**：embed 模式下视频区里除 iframe 外不得叠任何覆盖层。`.yt-player-loading` 是 `inset:0; z-index:1`，而 iframe 默认 `z-index:auto`，覆盖层会吞掉所有点击——表现是"画面在播却点不动、像卡死"。护栏：`tests/unit/book/test_bilibili_embed_fallback.py`（CSS 层级 + JS 侧隐藏的双重断言）。
 
