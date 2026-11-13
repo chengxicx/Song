@@ -21,6 +21,7 @@ import json
 import textwrap
 import requests
 from playwright.sync_api import Keyboard, Mouse, expect
+from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 # A structurally valid MPEG-1 Layer III stream, synthesized rather than
@@ -196,11 +197,47 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
 
     def _wait_for_book_import(self):
         """
-        The new-book form POST now starts a background import and lands
-        on a progress page that redirects to the reader when the book
-        exists; wait for that redirect so the next step sees the book.
+        Wait until a background new-book import has settled.
+
+        A successful import redirects the progress page to the reader.  A
+        rejected upload has no book to open: the poller reports the error
+        in place (or the form re-renders with a flash).  Waiting only for
+        the reader URL made every "bad file" scenario time out and hid the
+        message it was supposed to assert, so both outcomes count here.
         """
-        self.page.wait_for_url(re.compile(r"/read/\d+/page/1"), timeout=_NAV_TIMEOUT)
+        deadline = time.monotonic() + _NAV_TIMEOUT / 1000
+        while True:
+            url = self.page.url
+            if re.search(r"/read/\d+/page/1", url):
+                return
+            try:
+                settled = self.page.evaluate(
+                    """() => {
+                      const onProgress = location.pathname.indexOf(
+                        '/book/import/progress/') === 0;
+                      const status = document.getElementById('import-status');
+                      if (onProgress && status && status.style.color === 'red') {
+                        return true;
+                      }
+                      if (!onProgress && document.querySelector(
+                          '.flash-notice-narrow, .flash-notice')) {
+                        return true;
+                      }
+                      return false;
+                    }"""
+                )
+            except PlaywrightError:
+                # A navigation replaced the JS context between the URL read
+                # and this call; the next iteration sees the new document.
+                settled = False
+            if settled:
+                return
+            if time.monotonic() >= deadline:
+                raise AssertionError(
+                    "Book import neither reached the reader nor reported a "
+                    f"failure within {_NAV_TIMEOUT} ms; still on {url}"
+                )
+            time.sleep(0.2)
 
     def make_book(self, title, text, langname):
         "Create a book with title, text, and languagename."

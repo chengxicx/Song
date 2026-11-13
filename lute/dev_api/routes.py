@@ -23,6 +23,7 @@ import lute.parse.registry
 from lute.db import db
 import lute.db.management
 from lute.db.demo import Service as DemoService
+from lute.book import import_task
 from lute.i18n import t
 
 
@@ -36,10 +37,26 @@ def _ensure_is_test_db():
         raise RuntimeError("Dangerous method, only possible on test_lute database.")
 
 
+def _wipe_test_data():
+    """
+    Clear the db rows and the in-process background import queue.
+
+    The new-book import queue keeps its task table in this process and
+    deliberately reuses a just-finished task for 30 s to absorb double
+    clicks.  Acceptance tests wipe the db before every scenario and many
+    scenarios submit the same book, so without purging the queue the next
+    submission is handed the previous task's book id -- a book the wipe
+    just deleted.  Its progress page then bounces off /read/<missing> to
+    the home page instead of reaching the reader.
+    """
+    lute.db.management.delete_all_data(db.session)
+    import_task.purge_finished_tasks()
+
+
 @bp.route("/wipe_db", methods=["GET"])
 def wipe_db():
     "Clean it all."
-    lute.db.management.delete_all_data(db.session)
+    _wipe_test_data()
     flash(t("db wiped"))
     return redirect("/", 302)
 
@@ -47,7 +64,7 @@ def wipe_db():
 @bp.route("/load_demo", methods=["GET"])
 def load_demo():
     "Clean out everything, and load the demo."
-    lute.db.management.delete_all_data(db.session)
+    _wipe_test_data()
     demosvc = DemoService(db.session)
     demosvc.set_load_demo_flag()
     demosvc.load_demo_data()
@@ -58,7 +75,7 @@ def load_demo():
 @bp.route("/load_demo_languages", methods=["GET"])
 def load_demo_languages():
     "Clean out everything, and load the demo langs with dummy dictionaries."
-    lute.db.management.delete_all_data(db.session)
+    _wipe_test_data()
     demosvc = DemoService(db.session)
     demosvc.load_demo_languages()
     langs = db.session.query(Language).all()
