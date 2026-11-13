@@ -293,7 +293,7 @@ env -u HTTP_PROXY -u HTTPS_PROXY -u http_proxy -u https_proxy \
 
 ### 部署
 
-`ssh root@<server-ip> 'bash <prod-app-root>/deploy.sh'` 一次通过：
+`ssh root@&lt;server&gt; 'bash <prod-app-root>/deploy.sh'` 一次通过：
 `b9e14866..900b3088` → `HEAD is now at 900b3088` → 子模块 `7c6af0d4` → `pip install -e .` 无错 → `Active: active (running)`。
 重启后的启动日志里 **`Japanese (MeCab)` 与 `Japanese (Sudachi)` 两个解析器都仍在 Enabled parsers 列表**（正是方案 A 的意图），且 `journalctl` 中无任何 error/traceback/exception。
 
@@ -306,7 +306,7 @@ env -u HTTP_PROXY -u HTTPS_PROXY -u http_proxy -u https_proxy \
 - **线程压测：8 线程 × 30 轮 × 4 句 = 960 次并发解析，0 异常；每线程 token 数完全相同（`1470` × 8）** —— 这就是线程安全修复在生产解释器上的直接证明（修复前第 67 次调用即 `Already borrowed`）。
 - `japanese_sudachi` 与 `japanese` 两个解析器都仍 `is_supported`。
 
-**(2) 生产端到端 UI（Playwright 打 https://www.<prod-domain>）** —— 全部 PASS：
+**(2) 生产端到端 UI（Playwright 打 https://&lt;prod-domain&gt;）** —— 全部 PASS：
 
 | 检查 | 结果 |
 | --- | --- |

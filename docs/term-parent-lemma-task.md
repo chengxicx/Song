@@ -77,7 +77,7 @@ python -m scripts.probe_term_parents --db /tmp/<库副本>.db
 
 ## 环境与流程
 
-- 生产 https://www.<prod-domain>（Basic Auth `<user>:<redacted>`），SSH `root@<server-ip>` 免密。
+- 生产 https://&lt;prod-domain&gt;（Basic Auth `<user>:<redacted>`），SSH `root@&lt;server&gt;` 免密。
   代码 `<prod-app-root>`，venv py3.11，systemd `lute.service`(5001)。**真实库
   `<prod-app-root>/lute_data/users/<user>/lute.db`**（根目录 `lute.db` 是 0 字节空壳）。
 - 部署链路：本地改 → commit → `git push origin all-features-combine` → `ssh … 'bash <prod-app-root>/deploy.sh'` → 验证。
@@ -255,14 +255,14 @@ P1 的 **1,061** 是「文本能算出 lemma 的行数」，不是回填后总�
 
 ```bash
 # 0. 备份（必做）；用 sqlite backup API，别裸拷运行中的库
-ssh root@<server-ip> 'cd <prod-app-root> && ./venv/bin/python -c "
+ssh root@&lt;server&gt; 'cd <prod-app-root> && ./venv/bin/python -c "
 import sqlite3, time
 s = sqlite3.connect(\"file:<prod-app-root>/lute_data/users/<user>/lute.db?mode=ro\", uri=True)
 d = sqlite3.connect(\"<prod-app-root>/backup/pre_parent_backfill_%d.db\" % int(time.time()))
 s.backup(d); d.close(); s.close()"'
 
 # 1. 回填前状态快照（硬约束 2 的 diff 用）
-ssh root@<server-ip> 'cd <prod-app-root> && ./venv/bin/python -c "
+ssh root@&lt;server&gt; 'cd <prod-app-root> && ./venv/bin/python -c "
 import sqlite3
 c = sqlite3.connect(\"file:<prod-app-root>/lute_data/users/<user>/lute.db?mode=ro\", uri=True)
 out = open(\"/tmp/status_before.txt\", \"w\")
@@ -271,14 +271,14 @@ for r in c.execute(\"select WoID, WoStatus, WoSyncStatus from words\"):
 out.close()"'
 
 # 2. 干跑（默认不写），确认数字与副本一致
-ssh root@<server-ip> 'cd <prod-app-root> && ./venv/bin/flask --app lute.app_factory cli parent_backfill --language Japanese'
+ssh root@&lt;server&gt; 'cd <prod-app-root> && ./venv/bin/flask --app lute.app_factory cli parent_backfill --language Japanese'
 
 # 3. 金丝雀 50 条 → 浏览器点几个词看弹窗
-ssh root@<server-ip> 'cd <prod-app-root> && ./venv/bin/flask --app lute.app_factory cli parent_backfill \
+ssh root@&lt;server&gt; 'cd <prod-app-root> && ./venv/bin/flask --app lute.app_factory cli parent_backfill \
   --language Japanese --limit 50 --commit --audit <prod-app-root>/backup/parents_canary.jsonl'
 
 # 4. 全量
-ssh root@<server-ip> 'cd <prod-app-root> && ./venv/bin/flask --app lute.app_factory cli parent_backfill \
+ssh root@&lt;server&gt; 'cd <prod-app-root> && ./venv/bin/flask --app lute.app_factory cli parent_backfill \
   --language Japanese --commit --audit <prod-app-root>/backup/parents_full.jsonl'
 
 # 5. 校验：after 快照同样导出，然后 comm -23 /tmp/status_before.txt /tmp/status_after.txt 必须为空
