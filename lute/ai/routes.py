@@ -445,7 +445,7 @@ def _language_feature_enabled(langid, field_name):
     return True if value is None else bool(value)
 
 
-@bp.route("/sentence", methods=["GET"])
+@bp.route("/sentence", methods=["GET", "POST"])
 def sentence_page():
     """
     The reading page's Sentence tab frame.
@@ -453,9 +453,13 @@ def sentence_page():
     Rendered by Lute itself (so same-origin), it either streams a
     translation from the selected API provider or explains what to
     configure.  There is no third-party iframe or web-chat link.
+
+    POST carries the same lang/q fields as the query string: the reading
+    page's dictionary strip posts long passages, which would otherwise
+    overflow the web server's request-line limit (HTTP 414).
     """
-    sentence = service.clean_sentence(request.args.get("q", ""))
-    langid = request.args.get("lang", "")
+    sentence = service.clean_sentence(request.values.get("q", ""))
+    langid = request.values.get("lang", "")
     provider = service.sentence_provider(_language(langid))
     provider_info = service.provider_def(provider) if provider else None
     state = service.provider_status(provider) if provider else None

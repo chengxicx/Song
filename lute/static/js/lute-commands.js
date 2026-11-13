@@ -331,8 +331,11 @@ function send_selected_terms_to_anki() {
 
   function _get_sentence(el) {
     const el_sentence_id = $(el).data('sentence-id');
-    const selector = `span.textitem[data-sentence-id="${el_sentence_id}"]`;
-    const tis = $(selector).toArray();
+    // Page spans only: the players' subtitle clones live in the same
+    // document and would add their cue timestamps and player chrome.
+    const tis = _page_textitems().filter(
+      t => $(t).data('sentence-id') == el_sentence_id
+    );
     return _get_textitems_text(tis);
   }
 

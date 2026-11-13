@@ -304,6 +304,17 @@ def test_sentence_page_shows_a_regenerate_button(app_context, client):
     assert "Regenerate" in body
 
 
+def test_sentence_page_accepts_post_for_long_text(app_context, client):
+    "The reader's dictionary strip posts a page-long text instead of a URL."
+    _configure(client)
+    sentence = "あの時" * 900
+    body = client.post(
+        "/ai/sentence",
+        data={"q": sentence, "lang": "2"},
+    ).get_data(as_text=True)
+    assert sentence in body
+
+
 def test_translate_unconfigured_is_an_error_event(app_context, client):
     "No key means readable guidance inside the SSE stream."
     body = client.post("/ai/translate", json={"q": "Hello"}).get_data(as_text=True)
