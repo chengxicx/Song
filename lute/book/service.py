@@ -1258,8 +1258,14 @@ class Service:
         if book.text_source_path:
             _raise_if_file_missing(book.text_source_path, "text_source_path")
             tsp = book.text_source_path
+            # The upload is staged under a generated name (bookimport_<uuid>),
+            # so passing the path would name a file the user never chose in
+            # "non_utf_8.txt is not utf-8 encoding" (and would pick the parser
+            # from that name).  The form kept the original filename, and
+            # _save_upload preserves its extension, so use it for both.
+            display_name = book.text_stream_filename or tsp
             with open(tsp, mode="rb") as stream:
-                book.text = fte.get_file_content(tsp, stream)
+                book.text = fte.get_file_content(display_name, stream)
 
         if book.text_stream:
             _raise_if_none(book.text_stream_filename, "text_stream_filename")
