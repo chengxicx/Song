@@ -6,6 +6,33 @@ import re
 from lute.db import db
 from lute.parse.registry import get_parser, is_supported
 
+# The dictionary row type for Lute's own AI sentence translation tab.
+# It is an ordinary row in the language's dictionary list so its
+# position can be chosen by drag and drop like any other tab; the
+# language's "AI sentence translation" switch remains the master gate.
+AI_DICT_TYPE = "AI"
+
+
+def ai_sentence_url(langid):
+    "The AI sentence translation frame URL for one language."
+    return f"/ai/sentence?lang={langid}&q=[LUTE]"
+
+
+def _ai_dict_tab_entry(lang):
+    """
+    The tab entry for the language's AI dictionary row.
+
+    The URL is built from the language id at render time (the stored
+    LdDictURI is only a placeholder kept for the NOT NULL column), so a
+    row copied between languages still points at the right frame.
+    """
+    return {
+        "url": ai_sentence_url(lang.id),
+        "dicttype": "embeddedhtml",
+        "label": "AI",
+        "title": "AI sentence translation",
+    }
+
 
 def _local_dict_tab_entry(lang, d):
     """
@@ -56,6 +83,13 @@ class LanguageDictionary(db.Model):
     # Kept configured but no tab in the reading page's dictionary strip:
     # for dictionaries that are rarely used but not worth re-entering.
     is_hidden = db.Column("LdIsHidden", db.Boolean, default=False)
+    # The provider this language's AI sentence tab should use ("" =
+    # Default, i.e. the provider enabled in Settings).  Only the AI row
+    # sets it; the reader falls back to the shared choice when empty or
+    # when that provider no longer has a key (see lute/ai/service.py).
+    ai_provider = db.Column(
+        "LdAiProvider", db.String(20), nullable=False, default=""
+    )
     sort_order = db.Column("LdSortOrder", db.SmallInteger, nullable=False)
 
 
@@ -112,6 +146,14 @@ class Language(
     # Display language for grammar analysis results ("en" default, "zh" Chinese).
     grammar_translate_lang = db.Column("LgGrammarTranslateLang", db.String(20))
 
+    # Which AI features this language may use.  Both default on so
+    # existing languages keep working after the migration; the reader
+    # turns them off per language in the Language form.
+    ai_sentence_translation = db.Column(
+        "LgAiSentenceTranslation", db.Boolean, default=True
+    )
+    ai_grammar_analysis = db.Column("LgAiGrammarAnalysis", db.Boolean, default=True)
+
     # Grammar-panel groups the reader hides for this language: a
     # pipe-delimited list of level tokens (JLPT N5..N1, TOPIK bands,
     # CEFR A1..C2) and the Japanese aggregate keys (basic_forms,
@@ -137,6 +179,14 @@ class Language(
         "LgTermPopupShowDictGloss", db.Boolean, default=True
     )
 
+    # Whether the reading page's Local dictionary card (and an English
+    # term's IPA reading in the popup) shows pronunciation notation.
+    # Default off: the definitions are the content; /ˈɑːtʃəri/ is data
+    # the dictionary happens to carry.  The lookup and the stored gloss
+    # are unchanged -- this only trims what gets drawn (see
+    # gloss_format.display_blocks).
+    show_dict_phonetics = db.Column("LgShowDictPhonetics", db.Boolean, default=False)
+
     # What fills a new term's translation: 'online' (machine
     # translation, the old behaviour) or 'local_dict' -- the language's
     # local dictionaries (see the 'localdict' rows in self.dictionaries)
@@ -153,6 +203,7 @@ class Language(
         self.right_to_left = False
         self.show_romanization = False
         self.show_furigana = False
+        self.show_dict_phonetics = False
         self.parser_type = "spacedel"
         self.dictionaries = []
         self.is_active = True
@@ -162,6 +213,8 @@ class Language(
         self.kiwi_join_compound_nouns = False
         self.term_popup_show_dict_gloss = True
         self.term_translation_source = "online"
+        self.ai_sentence_translation = True
+        self.ai_grammar_analysis = True
 
     def __repr__(self):
         return f"<Language {self.id} '{self.name}'>"
@@ -245,6 +298,14 @@ class Language(
                 entry = _local_dict_tab_entry(self, d)
                 if entry is not None:
                     ret.append(entry)
+            elif d.dicttype == AI_DICT_TYPE:
+                # The switch is the master gate: with it off the row
+                # keeps its position but offers no tab and the API
+                # endpoint rejects the language.
+                if self.ai_sentence_translation is False:
+                    continue
+                if d.usefor == "sentences":
+                    ret.append(_ai_dict_tab_entry(self))
             else:
                 ret.append({"url": d.dicturi, "dicttype": d.dicttype})
         return ret
@@ -267,6 +328,66 @@ class Language(
     @property
     def sentence_dict_uris(self):
         return self.active_dict_uris("sentences")
+
+    def ensure_ai_dictionary_row(self) -> bool:
+        """
+        Keep exactly one AI row in step with the language's AI switch.
+
+        The "AI sentence translation" switch is the master gate; the
+        AI row only holds the tab's position (see active_dict_uris).
+
+        * no row, switch on  -> add one at position 0, where the old
+          hardcoded AI tab appeared;
+        * no row, switch off -> nothing: the migration added no row for
+          such languages, and there is no tab to order;
+        * row present        -> keep it and drop any duplicates.  Turning
+          the switch off leaves the row (and its position) alone; the
+          reader hides the tab.
+
+        Callers must have committed once for a new language, so the
+        placeholder URL can name the language id.  Returns True when the
+        session has pending changes.
+        """
+        ai_rows = sorted(
+            [d for d in self.dictionaries if d.dicttype == AI_DICT_TYPE],
+            key=lambda d: d.sort_order,
+        )
+        for extra in ai_rows[1:]:
+            self.dictionaries.remove(extra)
+
+        if ai_rows:
+            wanted = ai_sentence_url(self.id)
+            if ai_rows[0].dicturi != wanted:
+                ai_rows[0].dicturi = wanted
+                return True
+            return len(ai_rows) > 1
+
+        if self.ai_sentence_translation is False or self.id is None:
+            return False
+
+        row = LanguageDictionary()
+        row.usefor = "sentences"
+        row.dicttype = AI_DICT_TYPE
+        row.dicturi = ai_sentence_url(self.id)
+        row.is_active = True
+        row.is_hidden = False
+        row.ai_provider = ""
+        row.sort_order = 0
+        self.dictionaries.insert(0, row)
+        return True
+
+    @property
+    def ai_sentence_provider(self):
+        """
+        The provider pinned on this language's AI row, or "" for Default.
+
+        Only the AI row carries a provider, so the first AI row answers;
+        a language without one keeps the old shared-Settings behaviour.
+        """
+        for d in self.dictionaries:
+            if d.dicttype == AI_DICT_TYPE:
+                return (d.ai_provider or "").strip()
+        return ""
 
     @property
     def parser(self):
@@ -366,7 +487,7 @@ class Language(
                 dtype = "popuphtml"
             elif dtype in ("localdict", "local"):
                 dtype = "localdict"
-            else:
+            elif dtype != AI_DICT_TYPE:
                 raise ValueError(f"Invalid dictionary type {dtype}")
 
             ld = LanguageDictionary()

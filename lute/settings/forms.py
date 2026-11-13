@@ -4,7 +4,14 @@ Settings form.
 
 import os
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, StringField, IntegerField, TextAreaField, SelectField
+from wtforms import (
+    BooleanField,
+    StringField,
+    IntegerField,
+    TextAreaField,
+    SelectField,
+    HiddenField,
+)
 from wtforms.validators import InputRequired, NumberRange
 from wtforms import ValidationError
 
@@ -37,6 +44,34 @@ class UserSettingsForm(FlaskForm):
     ui_language = SelectField(lazy_t("UI language"))
     custom_styles = TextAreaField(lazy_t("Custom styles"))
     show_highlights = BooleanField(lazy_t("Highlight terms by status"))
+
+    # The whole AI provider list, serialized by the settings page's JS.
+    # It is validated here so an invalid row stops the save before any
+    # other setting is written, then stored by the route.
+    ai_providers_json = HiddenField(lazy_t("AI provider (API key)"))
+
+    # Background prefetch: on by default, four sentences from the current
+    # page, so clicking one of them opens a stored result instantly.
+    ai_prefetch_enabled = BooleanField(
+        lazy_t("Prefetch the next sentences in the background"), default="1"
+    )
+    ai_prefetch_count = SelectField(
+        lazy_t("Sentences to prefetch per page"),
+        choices=[(str(i), str(i)) for i in range(1, 6)],
+        default="4",
+    )
+
+    image_size_choices = [
+        ("400", lazy_t("400px (smallest)")),
+        ("800", lazy_t("800px")),
+        ("1200", lazy_t("1200px")),
+        ("original", lazy_t("Keep original")),
+    ]
+    word_image_max_edge = SelectField(
+        lazy_t("Word card image size"),
+        choices=image_size_choices,
+        default="400",
+    )
 
     open_popup_in_new_tab = BooleanField(lazy_t("Open popup in new tab"))
     stop_audio_on_term_form_open = BooleanField(lazy_t("Stop audio on term form open"))
@@ -117,6 +152,17 @@ class UserSettingsForm(FlaskForm):
     # setting, so the name stays readable on both surfaces.
     tts_show_control_panel = BooleanField(lazy_t("Show player"))
     tts_show_sentence_buttons = BooleanField(lazy_t("Show 🔊 button on each sentence"))
+
+    def validate_ai_providers_json(self, field):
+        "Every submitted row must be complete and internally consistent."
+        from lute.ai import service  # pylint: disable=import-outside-toplevel
+        from lute.ai.service import AiError  # pylint: disable=import-outside-toplevel
+
+        try:
+            raw = service.parse_provider_entries_json(field.data)
+            service.normalize_provider_entries(raw)
+        except AiError as e:
+            raise ValidationError(e.message) from e
 
     def validate_backup_dir(self, field):
         "Field must be set if enabled."

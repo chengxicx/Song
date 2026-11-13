@@ -17,6 +17,7 @@ import pytest
 from lute.book import sensevoice
 from lute.db import db
 from lute.read import shadowing
+from lute.settings.current import current_settings
 
 from tests.utils import add_terms
 
@@ -944,6 +945,78 @@ def test_annotate_tokens_strips_zws_from_text():
     assert annotated == [{"text": "cat", "reading": None}]
 
 
+def test_annotate_paragraphs_looks_terms_up_once(monkeypatch):
+    "A page's paragraphs share one saved-reading query."
+    lang = _FakeLanguage(
+        [], parser_type="japanese", readings={"天気": "てんき"}
+    )
+    calls = []
+
+    def _stored(_language, tokens):
+        calls.append(list(tokens))
+        return {}
+
+    monkeypatch.setattr(shadowing, "_stored_term_readings", _stored)
+    annotated = shadowing.annotate_paragraphs(
+        [
+            {"tokens": ["天気", "は"], "full_text": "天気は"},
+            {"tokens": ["良い"], "full_text": "良い"},
+        ],
+        lang,
+    )
+    assert annotated == [
+        [{"text": "天気", "reading": "てんき"}, {"text": "は", "reading": None}],
+        [{"text": "良い", "reading": None}],
+    ]
+    assert calls == [["天気", "は", "良い"]]
+
+
+def test_readings_route_batches_paragraphs(app, client, app_context, english):
+    "One POST answers every paragraph, each in its own slice."
+    resp = client.post(
+        "/read/shadowing/readings",
+        json={
+            "language_id": english.id,
+            "paragraphs": [
+                {"tokens": ["The", "cat"], "full_text": "The cat"},
+                {"tokens": ["sat", "down"], "full_text": "sat down"},
+            ],
+        },
+    )
+    assert resp.status_code == 200
+    body = resp.get_json()
+    assert [p["tokens"] for p in body["paragraphs"]] == [
+        [{"text": "The", "reading": None}, {"text": "cat", "reading": None}],
+        [{"text": "sat", "reading": None}, {"text": "down", "reading": None}],
+    ]
+
+    # The old single-paragraph body keeps its old response shape.
+    resp = client.post(
+        "/read/shadowing/readings",
+        json={"language_id": english.id, "tokens": ["The", "cat"], "full_text": "The cat"},
+    )
+    assert resp.status_code == 200
+    body = resp.get_json()
+    assert body["tokens"] == [
+        {"text": "The", "reading": None},
+        {"text": "cat", "reading": None},
+    ]
+    assert "paragraphs" not in body
+
+
+def test_readings_route_rejects_a_bad_batch(app, client, app_context, english):
+    resp = client.post(
+        "/read/shadowing/readings",
+        json={"language_id": english.id, "paragraphs": [{"tokens": [1]}]},
+    )
+    assert resp.status_code == 400
+    resp = client.post(
+        "/read/shadowing/readings",
+        json={"language_id": english.id, "paragraphs": []},
+    )
+    assert resp.status_code == 400
+
+
 # The morphemes a Japanese parser would answer for 広い宇宙の数ある一つ
 # when it reads the whole sentence: 数 is かず here, and 一つ splits into
 # 一(ひと) + つ.
@@ -1009,6 +1082,127 @@ def test_annotate_tokens_no_full_text_skips_context_parse():
     annotated = shadowing.annotate_tokens(["天気"], lang)
     assert annotated == [{"text": "天気", "reading": "てんき"}]
     assert lang.parser.context_calls == []
+
+
+def test_annotate_tokens_context_needs_the_real_sentence(monkeypatch):
+    """
+    Pin the page-vs-panel disagreement: the page built full_text by
+    joining the word tokens, which drops the punctuation between them.
+    李：今日は became 李今日は and Sudachi read 今日 as こんにち; the
+    real sentence 李：今日は休日なので、… reads きょう.
+    """
+    pytest.importorskip("sudachipy")
+    pytest.importorskip("sudachidict_core")
+    from lute.parse.sudachi_parser import JapaneseSudachiParser
+
+    if not JapaneseSudachiParser.is_supported():
+        pytest.skip("sudachipy and a sudachi dictionary are required")
+    monkeypatch.setitem(current_settings(), "japanese_reading", "hiragana")
+    monkeypatch.setitem(current_settings(), "japanese_sudachi_dict", "core")
+    monkeypatch.setitem(current_settings(), "japanese_sudachi_mode", "C")
+
+    class _SudachiLanguage:
+        parser_type = "japanese_sudachi"
+        name = "Japanese"
+        id = None
+        regexp_split_sentences = ".!?。？！"
+
+        def __init__(self):
+            self.parser = JapaneseSudachiParser()
+
+    lang = _SudachiLanguage()
+    sentence = "李：今日は休日なので、特に混んでいます。"
+    tokens = [
+        t.token for t in lang.parser.get_parsed_tokens(sentence, lang) if t.is_word
+    ]
+    assert "今日" in tokens
+
+    def today_reading(full_text):
+        annotated = shadowing.annotate_tokens(
+            tokens, lang, full_text=full_text, stored_readings={}
+        )
+        return [a["reading"] for a in annotated if a["text"] == "今日"][0]
+
+    assert today_reading(sentence) == "きょう"
+    assert today_reading("".join(tokens)) == "こんにち"
+
+
+def _db_backed_language(japanese, **kwargs):
+    "The duck-typed language above, wired to the real Japanese language row."
+    lang = _FakeLanguage([], parser_type="japanese", **kwargs)
+    lang.id = japanese.id
+    lang.get_lowercase = lang.parser.get_lowercase
+    return lang
+
+
+def test_annotate_tokens_saved_term_reading_wins(app_context, japanese):
+    """
+    A term's saved pronunciation drives the furigana.
+
+    The reading page's ruby asks this same annotate_tokens for readings;
+    the parser reads 天津駅 as あまつえき, but the term was corrected to
+    てんしんえき in the term form.  The body must show the saved value,
+    not the parser's guess (which is what the reading pane displayed
+    before this fix).
+    """
+    term = add_terms(japanese, ["天津駅"])[0]
+    term.romanization = "てんしんえき"
+    db.session.commit()
+
+    lang = _db_backed_language(
+        japanese,
+        readings={"天津駅": "あまつえき"},
+        context_readings=[("天津駅", "あまつえき")],
+    )
+    annotated = shadowing.annotate_tokens(
+        ["天津駅"], lang, full_text="天津駅へ行きました"
+    )
+    assert annotated == [{"text": "天津駅", "reading": "てんしんえき"}]
+
+
+def test_annotate_tokens_ktk_difference_is_not_an_edit(app_context, japanese):
+    """
+    A kana/katakana spelling difference is not a user edit: the saved
+    reading is the parser's reading in another script, so the contextual
+    reading keeps winning (changing the japanese_reading setting must not
+    switch every word to the old stored script).
+    """
+    term = add_terms(japanese, ["天津駅"])[0]
+    term.romanization = "アマツエキ"
+    db.session.commit()
+
+    lang = _db_backed_language(
+        japanese,
+        readings={"天津駅": "あまつえき"},
+        context_readings=[("天津駅", "あまつえき")],
+    )
+    annotated = shadowing.annotate_tokens(
+        ["天津駅"], lang, full_text="天津駅へ行きました"
+    )
+    assert annotated == [{"text": "天津駅", "reading": "あまつえき"}]
+
+
+def test_route_readings_returns_saved_term_reading(app_context, client, japanese):
+    "The furigana endpoint (/read/shadowing/readings) honours a saved reading."
+    from lute.settings.current import current_settings
+
+    current_settings()["japanese_reading"] = "hiragana"
+    term = add_terms(japanese, ["東京"])[0]
+    term.romanization = "とうきょうてい"
+    db.session.commit()
+
+    resp = client.post(
+        "/read/shadowing/readings",
+        json={
+            "language_id": japanese.id,
+            "tokens": ["東京"],
+            "full_text": "東京へ行く",
+        },
+    )
+    assert resp.status_code == 200
+    assert resp.get_json()["tokens"] == [
+        {"text": "東京", "reading": "とうきょうてい"}
+    ]
 
 
 def test_annotate_tokens_context_parse_error_falls_back_per_token():

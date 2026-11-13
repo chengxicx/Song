@@ -79,6 +79,32 @@
     }));
   };
 
+  // Regression: two overlapping terms share a token, so the second span
+  // renders only its un-covered tail and gets data-display-text.  The
+  // multiword term must be built from displayed tokens, not full terms.
+  // Also check that a span WITHOUT the new attribute keeps its internal
+  // ZWS token boundaries (the older "すれば / すれ\u200bば" bug).
+  window.__multiword_text_checks = (function () {
+    const Z = '\u200B';
+    function span(attrs, shown) {
+      const e = document.createElement('span');
+      Object.keys(attrs).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+      e.textContent = shown;
+      return e;
+    }
+    const normal = span({ 'data-text': 'some' + Z + ' ' + Z + 'data' }, 'some data');
+    const overlapped = span({
+      'data-text': 'data' + Z + ' ' + Z + 'here',
+      'data-display-text': ' ' + Z + 'here',
+      'class': 'overlapped'
+    }, ' here');
+    const noattr = span({ 'data-text': 'すれ' + Z + 'ば' }, 'すれば');
+    return {
+      overlapped: window.luteMultiwordTermText(window.$([normal, overlapped])),
+      fallback: window.luteMultiwordTermText(window.$([noattr]))
+    };
+  })();
+
   window.addEventListener("load", function () {
     prepareTextInteractions();
     // tts.js's word-hover handler is wired here on the reading page

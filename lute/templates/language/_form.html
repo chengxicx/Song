@@ -42,12 +42,40 @@
              showing the file name it points at.
           #}
           {% set dict_is_local = (dictionary.dicttype.data == 'localdict') and (dict_pool | length > 0) %}
+          {#
+            The AI row is Lute's own /ai/sentence tab.  Its use and type
+            are fixed (sentences / AI), its URL is generated from the
+            language id, and it can't be removed: the "AI sentence
+            translation" switch above is the master gate.  The row
+            itself only holds the tab's position, so the drag handle
+            stays live like every other row.
+          #}
+          {% set dict_is_ai = (dictionary.dicttype.object_data == 'AI') %}
           <div class="dict_entry valign"
                {% if dictionary.dicturi.data == '__TEMPLATE__' %}
                style="display: none"
                {% endif %}
                >
             <span class="drag-handle">☰</span>
+            {% if dict_is_ai %}
+            {# Disabled controls are not submitted: the hidden inputs
+               carry the fixed values so the row still validates. #}
+            {{ dictionary.usefor(class="dict-usefor", disabled=True) }}
+            <input type="hidden" name="{{ dictionary.usefor.name }}" value="sentences">
+            {{ dictionary.dicttype(class="dict-type", disabled=True) }}
+            <input type="hidden" name="{{ dictionary.dicttype.name }}" value="AI">
+            <input type="hidden" name="{{ dictionary.dicturi.name }}" value="{{ dictionary.dicturi.data }}">
+            {# The URL column holds the AI sentence tab's provider:
+               the row's URL is generated, so this select stands in the
+               same cell, with the same classes as every row's URL
+               control, so the left dropdowns line up with the others. #}
+            {{ dictionary.ai_provider(class="dict-uri form-control-narrower", title=t('Provider used by AI sentence translation')) }}
+            {% if not form.ai_sentence_translation.data %}
+            <span style="color:#a94442; font-size:0.85em;">
+              {{ t('The AI switch above is off, so this row offers no tab.  It keeps its position for when you turn it back on.') }}
+            </span>
+            {% endif %}
+            {% else %}
             {{ dictionary.usefor(class="dict-usefor") }}
             {{ dictionary.dicttype(class="dict-type") }}
             {# A row's URL is either an online lookup URL (a text input)
@@ -79,18 +107,29 @@
               {% endif %}
             </select>
             {% endif %}
+            {% endif %}
             {{ dictionary.is_active }}
             <label class="dict-hidden-toggle" style="white-space: nowrap;"
                    title="{{ t('Keep this dictionary but hide its tab from the reading page') }}">
               {{ dictionary.is_hidden }} <span style="font-size:0.85em;">{{ t('Hide') }}</span>
             </label>
             {{ dictionary.sort_order }}
+            {% if not dict_is_ai %}
             <span class="test-dict-entity" title="{{ t('Test dictionary') }}" style="margin-left: 20px">
               <img src="{{ vstatic('icn/external.png') }}">
             </span>
             <span class="remove-dict-entity" title="{{ t('Remove dictionary') }}">
               <img src="{{ vstatic('icn/minus-button.png') }}">
             </span>
+            {% else %}
+            {# The AI row keeps the same operations slot as every other
+               row -- it just has no buttons in it (it can't be tested or
+               removed).  Reserving the space keeps the row's total width
+               identical, so the URL column shrinks by the same amount and
+               the status/hide columns line up with the rows around it. #}
+            <span class="dict-ops-slot" style="margin-left: 20px;"></span>
+            <span class="dict-ops-slot"></span>
+            {% endif %}
           </div>
           {% endfor %}
         </div>
@@ -143,6 +182,15 @@
     </tr>
     <tr>
       <td style="vertical-align: top;">
+        {{ form.show_dict_phonetics.label(class="form-control-label") }}
+        <div style="color:#666; font-size:0.85em; max-width:24em;">
+          {{ t('Show the BrE/NAmE /.../ pronunciation run on the Local dictionary card.  Off by default: the word, part of speech, definitions, translations and examples are always shown.') }}
+        </div>
+      </td>
+      <td>{{ form.show_dict_phonetics() }}</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
         {{ form.term_translation_source.label(class="form-control-label") }}
         <div style="color:#666; font-size:0.85em; max-width:24em;">
           {{ t("What auto-fills a new term's translation.  <b>Local dictionary</b> tries this language's Local dictionaries in tab order, and falls back to online translation when none has an entry.") }}
@@ -151,9 +199,54 @@
       <td>{{ form.term_translation_source(class="form-control") }}</td>
     </tr>
 
+    <tr>
+      <td colspan="2">
+        <h3 class="language-form__section-title">{{ t('AI features') }}</h3>
+        <div style="color:#666; font-size:0.85em; max-width:32em;">
+          {{ t('The AI provider and API key are configured once in Settings.  These switches decide which AI features this language uses; both are on by default.  The AI tab is a row in the Dictionaries list above: drag it to change its order.') }}
+        </div>
+      </td>
+    </tr>
+    {#
+      The single language for both AI outputs: grammar explanations and
+      the sentence translation, word meanings, context notes and
+      examples.  Rendered here (not by the generic field loop) so the
+      help text can say both jobs; "Google Translate Target" above is
+      untouched and still only drives Google Translate.
+    #}
+    <tr>
+      <td style="vertical-align: top;">
+        <label class="form-control-label" for="{{ form.grammar_translate_lang.id }}">
+          {{ t('AI analysis & translation language') }}
+        </label>
+        <div style="color:#666; font-size:0.85em; max-width:24em;">
+          {{ t('Language of grammar explanations and of sentence translation, word meanings, context notes and example translations.  Google Translate Target above is separate.') }}
+        </div>
+      </td>
+      <td>{{ form.grammar_translate_lang(class="form-control") }}</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+        {{ form.ai_sentence_translation.label(class="form-control-label") }}
+        <div style="color:#666; font-size:0.85em; max-width:24em;">
+          {{ t('Master switch for the AI tab.  Its position is the AI row in the Dictionaries list above; off hides the tab and the AI endpoint refuses this language.') }}
+        </div>
+      </td>
+      <td>{{ form.ai_sentence_translation() }}</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+        {{ form.ai_grammar_analysis.label(class="form-control-label") }}
+        <div style="color:#666; font-size:0.85em; max-width:24em;">
+          {{ t('Use AI in the Grammar panel.  Off hides the AI section; the grammar library itself is unaffected.') }}
+        </div>
+      </td>
+      <td>{{ form.ai_grammar_analysis() }}</td>
+    </tr>
+
     {% set _kiwi_fields = ('kiwi_tokenizer_mode', 'kiwi_stemming', 'kiwi_filter_particles', 'kiwi_join_compound_nouns') %}
     {# Fields rendered by a hand-written block below, not by the loop. #}
-    {% set _custom_fields = ('hidden_grammar_levels', 'term_popup_show_dict_gloss', 'term_translation_source', 'show_furigana') %}
+    {% set _custom_fields = ('hidden_grammar_levels', 'term_popup_show_dict_gloss', 'show_dict_phonetics', 'term_translation_source', 'show_furigana', 'ai_sentence_translation', 'ai_grammar_analysis', 'grammar_translate_lang') %}
     {% for field in form %}
     {% if field.name not in ('name', 'csrf_token', 'dictionaries') and field.name not in _kiwi_fields and field.name not in _custom_fields %}
     <tr>

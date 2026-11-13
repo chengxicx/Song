@@ -81,16 +81,11 @@ function shadowingSentences() {
 
 /* A furigana <rt> reading is part of textContent but is not text to
    read, send, or match: on a ruby-annotated page 普通's span reads
-   "普通ふつう" and every consumer would double the word.  Same strip as
-   tts.js's ttsPlainText. */
+   "普通ふつう" and every consumer would double the word.  The strip is
+   shared with lute-furigana.js so the panel and the ruby request
+   always describe the same sentence (see lute-plain-text.js). */
 function shadowingPlainText(node) {
-  if (!node) return "";
-  if (node.nodeType === 3) return node.textContent || "";
-  const clone = node.cloneNode(true);
-  if (clone.querySelectorAll) {
-    clone.querySelectorAll("rt, rp").forEach(function (el) { el.remove(); });
-  }
-  return clone.textContent || "";
+  return window.lutePlainText(node);
 }
 
 function shadowingLineText(el) {
@@ -165,12 +160,135 @@ function shadowingCollectable(sp) {
   );
 }
 
+/* What a span looks like on the page: its own original text, punctuation
+   and surrounding spaces included.  Only invisible rendering artifacts
+   (zero-width spaces, the injected speaker button) are dropped. */
+function shadowingDisplayText(sp) {
+  return (sp.getAttribute("data-text") || sp.textContent || "")
+    .replace(/\u200B/g, "")
+    .replace(/🔊/g, "");
+}
+
+/* One displayable piece of the sentence for the panel.  Punctuation (and
+   the bare spaces between words) is display-only: scorable is false, so
+   it never reaches the diff, the score, or a verdict class. */
+function shadowingDisplayItem(sp) {
+  if (!sp || sp.nodeType !== 1 || !sp.classList) return null;
+  if (!sp.classList.contains("textitem")) return null;
+  if (sp.classList.contains("lute-sentence-play-btn")) return null;
+  const text = shadowingDisplayText(sp);
+  if (!text) return null;
+  return {
+    text: text,
+    scorable: shadowingCollectable(sp),
+    speak: null,
+    idx: null,
+    span: sp,
+  };
+}
+
+/* The sentence in reading order, including the text nodes between word
+   spans.  Some pages render spaces as their own textitem; the TTS cue
+   harness leaves them as bare text nodes, so both are kept.  Template
+   indentation can leave whitespace-only text nodes at the edges -- drop
+   those, they are not part of the sentence. */
+function shadowingDisplayItemsIn(root) {
+  const items = [];
+  const walk = function (node) {
+    if (node.nodeType === 3) {
+      if (node.textContent) {
+        items.push({
+          text: node.textContent,
+          scorable: false,
+          speak: null,
+          idx: null,
+          span: null,
+        });
+      }
+      return;
+    }
+    if (node.nodeType !== 1) return;
+    if (node.classList && node.classList.contains("lute-sentence-play-btn")) {
+      return;
+    }
+    const item = shadowingDisplayItem(node);
+    if (item) {
+      items.push(item);
+      return;
+    }
+    Array.prototype.forEach.call(node.childNodes, walk);
+  };
+  Array.prototype.forEach.call(root.childNodes, walk);
+  while (items.length && !items[0].span && !items[0].text.trim()) {
+    items.shift();
+  }
+  while (
+    items.length &&
+    !items[items.length - 1].span &&
+    !items[items.length - 1].text.trim()
+  ) {
+    items.pop();
+  }
+  return items;
+}
+
+/* The display pieces for the cue's own nodes.  Cue nodes are elements
+   only, so any spaces between them live in the neighbouring text nodes
+   of the live DOM and have to be picked up from there. */
+function shadowingDisplayItemsForNodes(nodes) {
+  const items = [];
+  (nodes || []).forEach(function (node) {
+    if (node.nodeType === 3) {
+      if (node.textContent) {
+        items.push({
+          text: node.textContent,
+          scorable: false,
+          speak: null,
+          idx: null,
+          span: null,
+        });
+      }
+      return;
+    }
+    if (node.nodeType !== 1) return;
+    const item = shadowingDisplayItem(node);
+    if (item) items.push(item);
+    const next = node.nextSibling;
+    if (next && next.nodeType === 3 && next.textContent) {
+      items.push({
+        text: next.textContent,
+        scorable: false,
+        speak: null,
+        idx: null,
+        span: null,
+      });
+    }
+  });
+  return items;
+}
+
+/* Split a display sequence into the two parallel lists the rest of the
+   module already works with: the scorable word spans (what is sent for
+   scoring and painted in the reading text) and their cleaned token
+   texts.  Display-only items get no index and are never scored. */
+function shadowingScoreableFromDisplay(display) {
+  const spans = [];
+  const texts = [];
+  display.forEach(function (item) {
+    if (!item.scorable || !item.span) return;
+    item.speak = shadowingTokenText(item.span);
+    item.idx = texts.length;
+    spans.push(item.span);
+    texts.push(item.speak);
+  });
+  return { spans: spans, texts: texts };
+}
+
 function shadowingUnitFromEl(el, src) {
   if (!el || !el.isConnected) return null;
-  const spans = Array.prototype.slice
-    .call(el.querySelectorAll("span.textitem"))
-    .filter(shadowingCollectable);
-  if (!spans.length) return null;
+  const display = shadowingDisplayItemsIn(el);
+  const scored = shadowingScoreableFromDisplay(display);
+  if (!scored.spans.length) return null;
   const clone = el.cloneNode(true);
   clone.querySelectorAll(".lute-sentence-play-btn").forEach(function (b) {
     b.remove();
@@ -179,8 +297,9 @@ function shadowingUnitFromEl(el, src) {
   return {
     el: el,
     lines: [el],
-    spans: spans,
-    texts: spans.map(shadowingTokenText),
+    display: display,
+    spans: scored.spans,
+    texts: scored.texts,
     fullText: (shadowingPlainText(clone) || "")
       .replace(/\u200B/g, "")
       .replace(/🔊/g, "")
@@ -192,16 +311,22 @@ function shadowingUnitFromEl(el, src) {
 
 function shadowingUnitFromLines(lines, src) {
   if (!lines || !lines.length) return null;
-  const spans = [];
-  lines.forEach(function (l) {
-    Array.prototype.push.apply(
-      spans,
-      Array.prototype.slice.call(l.querySelectorAll("span.textitem")).filter(
-        shadowingCollectable
-      )
-    );
+  const display = [];
+  lines.forEach(function (l, i) {
+    if (i) {
+      display.push({
+        text: "",
+        scorable: false,
+        speak: null,
+        idx: null,
+        span: null,
+        br: true,
+      });
+    }
+    Array.prototype.push.apply(display, shadowingDisplayItemsIn(l));
   });
-  if (!spans.length) return null;
+  const scored = shadowingScoreableFromDisplay(display);
+  if (!scored.spans.length) return null;
   let fullText = "";
   lines.forEach(function (l) {
     const clone = l.cloneNode(true);
@@ -210,12 +335,13 @@ function shadowingUnitFromLines(lines, src) {
     });
     fullText += (fullText ? "\n" : "") + (shadowingPlainText(clone) || "");
   });
-  const langSpan = spans[0];
+  const langSpan = scored.spans[0];
   return {
     el: lines[0],
     lines: lines,
-    spans: spans,
-    texts: spans.map(shadowingTokenText),
+    display: display,
+    spans: scored.spans,
+    texts: scored.texts,
     fullText: fullText.replace(/\u200B/g, "").replace(/🔊/g, "").trim(),
     langId: langSpan ? langSpan.getAttribute("data-lang-id") : "",
     src: src || null,
@@ -231,23 +357,24 @@ function shadowingUnitFromLines(lines, src) {
    connectivity checks and prev/next navigation keep working as
    before. */
 function shadowingUnitFromCueNodes(nodes, src) {
-  const spans = [];
+  const display = shadowingDisplayItemsForNodes(nodes);
+  const scored = shadowingScoreableFromDisplay(display);
+  if (!scored.spans.length) return null;
   let fullText = "";
   (nodes || []).forEach(function (n) {
     fullText += shadowingPlainText(n) || "";
-    if (n.nodeType === 1 && shadowingCollectable(n)) spans.push(n);
   });
-  if (!spans.length) return null;
   const langSpan =
-    spans.find(function (sp) {
+    scored.spans.find(function (sp) {
       return sp.getAttribute("data-lang-id") != null;
     }) || null;
-  const el = spans[0].closest(".textsentence");
+  const el = scored.spans[0].closest(".textsentence");
   return {
     el: el,
     lines: el ? [el] : [],
-    spans: spans,
-    texts: spans.map(shadowingTokenText),
+    display: display,
+    spans: scored.spans,
+    texts: scored.texts,
     fullText: fullText.replace(/\u200B/g, "").replace(/🔊/g, "").trim(),
     langId: langSpan ? langSpan.getAttribute("data-lang-id") : "",
     src: src || null,
@@ -665,7 +792,7 @@ function shadowingKanaReading(reading) {
   return /[\u3040-\u309F\u30A0-\u30FF]/.test(r) ? r : "";
 }
 
-function shadowingTokenHtml(text, reading, idx, cls) {
+function shadowingTokenHtml(text, reading, idx, cls, speak) {
   reading = shadowingKanaReading(reading);
   const inner = reading
     ? "<ruby>" +
@@ -675,12 +802,31 @@ function shadowingTokenHtml(text, reading, idx, cls) {
       "</rt></ruby>"
     : shadowingEscapeHtml(text);
   let attrs = ' class="' + (cls || "shadow-tok") + '"';
-  attrs += ' data-speak="' + shadowingEscapeHtml(text) + '"';
+  attrs +=
+    ' data-speak="' + shadowingEscapeHtml(speak == null ? text : speak) + '"';
   if (reading) attrs += ' data-reading="' + shadowingEscapeHtml(reading) + '"';
   if (idx != null) attrs += ' data-idx="' + idx + '"';
   return (
     "<span" + attrs + ' title="' + I18N.t('Click to hear this word') + '">' + inner + "</span>"
   );
+}
+
+/* Render one piece of the sentence's display sequence.  Word items keep
+   their existing clickable/verdict token; punctuation is shown in a
+   neutral span with no data-idx, so no recording can ever mark it. */
+function shadowingDisplayItemHtml(item, readings) {
+  if (item.br) return "<br>";
+  if (!item.scorable) {
+    if (!item.text.trim()) return shadowingEscapeHtml(item.text);
+    return (
+      '<span class="shadow-punct">' +
+      shadowingEscapeHtml(item.text) +
+      "</span>"
+    );
+  }
+  const r =
+    item.idx != null && readings[item.idx] ? readings[item.idx].reading : null;
+  return shadowingTokenHtml(item.text, r, item.idx, "shadow-tok", item.speak);
 }
 
 function shadowingRenderCurrent() {
@@ -692,12 +838,11 @@ function shadowingRenderCurrent() {
     return;
   }
   const readings = shadowingUnit.readings || [];
-  box.innerHTML = shadowingUnit.texts
-    .map(function (t, i) {
-      const r = readings[i] ? readings[i].reading : null;
-      return shadowingTokenHtml(t, r, i, "shadow-tok");
+  box.innerHTML = (shadowingUnit.display || [])
+    .map(function (item) {
+      return shadowingDisplayItemHtml(item, readings);
     })
-    .join(" ");
+    .join("");
 }
 
 // Speak one word of the panel.  The annotated kana reading is preferred

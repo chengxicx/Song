@@ -6,7 +6,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from flask import Blueprint, current_app, render_template, redirect, url_for, flash
 from lute.dict import service as dict_service
-from lute.models.language import Language
+from lute.models.language import AI_DICT_TYPE, Language
 from lute.models.repositories import UserSettingRepository
 from lute.language.service import Service
 from lute.language.forms import LanguageForm
@@ -55,6 +55,63 @@ def index():
     return render_template("language/index.html", language_data=languages)
 
 
+def _lock_dictionary_types(form):
+    """
+    Restrict each dictionary row's type options.
+
+    An AI row's type is fixed (the template renders it as a disabled
+    dropdown plus a hidden value), so it must still validate against a
+    one-item choice list.  Every other row offers the three ordinary
+    types: the AI row is added automatically, never chosen, and a
+    language has at most one.
+
+    Must run before the form is validated, and again after the
+    __TEMPLATE__ entry is appended so the add-button clone offers the
+    ordinary types too.
+    """
+    ordinary = [
+        ("embeddedhtml", "Embedded"),
+        ("popuphtml", "Pop-up window"),
+        ("localdict", "Local"),
+    ]
+    for entry in form.dictionaries:
+        # object_data is the row's *saved* type, not the submitted one:
+        # a crafted POST can't turn an ordinary row into an AI row.
+        if entry.dicttype.object_data == AI_DICT_TYPE:
+            entry.dicttype.choices = [(AI_DICT_TYPE, "AI")]
+        else:
+            entry.dicttype.choices = ordinary
+
+
+def _set_ai_provider_choices(form):
+    """
+    Offer the configured providers on every row's provider select.
+
+    Only the AI row renders the control (it stands in for that row's
+    URL cell), but the choices live on the field so the AI row can show
+    them and the posted value round-trips; the other rows post nothing
+    and stay at Default.  Must run before validation, like the type
+    lock -- a provider with no key is not a valid pin.
+    """
+    from lute.ai.service import (  # pylint: disable=import-outside-toplevel
+        ai_provider_choices,
+        resolve_language_pin,
+    )
+
+    choices = ai_provider_choices()
+    for entry in form.dictionaries:
+        entry.ai_provider.choices = choices
+        # Old rows pinned the literal openai/anthropic.  Map that to the
+        # current entry id so the select shows the right option and a
+        # save round-trips it, rather than clearing it by accident.
+        current = entry.ai_provider.data
+        resolved = resolve_language_pin(current) if current else ""
+        # Leave unknown/forged values untouched so validation rejects
+        # them -- only a usable legacy literal is rewritten.
+        if resolved:
+            entry.ai_provider.data = resolved
+
+
 def _handle_form(language, form) -> bool:
     """
     Handle the language form processing.
@@ -68,6 +125,10 @@ def _handle_form(language, form) -> bool:
             form.populate_obj(language)
             current_app.db.session.add(language)
             current_app.db.session.commit()
+            # A new language has no id until the commit above, so the
+            # AI row's placeholder URL can only be built now.
+            if language.ensure_ai_dictionary_row():
+                current_app.db.session.commit()
             flash(f"Language {language.name} updated", "success")
             result = True
         except IntegrityError as e:
@@ -226,11 +287,16 @@ def edit(langid):
     form.parser_type.choices = _dropdown_parser_choices(language)
     _ensure_tag_choices_include_current(form, language)
     _set_hidden_grammar_choices(form, language)
+    _lock_dictionary_types(form)
+    _set_ai_provider_choices(form)
 
     if _handle_form(language, form):
         return redirect("/")
 
     _add_hidden_dictionary_template_entry(form)
+    # The template row was appended after validation; give its clone
+    # the ordinary type options (see _lock_dictionary_types).
+    _lock_dictionary_types(form)
 
     return render_template(
         "language/edit.html",
@@ -273,6 +339,8 @@ def new(langname):
     form.parser_type.choices = _dropdown_parser_choices(language)
     _ensure_tag_choices_include_current(form, language)
     _set_hidden_grammar_choices(form, language)
+    _lock_dictionary_types(form)
+    _set_ai_provider_choices(form)
 
     if _handle_form(language, form):
         # New language, so show everything b/c user should re-choose
@@ -289,6 +357,7 @@ def new(langname):
         return redirect("/")
 
     _add_hidden_dictionary_template_entry(form)
+    _lock_dictionary_types(form)
 
     return render_template(
         "language/new.html",

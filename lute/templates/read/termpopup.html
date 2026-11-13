@@ -16,12 +16,12 @@
 <p class="small-flash-notice">{{ data.flash }}</p>
 {% endif %}
 
-{% if data.romanization %}
+{% if data.romanization and data.show_romanization %}
 <p><i>{{ data.romanization }}</i></p>
 {% endif %}
 
-{% for img, tooltip in data.popup_image_data.items() %}
-<img class="tooltip-image" src="{{ img }}" tooltip="{{ tooltip }}"/>
+{% for img in data.popup_images %}
+<img class="tooltip-image" src="{{ img.thumb }}" data-full-src="{{ img.full }}" tooltip="{{ img.tooltip }}" width="150" height="150" loading="lazy" decoding="async" onclick="window.open(this.dataset.fullSrc, '_blank', 'noopener');"/>
 {% endfor %}
 
 {% if data.translation != "" %}<p>{{ data.translation | safe }}</p>{% endif %}
@@ -40,7 +40,7 @@
   {% for p in data.parents %}
   <p>
     <b>{{ p.term_text }}</b>
-    {% if p.romanization != "" %}<i>({{ p.romanization }})</i>{% endif %}
+    {% if p.romanization != "" and p.show_romanization %}<i>({{ p.romanization }})</i>{% endif %}
     {% for t in p.tags %}
     <span class="termpopup-tag">{{ t }}</span>
     {% endfor %}
@@ -58,7 +58,7 @@
   {% for p in data.components %}
   <p>
     <b>{{ p.term_text }}</b>
-    {% if p.romanization != "" %}<i>({{ p.romanization }})</i>{% endif %}
+    {% if p.romanization != "" and p.show_romanization %}<i>({{ p.romanization }})</i>{% endif %}
     {% for t in p.tags %}
     <span class="termpopup-tag">{{ t }}</span>
     {% endfor %}

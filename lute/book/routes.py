@@ -38,6 +38,7 @@ from lute.netease.service import (
     netease_lyric_content,
     NETEASE_MAX_AUDIO_BYTES,
 )
+from lute.book import import_task
 from lute.book.datatables import get_data_tables_list
 from lute.book.series import get_series_overview
 from lute.book.epub_parser import parse_epub
@@ -158,8 +159,15 @@ def book_settings():
 
 @bp.route("/series/<tagtext>", methods=["GET"])
 def series(tagtext):
-    "Series overview: all books carrying the given tag."
-    data = get_series_overview(db.session, tagtext)
+    """
+    Series overview: all books carrying the given tag.
+
+    ?lgid=<id> scopes it to one language -- the home table renders one
+    series row per (tag, language), and a tag text can be shared by
+    several languages, so the row's link passes its language along.
+    """
+    lgid = request.args.get("lgid", type=int) or None
+    data = get_series_overview(db.session, tagtext, lgid=lgid)
     if data is None:
         flash(t("No books found with tag") + f" '{tagtext}'", "notice")
         return redirect("/", 302)
@@ -207,11 +215,23 @@ def new():
     if form.validate_on_submit():
         try:
             form.populate_obj(b)
-            svc = BookService()
-            book = svc.import_book(b, db.session)
-            return redirect(f"/read/{book.id}/page/1", 302)
+            # Parsing a whole book into pages can take seconds, so the
+            # import runs on the whisper-style background task and this
+            # request only saves the uploads and redirects to the
+            # progress page that polls it.
+            task_id, _duplicate = import_task.start_import(
+                current_app._get_current_object(),  # pylint: disable=protected-access
+                b,
+                get_current_user(),
+                text_upload=form.textfile.data,
+                audio_upload=form.audiofile.data,
+            )
+            return redirect(f"/book/import/progress/{task_id}", 302)
         except BookImportException as e:
             flash(e.message, "notice")
+        except Exception as e:  # pylint: disable=broad-except
+            current_app.logger.exception("Could not start the book import")
+            flash(str(e), "notice")
 
     # Don't set the current language before submit.
     usrepo = UserSettingRepository(db.session)
@@ -234,6 +254,18 @@ def new():
         show_language_selector=True,
         allowed_extensions=ALLOWED_AUDIO_EXTENSIONS,
     )
+
+
+@bp.route("/import/progress/<task_id>", methods=["GET"])
+def import_progress(task_id):
+    "Progress page for a background new-book import."
+    return render_template("book/import_progress.html", task_id=task_id)
+
+
+@bp.route("/import/status/<task_id>", methods=["GET"])
+def import_status(task_id):
+    "Poller payload for a new-book import task."
+    return jsonify(import_task.task_status(task_id))
 
 
 @bp.route("/edit/<int:bookid>", methods=["GET", "POST"])
@@ -991,6 +1023,9 @@ def import_epub():
             "imported": imported,
             "failed": failed,
             "series_tag": book_title,
+            # The overview must be scoped to this book's language: the
+            # tag text alone can be shared by several languages.
+            "language_id": language_id,
         }
     )
 

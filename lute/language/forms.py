@@ -17,7 +17,10 @@ from wtforms import (
 from wtforms.validators import DataRequired
 from wtforms.widgets import ListWidget, CheckboxInput
 from lute.language.langtags import tag_choices
-from lute.models.language import LanguageDictionary
+from lute.models.language import (
+    AI_DICT_TYPE,
+    LanguageDictionary,
+)
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -66,6 +69,19 @@ class LanguageDictionaryForm(Form):
     is_hidden = BooleanField(
         "Hide",
         render_kw={"title": "Keep this dictionary but hide its tab"},
+    )
+    # The provider the AI sentence tab uses; "" follows the shared
+    # Settings choice.  The template renders this only in the AI row
+    # (in the URL column), so other rows post nothing and stay at "".
+    # Choices are installed per request by the language routes, and
+    # validation checks them against the configured providers rather
+    # than trusting the posted value.
+    ai_provider = SelectField(
+        "AI provider",
+        choices=[("", "Default (use the enabled provider in Settings)")],
+        default="",
+        validate_choice=False,
+        render_kw={"title": "Provider used by AI sentence translation"},
     )
     sort_order = IntegerField("Sort", render_kw={"style": "display: none"})
 
@@ -129,9 +145,42 @@ class LanguageForm(FlaskForm):
         default="",
     )
     grammar_translate_lang = SelectField(
-        "Grammar Analysis Language",
-        choices=[("en", "English"), ("zh", "中文"), ("ko", "한국어")],
+        "AI analysis & translation language",
+        choices=[
+            ("en", "English"),
+            ("zh", "中文"),
+            ("ja", "日本語"),
+            ("ko", "한국어"),
+            ("fr", "Français"),
+            ("de", "Deutsch"),
+            ("es", "Español"),
+            ("ru", "Русский"),
+        ],
         default="en",
+    )
+    # Which AI features this language may use.  The API key and model
+    # are configured once in Settings; these switches decide whether the
+    # reader's Sentence tab and the Grammar panel show AI at all.  Both
+    # default on, matching the behaviour before the switches existed.
+    ai_sentence_translation = BooleanField(
+        "AI sentence translation",
+        default=True,
+        render_kw={
+            "title": (
+                "Offer the AI entry in the reader's Sentence tab for this "
+                "language.  The AI provider is configured once in Settings."
+            )
+        },
+    )
+    ai_grammar_analysis = BooleanField(
+        "AI grammar analysis",
+        default=True,
+        render_kw={
+            "title": (
+                "Use AI in this language's Grammar panel.  Turning it off "
+                "hides the AI section; the grammar library still works."
+            )
+        },
     )
     # --- Local (MDX) dictionaries.
     # Local dictionaries are ordinary rows in the dictionary list above
@@ -147,6 +196,21 @@ class LanguageForm(FlaskForm):
                 "Add this language's dictionary definition to the popup, for "
                 "terms with no translation yet.  The reading page's dictionary "
                 "tab is unaffected."
+            )
+        },
+    )
+    # English pronunciation notation (BrE/NAmE /.../) in the Local
+    # dictionary card.  Off by default: the card is for the word's
+    # meaning, and the IPA is optional detail.  Japanese/Chinese
+    # readings are not affected -- this only targets the English/IPA
+    # annotation forms (see gloss_format.display_blocks).
+    show_dict_phonetics = BooleanField(
+        "Show phonetics in dictionary cards",
+        render_kw={
+            "title": (
+                "Show the BrE/NAmE /.../ pronunciation run on the reading "
+                "page's Local dictionary card.  Off by default; definitions, "
+                "POS and examples are always shown."
             )
         },
     )
@@ -224,8 +288,47 @@ class LanguageForm(FlaskForm):
                     "dictionaries, ending in .db."
                 )
 
+        # The AI tab is one row per language, and only ever a sentence
+        # dictionary: the reading page renders it from the row's
+        # position (see Language.active_dict_uris).
+        ai_rows = [
+            d for d in self.dictionaries.data if d.get("dicttype") == AI_DICT_TYPE
+        ]
+        if len(ai_rows) > 1:
+            raise ValidationError("Only one AI dictionary row is allowed per language.")
+        for d in ai_rows:
+            if d.get("usefor", "") != "sentences":
+                raise ValidationError(
+                    "The AI dictionary row can only be used for Sentences."
+                )
+
+        # The sentence provider is a per-language pin on the AI row.
+        # Only a provider that currently has a key configured can be
+        # pinned -- a stale or forged value would leave the reader with
+        # an unusable tab, so it is refused here as a form error.
+        from lute.ai.service import (  # pylint: disable=import-outside-toplevel
+            provider_entries,
+        )
+
+        configured = {
+            e["id"] for e in provider_entries() if e["configured"]
+        }
+        for d in self.dictionaries.data:
+            provider = (d.get("ai_provider") or "").strip()
+            if provider and (
+                d.get("dicttype") != AI_DICT_TYPE or provider not in configured
+            ):
+                raise ValidationError(
+                    f'"{provider}" is not an AI provider configured in Settings.'
+                )
+
         term_dicts = _get_actives("terms")
-        sentence_dicts = _get_actives("sentences")
+        # The AI row doesn't count as a Sentences dictionary: a language
+        # still needs a real dictionary for its sentence tabs, exactly
+        # like before the AI row existed.
+        sentence_dicts = [
+            d for d in _get_actives("sentences") if d.get("dicttype") != AI_DICT_TYPE
+        ]
         if len(term_dicts) == 0:
             raise ValidationError("Please add an active Terms dictionary")
         if len(sentence_dicts) == 0:

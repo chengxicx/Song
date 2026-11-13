@@ -107,6 +107,30 @@
 
     <tr>
       <td>
+        <h2>{{ t('Word card images') }}</h2>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        {{ form.word_image_max_edge.label }}
+        <img
+          id="about_word_image_max_edge" style="margin-right:10px;"
+          src="{{ vstatic('icn/question-balloon.png') }}"
+          title="{{ t('Click for details') }}"
+          onclick="$('#word_image_max_edge_help').toggle();"
+          />
+        <blockquote id="word_image_max_edge_help" style="width:60%; display: none;">
+          <p>{{ t('New word card images are saved as one WebP file whose longest edge is capped at this size.  Smaller images are never enlarged.') }}</p>
+          <p>{{ t('Keep original stores the downloaded file unchanged plus a 400px thumbnail (the old two-file behaviour).  Existing images are not changed.') }}</p>
+        </blockquote>
+      </td>
+      <td>
+        {{ form.word_image_max_edge }}
+      </td>
+    </tr>
+
+    <tr>
+      <td>
         <h2>{{ t('Behaviour') }}</h2>
       </td>
     </tr>
@@ -331,10 +355,201 @@
       </td>
     </tr>
 
+    <tr>
+      <td>
+        <h2 id="ai-provider">{{ t('AI provider (API key)') }}</h2>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        {{ t('Add one or more AI providers here.  The default provider is used for grammar analysis and, unless a language pins another one, for sentence translation in the reader.  A language can pick its own provider on its AI dictionary row in Language settings.  Keys stay on this server, encrypted, and only a mask is shown.') }}
+        <div style="margin-top: 6px;">
+          <a href="/language/index">{{ t('Open Language settings') }}</a>
+          {{ t('to choose which AI features each language uses.') }}
+        </div>
+      </td>
+      <td>
+        <div id="ai_provider_box">
+          <style>
+            /* Provider rows are cards like the other Settings sub-blocks, so
+               every colour comes from the shared tokens in styles.css (the
+               active theme supplies --background-color / --font-color /
+               --panel-bg / --form-border-color).  Do not hard-code white or
+               grey here: literal #fafafa / #555 stayed light on the dark
+               Default theme. */
+            #ai_provider_rows .ai-provider-row {
+              border: 1px solid var(--form-border-color, #ddd);
+              border-radius: var(--form-border-radius, 6px);
+              padding: 10px;
+              margin-bottom: 10px;
+              color: var(--font-color);
+              background-color: var(--panel-bg, transparent);
+              background-color: color-mix(in srgb, var(--font-color, #000) 5%, transparent);
+            }
+            #ai_provider_rows .ai-prefetch-box {
+              margin-top: 14px;
+              border: 1px solid var(--form-border-color, #ddd);
+              border-radius: var(--form-border-radius, 6px);
+              padding: 10px;
+              color: var(--font-color);
+              background-color: color-mix(in srgb, var(--font-color, #000) 5%, transparent);
+            }
+            .ai-library-box {
+              margin-top: 14px;
+              border: 1px solid var(--form-border-color, #ddd);
+              border-radius: var(--form-border-radius, 6px);
+              padding: 10px;
+              color: var(--font-color);
+              background-color: color-mix(in srgb, var(--font-color, #000) 4%, transparent);
+            }
+            .ai-library-title { font-weight: 600; margin-bottom: 4px; }
+            .ai-library-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+            .ai-library-row .form-control {
+              width: auto;
+              min-width: 12rem;
+              padding: 0.24rem 0.4rem;
+              border: 1px solid var(--form-border-color, #ccc);
+              border-radius: var(--form-border-radius, 3px);
+              background-color: var(--input-bg, transparent);
+              color: var(--input-fg, var(--font-color, #000));
+            }
+            .ai-library-box .ai-provider-key-note { font-size: 0.78em; color: color-mix(in srgb, var(--font-color, #000) 55%, transparent); }
+            .ai-library-box .ai-provider-default-wrap { display: inline-flex; gap: 5px; align-items: center; white-space: nowrap; }
+            .ai-library-box .ai-provider-default-wrap input { margin: 0; }
+            .ai-library-report { margin-top: 8px; font-size: 0.85em; }
+            .ai-library-report .is-error { color: color-mix(in srgb, #e5484d 80%, var(--font-color, #000)); }
+            .ai-library-report a { color: var(--btn-accent, #007aff); }
+            #ai_provider_rows .ai-provider-grid { display: grid; grid-template-columns: 9rem minmax(16rem, 1.6fr) minmax(11rem, 1fr) 9rem 9rem 6rem; gap: 8px; align-items: end; }
+            /* The six-column row needs ~60rem; below that it would push the
+               Settings table past the viewport.  Two columns keep every
+               field usable at tablet widths. */
+            @media (max-width: 1200px) {
+              #ai_provider_rows .ai-provider-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            }
+            #ai_provider_rows .ai-provider-field { display: flex; flex-direction: column; min-width: 0; }
+            #ai_provider_rows .ai-provider-field > span { font-size: 0.85em; color: color-mix(in srgb, var(--font-color, #000) 64%, transparent); margin-bottom: 2px; }
+            #ai_provider_rows .ai-provider-field .form-control,
+            #ai_provider_rows .ai-provider-field .form-control:focus { border: 1px solid var(--form-border-color, #ccc); }
+            #ai_provider_rows .ai-provider-field .form-control { width: 100%; box-sizing: border-box; padding: 0.24rem 0.4rem; border-radius: var(--form-border-radius, 3px); background-color: var(--input-bg, #fff); color: var(--input-fg, var(--font-color, #000)); }
+            #ai_provider_rows .ai-provider-field .form-control:focus { outline: none; border-color: var(--btn-accent, #007aff); }
+            #ai_provider_rows .ai-provider-key-note { font-size: 0.78em; color: color-mix(in srgb, var(--font-color, #000) 55%, transparent); margin-top: 2px; }
+            #ai_provider_rows .ai-provider-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 8px; }
+            #ai_provider_rows .ai-provider-default-wrap { display: inline-flex; gap: 5px; align-items: center; margin-right: auto; white-space: nowrap; }
+            #ai_provider_rows .ai-provider-default-wrap input { margin: 0; }
+            #ai_provider_rows .ai-provider-message { font-size: 0.88em; min-width: 10rem; }
+            #ai_provider_rows .ai-provider-message.is-ok { color: color-mix(in srgb, #37b24d 80%, var(--font-color, #000)); }
+            #ai_provider_rows .ai-provider-message.is-error { color: color-mix(in srgb, #e5484d 80%, var(--font-color, #000)); }
+          </style>
+          <div id="ai_provider_rows">
+            {% for e in ai_entries %}
+            <div class="ai-provider-row" data-id="{{ e.id }}"
+                 data-configured="{{ '1' if e.configured else '0' }}"
+                 data-format="{{ e.format }}">
+              <div class="ai-provider-grid">
+                <label class="ai-provider-field">
+                  <span>{{ t('Format') }}</span>
+                  <select class="form-control ai-provider-format">
+                    <option value="openai" {% if e.format == 'openai' %}selected{% endif %}>OpenAI</option>
+                    <option value="anthropic" {% if e.format == 'anthropic' %}selected{% endif %}>Anthropic</option>
+                  </select>
+                </label>
+                <label class="ai-provider-field">
+                  <span>{{ t('Base URL') }}</span>
+                  <input type="text" class="form-control ai-provider-base-url"
+                         autocomplete="off" spellcheck="false" value="{{ e.base_url }}">
+                </label>
+                <label class="ai-provider-field">
+                  <span>{{ t('API key') }}</span>
+                  <input type="password" class="form-control ai-provider-key"
+                         autocomplete="off" spellcheck="false"
+                         placeholder="{{ e.masked if e.configured else '' }}">
+                  {% if e.configured %}
+                  <span class="ai-provider-key-note">{{ t('Leave blank to keep the saved key.') }}</span>
+                  {% endif %}
+                </label>
+                <label class="ai-provider-field">
+                  <span>{{ t('Model') }}</span>
+                  <input type="text" class="form-control ai-provider-model"
+                         autocomplete="off" spellcheck="false" value="{{ e.model }}">
+                </label>
+                <label class="ai-provider-field">
+                  <span>{{ t('Name (optional)') }}</span>
+                  <input type="text" class="form-control ai-provider-name"
+                         autocomplete="off" spellcheck="false" value="{{ e.name }}">
+                </label>
+                <label class="ai-provider-field">
+                  <span>{{ t('Requests / minute') }}</span>
+                  <input type="number" class="form-control ai-provider-rpm"
+                         min="1" max="600" step="1" value="{{ e.rpm or 20 }}"
+                         title="{{ t('Provider quota: requests per minute (1–600)') }}">
+                </label>
+              </div>
+              <div class="ai-provider-actions">
+                <label class="ai-provider-default-wrap">
+                  <input type="radio" name="ai_provider_default" class="ai-provider-default"
+                         {% if e.is_default %}checked{% endif %}>
+                  {{ t('Use as default') }}
+                </label>
+                <button type="button" class="btn btn-secondary ai-provider-test">{{ t('Test connection') }}</button>
+                <button type="button" class="btn btn-danger ai-provider-delete">{{ t('Delete') }}</button>
+                <span class="ai-provider-message" data-role="message"></span>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          <div id="ai_provider_empty" class="muted" style="margin-bottom: 8px;{% if ai_entries %} display: none;{% endif %}">
+            {{ t('No AI provider yet. Add one to use sentence translation and grammar analysis.') }}
+          </div>
+          <button type="button" id="ai_provider_add" class="btn btn-secondary">+ {{ t('Add provider') }}</button>
+
+          <div class="ai-prefetch-box">
+            <div style="display: flex; gap: 18px; flex-wrap: wrap; align-items: center;">
+              <label class="ai-provider-default-wrap" style="margin-right: 0;">
+                {{ form.ai_prefetch_enabled }} {{ form.ai_prefetch_enabled.label }}
+              </label>
+              <label class="ai-provider-default-wrap" style="margin-right: 0;">
+                {{ form.ai_prefetch_count.label }}
+                {{ form.ai_prefetch_count(class="form-control", style="width: 5rem;") }}
+              </label>
+            </div>
+            <div class="ai-provider-key-note">
+              {{ t('Background prefetch warms the next sentences of the page you open, so clicking one shows the stored explanation instantly. It waits behind live requests and never uses a stored sentence again.') }}
+            </div>
+          </div>
+        </div>
+
+        <div class="ai-library-box">
+          <div class="ai-library-title">{{ t('AI explanations library') }}</div>
+          <div class="ai-provider-key-note">
+            {{ t('Import a JSON or JSONL file of explanations (book_id, lang_id, target_lang and items), or export this book to fill the gaps with another AI. Importing never calls a provider and never uses your rate limit.') }}
+          </div>
+          <div class="ai-library-row">
+            <input type="file" id="ai_library_file" accept=".json,.jsonl,application/json">
+            <input type="text" id="ai_library_target" class="form-control"
+                   placeholder="{{ t('Target language (from the file)') }}" autocomplete="off">
+            <label class="ai-provider-default-wrap">
+              <input type="checkbox" id="ai_library_overwrite">
+              {{ t('Overwrite existing') }}
+            </label>
+            <button type="button" id="ai_library_import_btn" class="btn btn-primary">
+              {{ t('Import') }}
+            </button>
+          </div>
+          <div id="ai_library_report" class="ai-library-report" hidden></div>
+          <div class="ai-library-row" style="margin-top: 10px;">
+            <select id="ai_library_book" class="form-control"></select>
+            <button type="button" id="ai_library_export_btn" class="btn btn-secondary">
+              {{ t('Export this book') }}
+            </button>
+          </div>
+        </div>
+      </td>
+    </tr>
+
     {% if can_manage_server %}
     <tr>
       <td>
-        <h2>{{ t('Whisper (auto-subtitles)') }}</h2>
+        <h2>{{ t('Speech-to-text (auto-subtitles)') }}</h2>
       </td>
     </tr>
     <tr>
@@ -684,7 +899,7 @@
   document.addEventListener('DOMContentLoaded', netease_refresh_status);
 
   {% if can_manage_server %}
-  // --- Whisper (auto-subtitles) management. ---
+  // --- Speech-to-text (auto-subtitles) management. ---
   function whisperMsg(text, ok) {
     const el = document.getElementById('whisper_settings_msg');
     el.textContent = text;
@@ -712,7 +927,7 @@
           const row = document.createElement('div');
           row.style.marginTop = '4px';
           const state = document.createElement('span');
-          state.textContent = m.size + ' — ' + (m.cached ? I18N.t('cached,') + ' ' + m.size_mb + ' MB' : I18N.t('not downloaded'));
+          state.textContent = 'faster-whisper · ' + m.size + ' — ' + (m.cached ? I18N.t('cached,') + ' ' + m.size_mb + ' MB' : I18N.t('not downloaded'));
           row.appendChild(state);
 
           const dl = document.createElement('button');
@@ -739,7 +954,7 @@
           const row = document.createElement('div');
           row.style.marginTop = '8px';
           const state = document.createElement('span');
-          let stateText = I18N.t('sensevoice (zh/yue/en/ja/ko · fastest) — ');
+          let stateText = I18N.t('SenseVoice (zh/yue/en/ja/ko · fastest, sherpa-onnx) — ');
           if (!sv.installed) stateText += I18N.t('sherpa-onnx package not installed');
           else if (sv.cached) stateText += I18N.t('cached,') + ' ' + sv.size_mb + ' MB';
           else stateText += I18N.t('not downloaded');
@@ -766,7 +981,7 @@
         }
       })
       .catch(() => {
-        document.getElementById('whisper_settings_status').textContent = I18N.t('Could not load Whisper status.');
+        document.getElementById('whisper_settings_status').textContent = I18N.t('Could not load speech-to-text status.');
       });
   }
 
@@ -834,6 +1049,318 @@
 
   document.addEventListener('DOMContentLoaded', whisperRefresh);
   {% endif %}
+
+  (function () {
+    const rowsEl = document.getElementById('ai_provider_rows');
+    if (!rowsEl) return;
+    const emptyEl = document.getElementById('ai_provider_empty');
+    const addBtn = document.getElementById('ai_provider_add');
+    const formEl = rowsEl.closest('form');
+    const hiddenEl = document.querySelector('input[name="ai_providers_json"]');
+    const DEFAULTS = {
+      openai: 'https://api.openai.com/v1',
+      anthropic: 'https://api.anthropic.com',
+    };
+
+    function rows() {
+      return Array.from(rowsEl.querySelectorAll('.ai-provider-row'));
+    }
+
+    function part(row, cls) {
+      return row.querySelector('.' + cls);
+    }
+
+    function rowData(row) {
+      return {
+        id: row.dataset.id || '',
+        format: part(row, 'ai-provider-format').value,
+        base_url: part(row, 'ai-provider-base-url').value.trim(),
+        api_key: part(row, 'ai-provider-key').value.trim(),
+        model: part(row, 'ai-provider-model').value.trim(),
+        name: part(row, 'ai-provider-name').value.trim(),
+        rpm: parseInt(part(row, 'ai-provider-rpm').value, 10) || 20,
+        is_default: part(row, 'ai-provider-default').checked,
+      };
+    }
+
+    function allData() {
+      return rows().map(rowData);
+    }
+
+    function syncHidden() {
+      if (hiddenEl) hiddenEl.value = JSON.stringify(allData());
+    }
+
+    function showMessage(row, text, ok) {
+      const box = row.querySelector('[data-role="message"]');
+      if (!box) return;
+      box.textContent = text;
+      box.classList.toggle('is-ok', !!ok);
+      box.classList.toggle('is-error', !ok);
+    }
+
+    function updateEmpty() {
+      if (emptyEl) emptyEl.style.display = rows().length ? 'none' : 'block';
+    }
+
+    function ensureOneDefault() {
+      const rs = rows();
+      const checked = rs.filter(r => part(r, 'ai-provider-default').checked);
+      if (checked.length > 1) {
+        checked.slice(1).forEach(r => { part(r, 'ai-provider-default').checked = false; });
+      }
+    }
+
+    function afterDefaultChange(row) {
+      if (!part(row, 'ai-provider-default').checked) return;
+      rows().forEach(function (r) {
+        if (r !== row) part(r, 'ai-provider-default').checked = false;
+      });
+    }
+
+    function makeRow(entry) {
+      const row = document.createElement('div');
+      row.className = 'ai-provider-row';
+      row.dataset.id = entry.id || '';
+      row.dataset.configured = entry.configured ? '1' : '0';
+      row.dataset.format = entry.format || 'openai';
+      row.innerHTML =
+        '<div class="ai-provider-grid">' +
+        '  <label class="ai-provider-field"><span>' + I18N.t('Format') + '</span>' +
+        '    <select class="form-control ai-provider-format">' +
+        '      <option value="openai">OpenAI</option>' +
+        '      <option value="anthropic">Anthropic</option>' +
+        '    </select></label>' +
+        '  <label class="ai-provider-field"><span>' + I18N.t('Base URL') + '</span>' +
+        '    <input type="text" class="form-control ai-provider-base-url" autocomplete="off" spellcheck="false"></label>' +
+        '  <label class="ai-provider-field"><span>' + I18N.t('API key') + '</span>' +
+        '    <input type="password" class="form-control ai-provider-key" autocomplete="off" spellcheck="false"></label>' +
+        '  <label class="ai-provider-field"><span>' + I18N.t('Model') + '</span>' +
+        '    <input type="text" class="form-control ai-provider-model" autocomplete="off" spellcheck="false"></label>' +
+        '  <label class="ai-provider-field"><span>' + I18N.t('Name (optional)') + '</span>' +
+        '    <input type="text" class="form-control ai-provider-name" autocomplete="off" spellcheck="false"></label>' +
+        '  <label class="ai-provider-field"><span>' + I18N.t('Requests / minute') + '</span>' +
+        '    <input type="number" class="form-control ai-provider-rpm" min="1" max="600" step="1" value="20"></label>' +
+        '</div>' +
+        '<div class="ai-provider-actions">' +
+        '  <label class="ai-provider-default-wrap">' +
+        '    <input type="radio" name="ai_provider_default" class="ai-provider-default"> ' +
+        I18N.t('Use as default') + '</label>' +
+        '  <button type="button" class="btn btn-secondary ai-provider-test">' + I18N.t('Test connection') + '</button>' +
+        '  <button type="button" class="btn btn-danger ai-provider-delete">' + I18N.t('Delete') + '</button>' +
+        '  <span class="ai-provider-message" data-role="message"></span>' +
+        '</div>';
+      part(row, 'ai-provider-format').value = entry.format || 'openai';
+      part(row, 'ai-provider-base-url').value = entry.base_url || DEFAULTS[entry.format || 'openai'];
+      part(row, 'ai-provider-model').value = entry.model || '';
+      part(row, 'ai-provider-name').value = entry.name || '';
+      part(row, 'ai-provider-rpm').value = entry.rpm || 20;
+      part(row, 'ai-provider-default').checked = !!entry.is_default;
+      return row;
+    }
+
+    function addRow(entry) {
+      const row = makeRow(entry || {});
+      rowsEl.appendChild(row);
+      updateEmpty();
+      ensureOneDefault();
+      return row;
+    }
+
+    addBtn.addEventListener('click', function () {
+      const row = addRow({ format: 'openai', base_url: DEFAULTS.openai });
+      part(row, 'ai-provider-model').focus();
+    });
+
+    rowsEl.addEventListener('change', function (event) {
+      const target = event.target;
+      if (target.classList.contains('ai-provider-default')) {
+        afterDefaultChange(target.closest('.ai-provider-row'));
+        return;
+      }
+      if (target.classList.contains('ai-provider-format')) {
+        const row = target.closest('.ai-provider-row');
+        const base = part(row, 'ai-provider-base-url');
+        if (!base.value.trim() || base.value === DEFAULTS.openai ||
+            base.value === DEFAULTS.anthropic) {
+          base.value = DEFAULTS[target.value] || '';
+        }
+      }
+    });
+
+    rowsEl.addEventListener('click', function (event) {
+      const target = event.target;
+      const row = target.closest('.ai-provider-row');
+      if (!row) return;
+      if (target.classList.contains('ai-provider-delete')) {
+        if (!confirm(I18N.t('Delete this provider?'))) return;
+        const wasDefault = part(row, 'ai-provider-default').checked;
+        row.remove();
+        updateEmpty();
+        if (wasDefault) {
+          const next = rows().find(function (r) {
+            return part(r, 'ai-provider-base-url').value.trim();
+          }) || rows()[0];
+          if (next) part(next, 'ai-provider-default').checked = true;
+        }
+        syncHidden();
+        return;
+      }
+      if (target.classList.contains('ai-provider-test')) {
+        showMessage(row, I18N.t('Testing the connection…'), true);
+        fetch('/ai/providers/test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(rowData(row)),
+        })
+          .then(r => r.json())
+          .then(d => showMessage(row, d.message || I18N.t('No result.'), !!d.ok))
+          .catch(() => showMessage(row, I18N.t('Could not reach the server.'), false));
+      }
+    });
+
+    if (formEl) formEl.addEventListener('submit', syncHidden);
+    updateEmpty();
+  })();
+
+  // AI explanations library: import a JSON/JSONL file, export this book.
+  (function () {
+    const fileEl = document.getElementById('ai_library_file');
+    if (!fileEl) return;
+    const targetEl = document.getElementById('ai_library_target');
+    const overwriteEl = document.getElementById('ai_library_overwrite');
+    const importBtn = document.getElementById('ai_library_import_btn');
+    const reportEl = document.getElementById('ai_library_report');
+    const bookEl = document.getElementById('ai_library_book');
+    const exportBtn = document.getElementById('ai_library_export_btn');
+
+    function showLibraryMessage(text, ok) {
+      reportEl.hidden = false;
+      reportEl.textContent = text;
+      reportEl.classList.toggle('is-error', !ok);
+    }
+
+    function csvEscape(value) {
+      return '"' + String(value == null ? '' : value).replace(/"/g, '""') + '"';
+    }
+
+    function downloadCsv(report) {
+      const lines = ['type,sentence,detail'];
+      (report.errors || []).forEach(function (e) {
+        lines.push(['error', '', 'line ' + e.line + ': ' + e.reason].map(csvEscape).join(','));
+      });
+      (report.unmatched_items || []).forEach(function (sentence) {
+        lines.push(['unmatched', sentence, ''].map(csvEscape).join(','));
+      });
+      const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'ai-import-report.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function renderReport(report) {
+      reportEl.hidden = false;
+      reportEl.classList.remove('is-error');
+      reportEl.textContent = '';
+      const summary = I18N.t(
+        'Total %(total)s · added %(added)s · overwritten %(overwritten)s · skipped %(skipped)s · unmatched %(unmatched)s'
+      )
+        .replace('%(total)s', report.total)
+        .replace('%(added)s', report.added)
+        .replace('%(overwritten)s', report.overwritten)
+        .replace('%(skipped)s', report.skipped)
+        .replace('%(unmatched)s', report.unmatched);
+      const levels = I18N.t('Matches: %(exact)s exact · %(punct)s punctuation · %(fuzzy)s fuzzy')
+        .replace('%(exact)s', report.levels.exact)
+        .replace('%(punct)s', report.levels.punct)
+        .replace('%(fuzzy)s', report.levels.fuzzy);
+      const p1 = document.createElement('div');
+      p1.textContent = summary;
+      const p2 = document.createElement('div');
+      p2.textContent = levels;
+      reportEl.appendChild(p1);
+      reportEl.appendChild(p2);
+      if (report.unmatched_items && report.unmatched_items.length) {
+        const list = document.createElement('div');
+        const title = document.createElement('div');
+        title.textContent = I18N.t('Unmatched sentences (first 10):');
+        list.appendChild(title);
+        const ul = document.createElement('ul');
+        report.unmatched_items.slice(0, 10).forEach(function (sentence) {
+          const li = document.createElement('li');
+          li.textContent = sentence;
+          ul.appendChild(li);
+        });
+        list.appendChild(ul);
+        reportEl.appendChild(list);
+      }
+      if (report.errors && report.errors.length) {
+        const errs = document.createElement('div');
+        errs.className = 'is-error';
+        errs.textContent = I18N.t('Skipped with errors: %(n)s')
+          .replace('%(n)s', report.errors.length);
+        reportEl.appendChild(errs);
+      }
+      const link = document.createElement('a');
+      link.href = '#';
+      link.textContent = I18N.t('Download the full report (CSV)');
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        downloadCsv(report);
+      });
+      const wrap = document.createElement('div');
+      wrap.style.marginTop = '6px';
+      wrap.appendChild(link);
+      reportEl.appendChild(wrap);
+    }
+
+    importBtn.addEventListener('click', function () {
+      const file = fileEl.files && fileEl.files[0];
+      if (!file) {
+        showLibraryMessage(I18N.t('Choose a .json or .jsonl file first.'), false);
+        return;
+      }
+      const data = new FormData();
+      data.append('file', file);
+      data.append('target_lang', targetEl.value.trim());
+      data.append('overwrite', overwriteEl.checked ? '1' : '0');
+      importBtn.disabled = true;
+      showLibraryMessage(I18N.t('Importing…'), true);
+      fetch('/ai/library/import', { method: 'POST', body: data })
+        .then(r => r.json())
+        .then(d => {
+          if (!d.ok) throw new Error(d.message || I18N.t('Import failed.'));
+          renderReport(d);
+        })
+        .catch(e => showLibraryMessage(e.message || I18N.t('Import failed.'), false))
+        .finally(() => { importBtn.disabled = false; });
+    });
+
+    fetch('/ai/library/books')
+      .then(r => r.json())
+      .then(d => {
+        (d.books || []).forEach(function (book) {
+          const option = document.createElement('option');
+          option.value = book.id;
+          option.textContent = '#' + book.id + ' ' + (book.title || '');
+          bookEl.appendChild(option);
+        });
+      })
+      .catch(() => {});
+
+    exportBtn.addEventListener('click', function () {
+      if (!bookEl.value) {
+        showLibraryMessage(I18N.t('Choose a book to export.'), false);
+        return;
+      }
+      window.location = '/ai/library/export?book_id=' + encodeURIComponent(bookEl.value);
+    });
+  })();
 
 </script>
 

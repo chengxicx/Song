@@ -35,6 +35,7 @@ from lute.book.whisper_transcribe import (
 from lute.db import db
 from lute.models.repositories import LanguageRepository
 from lute.models.shadowing import ShadowAttempt
+from lute.models.term import Term
 from lute.multiuser import context as mu_context
 from lute.read.render.grammar_analysis import (
     is_cantonese_language,
@@ -240,7 +241,103 @@ def supports_readings(language):
     )
 
 
-def annotate_tokens(tokens, language, full_text=None):
+_JAPANESE_KANA = re.compile(r"[\u3040-\u309f\u30a0-\u30ff]")
+
+
+def _reading_key(reading, japanese):
+    """
+    Normalized form used to tell an edited term reading from the
+    parser's own reading, so hiragana/katakana/romaji settings don't
+    count as edits.
+    """
+    text = (reading or "").strip().lower()
+    if not text or not japanese:
+        return text
+    try:
+        if _JAPANESE_KANA.search(text):
+            return jaconv.kata2hira(text)
+        return jaconv.kata2hira(jaconv.alphabet2kana(text))
+    except Exception:  # pylint: disable=broad-exception-caught
+        return text
+
+
+def _stored_term_readings(language, tokens):
+    """
+    {token text: stored term romanization} for the tokens that have a
+    dictionary term.  Empty when the language isn't db-backed (unit
+    tests with duck-typed languages).
+    """
+    lang_id = getattr(language, "id", None)
+    get_lowercase = getattr(language, "get_lowercase", None)
+    if lang_id is None or get_lowercase is None:
+        return {}
+    texts = [t for t in {_clean_token(t) for t in tokens} if t]
+    if not texts:
+        return {}
+    keys = [get_lowercase(t) for t in texts]
+    rows = (
+        db.session.query(Term.text_lc, Term.romanization)
+        .filter(Term.language_id == lang_id, Term.text_lc.in_(keys))
+        .all()
+    )
+    by_lc = {lc: romanization for lc, romanization in rows}
+    return {
+        text: by_lc.get(get_lowercase(text))
+        for text in texts
+        if by_lc.get(get_lowercase(text)) is not None
+    }
+
+
+def _apply_stored_readings(annotated, language, stored=None):
+    """
+    Let a term's saved pronunciation win over the parser's guess.
+
+    Terms are created with an auto-filled romanization (the parser's
+    reading of the bare word) and that value is editable in the term
+    form.  When the saved value differs from the parser's reading for
+    the token, someone edited it -- e.g. 天津駅 saved as てんしんえき
+    while the dictionary parse says あまつえき -- and the body's
+    furigana must follow the save, not the parser.
+
+    Unedited terms (saved == parser, whatever the hiragana/katakana/
+    romaji setting) keep the contextual reading, so 一つ still reads
+    ひとつ rather than the isolated いち + つ.
+
+    ``stored`` is the precomputed {token: saved reading} map; a batch
+    caller looks every paragraph's terms up in one query and passes it
+    here (see annotate_paragraphs).  None means look it up now.
+    """
+    if stored is None:
+        stored = _stored_term_readings(language, [e["text"] for e in annotated])
+    if not stored:
+        return annotated
+    japanese = is_japanese_language(language)
+    parser = language.parser
+    for entry in annotated:
+        text = entry["text"]
+        saved = (stored.get(text) or "").strip()
+        if not text or not saved:
+            continue
+        # Already showing the saved reading: parsing the bare word again
+        # can only confirm there is nothing to override, so skip it.
+        # This is the common case (unedited terms), and get_reading is
+        # the expensive part of this loop.
+        current = (entry.get("reading") or "").strip()
+        if current and _reading_key(saved, japanese) == _reading_key(current, japanese):
+            continue
+        try:
+            isolated = (parser.get_reading(text) or "").strip()
+        except Exception:  # pylint: disable=broad-exception-caught
+            isolated = ""
+        # No reading under the current setting: nothing to override.
+        if not isolated:
+            continue
+        if _reading_key(saved, japanese) != _reading_key(isolated, japanese):
+            entry["reading"] = saved
+    return annotated
+
+
+def annotate_tokens(tokens, language, full_text=None, stored_readings=None):
     """
     Pair each token with its pronunciation reading for the shadowing
     panel.
@@ -259,6 +356,9 @@ def annotate_tokens(tokens, language, full_text=None):
     per token -- word-level input already resolves most polyphones
     (银行 -> háng).  Languages without reading support yield
     reading=None, so the panel simply shows the plain word.
+
+    ``stored_readings`` lets a batch caller share one term lookup across
+    paragraphs (see annotate_paragraphs); None looks it up here.
     """
     cleaned = [{"text": _clean_token(t), "reading": None} for t in tokens]
     if not supports_readings(language):
@@ -273,7 +373,7 @@ def annotate_tokens(tokens, language, full_text=None):
         if morphs:
             aligned = _align_context_readings(tokens, morphs)
             if aligned is not None:
-                return aligned
+                return _apply_stored_readings(aligned, language, stored_readings)
 
     out = []
     for entry in cleaned:
@@ -285,7 +385,32 @@ def annotate_tokens(tokens, language, full_text=None):
             except Exception:  # pylint: disable=broad-exception-caught
                 reading = None
         out.append({"text": text, "reading": (reading or "").strip() or None})
-    return out
+    return _apply_stored_readings(out, language, stored_readings)
+
+
+def annotate_paragraphs(paragraphs, language):
+    """
+    Annotate several paragraphs in one call.
+
+    ``paragraphs`` is a list of {"tokens": [...], "full_text": str-or-None},
+    one entry per paragraph on the page.  Every paragraph's terms are
+    looked up in a single query (instead of one query per paragraph), and
+    each paragraph still gets its own contextual parse, so readings stay
+    sentence-aware.  Returns a list of token lists parallel to the input.
+    """
+    all_tokens = []
+    for para in paragraphs:
+        all_tokens.extend(para.get("tokens") or [])
+    stored = _stored_term_readings(language, all_tokens)
+    return [
+        annotate_tokens(
+            para.get("tokens") or [],
+            language,
+            full_text=para.get("full_text"),
+            stored_readings=stored,
+        )
+        for para in paragraphs
+    ]
 
 
 def _is_chinese_language(language):

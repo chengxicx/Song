@@ -36,7 +36,7 @@
   </body>
 
   <script>
-    let _update_term_form_image = function(filename, new_url) {
+    let _update_term_form_image = function(filename, new_url, thumb_url) {
       // Well, this took **far** too long to figure out ...
       let fr = window.parent.frames['wordframe'];
       if (fr == null) {
@@ -60,9 +60,10 @@
       img.style.display = "block";
 
       var timestamp = new Date().getTime();
-      const newsrc = `${new_url}?${timestamp}`;
+      const newsrc = `${thumb_url || new_url}?${timestamp}`;
       // console.log(`switching source to ${newsrc}`);
       img.src = newsrc;
+      img.setAttribute("data-full-src", new_url);
     }
 
     function save_image_locally(src, langid, text) {
@@ -77,7 +78,7 @@
         dataType: 'json',
         success: function(data) {
           // console.log("success: " + data);
-          _update_term_form_image(data.filename, data.url);
+          _update_term_form_image(data.filename, data.url, data.thumb_url);
           $('.saved').removeClass('saved');
           $('.highlight').addClass('saved').removeClass('highlight');
         },
@@ -109,7 +110,7 @@
           contentType: false,
           success: function(data) {
             // console.log("Saved: " + data + "\nStatus: " + status);
-            _update_term_form_image(data.filename, data.url);
+            _update_term_form_image(data.filename, data.url, data.thumb_url);
           },
           error: function(xhr, status, error) {
             console.error(`Error submitting form.  ${error}; ${status}; ${xhr.responseText}`);
@@ -163,7 +164,9 @@
           // Make Bing API call for images asynchronously
           // This avoids blocking the page load
           data.images.forEach(function(item) {
-            const imgWrapper = create_imageWrapper_element(item.src, data.langid, data.text);
+            const imgWrapper = create_imageWrapper_element(
+              item.src, item.thumb, data.langid, data.text
+            );
             container.appendChild(imgWrapper);
           });
         },
@@ -175,18 +178,29 @@
       });
     });
 
-    function create_imageWrapper_element(src, langid, text) {
+    function create_imageWrapper_element(src, thumb, langid, text) {
       const imgWrapper = document.createElement('span');
       imgWrapper.classList.add('initial');
       imgWrapper.style.margin = '2px';
       imgWrapper.style.display = 'inline-block';
       imgWrapper.onmouseover = () => highlight_image(imgWrapper);
       imgWrapper.onmouseout = () => un_highlight_image(imgWrapper);
+      // Saving always downloads the original src; only the preview
+      // uses Bing's thumbnail (falling back to src when turl is missing).
       imgWrapper.onclick = () => save_image_locally(src, langid, text);
 
       const img = document.createElement('img');
-      img.src = src;
-      
+      img.src = thumb || src;
+      if (thumb) {
+        // A broken thumbnail falls back to the original preview.
+        img.onerror = () => { img.onerror = null; img.src = src; };
+      }
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.width = 160;
+      img.height = 120;
+      img.alt = text;
+
       imgWrapper.appendChild(img);
 
       return imgWrapper;

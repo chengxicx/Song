@@ -3,6 +3,51 @@
 
 Feature changes:
 
+* Restoring a backup keeps the AI sentence translations and grammar
+  explanations.  A backup is the whole sqlite file, so it has always
+  carried the airesults table; the loss happened on restore, where
+  replacing the database discarded explanations generated after the
+  backup was taken (and backups older than the table had none at all).
+  Restore now merges the pre-restore rows into the restored database:
+  one row per result key, the pre-restore copy winning for a key it
+  shares with the backup, rows whose sentence isn't in the restored
+  library skipped instead of erroring, and the table created first when
+  an old backup has none.  The restore message reports the counts.
+* A homograph's term card shows a meaning instead of a menu of
+  readings.  MOJi 辞書 keys one entry per reading and gives the bare
+  spelling a stub that is nothing but "See also: 空く【あく】" lines, so
+  the popup's definition was that list and the form's auto-fill saved it
+  as the translation -- two places saying "see also" and neither saying
+  what the word means.  Both now show the meaning the first pointer
+  names (dict.service.resolved_gloss follows one cross-reference, with a
+  depth cap and a cycle guard), and "See also" lines are dropped from
+  the popup and the auto-fill everywhere else, a pointer naming another
+  word rather than a meaning.  The reading page's Local tab is
+  unchanged: there the list is how you reach the other readings, and
+  its links still do.  An entry that is only pointers, whose target the
+  dictionary does not have, still shows the pointers -- something beats
+  an empty card -- and compact_gloss keeps that same last resort.
+* Turning the page in a reader-mode EPUB chapter no longer drops the
+  reader at the bottom of the page they turned to.  A chapter scrolls
+  continuously, and the next arrow only appears once they have scrolled
+  to its bottom -- so the document offset they turn the page with IS the
+  chapter's bottom, and that offset survived the swap: the new chapter
+  opened at the same offset, i.e. at its own bottom, and every turn cost
+  a scroll back up.  Two things held it there: the term-save scroll
+  restore (the MutationObserver on #thetext that puts the offset back
+  after a re-swap) fired on the page turn's own DOM churn, and nothing
+  reset the document scroll afterwards.  A turn is now marked as such
+  from the request until the new page is laid out -- the restore stands
+  down for that window, the offset is not saved under the arriving
+  page's key, and a scrolling chapter lands on the top of the page it
+  turned to.  Turning back restores the offset the reader stopped at on
+  that page (same per-page store), so the left arrow still continues
+  where they were instead of rewinding to the first line.  Verified in a
+  browser against a scratch book: from the bottom of chapter 1, the side
+  arrow and the footer arrow both land at the top of page 2, the left
+  arrow returns to the 543px they left, mid-chapter turns and a phone
+  viewport behave the same, and a same-page refetch (term save) still
+  keeps its offset.
 * English (Latin-script) dictionary entries render structured on the
   reading page's Local tab, instead of every line -- phonetics, part of
   speech, examples and definitions alike -- degrading to one numbered

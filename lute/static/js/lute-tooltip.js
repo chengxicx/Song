@@ -25,7 +25,9 @@ let _get_tooltip_pos = function() {
   // answer, and is handed the target element, so that is where we take
   // over and place the card ourselves.
   ret.using = function (css, feedback) {
-    const pos = _place_term_popup($(this), feedback);
+    const target = feedback && feedback.target && feedback.target.element;
+    const el = target && (target.jquery ? target[0] : target);
+    const pos = _place_term_popup($(this), el);
     if (pos) $(this).offset(pos);
     else $(this).css(css);
   };
@@ -42,19 +44,26 @@ let _get_tooltip_pos = function() {
 // content arrives -- i.e. always later than this event, so the widget's
 // own mouseover handler, which runs first and starts the fetch, cannot
 // make us look at a stale value.
+//
+// The word the pointer was on is recorded with it.  The position is
+// computed later (after the popup content arrives), and by then the
+// pointer may have left the word, or a page/screen swap may have moved
+// the pointer's old coordinates onto a different word.  Only a pointer
+// recorded for *this* word's element is allowed to pick which of its
+// line fragments the card hangs off.
 let _term_popup_pointer = null;
 $(document).on('mouseover', '.word', function (e) {
-  _term_popup_pointer = { x: e.clientX, y: e.clientY };
+  _term_popup_pointer = { el: this, x: e.clientX, y: e.clientY };
 });
 // Same for a tap, so the touch modes (Quick Set Status) hang the card
 // off the fragment that was actually touched.
 $(document).on('touchstart', '.word', function (e) {
   const touch = e.originalEvent && e.originalEvent.touches && e.originalEvent.touches[0];
-  if (touch) _term_popup_pointer = { x: touch.clientX, y: touch.clientY };
+  if (touch) _term_popup_pointer = { el: this, x: touch.clientX, y: touch.clientY };
 });
 
 /**
- * The line fragment of a word that the pointer is on.
+ * The line fragments of a word, top to bottom in reading order.
  *
  * A `.word` span that wraps at the end of a line has one client rect per
  * line.  getClientRects() returns them in reading order, but
@@ -64,28 +73,86 @@ $(document).on('touchstart', '.word', function (e) {
  * Positioning the card against it threw the card hundreds of pixels away
  * from the pointer, to the far left of the column (or flipped it above
  * the word once the tall card no longer fitted below that union).
+ *
+ * A browser that collapses those per-line boxes into a single union rect
+ * would hide the fragment under the pointer behind what looks like an
+ * ordinary one-line word, so a lone element rect is checked against the
+ * line boxes of the element's own text before it is trusted.
  * Words that do not wrap have a single fragment, so for them this is
  * exactly the element box and nothing changes.
  */
-function _term_popup_fragment(el) {
-  if (!el || !el.getClientRects) return null;
-  const frags = Array.prototype.filter.call(el.getClientRects(), function (r) {
-    return r.width || r.height;
+function _term_popup_rects(el) {
+  if (!el) return [];
+  const usable = function (rects) {
+    return Array.prototype.filter.call(rects || [], function (r) {
+      return r.width || r.height;
+    });
+  };
+  const own = el.getClientRects ? usable(el.getClientRects()) : [];
+  if (own.length > 1) return own;
+
+  let text = [];
+  const doc = el.ownerDocument;
+  if (doc && doc.createRange) {
+    try {
+      const range = doc.createRange();
+      range.selectNodeContents(el);
+      text = usable(range.getClientRects());
+    } catch (e) {
+      text = [];
+    }
+  }
+  if (text.length > 1) return text;
+  return own.length ? own : text;
+}
+
+/** The fragment closest to a viewport point (0 distance when inside it). */
+function _term_popup_nearest(frags, pointer) {
+  let best = frags[0];
+  let best_d = Infinity;
+  Array.prototype.forEach.call(frags, function (r) {
+    const dx = Math.max(r.left - pointer.x, 0, pointer.x - r.right);
+    const dy = Math.max(r.top - pointer.y, 0, pointer.y - r.bottom);
+    const d = dx * dx + dy * dy;
+    if (d < best_d) {
+      best_d = d;
+      best = r;
+    }
   });
-  if (frags.length === 0) return null;
+  return best;
+}
+
+function _term_popup_fragment(el) {
+  const frags = _term_popup_rects(el);
+  if (frags.length === 0) {
+    // No line boxes at all: the word sits on a screen the page splitter
+    // has hidden, or has already been swapped out.  This used to return
+    // null here, and jquery-ui then placed the card from the element's
+    // union box.  Anchor on where the reader actually clicked instead;
+    // that keeps the card at the word even when the browser cannot
+    // measure it.
+    const p = _term_popup_pointer;
+    if (!p) return null;
+    return { left: p.x, right: p.x, top: p.y, bottom: p.y, width: 0, height: 0 };
+  }
+  if (frags.length === 1) return frags[0];
 
   const pointer = _term_popup_pointer;
-  if (pointer) {
+  if (!pointer) return frags[0];
+  if (pointer.el === el) {
     const hit = Array.prototype.find.call(frags, function (r) {
       return pointer.x >= r.left - 1 && pointer.x <= r.right + 1 &&
              pointer.y >= r.top - 1 && pointer.y <= r.bottom + 1;
     });
     if (hit) return hit;
   }
-  // Opened without a pointer of its own -- a tap on a word whose content
-  // was already cached, say.  The first fragment is where the reader
-  // starts reading the word.
-  return frags[0];
+  // The pointer is not on this word (content was already cached and the
+  // popup was opened some other way, say), or it fell between fragments
+  // (a tap on the ruby reading above the glyphs): use the fragment
+  // closest to it.  Never the union -- that starts at the column's left
+  // edge and ends on the last line the word touches, which is what put
+  // the card hundreds of pixels away from the word.
+  return _term_popup_nearest(frags, pointer);
 }
 
 /**
@@ -102,12 +169,11 @@ function _term_popup_fragment(el) {
  * not carry, and without it a word near the top of a narrow screen got
  * its card on top of itself instead of flipping to below.
  *
- * Returns null when the word has no fragments to speak of, leaving
- * jquery-ui's own placement in place.
+ * Returns null when the word has no fragments to speak of and no
+ * pointer to fall back on, leaving jquery-ui's own placement in place.
  */
-function _place_term_popup(card, feedback) {
-  const target = feedback && feedback.target && feedback.target.element;
-  const frag = _term_popup_fragment(target && target[0]);
+function _place_term_popup(card, el) {
+  const frag = _term_popup_fragment(el);
   if (!frag) return null;
 
   const cardW = card.outerWidth();
@@ -140,6 +206,12 @@ function _place_term_popup(card, feedback) {
   // window has nowhere left to go, so it is left where it is.
   if (cardW + 8 <= viewW) {
     left = Math.min(Math.max(left, pageX + 4), pageX + viewW - cardW - 4);
+  }
+  // Same vertically: the flip above/below already keeps it on screen
+  // unless the card is taller than the window, in which case it has
+  // nowhere left to go and is left where it is.
+  if (cardH + 8 <= viewH) {
+    top = Math.min(Math.max(top, pageY + 4), pageY + viewH - cardH - 4);
   }
   return {left: left, top: top};
 }
@@ -476,7 +548,11 @@ function show_term_edit_form(el) {
     const text = el.data('text') || el.text();
     const lid = parseInt(el.data('lang-id'));
     if (isNaN(lid)) return;
-    const sendtext = text.replace(/\//g, "LUTESLASH");
+    // "/" would break the path segment, so it keeps the old LUTESLASH
+    // placeholder; everything else (%, #, &, +, ?, spaces, quotes, CJK)
+    // has to be percent-encoded or nginx rejects the URL before Flask
+    // ever sees it (e.g. "99%" -> 400 Bad Request).
+    const sendtext = encodeURIComponent(text.replace(/\//g, "LUTESLASH"));
     _show_wordframe_url(`/read/termform/${lid}/${sendtext}`);
     return;
   }
@@ -520,37 +596,58 @@ function _hide_term_edit_form() {
   */
 }
 
+/**
+ * Build the ZWS-joined text sent to /read/termform for a multiword
+ * selection.  Exposed on window for the JS harness tests.
+ *
+ * A span's data-text is the parser's FULL token text -- that is what the
+ * term popup, hover TTS and furigana lookup need.  But when two saved
+ * terms overlap (e.g. のか and かな sharing か), the later TextItem
+ * renders only its un-covered tail (な) and is marked .overlapped,
+ * while data-text still says か\u200Bな.  Joining those full texts
+ * counts the shared か twice and creates a bogus term "...のかかな"
+ * that can never match the page.
+ *
+ * data-display-text (textitem.html, emitted only when it differs from
+ * data-text) is TextItem.display_text: the un-covered tail with its
+ * internal ZWS token boundaries intact.  Prefer it, and keep data-text
+ * as the fallback for every other span, so ordinary spans and any
+ * rendering path that doesn't emit the attribute behave exactly as
+ * before.
+ *
+ * Never use text() as the primary source: it drops internal ZWS, so a
+ * span displaying すれば but stored as すれ\u200Bば collapses to one
+ * token, breaking token_count and the highlight after save (see
+ * tests/unit/read/render/test_multiword_highlight.py).
+ */
+function luteMultiwordTermText(selected) {
+  const ZWS = '\u200B';
+  const textparts = selected.toArray().map((el) =>
+    el.getAttribute('data-display-text') ||
+    $(el).data('text') ||
+    $(el).text()
+  );
+  // Join with ZWS, not '', so the exact tokens the parser already
+  // produced for this sentence are preserved and sent to the backend
+  // as-is, instead of being collapsed into a flat string that then has
+  // to be re-parsed out of context. Context-sensitive parsers (e.g.
+  // MeCab for Japanese) can tokenize an isolated substring differently
+  // than they tokenize it within its original sentence, which was
+  // causing newly-created multiword terms to not match when reading.
+  return textparts.join(ZWS).trim();
+}
+window.luteMultiwordTermText = luteMultiwordTermText;
+
 function show_multiword_term_edit_form(selected) {
   if (selected.length == 0)
     return;
-  // Zero-width space: matches the separator Lute uses internally
-  // (see lute.models.term.Term) to mark token boundaries in
-  // multiword terms.
-  const ZWS = '\u200B';
-  // Use data('text') instead of text() to preserve the internal ZWS
-  // boundaries of multiword token spans. Each span's displayed text
-  // has ZWS stripped (see TextItem.html_display_text), but data-text
-  // holds the raw text with ZWS intact. Using text() would lose those
-  // internal boundaries, causing the created term's token_count to
-  // not match the actual parsed tokens on the page.
-  // Example: "すれば" displayed on screen may actually be stored as
-  // "すれ\u200Bば" (2 tokens). Using text() gives "すれば" (1 token),
-  // but data('text') gives "すれ\u200Bば" (2 tokens, correct).
-  const textparts = selected.toArray().map((el) => $(el).data('text') || $(el).text());
-  // Join with ZWS, not '', so the exact tokens the parser already
-  // produced for this sentence (i.e., the ones currently rendered
-  // on screen) are preserved and sent to the backend as-is, instead
-  // of being collapsed into a flat string that then has to be
-  // re-parsed out of context. Context-sensitive parsers (e.g. MeCab
-  // for Japanese) can tokenize an isolated substring differently
-  // than they tokenize it within its original sentence, which was
-  // causing newly-created multiword terms to not match when reading.
-  const text = textparts.join(ZWS).trim();
+  const text = luteMultiwordTermText(selected);
   if (text == "")
     return;
   const lid = parseInt(selected.eq(0).data('lang-id'));
-  // "/" in the term cause problems with routing, so hack a fix.
-  const sendtext = text.replace(/\//g, "LUTESLASH");
+  // "/" in the term cause problems with routing, so hack a fix; the
+  // remaining text still needs percent-encoding (see show_term_edit_form).
+  const sendtext = encodeURIComponent(text.replace(/\//g, "LUTESLASH"));
   _show_wordframe_url(`/read/termform/${lid}/${sendtext}`);
 }
 

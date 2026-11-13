@@ -189,6 +189,14 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
     ################################3
     # Books
 
+    def _wait_for_book_import(self):
+        """
+        The new-book form POST now starts a background import and lands
+        on a progress page that redirects to the reader when the book
+        exists; wait for that redirect so the next step sees the book.
+        """
+        self.page.wait_for_url(re.compile(r"/read/\d+/page/1"), timeout=20)
+
     def make_book(self, title, text, langname):
         "Create a book with title, text, and languagename."
         self.visit("book/new")
@@ -201,6 +209,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         # "<td>…</td> from <table id="book">…</table> subtree intercepts pointer events".
         # TODO fix_test: "force=True" is hacky as it can obscure layout problems.
         self.page.locator("#save").click(force=True)
+        self._wait_for_book_import()
 
     def make_book_from_file(self, title, filename, langname):
         "Create a book with title, content from filename, and languagename."
@@ -212,6 +221,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
             'select[name="language_id"]', str(self.language_ids[langname])
         )
         self.page.locator("#save").click(force=True)
+        self._wait_for_book_import()
 
     def make_book_from_url(self, url, langname):
         "Create a book with title, content from url, and languagename."
@@ -228,6 +238,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
             'select[name="language_id"]', str(self.language_ids[langname])
         )
         self.page.locator("#save").click(force=True)
+        self._wait_for_book_import()
 
     def get_book_table_content(self):
         """

@@ -273,8 +273,16 @@
       if (imgsrc) {
         const img = document.createElement('img');
         img.className = 'term-listing-image';
-        img.src = `/userimages/${rowData["LgID"]}/${imgsrc}`;
-        $(td).append(img);
+        img.src = `/userimages/${rowData["LgID"]}/thumb/${imgsrc}`;
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        img.alt = rowData["WoText"] || '';
+        const link = document.createElement('a');
+        link.href = `/userimages/${rowData["LgID"]}/${imgsrc}`;
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.appendChild(img);
+        $(td).append(link);
       }
 
       let old_state = (cellData ?? '');

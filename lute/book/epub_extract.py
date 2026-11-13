@@ -51,7 +51,11 @@ from urllib.parse import quote, unquote
 from bs4 import BeautifulSoup, NavigableString
 
 from lute.book.epub_css import scope_css
-from lute.book.epub_parser import _extract_text, _prep_soup  # internal reuse
+from lute.book.epub_parser import (
+    _extract_text,
+    _fixed_viewport,
+    _prep_soup,
+)  # internal reuse
 from lute.book import epub_paths
 from lute.book.service import BookImportException
 
@@ -250,7 +254,9 @@ def extract_epub_package(data, chapters, static_root):
             def read_member_text(path):
                 return _decode(_read_member(zf, name_map, path))
 
-            chapter_paths = [c.path for c in chapters]
+            # Every source document, dividers included: a merged chapter
+            # may reference a stylesheet from any of its parts.
+            chapter_paths = [p for c in chapters for p in c.parts]
             css_text = _collect_css(read_member_text, chapter_paths, root_rel, False)
             orig_text = _collect_css(read_member_text, chapter_paths, root_rel, True)
 
@@ -263,6 +269,10 @@ def extract_epub_package(data, chapters, static_root):
                     {
                         "index": chapter.index,
                         "path": chapter.path,
+                        # Dividers merged into this chapter, so the
+                        # original-look stylesheet can be rebuilt from
+                        # every part (see ensure_orig_css).
+                        "parts": list(chapter.parts),
                         "viewport": result["viewport"],
                     }
                 )
@@ -444,6 +454,12 @@ def _write_chapter(zf, name_map, chapter, root_abs, root_rel):
          "viewport": fixed-layout viewport or None,
          "pages": [{"html": path, "text": text}, ...]}
 
+    A chapter is normally one source document, but a structural divider
+    page merged into it (chapter.parts, see
+    epub_parser._merge_structural_dividers) means several: their bodies
+    are concatenated here before pagination, each sanitised and URL-
+    rewritten against its own directory.
+
     A reflowing chapter over PAGE_CHAR_BUDGET is written as several
     pages (ch/003.html, ch/003-002.html, ...) so the reading screen never
     has to build a chapter-sized DOM; `html` is page 1's file, which is
@@ -451,29 +467,37 @@ def _write_chapter(zf, name_map, chapter, root_abs, root_rel):
     epub_paths.chapter_file).  Everything else -- a short chapter, a
     fixed-layout page box -- is written exactly as before, one page.
     """
-    raw = _read_member(zf, name_map, chapter.path)
-    if raw is None:
-        raise BookImportException(
-            f"Chapter {chapter.index + 1} is missing from the EPUB file."
-        )
-    soup = BeautifulSoup(_decode(raw), "html.parser")
-    # The viewport has to be read before _prep_soup drops <head>, where
-    # the meta lives.
-    viewport = _fixed_viewport(soup)
-    # Drops script/style/head/template/svg/iframe/noscript and the ruby
-    # annotations (rt/rp): readings are not part of the text the parser
-    # tokenises, and leaving them in the DOM would desync the token
-    # stream from the rendered characters.
-    _prep_soup(soup)
-    body = soup.body or soup
+    soup = BeautifulSoup("<html><body></body></html>", "html.parser")
+    body = soup.body
+    viewport = None
+    body_classes = []
+    for part_path in chapter.parts or [chapter.path]:
+        raw = _read_member(zf, name_map, part_path)
+        if raw is None:
+            raise BookImportException(
+                f"Chapter {chapter.index + 1} is missing from the EPUB file."
+            )
+        part_soup = BeautifulSoup(_decode(raw), "html.parser")
+        # The viewport has to be read before _prep_soup drops <head>,
+        # where the meta lives.
+        viewport = viewport or _fixed_viewport(part_soup)
+        # Drops script/style/head/template/svg/iframe/noscript and the ruby
+        # annotations (rt/rp): readings are not part of the text the parser
+        # tokenises, and leaving them in the DOM would desync the token
+        # stream from the rendered characters.
+        _prep_soup(part_soup)
+        part_body = part_soup.body or part_soup
 
-    for tag in body.find_all(_DROP_TAGS):
-        tag.decompose()
-    _sanitise_attributes(body, chapter.path, root_rel)
+        for tag in part_body.find_all(_DROP_TAGS):
+            tag.decompose()
+        _sanitise_attributes(part_body, part_path, root_rel)
+        body_classes.extend(_body_classes(part_soup).split())
+        for child in list(part_body.children):
+            body.append(child.extract())
 
     text = _extract_text(soup)
-    body_classes = _body_classes(soup)
-    classes = "epub-body" + ((" " + body_classes) if body_classes else "")
+    unique_classes = [c for c in dict.fromkeys(body_classes) if c]
+    classes = "epub-body" + ((" " + " ".join(unique_classes)) if unique_classes else "")
     if viewport:
         classes += " epub-fixed"
     wrapper = (
@@ -736,32 +760,6 @@ def write_page_files(root_abs, stored_path, pages, start=1):
     return written
 
 
-# A viewport meta with both dimensions as plain pixel numbers marks a
-# fixed-layout page (EPUB FXL); `device-width` / percentages are the
-# reflowable spellings and never match.
-_VIEWPORT_RE = re.compile(
-    r"width\s*=\s*(\d+)\s*,\s*height\s*=\s*(\d+)\s*(?:,|$)"
-    r"|height\s*=\s*(\d+)\s*,\s*width\s*=\s*(\d+)\s*(?:,|$)",
-    re.I,
-)
-
-
-def _fixed_viewport(soup):
-    '"WxH" for a fixed-layout chapter document, else None.'
-    for meta in soup.find_all("meta"):
-        if (meta.get("name") or "").strip().lower() != "viewport":
-            continue
-        content = meta.get("content") or ""
-        m = _VIEWPORT_RE.search(content)
-        if not m:
-            continue
-        w = m.group(1) or m.group(4)
-        h = m.group(2) or m.group(3)
-        if int(w) > 0 and int(h) > 0:
-            return f"{w}x{h}"
-    return None
-
-
 def _body_classes(soup):
     "Classes of <html> and <body>, so scoped `body.foo` rules still apply."
     classes = []
@@ -938,7 +936,16 @@ def _manifest_chapter_paths(root_abs):
     try:
         with open(manifest, encoding="utf-8") as f:
             entries = json.load(f)
-        return [e["path"] for e in entries if isinstance(e, dict) and e.get("path")]
+        paths = []
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            # "parts" lists every source document of a merged chapter;
+            # old manifests only have the single "path".
+            for path in entry.get("parts") or [entry.get("path")]:
+                if path:
+                    paths.append(path)
+        return paths
     except (ValueError, KeyError, TypeError, OSError):
         return None
 

@@ -5,6 +5,8 @@ Book entity.
 import json
 import sqlite3
 import threading
+from sqlalchemy import func
+from sqlalchemy.orm import object_session
 from lute.db import db
 
 booktags = db.Table(
@@ -118,7 +120,22 @@ class Book(
 
     @property
     def page_count(self):
-        return len(self.texts)
+        """
+        Number of pages.
+
+        Only reads the texts collection when it is already in memory
+        (import, add/remove page, or a book that was already loaded body
+        and all); otherwise asks the database for a COUNT.  Loading every
+        page row just to call len() made each page turn of a long book
+        fetch the whole book.
+        """
+        texts = self.__dict__.get("texts")
+        if texts is not None:
+            return len(texts)
+        if self.id is None:
+            return 0
+        sess = object_session(self) or db.session
+        return sess.query(func.count(Text.id)).filter(Text.bk_id == self.id).scalar() or 0
 
     def page_in_range(self, n):
         "Return page number that is in the book's page count."
@@ -127,9 +144,31 @@ class Book(
         return ret
 
     def text_at_page(self, n):
-        "Return the text object at page n."
-        pagenum = self.page_in_range(n)
-        return self.texts[pagenum - 1]
+        """
+        Return the text object at page n.
+
+        With the pages already in memory this indexes the list; otherwise
+        it fetches exactly that page by its order (the same ordering as
+        the relationship), so a 500-page book no longer transfers 500
+        rows per turn.
+        """
+        texts = self.__dict__.get("texts")
+        if texts is not None:
+            return texts[self.page_in_range(n) - 1]
+        count = self.page_count
+        if count == 0:
+            raise IndexError("book has no pages")
+        pagenum = max(n, 1)
+        pagenum = min(pagenum, count)
+        sess = object_session(self) or db.session
+        return (
+            sess.query(Text)
+            .filter(Text.bk_id == self.id)
+            .order_by(Text.order)
+            .offset(pagenum - 1)
+            .limit(1)
+            .one()
+        )
 
     def _add_page(self, new_pagenum):
         "Add new page, increment other page orders."

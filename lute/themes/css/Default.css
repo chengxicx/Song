@@ -53,6 +53,9 @@ body {
   /* 暗色下 #ddd 会成为整个表单最亮的东西；Dark_slate / Dusk 也是这么做的 */
   --form-border-color: rgba(255, 255, 255, 0.15);
 
+  /* Native widgets (select option popups, scrollbars) follow this. */
+  color-scheme: dark;
+
   /* Links and menu text (consumed by styles.css guard-var rules). */
   --link-color: #0a84ff;
   --menu-link-color: #8e8e93;
@@ -82,10 +85,8 @@ body {
   justify-content: flex-start !important;
   height: 52px !important;
   padding: 0 24px !important;
-  background-color: rgba(28, 28, 30, 0.85) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background-color: var(--surface-1) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
   position: relative !important;
   z-index: 1000 !important;
 }
@@ -135,11 +136,12 @@ body {
   font-weight: 600 !important;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  transition: color 0.2s ease;
 }
 
-.menu-item:hover > span {
-  color: var(--menu-link-hover-color, #0a84ff) !important;
+@media (hover: hover) {
+  .menu-item:hover > span {
+    color: var(--menu-link-hover-color, var(--btn-accent, #0a84ff)) !important;
+  }
 }
 
 /* 下拉菜单 —— 暗黑悬浮卡片 */
@@ -148,12 +150,10 @@ body {
   top: 100% !important;
   right: 0 !important;
   left: auto !important;
-  background: rgba(44, 44, 46, 0.95) !important;
-  backdrop-filter: blur(25px) !important;
-  -webkit-backdrop-filter: blur(25px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  border-radius: 10px !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+  background: var(--surface-2) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18) !important;
   padding: 6px !important;
   min-width: 160px !important;
   z-index: 10001 !important;
@@ -167,12 +167,11 @@ body {
   color: #f2f2f7 !important;
   border-radius: 6px !important;
   text-decoration: none !important;
-  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .sub-menu li a:hover {
-  background-color: #0a84ff !important;
-  color: #ffffff !important;
+  background-color: var(--accent-soft) !important;
+  color: var(--font-color) !important;
 }
 
 .sub-menu hr {
@@ -351,22 +350,22 @@ div.dt-container div.dt-layout-row:first-child {
   font-size: 11px !important;
   font-weight: 600 !important;
   letter-spacing: -0.01em;
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid var(--chip-border) !important;
 }
 
 .new-word-easy {
-  background-color: #1e3a29 !important;
-  color: #a7d8b9 !important;
+  background-color: var(--chip-1) !important;
+  color: var(--chip-fg) !important;
 }
 
 .new-word-chal {
-  background-color: #423213 !important;
-  color: #f7d382 !important;
+  background-color: var(--chip-2) !important;
+  color: var(--chip-fg) !important;
 }
 
 .new-word-hard {
-  background-color: #451b1b !important;
-  color: #f09595 !important;
+  background-color: var(--chip-3) !important;
+  color: var(--chip-fg) !important;
 }
 
 /* ---------------------------------------------------------
@@ -374,7 +373,10 @@ div.dt-container div.dt-layout-row:first-child {
    --------------------------------------------------------- */
 .dt-container, div.dt-container {
   margin-top: 16px !important;
-  padding: 0 24px !important;
+  /* No extra horizontal padding: .container already owns the 24px gutter
+     that .menu-bar uses.  A second inset here pushed the table 24px past
+     the top bar's left/right edges. */
+  padding: 0 !important;
 }
 
 table.dataTable, table {
@@ -387,6 +389,35 @@ table.dataTable, table {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
   width: 100% !important;
 }
+/* DataTables' scrollX splits one table into a header table and a body
+   table.  The generic rule above gives both of them 12px corners and a
+   1px border, so their seam shows a doubled rounded frame.  Round only
+   the outer top/bottom corners and keep a single line at the seam. */
+div.dt-scroll-head table.dataTable {
+  border-radius: 12px 12px 0 0 !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+div.dt-scroll-body table.dataTable {
+  border-radius: 0 0 12px 12px !important;
+  border-top: none !important;
+}
+
+
+/* EPUB 书内表格是"书的一部分"，不是 UI 表格：上面的全局美化会涂穿到
+   reader-mode 章节，night/original 的反相滤镜再把卡底翻成浅灰、压上
+   反相的深墨 —— 『悪意』目次页（整页 table 排版）实测 #2c2c2e 反相成
+   #bfbfbf 纸、#1c1b1f 钉墨反相成 #cccbce 字，1.07:1，整章看不清。
+   纸 look 下表格一律交还给书：透明底、继承墨色、无 UI 装饰。 */
+.epub-body table,
+.epub-body th,
+.epub-body td {
+  background-color: transparent !important;
+  color: inherit !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
 
 th {
   background-color: #242426 !important;
@@ -398,6 +429,19 @@ th {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
   padding: 12px 16px !important;
 }
+/* Book listing headers must stay on one line: with 11 columns the narrow
+   ones (Type / AI Explain) otherwise wrap into truncated stubs.  scrollX
+   lets the table grow horizontally instead of crushing the labels. */
+/* scrollX moves the visible header into a cloned table without an id,
+   so both the clone and the original body table must be targeted -- and
+   their padding must match or DataTables' column sizing drifts. */
+div.dt-scroll-head table.dataTable thead th,
+#booktable thead th {
+  white-space: nowrap;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
 
 td {
   border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
@@ -1130,11 +1174,9 @@ canvas + svg text {
 }
 
 .colvis-menu {
-  background: rgba(44, 44, 46, 0.95) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
-  backdrop-filter: blur(25px) !important;
-  -webkit-backdrop-filter: blur(25px) !important;
+  background: var(--surface-2) !important;
+  border: 1px solid var(--border-subtle) !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18) !important;
 }
 
 .colvis-menu .colvis-item {
@@ -1142,7 +1184,7 @@ canvas + svg text {
 }
 
 .colvis-menu .colvis-item:hover {
-  background-color: rgba(10, 132, 255, 0.15) !important;
+  background-color: var(--accent-soft) !important;
 }
 
 .colvis-menu .colvis-item input[type="checkbox"] {
@@ -1154,12 +1196,10 @@ canvas + svg text {
    与 colvis-menu / sub-menu 使用同款暗黑悬浮卡片风格。
    --------------------------------------------------------- */
 .book-action-dropdown-content {
-  background: rgba(44, 44, 46, 0.95) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
-  backdrop-filter: blur(25px) !important;
-  -webkit-backdrop-filter: blur(25px) !important;
-  border-radius: 10px !important;
+  background: var(--surface-2) !important;
+  border: 1px solid var(--border-subtle) !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18) !important;
+  border-radius: 12px !important;
   padding: 6px !important;
   min-width: 120px !important;
 }
@@ -1171,8 +1211,8 @@ canvas + svg text {
 }
 
 .book-action-dropdown-content a:hover {
-  background-color: #0a84ff !important;
-  color: #ffffff !important;
+  background-color: var(--accent-soft) !important;
+  color: var(--font-color) !important;
 }
 
 /* ---------------------------------------------------------
@@ -1220,4 +1260,13 @@ a.refresh.refreshed::after {
   background-color: #423213 !important;
   border-color: #6e5218 !important;
   color: #f7d382 !important;
+}
+
+/* ---------------------------------------------------------
+   14. 动效收敛：只改颜色、≤150ms，reduced-motion 下完全静态
+   --------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .menu-item > span { transition: color 120ms ease; }
+  .sub-menu li a { transition: background-color 120ms ease, color 120ms ease; }
+  .book-action-dropdown-content a { transition: background-color 120ms ease, color 120ms ease; }
 }

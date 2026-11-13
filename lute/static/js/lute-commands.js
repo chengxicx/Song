@@ -18,9 +18,278 @@
 // one click away.  Repeating the command does NOT cycle dictionaries,
 // and translating another sentence starts back at the first tab.
 
-let show_translation_for_text = function(text) {
+/**
+ * The reading page's current-sentence pointer, shared by the sentence
+ * translation panel (iframe), the grammar analysis panel and the text
+ * itself.  Moving it paints the highlight, scrolls the sentence into
+ * view and notifies subscribers (the sentence tabs rebuild).  Kept on
+ * window because the sentence panel is an iframe that has to drive the
+ * parent page.
+ */
+window.LuteSentenceNav = (function () {
+  let current = null;
+  const subscribers = [];
+
+  function sentences() {
+    const root = document.getElementById("thetext");
+    return root ? Array.from(root.querySelectorAll("span.textsentence")) : [];
+  }
+
+  // In fit-to-screen ("split") reading only one sub-screen of
+  // paragraphs is rendered at a time: _renderScreen hides the rest with
+  // display:none, but those sentences stay in the DOM and the query
+  // above still finds them.  Moving to a hidden sentence would highlight
+  // nothing the reader can see (and scroll to nothing), so all
+  // navigation works on the visible set.
+  function isVisible(el) {
+    if (!el || !el.isConnected) return false;
+    const p = el.closest ? el.closest("p") : null;
+    if (p && p.style.display === "none") return false;
+    if (el.getClientRects && el.getClientRects().length) return true;
+    // A sentence span itself can report no box (font-size 0%); its
+    // paragraph being laid out is then the ground truth.
+    return !!(p && p.getClientRects && p.getClientRects().length);
+  }
+
+  function visibleSentences() {
+    return sentences().filter(isVisible);
+  }
+
+  function pageNum() {
+    const el = document.getElementById("page_num");
+    return el ? parseInt(el.value, 10) || 0 : 0;
+  }
+
+  function pageCount() {
+    const el = document.getElementById("page_count");
+    return el ? parseInt(el.value, 10) || 0 : 0;
+  }
+
+  function textOf(el) {
+    if (!el) return "";
+    const items = el.querySelectorAll("span.textitem");
+    if (!items.length) return "";
+    return _get_textitems_text(Array.from(items)).replace(/\u200B/g, "");
+  }
+
+  function indexOf(el) {
+    return el ? sentences().indexOf(el) : -1;
+  }
+
+  function state() {
+    const all = sentences();
+    const items = all.filter(isVisible);
+    const index = items.indexOf(current);
+    const firstVisible = items.length ? all.indexOf(items[0]) : -1;
+    const lastVisible = items.length ? all.indexOf(items[items.length - 1]) : -1;
+    return {
+      index: index,
+      count: items.length,
+      // Hidden sentences of the current page, and neighbouring pages,
+      // are still reachable by stepping: a visible edge is only the
+      // edge of the sub-screen, not of the sentence sequence.
+      hasPrev:
+        index > 0 ||
+        (index >= 0 && firstVisible > 0) ||
+        pageNum() > 1,
+      hasNext:
+        index >= 0 &&
+        (index < items.length - 1 ||
+          lastVisible < all.length - 1 ||
+          pageNum() < pageCount()),
+      text: textOf(current),
+      sentenceId: current ? current.id : "",
+    };
+  }
+
+  function notify(source) {
+    const st = state();
+    subscribers.forEach(function (fn) {
+      try {
+        fn({
+          index: st.index,
+          count: st.count,
+          text: st.text,
+          element: current,
+          source: source || "set",
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  }
+
+  function setCurrent(el, opts) {
+    opts = opts || {};
+    if (!el || !el.isConnected || indexOf(el) < 0) return null;
+    if (current !== el) {
+      if (current) current.classList.remove("sentence-nav-current");
+      current = el;
+      current.classList.add("sentence-nav-current");
+    }
+    if (opts.scroll !== false) {
+      try {
+        el.scrollIntoView({ block: "center", inline: "nearest", behavior: "smooth" });
+      } catch (e) {
+        el.scrollIntoView();
+      }
+    }
+    notify(opts.source);
+    return el;
+  }
+
+  function setByText(text, opts) {
+    const wanted = (text || "").replace(/\u200B/g, "");
+    if (!wanted) return null;
+    const found = sentences().find(function (el) {
+      return textOf(el) === wanted || textOf(el).trim() === wanted.trim();
+    });
+    return found ? setCurrent(found, opts) : null;
+  }
+
+  /** Move delta sentences, crossing a sub-screen (or a whole page) when
+   * the visible sequence ends.  Returns the new sentence element when
+   * the move was immediate, true when a screen/page turn is in flight
+   * (the optional `done` callback receives the element once it lands),
+   * or null at the very edges of the book. */
+  function step(delta, source, done) {
+    const finish = typeof done === "function" ? done : null;
+    const items = visibleSentences();
+    let index = items.indexOf(current);
+    if (index < 0) {
+      if (!items.length) return null;
+      // No usable pointer (or it is on a screen that was just hidden):
+      // start from the edge the move comes from.
+      const el = setCurrent(delta < 0 ? items[items.length - 1] : items[0], {
+        source: source || "step",
+      });
+      if (finish) finish(el);
+      return el;
+    }
+    const next = items[index + delta];
+    if (next) {
+      const el = setCurrent(next, { source: source || "step" });
+      if (finish) finish(el);
+      return el;
+    }
+    return turnScreen(delta, source || "step", finish);
+  }
+
+  /** The visible edge is only a sub-screen (or page) edge: ask the
+   * reader's own arrow navigation to move on.  It may be synchronous
+   * (same page, next group of paragraphs) or asynchronous (next Lute
+   * page, htmx swap).  Wait until the old screen is gone and the new
+   * layout has settled, then select its first (forward) or last
+   * (backward) sentence -- a natural continuation of the sequence. */
+  function turnScreen(delta, source, done) {
+    const nav = delta > 0 ? window.navigateNext : window.navigatePrev;
+    if (typeof nav !== "function") return null;
+    const marker = current;
+    try {
+      nav();
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+    const startedAt = Date.now();
+    let lastSignature = null;
+    let stableFrames = 0;
+
+    function signature() {
+      // Sent ids repeat across a page (they identify the paragraph's
+      // sentence slot), so the id text cannot tell screens apart: use
+      // the visibility mask over the full sentence list instead.
+      return (
+        pageNum() +
+        "|" +
+        sentences().map(function (el) {
+          return isVisible(el) ? "1" : "0";
+        }).join("")
+      );
+    }
+
+    function tick() {
+      const items = visibleSentences();
+      // The old screen is gone and the new one is laid out enough to
+      // have visible sentences: same page (paragraphs hidden) or a
+      // new page (old sentence no longer connected).
+      const moved =
+        !!marker &&
+        (!marker.isConnected || !isVisible(marker)) &&
+        items.length > 0;
+      if (moved) {
+        const sig = signature();
+        stableFrames = sig === lastSignature ? stableFrames + 1 : 0;
+        lastSignature = sig;
+        // Two identical frames: the split/render has finished hiding
+        // the paragraphs that do not belong to the new screen.
+        if (stableFrames >= 2) {
+          const target = delta > 0 ? items[0] : items[items.length - 1];
+          const el = setCurrent(target, { source: source });
+          if (done) done(el);
+          return;
+        }
+      } else {
+        lastSignature = null;
+        stableFrames = 0;
+      }
+      if (Date.now() - startedAt > 3000) {
+        if (done) done(null);
+        return;
+      }
+      requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+    return true;
+  }
+
+  function subscribe(fn) {
+    subscribers.push(fn);
+    return function () {
+      const at = subscribers.indexOf(fn);
+      if (at >= 0) subscribers.splice(at, 1);
+    };
+  }
+
+  return {
+    sentences: sentences,
+    textOf: textOf,
+    state: state,
+    setCurrent: setCurrent,
+    setByText: setByText,
+    step: step,
+    subscribe: subscribe,
+  };
+})();
+
+// Arrow-key / panel navigation in sentence mode: rebuild the whole row
+// of sentence tabs for the new sentence, debounced so a quick double
+// click cannot fire two rounds of requests.  Each rebuild tears the old
+// frames down, so a late reply can never paint into the previous
+// sentence's panel.
+let _sentenceNavTimer = null;
+window.LuteSentenceNav.subscribe(function (ev) {
+  if (typeof LookupButton === "undefined" || !LookupButton.sentenceMode) return;
+  if (ev.source === "translate" || ev.source === "grammar") return;
+  const active = LookupButton.all.find(
+    b => b.is_active && b instanceof SentenceDictButton
+  );
+  const dictID = active ? active.dictID : null;
+  clearTimeout(_sentenceNavTimer);
+  _sentenceNavTimer = setTimeout(function () {
+    createSentenceLookupButtons(ev.text, 5, dictID);
+  }, 140);
+});
+
+let show_translation_for_text = function(text, sentenceEl) {
   if (text == '')
     return;
+
+  if (sentenceEl && window.LuteSentenceNav)
+    window.LuteSentenceNav.setCurrent(sentenceEl, { source: "translate" });
+  else if (window.LuteSentenceNav)
+    window.LuteSentenceNav.setByText(text, { source: "translate" });
 
   if (LUTE_SENTENCE_LOOKUP_DICTS.length == 0) {
     // Same feedback as the LuteForMobile sentence sheet ("No dictionaries
@@ -62,8 +331,11 @@ function send_selected_terms_to_anki() {
 
   function _get_sentence(el) {
     const el_sentence_id = $(el).data('sentence-id');
-    const selector = `span.textitem[data-sentence-id="${el_sentence_id}"]`;
-    const tis = $(selector).toArray();
+    // Page spans only: the players' subtitle clones live in the same
+    // document and would add their cue timestamps and player chrome.
+    const tis = _page_textitems().filter(
+      t => $(t).data('sentence-id') == el_sentence_id
+    );
     return _get_textitems_text(tis);
   }
 
@@ -121,7 +393,11 @@ function open_term_list_for_current_page() {
 function handle_translate(span_attribute) {
   const tis = get_textitems_spans(span_attribute);
   const text = _get_textitems_text(tis);
-  show_translation_for_text(text);
+  // The panel arrows move sentence by sentence, so the click has to say
+  // which sentence is showing.  A page-wide selection has no owning
+  // .textsentence, in which case the panel has no sentence nav.
+  const sentenceEl = tis.length ? grammarTargetSentence(tis[0]) : null;
+  show_translation_for_text(text, sentenceEl);
 }
 
 
@@ -409,6 +685,21 @@ function open_grammar_analysis(opts) {
   // The deadline keeps a book that never finishes from spinning forever.
   var bookPollTimer = null;
   var bookPollDeadline = 0;
+  // AI grammar analysis for the one sentence this panel was opened from.
+  // The state survives re-renders of the library rows, so switching scope
+  // does not restart (or re-bill) the same analysis.
+  var aiState = {
+    sentence: null,
+    status: "idle",
+    raw: "",
+    result: null,
+    fallback: false,
+    error: null,
+    cached: false,
+    provider: "",
+    model: "",
+  };
+  var aiRunToken = 0;
 
   function header() {
     // The library index for this book's language -- the way to find a
@@ -546,6 +837,15 @@ function open_grammar_analysis(opts) {
 
   function bindPanelControls() {
     panel.find(".grammar-analysis-panel__close").on("click", window.closeGrammarAnalysis);
+    panel.find(".grammar-ai__retry").on("click", function () {
+      if (aiState.sentence) startAiAnalysis(aiState.sentence, true);
+    });
+    panel.find('[data-role="ai-prev"]').on("click", function () {
+      grammarStepSentence(-1);
+    });
+    panel.find('[data-role="ai-next"]').on("click", function () {
+      grammarStepSentence(1);
+    });
     // Three scopes, three behaviours:
     //   sentence -- narrow the already-rendered rows to the one sentence,
     //               purely in the DOM (instant, no request)
@@ -589,6 +889,7 @@ function open_grammar_analysis(opts) {
       syncScopeControl();
     });
     syncScopeControl();
+    updateAiNav();
   }
 
   bindPanelControls();
@@ -721,6 +1022,363 @@ function open_grammar_analysis(opts) {
   // examples come from every other page, have no nodes on this screen, and
   // narrowing there filtered nearly every card away while the level headers
   // still counted the whole payload ("This book: 1 point", N5: 10).
+  // -------------------------------------------------------------------
+  // AI grammar analysis (official OpenAI / Anthropic API, configured in
+  // Settings).  The block is tied to the sentence the panel opened from;
+  // the server caches by sentence hash + model + language pair.
+  // -------------------------------------------------------------------
+
+  function aiSentenceText() {
+    if (!filterableSentence) return "";
+    var text = grammarCleanText(grammarVisibleText(filterableSentence));
+    return text.replace(/\s+/g, " ").trim();
+  }
+
+  function aiMetaText() {
+    var bits = [];
+    if (aiState.provider) bits.push(aiState.provider);
+    if (aiState.model) bits.push(aiState.model);
+    if (aiState.cached) bits.push(I18N.t("cached"));
+    if (aiState.status === "loading") bits.push(I18N.t("Analyzing…"));
+    return bits.join(" · ");
+  }
+
+  function aiCardHtml(title, inner) {
+    return (
+      '<section class="grammar-ai__card">' +
+      '<div class="grammar-ai__card-title">' + escapeHtml(title) + "</div>" +
+      inner +
+      "</section>"
+    );
+  }
+
+  function aiRowHtml(label, value) {
+    if (value === undefined || value === null || String(value).trim() === "") return "";
+    return (
+      '<div class="grammar-ai__row">' +
+      '<span class="grammar-ai__label">' + escapeHtml(label) + "</span>" +
+      '<span class="grammar-ai__value">' + escapeHtml(value) + "</span>" +
+      "</div>"
+    );
+  }
+
+  function aiRenderResult(result) {
+    if (!result || typeof result !== "object") return "";
+    var html = "";
+
+    var translation = typeof result.translation === "string" ? result.translation.trim() : "";
+    if (translation) {
+      html += aiCardHtml(
+        I18N.t("Translation"),
+        '<div class="grammar-ai__translation">' + escapeHtml(translation) + "</div>"
+      );
+    }
+
+    var skeleton = result.skeleton && typeof result.skeleton === "object" ? result.skeleton : {};
+    var skeletonBody =
+      aiRowHtml(I18N.t("Subject"), skeleton.subject) +
+      aiRowHtml(I18N.t("Verb"), skeleton.verb) +
+      aiRowHtml(I18N.t("Object"), skeleton.object);
+    if (skeletonBody) html += aiCardHtml(I18N.t("Sentence skeleton"), skeletonBody);
+
+    var clauses = Array.isArray(result.clauses) ? result.clauses : [];
+    clauses = clauses.filter(function (c) {
+      return c && typeof c === "object" && (c.text || c.role || c.type);
+    });
+    if (clauses.length) {
+      html += aiCardHtml(
+        I18N.t("Clauses"),
+        clauses
+          .map(function (c) {
+            return (
+              '<div class="grammar-ai__item">' +
+              (c.type ? '<span class="grammar-ai__badge">' + escapeHtml(c.type) + "</span>" : "") +
+              (c.text ? '<div class="grammar-ai__quote">' + escapeHtml(c.text) + "</div>" : "") +
+              (c.role ? '<div class="grammar-ai__role">' + escapeHtml(c.role) + "</div>" : "") +
+              "</div>"
+            );
+          })
+          .join("")
+      );
+    }
+
+    var points = Array.isArray(result.grammar_points) ? result.grammar_points : [];
+    points = points.filter(function (p) {
+      return p && typeof p === "object" && (p.name || p.role || p.fragment);
+    });
+    if (points.length) {
+      html += aiCardHtml(
+        I18N.t("Grammar points"),
+        points
+          .map(function (p) {
+            return (
+              '<div class="grammar-ai__item">' +
+              (p.name ? '<div class="grammar-ai__name">' + escapeHtml(p.name) + "</div>" : "") +
+              (p.role ? '<div class="grammar-ai__role">' + escapeHtml(p.role) + "</div>" : "") +
+              (p.fragment ? '<div class="grammar-ai__frag">' + escapeHtml(p.fragment) + "</div>" : "") +
+              "</div>"
+            );
+          })
+          .join("")
+      );
+    }
+
+    var tv = result.tense_voice && typeof result.tense_voice === "object" ? result.tense_voice : {};
+    var tvBody =
+      aiRowHtml(I18N.t("Tense"), tv.tense) +
+      aiRowHtml(I18N.t("Voice"), tv.voice) +
+      aiRowHtml(I18N.t("Aspect"), tv.aspect);
+    if (tvBody) html += aiCardHtml(I18N.t("Tense · voice · aspect"), tvBody);
+
+    var pitfalls = Array.isArray(result.pitfalls) ? result.pitfalls : [];
+    pitfalls = pitfalls.filter(function (p) {
+      return typeof p === "string" && p.trim() !== "";
+    });
+    if (pitfalls.length) {
+      html += aiCardHtml(
+        I18N.t("Pitfalls"),
+        pitfalls.map(function (p) {
+          return '<div class="grammar-ai__item">' + escapeHtml(p) + "</div>";
+        }).join("")
+      );
+    }
+    return html;
+  }
+
+  function aiFallbackBlock(html, sentence) {
+    if (!sentence) return html;
+    var block = aiBlockHtml();
+    var marker = '<div class="grammar-analysis-panel__body">';
+    if (html.indexOf(marker) === 0) {
+      return marker + block + html.slice(marker.length);
+    }
+    return '<div class="grammar-analysis-panel__body">' + block + html + "</div>";
+  }
+
+  function aiBlockHtml() {
+    return (
+      '<section class="grammar-ai">' +
+      '<div class="grammar-ai__head">' +
+      '<span class="grammar-ai__nav" data-role="ai-nav" hidden>' +
+      '<button type="button" class="grammar-ai__nav-btn" data-role="ai-prev" title="' +
+      I18N.t("Previous sentence") + '" aria-label="' + I18N.t("Previous sentence") + '">' +
+      '<svg viewBox="7.5 3.5 15 25" width="12" height="20"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="20.5,4.5 9.5,15.5 19.5,27.5 "></polyline></svg>' +
+      "</button>" +
+      '<button type="button" class="grammar-ai__nav-btn" data-role="ai-next" title="' +
+      I18N.t("Next sentence") + '" aria-label="' + I18N.t("Next sentence") + '">' +
+      '<svg viewBox="7.5 3.5 15 25" width="12" height="20"><polyline fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="9.5,4.5 20.5,15.5 10.5,27.5 "></polyline></svg>' +
+      "</button>" +
+      "</span>" +
+      '<span class="grammar-ai__title">' + I18N.t("AI grammar analysis") + "</span>" +
+      '<span class="grammar-ai__meta" data-role="ai-meta"></span>' +
+      '<button type="button" class="grammar-ai__retry" data-role="ai-retry">' +
+      I18N.t("Retry") + "</button>" +
+      "</div>" +
+      '<div class="grammar-ai__error" data-role="ai-error" hidden></div>' +
+      '<div class="grammar-ai__raw" data-role="ai-raw"></div>' +
+      '<div class="grammar-ai__result" data-role="ai-result"></div>' +
+      "</section>"
+    );
+  }
+
+  /** Arrows only exist while the panel has a sentence to move from. */
+  function updateAiNav() {
+    var nav = panel[0] && panel[0].querySelector('[data-role="ai-nav"]');
+    if (!nav) return;
+    var st = window.LuteSentenceNav ? window.LuteSentenceNav.state() : null;
+    var usable = !!(
+      st &&
+      st.index >= 0 &&
+      filterableSentence &&
+      (st.count > 1 || st.hasPrev || st.hasNext)
+    );
+    nav.hidden = !usable;
+    if (!usable) return;
+    var prev = nav.querySelector('[data-role="ai-prev"]');
+    var next = nav.querySelector('[data-role="ai-next"]');
+    if (prev) prev.disabled = !st.hasPrev;
+    if (next) next.disabled = !st.hasNext;
+  }
+
+  /** Show the previous/next sentence: move the highlight, keep the panel
+   * on the current scope and start that sentence's AI analysis.  The
+   * run token in startAiAnalysis drops any reply from the old sentence,
+   * so fast clicks never paint the wrong text.
+   *
+   * At a sub-screen edge the move is a screen/page turn, which is
+   * asynchronous: the work on the landed sentence happens in the
+   * callback, never with the step's in-flight return value. */
+  function grammarStepSentence(delta) {
+    if (!window.LuteSentenceNav) return;
+    if (!filterableSentence && window.LuteSentenceNav.state().index < 0) return;
+    if (filterableSentence) {
+      window.LuteSentenceNav.setCurrent(filterableSentence, {
+        scroll: false,
+        source: "grammar",
+      });
+    }
+    window.LuteSentenceNav.step(delta, "grammar", function (el) {
+      if (!el) {
+        updateAiNav();
+        return;
+      }
+      filterableSentence = el;
+      // Only re-narrow when the panel is already on the sentence scope;
+      // a page/book view keeps its rows and just follows the AI block.
+      if (scope === "sentence") {
+        sentenceFilter = el;
+        filterToSentence(el);
+        syncScopeControl();
+      }
+      startAiAnalysis(aiSentenceText(), true);
+      updateAiNav();
+    });
+  }
+
+  function aiErrorHtml() {
+    if (!aiState.error) return "";
+    var message = escapeHtml(aiState.error.message || I18N.t("AI analysis failed."));
+    var kind = aiState.error.kind || "";
+    if (kind === "unconfigured" || kind === "auth" || kind === "config") {
+      message += ' <a href="/settings/index" target="_blank" rel="noopener">' +
+        I18N.t("AI settings") + "</a>";
+    }
+    return message;
+  }
+
+  function paintAi() {
+    var root = panel[0] && panel[0].querySelector(".grammar-ai");
+    if (!root) return;
+    var meta = root.querySelector('[data-role="ai-meta"]');
+    var raw = root.querySelector('[data-role="ai-raw"]');
+    var result = root.querySelector('[data-role="ai-result"]');
+    var error = root.querySelector('[data-role="ai-error"]');
+    var retry = root.querySelector('[data-role="ai-retry"]');
+
+    if (meta) meta.textContent = aiMetaText();
+    if (retry) retry.disabled = aiState.status === "loading";
+
+    if (error) {
+      error.innerHTML = aiErrorHtml();
+      error.hidden = !aiState.error;
+    }
+
+    if (aiState.result && !aiState.fallback) {
+      var rendered = aiRenderResult(aiState.result);
+      if (rendered) {
+        result.innerHTML = rendered;
+        result.hidden = false;
+        raw.hidden = true;
+        return;
+      }
+    }
+    result.innerHTML = "";
+    result.hidden = true;
+    raw.textContent = aiState.raw;
+    raw.hidden = !aiState.raw && aiState.status !== "loading";
+  }
+
+  function aiHandleEvent(rawEvent, runId) {
+    if (runId !== aiRunToken) return;
+    var eventName = "message";
+    var dataLines = [];
+    rawEvent.split("\n").forEach(function (line) {
+      if (line.indexOf("event:") === 0) eventName = line.slice(6).trim();
+      else if (line.indexOf("data:") === 0) dataLines.push(line.slice(5).trim());
+    });
+    if (!dataLines.length) return;
+    var data;
+    try {
+      data = JSON.parse(dataLines.join("\n"));
+    } catch (e) {
+      return;
+    }
+    if (eventName === "meta") {
+      aiState.provider = data.provider || "";
+      aiState.model = data.model || "";
+      aiState.cached = !!data.cached;
+    } else if (eventName === "text") {
+      aiState.raw += data.text || "";
+    } else if (eventName === "result") {
+      if (data.result) {
+        aiState.result = data.result;
+        aiState.fallback = false;
+      } else {
+        aiState.fallback = true;
+        if (data.text) aiState.raw = data.text;
+      }
+      aiState.status = "done";
+    } else if (eventName === "error") {
+      aiState.status = "error";
+      aiState.error = {
+        kind: data.kind || "upstream",
+        message: data.message || I18N.t("AI analysis failed."),
+      };
+    } else if (eventName === "done" && aiState.status === "loading") {
+      aiState.status = "done";
+    }
+    paintAi();
+  }
+
+  function startAiAnalysis(sentence, force) {
+    if (!sentence) return;
+    if (!force && aiState.sentence === sentence && aiState.status !== "idle") {
+      paintAi();
+      return;
+    }
+    aiState = {
+      sentence: sentence,
+      status: "loading",
+      raw: "",
+      result: null,
+      fallback: false,
+      error: null,
+      cached: false,
+      provider: "",
+      model: "",
+    };
+    var runId = ++aiRunToken;
+    paintAi();
+
+    fetch("/ai/grammar/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ q: sentence, lang: $("#lang_id").val() }),
+    })
+      .then(function (resp) {
+        if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
+        var reader = resp.body.getReader();
+        var decoder = new TextDecoder();
+        var buffer = "";
+        function pump() {
+          return reader.read().then(function (chunk) {
+            if (runId !== aiRunToken) return;
+            if (chunk.done) {
+              if (buffer.trim()) aiHandleEvent(buffer, runId);
+              return;
+            }
+            buffer += decoder.decode(chunk.value, { stream: true });
+            var splitAt;
+            while ((splitAt = buffer.indexOf("\n\n")) >= 0) {
+              aiHandleEvent(buffer.slice(0, splitAt), runId);
+              buffer = buffer.slice(splitAt + 2);
+            }
+            return pump();
+          });
+        }
+        return pump();
+      })
+      .catch(function (e) {
+        if (runId !== aiRunToken) return;
+        aiState.status = "error";
+        aiState.error = {
+          kind: "upstream",
+          message: I18N.t("Could not reach the grammar analyzer.") + " (" + e.message + ")",
+        };
+        paintAi();
+      });
+  }
+
   function renderResults(data, narrowToTarget) {
     // Resolved before the header is built: header() renders the "This
     // sentence" button only when a sentence is known, and syncScopeControl
@@ -737,12 +1395,24 @@ function open_grammar_analysis(opts) {
       targetSentence = grammarTargetSentence(targetWordEl);
       if (targetSentence) {
         filterableSentence = targetSentence;
+        if (window.LuteSentenceNav)
+          window.LuteSentenceNav.setCurrent(targetSentence, {
+            scroll: false,
+            source: "grammar",
+          });
         // A book request may already be in flight (the reader switched
         // scope while this response was on its way): do not claim the
         // sentence scope for a render that is about to be replaced.
         if (scope === "page") scope = "sentence";
       }
     }
+    // Language form's "AI grammar analysis" switch (read/index.html sets
+    // this; other pages leave it undefined, which keeps AI on).
+    var aiGrammarEnabled =
+      typeof window.LUTE_AI_GRAMMAR_ENABLED === "undefined"
+        ? true
+        : window.LUTE_AI_GRAMMAR_ENABLED !== false;
+    var aiSentence = aiGrammarEnabled ? aiSentenceText() : "";
     let bodyHtml;
     if (!data || data.length === 0) {
       bodyHtml = '<div class="grammar-analysis-panel__state">' + I18N.t('No known grammar points detected on this page.') + '</div>';
@@ -989,11 +1659,19 @@ function open_grammar_analysis(opts) {
           I18N.t('No known grammar points for this sentence.') +
           "</div></div>";
       }
-      panel.html(header() + bodyHtml);
+      if (!aiGrammarEnabled) {
+        bodyHtml =
+          '<div class="grammar-analysis-panel__state">' +
+          I18N.t('AI grammar analysis is turned off for this language in Language settings.') +
+          '</div>' +
+          bodyHtml;
+      }
+      panel.html(header() + aiFallbackBlock(bodyHtml, aiSentence));
       panel.find("#grammar-count").text(
         data.length + (data.length === 1 ? I18N.t(' point') : I18N.t(' points'))
       );
       bindPanelControls();
+      if (aiSentence) startAiAnalysis(aiSentence);
 
       // Cross-highlight: hovering a grammar entry on the right draws a blue
       // ring around the whole example sentence and an amber glow around the

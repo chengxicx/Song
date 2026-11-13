@@ -340,8 +340,37 @@ class DictButton extends LookupButton {
       url = `/bing/search/${LookupButton.LANG_ID}/${encodeURIComponent(use_text)}/${encodeURIComponent(binghash)}`;
     }
 
-    this.frame.setAttribute("src", url);
+    // Lute's own AI tab accepts POST: a page-wide or long sentence lookup
+    // would overflow the web server's request-line limit as a GET query
+    // string (HTTP 414), so send its text as a form body instead.
+    if (url.startsWith("/ai/sentence")) {
+      this._post_to_frame(url);
+    }
+    else {
+      this.frame.setAttribute("src", url);
+    }
     this.contentLoaded = true;
+  }
+
+  /** Submit a same-origin lookup URL into this button's iframe as a POST
+   * form, carrying its query string as form fields. */
+  _post_to_frame(url) {
+    const parsed = new URL(url, window.location.origin);
+    const form = document.createElement("form");
+    form.method = "post";
+    form.action = parsed.pathname;
+    form.target = this.frame.name;
+    form.style.display = "none";
+    parsed.searchParams.forEach((value, key) => {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = key;
+      input.value = value;
+      form.appendChild(input);
+    });
+    document.body.appendChild(form);
+    form.submit();
+    form.remove();
   }
 
 }  // end DictButton
@@ -454,6 +483,12 @@ function createLookupButtons(tab_count = 5, activateDictID = null) {
   LookupButton.TERM_DICTS.forEach((dict, index) => { new DictButton(dict,`dict${index}`); });
   _layoutDictTabs(LookupButton.all, tab_count);
 
+  // The frames must be in the document before a lookup loads into them:
+  // the AI tab posts a form targeted at its frame by name, which only
+  // resolves for a connected iframe.
+  const dictframes = document.getElementById("dictframes");
+  LookupButton.all.forEach((button) => { dictframes.appendChild(button.frame); });
+
   const target_button = (activateDictID == null)
     ? LookupButton.all[0]
     : LookupButton.all.find(b => b.dictID === activateDictID) || LookupButton.all[0];
@@ -464,9 +499,6 @@ function createLookupButtons(tab_count = 5, activateDictID = null) {
 
   for (let b of [new SentenceLookupButton(), new ImageLookupButton()])
     document.getElementById("dicttabsstatic").appendChild(b.btn);
-
-  const dictframes = document.getElementById("dictframes");
-  LookupButton.all.forEach((button) => { dictframes.appendChild(button.frame); });
 }
 
 
@@ -479,7 +511,7 @@ function createLookupButtons(tab_count = 5, activateDictID = null) {
  * Toggling Sentence off (restoreTermLookupButtons, or opening another
  * word) rebuilds the term tabs.
  */
-function createSentenceLookupButtons(sentence, tab_count = 5) {
+function createSentenceLookupButtons(sentence, tab_count = 5, activateDictID = null) {
   const dicts = LUTE_SENTENCE_LOOKUP_DICTS;
   if ((sentence ?? '') == '' || dicts.length == 0)
     return false;
@@ -492,6 +524,17 @@ function createSentenceLookupButtons(sentence, tab_count = 5) {
   );
   if (active_term)
     LookupButton.lastTermDictID = active_term.dictID;
+
+  // The sentence panel's arrows move the whole strip to another
+  // sentence: keep the tab the reader is looking at (the AI row, for
+  // instance) instead of falling back to the first dictionary.
+  if (activateDictID == null && LookupButton.sentenceMode) {
+    const active_sentence = LookupButton.all.find(
+      b => b.is_active && b instanceof SentenceDictButton
+    );
+    if (active_sentence)
+      activateDictID = active_sentence.dictID;
+  }
 
   _teardownLookupButtons();
   LookupButton.sentenceMode = true;
@@ -506,14 +549,18 @@ function createSentenceLookupButtons(sentence, tab_count = 5) {
   });
   _layoutDictTabs(LookupButton.all, tab_count);
 
-  const first_button = LookupButton.all[0];
-  if (first_button) {
-    first_button.activate();
-    first_button.do_lookup();
-  }
-
+  // Connected before the first lookup, for the AI tab's form POST (see
+  // createLookupButtons).
   const dictframes = document.getElementById("dictframes");
   LookupButton.all.forEach((button) => { dictframes.appendChild(button.frame); });
+
+  const target_button = (activateDictID == null)
+    ? LookupButton.all[0]
+    : LookupButton.all.find(b => b.dictID === activateDictID) || LookupButton.all[0];
+  if (target_button) {
+    target_button.activate();
+    target_button.do_lookup();
+  }
 
   // The strip is display:none until the first lookup (loadDictionaries
   // normally reveals it on word click); make sure it's shown here too.

@@ -52,6 +52,30 @@ let render_tag_list = function(data, type, row, meta) {
 };
 
 /*
+ * AI Explain column: share of the book's sentences that already have a
+ * stored AI sentence explanation.  Both figures come from the server
+ * (AiExplainPercent / AiExplainedCount / SentenceCount) so the column
+ * sorts in SQL; series aggregate rows report the summed share of their
+ * member books.  The tooltip carries the exact numerator/denominator.
+ */
+let render_ai_explain = function (data, type, row, meta) {
+  let pct = parseInt(row['AiExplainPercent'], 10);
+  if (isNaN(pct)) pct = 0;
+  pct = Math.max(0, Math.min(100, pct));
+  if (type !== 'display') {
+    return pct;
+  }
+  const explained = parseInt(row['AiExplainedCount']) || 0;
+  const sentences = parseInt(row['SentenceCount']) || 0;
+  // Exact numerator/denominator for checking the percentage; no words,
+  // so no translation is needed inside the attribute.
+  const tip = `${explained} / ${sentences}`;
+  // Plain cell text, the same as the Word count column: no muted
+  // styling, the tooltip is the only extra.
+  return `<span title="${tip}">${pct}%</span>`;
+};
+
+/*
  * Progress column: how much of the book has been read, as a bar plus a
  * percentage.  The number comes from the server (ProgressPercent) so the
  * home table can sort on it in SQL; series aggregate rows report the
@@ -211,13 +235,17 @@ let render_book_title = function ( data, type, row, meta ) {
   if (type === 'sort' || type === 'filter') {
     return String(row['SeriesTag'] || row['BkTitle'] || '');
   }
-  // Series aggregate row: link to the series overview page.
+  // Series aggregate row: link to the series overview page.  A series
+  // row is one (tag, language) pair -- the same tag text can exist in
+  // several languages (e.g. Mini Stories) -- so carry the language.
   if (row['SeriesTag']) {
     const tag = encodeURIComponent(row['SeriesTag']);
+    const lgid = parseInt(row['LgID']);
+    const lgq = isNaN(lgid) ? '' : `?lgid=${lgid}`;
     const n = parseInt(row['SeriesBookCount']);
     const r = parseInt(row['SeriesReadCount']);
     return `<div class="series-titlebox">` +
-      `<a class="book-title series-title" href="/book/series/${tag}">${row['SeriesTag']}</a>` +
+      `<a class="book-title series-title" href="/book/series/${tag}${lgq}">${row['SeriesTag']}</a>` +
       `<div class="series-sub">${n} ${I18N.t('eps')} &middot; ${r}/${n} ${I18N.t('read')}</div>` +
       `</div>`;
   }

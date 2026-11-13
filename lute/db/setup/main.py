@@ -47,6 +47,18 @@ class BackupManager:  # pylint: disable=too-few-public-methods
 
         os.makedirs(self.backup_directory, exist_ok=True)
 
+        # The db runs in WAL mode: pages committed since the last
+        # checkpoint live in <db>-wal, so the raw file copy below would
+        # miss them.  Fold them into the main file first.  The caller
+        # (Setup) has closed its own connection by this point.  A file
+        # that sqlite cannot read is copied as-is (the migration that
+        # follows will report the real problem).
+        try:
+            with closing(sqlite3.connect(self.file_to_backup)) as conn:
+                conn.execute("pragma wal_checkpoint(truncate)")
+        except sqlite3.DatabaseError:
+            pass
+
         # Copy the file to the backup directory and gzip it
         with open(self.file_to_backup, "rb") as source_file, gzip.open(
             backup_path, "wb"

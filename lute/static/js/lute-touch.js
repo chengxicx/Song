@@ -486,21 +486,62 @@ function _quick_cycle_status(el) {
 /********************************************/
 // Keyboard navigation.
 
-/** Get the textitems whose span_attribute value matches that of the
- * current active/hovered word.  If span_attribute is null, return
- * all. */
+/** The reading page's own textitem spans.
+ *
+ * The media and TTS players render clones of the reading-page spans (the
+ * scrolling subtitle) into the same document.  Copying or translating
+ * "all" text must not include them: the player chrome between them (the
+ * open transcript's lines and timestamps, the voice list) is not book
+ * text, and it can push a dictionary lookup's URL past the web server's
+ * request-line limit (HTTP 414).  Pages without #thetext (standalone
+ * term views) keep the whole document. */
+let _page_textitems = function() {
+  const root = document.getElementById('thetext') || document;
+  return $(root).find('span.textitem').toArray()
+    // The renderer appends a zero-width-space sentinel span to each
+    // paragraph.  It carries no text, and having no data-paragraph-id it
+    // would group every paragraph's range together.
+    .filter(el => el.textContent.replace(/\u200B/g, '') !== '');
+};
+
+/** Get the reading text's textitems whose span_attribute value matches
+ * that of the current active/hovered word.  If span_attribute is null,
+ * return all of the reading text. */
 let get_textitems_spans = function(span_attribute) {
+  const textitems = _page_textitems();
   if (span_attribute == null)
-    return $('span.textitem').toArray();
+    return textitems;
 
   let elements = $('span.kwordmarked, span.newmultiterm, span.wordhover');
   elements.sort((a, b) => _get_order($(a)) - _get_order($(b)));
   if (elements.length == 0)
-    return elements;
+    return [];
 
-  const attr_value = $(elements[0]).data(span_attribute);
-  const selector = `span.textitem[data-${span_attribute}="${attr_value}"]`;
-  return $(selector).toArray();
+  // A word clicked in a player subtitle is a clone of the reading-page
+  // span and carries the same data-order: look through the page's copy so
+  // the matches below never reach into the player.
+  let anchor = elements[0];
+  const textroot = document.getElementById('thetext');
+  if (textroot && !textroot.contains(anchor)) {
+    const order = anchor.getAttribute('data-order');
+    const twin = order == null
+      ? null
+      : textroot.querySelector(`span.textitem[data-order="${order}"]`);
+    if (twin) {
+      anchor = twin;
+    }
+    else {
+      // The player's line is not in the page (e.g. an ASR subtitle):
+      // match inside that line alone, not every clone in the document.
+      const line = anchor.closest('[id$="-subtitle-inner"]') || anchor.parentElement;
+      const anchor_value = $(anchor).data(span_attribute);
+      return $(line).find('span.textitem').toArray()
+        .filter(el => $(el).data(span_attribute) == anchor_value);
+    }
+  }
+
+  const attr_value = $(anchor).data(span_attribute);
+  return textitems.filter(el => $(el).data(span_attribute) == attr_value);
 };
 
 let handle_bookmark = function() {

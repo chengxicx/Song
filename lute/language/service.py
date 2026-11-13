@@ -148,6 +148,12 @@ class Service:
         self.session.add(lang)
         self.session.commit()
 
+        # The AI tab is an ordinary dictionary row now (see
+        # Language.active_dict_uris); a freshly loaded language needs
+        # one, at the position the hardcoded tab used to occupy.
+        if lang.ensure_ai_dictionary_row():
+            self.session.commit()
+
         r = Repository(self.session)
         for b in load_def.books:
             r.add(b)

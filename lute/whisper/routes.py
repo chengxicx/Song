@@ -69,7 +69,7 @@ def _engine_error(model_size, language):
         if not sensevoice.installed():
             return t(
                 "SenseVoice isn't installed on this server yet "
-                "-- set it up under Settings -> Whisper (auto-subtitles)."
+                "-- set it up under Settings -> Speech-to-text (auto-subtitles)."
             )
         if sensevoice.lang_code_for(language) is None:
             return t(

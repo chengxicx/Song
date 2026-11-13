@@ -11,8 +11,8 @@ Checks, against the real lute-furigana.js:
   1. every Thai word span gets exactly one ruby whose base is the word;
   2. a non-Thai span (the "!") stays untouched;
   3. no duplication: no base text contains its own reading;
-  4. the three back-to-back entry points still fire one request per
-     paragraph (the in-flight claim works in thai mode too);
+  4. the three back-to-back entry points still fire one batched request
+     (the in-flight claim works in thai mode too);
   5. a failed request releases its claim, so a later pass retries.
 """
 
@@ -56,7 +56,7 @@ def main():
         page = browser.new_page(viewport={"width": 900, "height": 700})
         page.goto(HARNESS.as_uri())
 
-        # --- 1. three back-to-back entry points, one request each ---
+        # --- 1. three back-to-back entry points, one batched request ---
         # The load-time annotate already claimed the paragraphs; firing
         # the other two entry points while that request is in flight must
         # not double up.
@@ -72,8 +72,8 @@ def main():
         page.wait_for_timeout(400)
         calls = page.evaluate("window.__fetch_calls")
         check(
-            "load + three entry points -> still one request per paragraph (2)",
-            calls == 2,
+            "load + three entry points -> one batched request",
+            calls == 1,
             " fetch_calls=%r" % (calls,),
         )
 

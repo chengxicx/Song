@@ -75,16 +75,48 @@ body {
     --input-placeholder-color-focus: rgba(0, 0, 0, 0.25);
     --status-ign-bg: var(--background-color);  /* Ign (⊘) status button fill */
 
+    /* UI refresh: derived surface / edge / muted-text tokens.  Every
+       value is computed from tokens the themes already set, so the
+       color-only themes, the grayscale e-ink theme and uploaded themes
+       follow automatically.  No new requests, scripts or animations. */
+    --surface-1: var(--panel-bg, #fff);
+    --surface-2: color-mix(in srgb, var(--panel-bg, #fff) 92%, var(--font-color, #000));
+    --surface-3: color-mix(in srgb, var(--font-color, #000) 6%, var(--panel-bg, #fff));
+
+    --border-subtle: color-mix(in srgb, var(--font-color, #000) 12%, transparent);
+    --border-strong: color-mix(in srgb, var(--font-color, #000) 22%, transparent);
+    --text-muted: color-mix(in srgb, var(--font-color, #000) 60%, var(--background-color, #fff));
+
+    --accent-soft: color-mix(in srgb, var(--btn-accent, #007aff) 12%, transparent);
+    --focus-ring: color-mix(in srgb, var(--btn-accent, #007aff) 45%, transparent);
+    --tracking-tight: -0.01em;
+
+    /* Book-shelf difficulty chips: three distinct hues (easy / challenging
+       / hard), INDEPENDENT of --status-N-color (shared with the reading
+       pane).  Each hue is mixed into the theme's own panel colour so dark,
+       light and uploaded themes keep readable contrast; the badge also
+       carries a border and the EASY / CHAL / HARD label, so the state is
+       never communicated by colour alone (grayscale safe). */
+    --chip-1: color-mix(in srgb, #34c759 22%, var(--panel-bg, #fff));
+    --chip-2: color-mix(in srgb, #f0b429 26%, var(--panel-bg, #fff));
+    --chip-3: color-mix(in srgb, #f0616d 30%, var(--panel-bg, #fff));
+    --chip-fg: var(--font-color, #000);
+    --chip-border: color-mix(in srgb, var(--font-color, #000) 20%, transparent);
+
     background-color: var(--background-color);
     color: var(--font-color);
 
     font: 100%/1.25 "Lucida Grande",Arial,sans-serif,STHeiti,"Arial Unicode MS",MingLiu;
 }
 
-/* Main container div for Lute site content. */
+/* Main container div for Lute site content.
+   Fixed gutters keep every page's content edge aligned with the top bar
+   (.menu-bar uses 24px horizontal padding).  A 95% width with auto margins
+   shifts by the vertical scrollbar width, leaving the right gutter ~15px
+   wider than the left one. */
 .container {
-    width: 95%;
-    margin: 0 auto;
+    width: auto;
+    margin: 0 24px;
     box-sizing: border-box;
 }
 
@@ -180,10 +212,11 @@ p.version {
     list-style-type: none;
     margin: 0;
     padding: 10px;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: var(--surface-2);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
     z-index: 1000;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
 }
 
 .last-sub-menu {
@@ -191,8 +224,13 @@ p.version {
 }
 
 .sub-menu li {
-    margin: 10px 0;
+    margin: 3px 0;
     white-space: nowrap;
+}
+
+.sub-menu li + li {
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 3px;
 }
 
 /* Hover-open only where hover really exists.  On touch screens :hover
@@ -436,22 +474,24 @@ div.toolbar {
     font-weight: bold;
     font-size: 0.8rem;
     text-transform: uppercase;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--chip-border);
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
 }
 
 .new-word-easy {
-    background-color: #72da88;
-    color: #1a5f2a;
+    background-color: var(--chip-1);
+    color: var(--chip-fg);
 }
 
 .new-word-chal {
-    background-color: #ffd43b;
-    color: #7a6000;
+    background-color: var(--chip-2);
+    color: var(--chip-fg);
 }
 
 .new-word-hard {
-    background-color: #ff6b6b;
-    color: #8b1a1a;
+    background-color: var(--chip-3);
+    color: var(--chip-fg);
 }
 
 .book-action-dropdown {
@@ -469,11 +509,12 @@ div.toolbar {
 .book-action-dropdown-content {
     display: none;
     position: absolute;
-    background-color: #f9f9f9;
+    background-color: var(--surface-2);
+    border: 1px solid var(--border-subtle);
     min-width: 120px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
     z-index: 10001;
-    border-radius: 5px;
+    border-radius: 12px;
     padding: 5px;
 }
 
@@ -485,7 +526,7 @@ div.toolbar {
 }
 
 .book-action-dropdown-content a:hover {
-    background-color: #f0f0f0;
+    background-color: var(--accent-soft);
 }
 
 /* The dropdown content is shown/hidden only by the JS handler
@@ -590,10 +631,10 @@ div.toolbar {
     max-height: 320px;
     overflow-y: auto;
     padding: 6px;
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    background: #fff;
-    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 12px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+    background: var(--surface-2);
+    border: 1px solid var(--border-subtle);
 }
 .colvis-menu .colvis-item {
     display: flex;
@@ -608,7 +649,7 @@ div.toolbar {
     white-space: nowrap;
 }
 .colvis-menu .colvis-item:hover {
-    background-color: rgba(0,122,255,0.08);
+    background-color: var(--accent-soft);
 }
 .colvis-menu .colvis-item input[type="checkbox"] {
     margin: 0;
@@ -1827,6 +1868,24 @@ select.dict-uri.form-control-narrower {
     margin: 2px 0;
 }
 
+/* An empty stand-in for the row's actions slot (test/remove buttons).
+   The AI row has no buttons there, but the same slot width must still
+   be present -- and must not shrink -- so every row's flex children
+   add up to the same total and the columns line up. */
+.dict-ops-slot {
+    display: inline-block;
+    flex: 0 0 16px;
+    height: 20px;
+}
+
+/* The AI row's locked type dropdown has a single, short option, so its
+   automatic minimum width is narrower than the other rows' ("Pop-up
+   window" sets theirs).  Pin the declared 8rem width so the row's URL
+   column starts at the same x as every other row's. */
+#language .dict_entry select.dict-type:disabled {
+    flex-shrink: 0;
+}
+
 .formfieldcomment {
     font-size: 0.85em;
     font-style: italic;
@@ -1912,6 +1971,19 @@ span.textsentence {
     font-size: 0%;
 }
 
+/* The sentence the AI panel is showing (static/js/lute-commands.js'
+   LuteSentenceNav).  A sentence span is font-size: 0%, so the underline
+   needs an explicit thickness like the playing line; the tint makes it
+   readable even when every word already carries a status colour. */
+#thetext .sentence-nav-current {
+    text-decoration: underline;
+    text-decoration-color: var(--btn-accent, #007aff);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+    background: color-mix(in srgb, var(--btn-accent, #007aff) 8%, transparent);
+    border-radius: 3px;
+}
+
 /* The line the player is reading, underlined in the page text itself so
    the reader can follow along there and not only in the player's
    subtitle strip.  Applied by static/js/lute-playing-line.js: to the
@@ -1960,6 +2032,16 @@ span.textitem {
     /* Add a transparent border so that when the .wordhover or .kwordmarked
    style is added, things don't get pushed around. */
     border-bottom: 1px solid transparent;
+}
+
+/* Some EPUBs carry a converter-injected `* { border-color: #555 !important }`
+   (with the matching forced-ink `* { color: ... !important }`), which paints
+   every word's invisible placeholder border as a visible hairline -- one
+   under every token of the chapter.  Re-pin the transparent colour here:
+   an element selector outranks `*` under !important, while .wordhover /
+   .kwordmarked (class selectors) still win when they apply. */
+span.textitem {
+    border-bottom-color: transparent !important;
 }
 
 /* Furigana above reading-page words (per-language "show furigana"
@@ -2556,6 +2638,10 @@ div.ui-tooltip {
     max-height: 150px;
     width: auto;
     height: auto;
+    /* The popup container ignores pointer events; let the image be clicked
+       to open the full-size original. */
+    pointer-events: auto;
+    cursor: zoom-in;
 }
 
 ul.sentencelist {
@@ -2990,9 +3076,12 @@ div.code pre {
    themes care about is painted by a higher-specificity rule of their own
    (#defaultLanguageSelect, .dt-length select, #dict-select:hover, ...).
    input[type="search"] is excluded on purpose -- that is DataTables'
-   search box, which the themes style themselves. */
+   search box, which the themes style themselves.  password fields are
+   included: the AI provider key input is the only one, and without this
+   it stayed a white UA field on the dark themes. */
 input[type="text"],
 input[type="url"],
+input[type="password"],
 textarea,
 select {
     background-color: var(--input-bg, #fff);
@@ -3976,7 +4065,7 @@ input[name='status']:disabled + label {
     }
 
     div#read_pane_right {
-        background-color: white;
+        background-color: var(--background-color, #fff);
         z-index: 1003;
         transform: translateY(100%);
         /* transition: all creates issues for drag resizing (laggy, slow)*/
@@ -4185,7 +4274,7 @@ input[name='status']:disabled + label {
     z-index: 10;
     user-select: none;
     background-color: transparent;
-    border-right: 1px solid #dee2e6;
+    border-right: 1px solid var(--border-subtle);
     transition: background-color 0.15s ease;
   }
 
@@ -4193,8 +4282,8 @@ input[name='status']:disabled + label {
   #booktable .resize-handle:active,
   .dt-scroll-headInner .resize-handle:hover,
   .dt-scroll-headInner .resize-handle:active {
-    background-color: rgba(0, 120, 255, 0.3);
-    border-right: 1px solid rgba(0, 120, 255, 0.6);
+    background-color: var(--accent-soft);
+    border-right: 1px solid var(--btn-accent, #007aff);
   }
 
 #booktable col {
@@ -4206,7 +4295,7 @@ input[name='status']:disabled + label {
 }
 
 #booktable thead th {
-    border-right: 1px solid #dee2e6 !important;
+    border-right: 1px solid var(--border-subtle) !important;
 }
 
 #booktable thead th:last-child {
@@ -4214,7 +4303,7 @@ input[name='status']:disabled + label {
 }
 
 #booktable thead {
-    border-bottom: 2px solid #dee2e6;
+    border-bottom: 2px solid var(--border-strong);
 }
 
 #booktable td:nth-child(3),
@@ -4450,6 +4539,7 @@ div#termimagesearch span img {
     /* Container fills the viewport on phones. */
     .container {
         width: 100%;
+        margin: 0;
         padding: 0 0.5rem;
         box-sizing: border-box;
     }
@@ -4527,10 +4617,11 @@ div#termimagesearch span img {
         display: none !important;
     }
 
-    /* Hide columns: Language, Words, Status */
+    /* Hide columns: Language, Words, Status, AI Explain */
     #booktable td.col-lang,
     #booktable td.col-words,
-    #booktable td.col-status {
+    #booktable td.col-status,
+    #booktable td.col-aiexplain {
         display: none !important;
     }
 
@@ -4772,22 +4863,44 @@ div#termimagesearch span img {
     min-width: 30px;
     height: 8px;
     border-radius: 999px;
-    background-color: rgba(128, 128, 128, 0.22);
+    background-color: var(--surface-3);
+    box-shadow: inset 0 0 0 1px var(--border-subtle);
     overflow: hidden;
 }
 .book-progress-fill {
     height: 100%;
     border-radius: 999px;
-    background-color: #4c6ef5;
+    background-image: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--btn-accent, #007aff) 62%, var(--surface-1)),
+        var(--btn-accent, #007aff)
+    );
 }
 .book-progress-fill-complete {
-    background-color: #2f9e44;
+    background-image: linear-gradient(
+        90deg,
+        color-mix(in srgb, #2f9e44 62%, var(--surface-1)),
+        #2f9e44
+    );
 }
 .book-progress-pct {
     flex: 0 0 auto;
     font-size: 11px;
     opacity: 0.7;
     font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   AI Explain column (share of a book's sentences that already
+   have a stored AI explanation).  The cell text uses the table's
+   normal font, like the Word count column; only the alignment
+   and no-wrap hints are column-specific.
+   ============================================================ */
+#booktable td.col-aiexplain,
+#booktable th.col-aiexplain,
+.dt-scroll-headInner thead th.col-aiexplain {
+    vertical-align: middle;
+    white-space: nowrap;
 }
 
 /* Series overview page (/book/series/<tag>). */
@@ -5346,53 +5459,60 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
 .grammar-item--TOPIK34, .grammar-group--TOPIK34 { --g-accent: #f08c00; }
 .grammar-item--TOPIK56, .grammar-group--TOPIK56 { --g-accent: #e64980; }
 
+/* Two rows, not one.  A 640px reading pane cannot hold the scope control,
+   the title, the count, the library link and the close button on one line:
+   the title used to wrap to two lines and the right-hand items were pushed
+   outside the pane (scrollWidth 790 against clientWidth 640), clipping the
+   library link and the close button.  Title/count/library/close share the
+   first row; the scope control gets its own row underneath. */
 .grammar-analysis-panel__header {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    grid-template-areas:
+        "title badge library close"
+        "scopes scopes scopes scopes";
     align-items: center;
-    gap: 8px;
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--g-rule);
-    background: linear-gradient(
-        180deg,
-        color-mix(in srgb, var(--g-accent-soft) 45%, var(--background-color, #fff)),
-        var(--background-color, #fff)
-    );
+    gap: 7px 8px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--g-card-border);
+    background: var(--background-color, #fff);
 }
 
 .grammar-analysis-panel__title {
-    flex: 1;
-    font-size: 1.12em;
+    grid-area: title;
+    min-width: 0;
+    font-size: 1.2em;
     font-weight: 700;
-    letter-spacing: 0.01em;
+    letter-spacing: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .grammar-analysis-panel__badge {
-    /* A pill never splits its own text.  The header is a single flex row and
-       the control and the library link both take a fixed slice of it, so the
-       badge is squeezed to 75px on a half-width pane (1280x720) -- without
-       this it breaks "2 points" across two lines inside the rounded border,
-       which reads as a rendering bug.  It is the title that gives way
-       instead. */
+    /* The count is metadata: a neutral chip, not a second accent pill
+       competing with the title and the scope control. */
+    grid-area: badge;
     flex: none;
     white-space: nowrap;
-    font-size: 0.85em;
-    font-weight: 700;
-    color: var(--g-accent);
-    border: 1px solid currentColor;
+    font-size: 0.8em;
+    font-weight: 600;
+    color: var(--g-text-2);
+    border: 1px solid var(--g-card-border);
     border-radius: 999px;
-    padding: 1px 9px;
-    opacity: 0.95;
+    padding: 1px 8px;
 }
 
 .grammar-analysis-panel__close {
+    grid-area: close;
     border: none;
     background: transparent;
     color: var(--font-color, #000);
-    font-size: 1.5em;
+    font-size: 1.35em;
     line-height: 1;
     cursor: pointer;
     padding: 0 3px;
-    opacity: 0.55;
+    opacity: 0.5;
     border-radius: 4px;
 }
 .grammar-analysis-panel__close:hover {
@@ -5401,17 +5521,19 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
 
 /* Link to the grammar library from the panel header. */
 .grammar-analysis-panel__library {
+    grid-area: library;
     flex: none;
-    font-size: 0.85em;
+    font-size: 0.82em;
     font-weight: 600;
     color: var(--g-accent);
     text-decoration: none;
-    border: 1px solid var(--g-accent-line);
+    border: 1px solid var(--g-card-border);
     border-radius: 999px;
     padding: 1px 9px;
     white-space: nowrap;
 }
 .grammar-analysis-panel__library:hover {
+    border-color: var(--g-accent-line);
     background: var(--g-accent-soft);
 }
 
@@ -5423,6 +5545,9 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
    The panel title already says "grammar", so each button carries only its
    own scope word.  Three buttons reading "... grammar" each was noise. */
 .grammar-analysis-panel__scopes {
+    grid-area: scopes;
+    justify-self: start;
+    max-width: 100%;
     display: inline-flex;
     flex: none;
     border: 1px solid var(--g-accent-line);
@@ -5732,10 +5857,297 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     color: var(--g-text-2);
 }
 
+/* ---- Reading-panel card refinements ---------------------------------
+   The panel is a narrow column, so its cards get a tighter vertical rhythm
+   and one frame per card.  Scope every selector to .grammar-analysis-panel
+   so the roomier shared card styles stay untouched on the grammar-library
+   pages, which reuse the same markup. */
+
+/* A level is a quiet label, not a table row: the full-width rule under it
+   was a second divider directly above each card. */
+.grammar-analysis-panel .grammar-group__head {
+    top: -12px;
+    gap: 6px;
+    padding: 4px 0 2px;
+    border-bottom: 0;
+}
+.grammar-analysis-panel .grammar-group__level {
+    font-size: 0.82em;
+}
+.grammar-analysis-panel .grammar-group__count {
+    font-size: 0.74em;
+}
+
+.grammar-analysis-panel .grammar-item {
+    padding: 12px 14px;
+}
+/* The active card already has an accent border and tint; the extra 2px
+   outer ring made it a double frame. */
+.grammar-analysis-panel .grammar-item--active {
+    box-shadow: none;
+}
+.grammar-analysis-panel .grammar-item__name {
+    font-size: 1.06em;
+}
+
+/* The gloss is the point of the card: raise it out of the muted metadata
+   colour and keep a comfortable measure. */
+.grammar-analysis-panel .grammar-item__desc {
+    margin-top: 6px;
+    font-size: 1em;
+    line-height: 1.55;
+    color: color-mix(in srgb, var(--font-color, #000) 82%, transparent);
+    max-width: 74ch;
+}
+.grammar-analysis-panel .grammar-item__formation {
+    font-size: 0.84em;
+    line-height: 1.5;
+    padding: 3px 8px;
+    background: color-mix(in srgb, var(--font-color, #000) 3%, transparent);
+}
+/* Long explanations: readable line height, muted but not dim, and a line
+   measure that stops at ~68 characters instead of running the full card. */
+.grammar-analysis-panel .grammar-item__detail,
+.grammar-analysis-panel .grammar-item__notes {
+    max-width: 68ch;
+    line-height: 1.65;
+    color: color-mix(in srgb, var(--font-color, #000) 72%, transparent);
+}
+.grammar-analysis-panel .grammar-item__detail {
+    margin-top: 7px;
+    font-size: 0.92em;
+}
+.grammar-analysis-panel .grammar-item__notes {
+    margin-top: 7px;
+    font-size: 0.9em;
+}
+.grammar-analysis-panel .grammar-item__reftr {
+    line-height: 1.5;
+}
+
+/* Draw one rule for the whole example group instead of a grey box with its
+   own left bar around every sentence -- two or three stacked boxes inside
+   one card was the noisiest part of the block. */
+.grammar-analysis-panel .grammar-item__examples {
+    margin-top: 10px;
+    gap: 6px;
+    padding-left: 10px;
+    border-left: 2px solid var(--g-accent-line);
+}
+.grammar-analysis-panel .grammar-item__example {
+    padding: 0;
+    border-left: 0;
+    border-radius: 0;
+    background: transparent;
+    line-height: 1.55;
+}
+
+/* At phone widths the title row can still overrun the pane.  Put the
+   library link on its own line and trim the segment padding so the
+   segmented control never scrolls sideways. */
+@media (max-width: 480px) {
+    .grammar-analysis-panel__header {
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        grid-template-areas:
+            "title badge close"
+            "scopes scopes scopes"
+            "library library library";
+        row-gap: 6px;
+    }
+    .grammar-analysis-panel__library {
+        justify-self: start;
+    }
+    .grammar-analysis-panel__body {
+        padding: 10px 12px 16px;
+    }
+    .grammar-analysis-panel .grammar-item {
+        padding: 11px 12px;
+    }
+}
+
+@media (max-width: 420px) {
+    .grammar-analysis-panel__scope {
+        padding: 2px 6px;
+        font-size: 0.72em;
+    }
+}
+
+/* The 320px edge: the point count is already repeated in every level
+   header, so drop the aggregate badge and keep the full title on one line. */
+@media (max-width: 340px) {
+    .grammar-analysis-panel__badge {
+        display: none;
+    }
+}
+
 /* Grammar examples must never carry a TTS speaker (nothing to read
    aloud, and they re-use the page's sentence text). */
 .grammar-analysis-panel .lute-sentence-play-btn {
     display: none !important;
+}
+
+/* AI grammar analysis block: same card tokens as the library rows, placed
+   at the top of the sentence view. */
+.grammar-ai {
+    margin: 0 0 12px;
+    padding: 12px 14px;
+    background: var(--g-card);
+    border: 1px solid var(--g-accent-line);
+    border-radius: 10px;
+}
+.grammar-ai__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.grammar-ai__title {
+    font-weight: 600;
+}
+.grammar-ai__meta {
+    font-size: 0.78em;
+    opacity: 0.7;
+}
+.grammar-ai__retry {
+    margin-left: auto;
+    padding: 2px 9px;
+    font-size: 0.78em;
+    border: 1px solid var(--g-card-border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--font-color);
+    cursor: pointer;
+}
+.grammar-ai__retry:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+/* Prev/next sentence arrows, matching the reading page's side arrows.
+   Hidden (but laid out as flex) when the panel has no sentence to move
+   from; [hidden] has to out-rank the display rule below. */
+.grammar-ai__nav {
+    display: inline-flex;
+    gap: 2px;
+    margin-right: 2px;
+}
+.grammar-ai__nav[hidden] {
+    display: none;
+}
+.grammar-ai__nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.55rem;
+    padding: 1px 4px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--font-color);
+    opacity: 0.5;
+    cursor: pointer;
+}
+.grammar-ai__nav-btn:hover:not(:disabled) {
+    opacity: 1;
+    background: rgba(128, 128, 128, 0.14);
+}
+.grammar-ai__nav-btn:disabled {
+    opacity: 0.2;
+    cursor: default;
+}
+.grammar-ai__nav-btn svg {
+    display: block;
+}
+@media (max-width: 864px) {
+    .grammar-ai__nav-btn {
+        min-width: 1.35rem;
+        padding: 0 2px;
+    }
+}
+.grammar-ai__raw {
+    margin-top: 8px;
+    font-size: 0.9em;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+.grammar-ai__error {
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 0.88em;
+    background: color-mix(in srgb, #e03131 12%, transparent);
+    color: #c92a2a;
+}
+.grammar-ai__result {
+    display: grid;
+    gap: 8px;
+    margin-top: 8px;
+}
+.grammar-ai__card {
+    padding: 10px 12px;
+    background: var(--g-card);
+    border: 1px solid var(--g-card-border);
+    border-radius: 8px;
+}
+.grammar-ai__card-title {
+    margin-bottom: 6px;
+    font-size: 0.85em;
+    font-weight: 600;
+    color: var(--g-accent);
+}
+/* Whole-sentence translation: the first card of the AI block.  Long
+   sentences wrap instead of widening the panel. */
+.grammar-ai__translation {
+    font-size: 0.95em;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+.grammar-ai__row {
+    display: grid;
+    grid-template-columns: 5.5em minmax(0, 1fr);
+    gap: 8px;
+    font-size: 0.9em;
+    margin-top: 3px;
+}
+.grammar-ai__label {
+    opacity: 0.7;
+}
+.grammar-ai__value {
+    white-space: pre-wrap;
+}
+.grammar-ai__item {
+    margin-top: 8px;
+    font-size: 0.9em;
+}
+.grammar-ai__item:first-child {
+    margin-top: 0;
+}
+.grammar-ai__badge {
+    display: inline-block;
+    margin-bottom: 3px;
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 0.78em;
+    background: var(--g-accent-soft);
+    color: var(--g-accent);
+}
+.grammar-ai__quote {
+    font-style: italic;
+}
+.grammar-ai__name {
+    font-weight: 600;
+}
+.grammar-ai__role {
+    opacity: 0.85;
+}
+.grammar-ai__frag {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.95em;
+    background: var(--g-accent-soft);
 }
 
 /* Reading-text highlight driven by hovering a grammar entry on the right.
@@ -6244,6 +6656,13 @@ span.textitem.shadow-miss {
     border-radius: 4px;
     padding: 0 1px;
 }
+/* Punctuation in the practised sentence: shown as written, but neutral --
+   it is never scored, so it gets no verdict colour, no hover and no
+   click-to-hear affordance. */
+.shadow-punct {
+    color: var(--s-text-2);
+    cursor: default;
+}
 .shadow-tok.shadow-ok {
     border-bottom: 2px solid rgba(55, 178, 77, 0.75);
 }
@@ -6480,4 +6899,143 @@ span.textitem.shadow-miss {
     font-size: 0.88em;
 }
 
+/* Settings page: the Local dictionaries (MDX) pool (see
+   static/js/dict-settings.js).  One compact row per dictionary: the
+   name and its entries/size are visible, provenance folds away behind
+   Details (and the row's hover title), and the actions stay quiet
+   until the row is hovered or focused. */
+.dict-settings__item {
+    border-bottom: 1px solid #e5e5e5;
+}
+.dict-settings__row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 0;
+}
+.dict-settings__main {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.dict-settings__title {
+    font-weight: 600;
+    font-size: 0.95em;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.dict-settings__summary {
+    font-size: 0.78em;
+    line-height: 1.35;
+    color: #666;
+}
+.dict-settings__actions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    opacity: 0.55;
+}
+.dict-settings__row:hover .dict-settings__actions,
+.dict-settings__row:focus-within .dict-settings__actions {
+    opacity: 1;
+}
+.dict-settings__more,
+.dict-settings__remove {
+    background: none;
+    border: none;
+    padding: 2px 6px;
+    cursor: pointer;
+    font-size: 0.78em;
+    color: #888;
+}
+.dict-settings__more:hover {
+    color: #333;
+    text-decoration: underline;
+}
+.dict-settings__remove:hover {
+    color: #b00;
+    text-decoration: underline;
+}
+.dict-settings__more:focus-visible,
+.dict-settings__remove:focus-visible {
+    outline: 2px solid var(--link-color, #007aff);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+.dict-settings__body {
+    font-size: 0.78em;
+    color: #888;
+    line-height: 1.5;
+    padding: 0 0 6px 2px;
+    word-break: break-all;
+}
 
+/* ============================================================
+   UI refresh — scoped additions for the top bar, book shelf and
+   settings form.  Kept at the end so equal-specificity legacy rules
+   above are superseded; themes load afterwards and still win where
+   they define a token-backed value.
+   ============================================================ */
+
+/* Scoped focus ring.  Deliberately NOT a global `* :focus-visible`:
+   the reading pane owns its tooltip and tap-feedback outlines. */
+.menu-bar :focus-visible,
+.sub-menu :focus-visible,
+.dt-container :focus-visible,
+.settingstable :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+/* Book shelf: card-ify the DataTables wrapper only.  Its generated
+   DOM and the DataTables JS are untouched. */
+div#booktable_wrapper.dt-container {
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 14px;
+}
+
+#booktable tbody tr:hover {
+    background-color: var(--surface-3);
+}
+
+/* Settings form: table structure unchanged, section headers become
+   quiet cards and the label column drops back to muted text. */
+.settingstable h2 {
+    background: var(--surface-2);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 9px 14px;
+    margin: 20px 0 10px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: var(--tracking-tight);
+    color: var(--font-color);
+}
+
+.settingstable td:first-child {
+    color: var(--text-muted);
+}
+
+.settingstable .form-control,
+.settingstable select,
+.settingstable textarea {
+    min-height: 34px;
+    border-radius: var(--form-border-radius, 3px);
+    border-color: var(--border-subtle);
+}
+
+/* Reduced motion: colour-only hovers fade to a fully static state.
+   The themes only declare their short transitions inside the
+   no-preference branch, so nothing animates here. */
+@media (prefers-reduced-motion: reduce) {
+    .menu-item > span,
+    .sub-menu li a,
+    .book-action-dropdown-content a,
+    .colvis-menu .colvis-item {
+        transition: none;
+    }
+}

@@ -4,11 +4,14 @@ Drive the furigana harness and assert the reading-pane annotation rules.
 Checks, against the real lute-furigana.js:
 
   1. the initial load's three entry points (DOMContentLoaded,
-     htmx:afterSwap, page_content's explicit call) fire one request per
-     paragraph, not one per entry point -- the production regression let
-     each pass re-read an already-wrapped span and wrap it again, so the
-     reading was appended to the base text ("音" became "音おと") and the
-     ruby sat above the wrong (longer) text;
+     htmx:afterSwap, page_content's explicit call) fire one batched
+     request, not one per entry point or per paragraph -- the production
+     regression let each pass re-read an already-wrapped span and wrap it
+     again, so the reading was appended to the base text ("音" became
+     "音おと") and the ruby sat above the wrong (longer) text;
+     the request's full_text is the paragraph's real text, punctuation
+     included (joining the word tokens turned 李：今日は into 李今日は
+     and made Sudachi read 今日 as こんにち);
   2. a kanji word gets exactly one ruby whose base is the word itself;
   3. a pure-katakana word (カサカサ) and a pure-kana word get no ruby --
      furigana is for kanji;
@@ -20,7 +23,10 @@ Checks, against the real lute-furigana.js:
      answered from the readings cache with no fetch, and the ruby lands
      in a microtask of the calling task -- before any paint, so it does
      not blink off;
-  8. a changed token set is a cache miss and fetches again.
+  8. a changed token set is a cache miss and fetches again;
+  9. invalidating the saved term drops only the batches holding it, so
+     the edited ruby refetches and updates while other paragraphs keep
+     their cached ruby; an unknown term text clears everything.
 """
 
 import pathlib
@@ -63,7 +69,7 @@ def main():
         page = browser.new_page(viewport={"width": 900, "height": 700})
         page.goto(HARNESS.as_uri())
 
-        # --- 1. three back-to-back entry points, one request each ---
+        # --- 1. three back-to-back entry points, one batched request ---
         # lute-furigana.js already annotated once on load (its readyState
         # branch), and that request is still in flight (the stub answers
         # after 150ms).  Fire the initial load's remaining entry points
@@ -71,8 +77,8 @@ def main():
         # targeting #thetext, then annotate again (page_content's
         # explicit call) -- so every pass sees the same unmarked spans,
         # exactly like the real page.  If claiming did not happen
-        # synchronously, each pass would add its own request per
-        # paragraph and re-wrap the already-wrapped spans.
+        # synchronously, each pass would add its own requests and re-wrap
+        # the already-wrapped spans.
         page.evaluate(
             """() => {
               window.lute_furigana_annotate();
@@ -85,9 +91,22 @@ def main():
         page.wait_for_timeout(400)
         calls = page.evaluate("window.__fetch_calls")
         check(
-            "load + three entry points -> still one request per paragraph (2)",
-            calls == 2,
+            "load + three entry points -> one batched request",
+            calls == 1,
             " fetch_calls=%r" % (calls,),
+        )
+
+        # --- 1b. the request carries the paragraph's real text ---
+        # The spans alone are not the text the parser saw: punctuation
+        # between them has to survive, or 李：今日は is sent as 李今日は
+        # and 今日 is read こんにち instead of きょう.
+        requests = page.evaluate("window.__requests")
+        para1 = requests[0]["paragraphs"][0]
+        check(
+            "the readings request keeps the paragraph punctuation",
+            para1["full_text"] == "音、カサカサが聞こえ"
+            and para1["tokens"] == ["音", "カサカサ", "聞こえ"],
+            " paragraph=%r" % (para1,),
         )
 
         # --- 2. kanji words: exactly one ruby, clean base ---
@@ -235,6 +254,88 @@ def main():
             "a changed token set is a cache miss (fetches again)",
             result == 1,
             " fetch_calls=%r" % (result,),
+        )
+
+        # --- 10. a term save invalidates only the batches holding it ---
+        # The saved word's pronunciation changed: its paragraph must
+        # refetch, while the other paragraph keeps its cached ruby (no
+        # fetch, and ruby present in the same microtask).
+        page.evaluate("window.__READINGS['音'] = 'おとの';")
+        result = page.evaluate(
+            """() => {
+              const t = document.getElementById('thetext');
+              t.innerHTML =
+                '<p><span class="textsentence" id="sent_1">' +
+                '<span class="textitem click word" data-paragraph-id="1" data-sentence-id="1" data-text="音">音</span>' +
+                '<span class="textitem">が</span>' +
+                '<span class="textitem click word" data-paragraph-id="1" data-sentence-id="1" data-text="カサカサ">カサカサ</span>' +
+                '<span class="textitem">ました</span>' +
+                '<span class="textitem click word" data-paragraph-id="1" data-sentence-id="1" data-text="聞こえ">聞こえ</span>' +
+                '</span></p>' +
+                '<p><span class="textsentence" id="sent_2">' +
+                '<span class="textitem click word" data-paragraph-id="2" data-sentence-id="2" data-text="夜">夜</span>' +
+                '<span class="textitem click word" data-paragraph-id="2" data-sentence-id="2" data-text="わたし">わたし</span>' +
+                '</span></p>';
+              window.lute_furigana_invalidate_term('音');
+              window.__fetch_calls = 0;
+              window.lute_furigana_annotate();
+              return Promise.resolve().then(() => {
+                const night = Array.from(t.querySelectorAll('span.word'))
+                  .find(s => s.getAttribute('data-text') === '夜');
+                const rb = night && night.querySelector('ruby');
+                return {
+                  fetch_calls: window.__fetch_calls,
+                  night_ruby_kept: !!(rb && rb.querySelector('rt').textContent === 'よる'),
+                };
+              });
+            }"""
+        )
+        page.wait_for_timeout(300)
+        after = page.evaluate(
+            """() => {
+              const song = Array.from(
+                document.querySelectorAll('#thetext span.word')
+              ).find(s => s.getAttribute('data-text') === '音');
+              const ruby = song && song.querySelector('ruby');
+              return {
+                fetch_calls: window.__fetch_calls,
+                reading: ruby && ruby.querySelector('rt')
+                  ? ruby.querySelector('rt').textContent : null,
+              };
+            }"""
+        )
+        check(
+            "a saved term refetches its paragraph only",
+            result["fetch_calls"] == 1
+            and result["night_ruby_kept"]
+            and after["fetch_calls"] == 1
+            and after["reading"] == "おとの",
+            " result=%r after=%r" % (result, after),
+        )
+
+        # --- 11. without the term text, the invalidation clears all ---
+        result = page.evaluate(
+            """() => {
+              const t = document.getElementById('thetext');
+              t.innerHTML =
+                '<p><span class="textsentence" id="sent_1">' +
+                '<span class="textitem click word" data-paragraph-id="1" data-sentence-id="1" data-text="音">音</span>' +
+                '</span></p>' +
+                '<p><span class="textsentence" id="sent_2">' +
+                '<span class="textitem click word" data-paragraph-id="2" data-sentence-id="2" data-text="夜">夜</span>' +
+                '</span></p>';
+              window.lute_furigana_invalidate_term(null);
+              window.__fetch_calls = 0;
+              window.lute_furigana_annotate();
+              return Promise.resolve().then(() => window.__fetch_calls);
+            }"""
+        )
+        page.wait_for_timeout(300)
+        after = page.evaluate("window.__fetch_calls")
+        check(
+            "an unknown term text clears every cached batch",
+            result == 1 and after == 1,
+            " in_task=%r after=%r" % (result, after),
         )
         browser.close()
 

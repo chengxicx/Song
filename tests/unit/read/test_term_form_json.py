@@ -87,17 +87,18 @@ def test_termform_new_word_json(app_context, client, english):
 
 
 def test_termform_multiword_json_action_uses_luteslash(app_context, client, english):
-    "Multiword terms with slashes get the LUTESLASH encoding in form_action."
+    "Multiword terms keep LUTESLASH, and the path segment is percent-encoded."
     # lute.js replaces / with LUTESLASH before building the URL.
     resp = client.get(f"/read/termform/{english.id}/someLUTESLASHword?format=json")
     assert resp.status_code == 200, resp.status_code
     data = resp.get_json()
 
-    # The text is tokenized, so it carries ZWS token boundaries.
+    # The text is tokenized (ZWS boundaries), and the whole segment is
+    # percent-encoded, so the ZWS markers ride along as %E2%80%8B.
     zws = "\u200B"
     assert data["original_text"] == zws.join(["some", "/", "word"])
     assert data["form_action"] == (
-        f"/read/termform/{english.id}/{zws.join(['some', 'LUTESLASH', 'word'])}"
+        f"/read/termform/{english.id}/some%E2%80%8BLUTESLASH%E2%80%8Bword"
     )
 
 

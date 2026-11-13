@@ -42,8 +42,13 @@
   const WHITESPACE = /\s/;
   // Never descend into these: ruby readings (already stripped
   // server-side, but a stray one must not desync the stream), and the
-  // sentence play buttons tts.js injects.
-  const SKIP_SELECTOR = "rt, rp, script, style, .lute-sentence-play-btn";
+  // chrome injected at runtime -- the sentence play buttons tts.js adds
+  // and the mobile app's end-of-chapter block, which it appends inside
+  // `#epub-chapter .epub-body` so the paper filter paints it.  Both were
+  // counted as chapter text once, and a single mismatch means the
+  // chapter renders with no word spans at all.
+  const SKIP_SELECTOR =
+    "rt, rp, script, style, .lute-sentence-play-btn, .lute-chapter-nav";
 
   // The <link> this module owns in <head> for the current book.
   const STYLESHEET_ID = "lute-epub-stylesheet";
@@ -421,7 +426,16 @@
    */
   function wrapSentences(root) {
     const blocks = Array.from(root.querySelectorAll("*")).filter((el) => {
-      if (!BLOCK_TAGS.has(el.tagName.toLowerCase())) return false;
+      const tag = el.tagName.toLowerCase();
+      // A table is never a sentence container.  Wrapping it puts
+      // `.textsentence` spans between <table> and its <tbody> and clones
+      // a tbody/tr/td per sentence -- invalid table structure that the
+      // browser lays out as side-by-side fragments, so a book's
+      // table-typeset TOC page scatters into one block per word.  The
+      // cells and paragraphs inside it are blocks in their own right and
+      // still get wrapped.
+      if (tag === "table") return false;
+      if (!BLOCK_TAGS.has(tag)) return false;
       if (!el.querySelector("span.word")) return false;
       // Only the innermost block: a <div> holding <p>s must not swallow
       // its children's sentences.

@@ -4,10 +4,10 @@ Reading helpers.
 
 import os
 import re
-from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 import functools
 from flask import current_app, url_for
+from bs4 import BeautifulSoup
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import StaleDataError
 from lute.models.term import Term, Status
@@ -20,10 +20,12 @@ from lute.read.render.service import Service as RenderService
 from lute.read.render.calculate_textitems import get_string_indexes
 from lute.read import manga_columns
 from lute.book.epub_extract import css_path_for, orig_css_path_for, ensure_orig_css
+from lute.book.epub_parser import _extract_text, _prep_soup  # internal reuse
 from lute.book import epub_paths
 from lute.term.model import Repository
 from lute.term import pos_tags
 from lute.utils.manga_images import image_path_for_page
+from lute.userimage.service import full_url, thumbnail_url
 
 # from lute.utils.debug_helpers import DebugTimer
 
@@ -31,6 +33,10 @@ from lute.utils.manga_images import image_path_for_page
 # Extraction is not cheap and users flip between pages often.  The
 # cache holds only positions, never terms or session objects.
 _pdf_page_words_cache = {}
+
+# The precision at which a page open is worth writing: TxStartDate is used
+# for last-opened ordering and reading-time stats, both second-granular.
+_ONE_SECOND = timedelta(seconds=1)
 
 
 def _extract_pdf_page_words(pdf_abs_path, pagenum):
@@ -287,6 +293,51 @@ def _epub_token(ti):
     return [ti.html_display_text, 0, -1, ti.sentence_number, ti.paragraph_number]
 
 
+def _epub_tokens_from(paragraphs):
+    "Flatten rendered paragraphs into the token stream the page embeds."
+    return [
+        _epub_token(ti) for para in paragraphs for sentence in para for ti in sentence
+    ]
+
+
+# JS `/\s/`, which the page uses on both streams.  Python's \s matches a
+# couple of exotic characters JS does not (e.g. \x1c-\x1f); those never
+# appear in book text, and a false "match" would only skip a rebuild the
+# page then rejects on its own.
+_EPUB_WS_RE = re.compile(r"\s")
+
+
+def _chapter_align_text(chapter_html, subs):
+    """
+    The chapter's text as the reader page's aligner sees it: the text a
+    fresh import of the same markup would store.
+
+    Reuses the import's own extraction, so ruby readings, scripts and
+    styles are dropped and one line per block element is kept -- the same
+    normalisation the front end performs (its SKIP_SELECTOR skips rt/rp)
+    before comparing the token stream to the chapter.  The parser's
+    character substitutions are applied on top, because the stored tokens
+    come from text that already went through them.
+    """
+    soup = BeautifulSoup(chapter_html, "html.parser")
+    _prep_soup(soup)
+    text = _extract_text(soup)
+    for pair in subs:
+        if len(pair) == 2 and pair[0]:
+            text = text.replace(pair[0], pair[1])
+    return text
+
+
+def _epub_streams_match(chapter_html, tokens, subs):
+    """
+    Whether the token stream and the chapter markup describe the same
+    characters -- the invariant the front end's mount() depends on.
+    """
+    markup = _EPUB_WS_RE.sub("", _chapter_align_text(chapter_html, subs))
+    stream = _EPUB_WS_RE.sub("", "".join(t[0] for t in tokens))
+    return markup == stream
+
+
 # A converted dictionary entry is the headword, the part of speech,
 # the senses and then a long tail of example sentences -- dozens of
 # lines for a common word.  The popup is a glance, not a reading
@@ -340,10 +391,18 @@ class TermPopup:
         # gloss is -- the popup is a glance, the form holds the full text.
         self.translation = self._clean(_popup_first_lines(term.translation))
         self.romanization = self._clean(term.romanization)
+        # An English term's reading may be an IPA string rather than a
+        # true reading (kana/pinyin).  Hide the *visible* copy when the
+        # language has phonetics off; the hidden copy stays for TTS.
+        self.show_romanization = self.romanization != "" and (
+            getattr(term.language, "show_dict_phonetics", True)
+            or not gloss_format.is_phonetic_annotation(self.romanization)
+        )
         self.tags = [tt.text for tt in term.term_tags]
         self.flash = self._clean(term.get_flash_message())
         self.image = term.get_current_image()
-        self.popup_image_data = self._get_popup_image_data()
+        self.popup_images = self._get_popup_images()
+        self.popup_image_data = {i["full"]: i["tooltip"] for i in self.popup_images}
 
         # Final data to include in popup.
         self.parents = []
@@ -373,22 +432,39 @@ class TermPopup:
             ret = f"{ret} ({self.parents_text})"
         return ret
 
-    def _get_popup_image_data(self):
-        "Get images"
+    def _get_popup_images(self):
+        "Images for the popup, with thumbnail and original URLs."
         # Don't include component images in the hover for now,
         # it can get confusing!
         # ref https://github.com/LuteOrg/lute-v3/issues/355
         terms = [self.term, *self.term.parents]
+        grouped = {}
+        for term in terms:
+            filename = term.get_current_image()
+            if not filename:
+                continue
+            original = full_url(term.language.id, filename)
+            item = grouped.setdefault(
+                original,
+                {
+                    "full": original,
+                    "thumb": thumbnail_url(term.language.id, filename),
+                    "tooltips": [],
+                },
+            )
+            item["tooltips"].append(self._clean(term.text))
+        return [
+            {
+                "full": item["full"],
+                "thumb": item["thumb"],
+                "tooltip": ", ".join(item["tooltips"]),
+            }
+            for item in grouped.values()
+        ]
 
-        def _make_image_url(t):
-            return f"/userimages/{t.language.id}/{t.get_current_image()}"
-
-        images = [(_make_image_url(t), t.text) for t in terms if t.get_current_image()]
-        imageresult = defaultdict(list)
-        for key, value in images:
-            imageresult[key].append(self._clean(value))
-        # Convert lists to comma-separated strings
-        return {k: ", ".join(v) for k, v in imageresult.items()}
+    def _get_popup_image_data(self):
+        "Legacy mapping of original image URL to tooltip text."
+        return {i["full"]: i["tooltip"] for i in self.popup_images}
 
 
 class Service:
@@ -400,7 +476,16 @@ class Service:
     def update_start_date(self, book, pagenum):
         "Lightweight update of text.start_date."
         text = book.text_at_page(pagenum)
-        text.start_date = datetime.utcnow()
+        now = datetime.utcnow()
+        if (
+            book.current_tx_id == text.id
+            and text.start_date is not None
+            and abs(now - text.start_date) < _ONE_SECOND
+        ):
+            # The unload beacon fired right after the page opened: the row
+            # already records this page, opened just now.  Nothing to write.
+            return
+        text.start_date = now
         book.current_tx_id = text.id
         self.session.add(text)
         self.session.add(book)
@@ -737,17 +822,14 @@ class Service:
         )
 
     def _get_reading_data(self, dbbook, pagenum, track_page_open=False):
-        "Get paragraphs, set text.start_date if needed."
+        "Get paragraphs, recording the page open when asked."
         text = dbbook.text_at_page(pagenum)
 
-        # Only load sentences if they don't already exist.
-        # load_sentences() re-parses the full text with the language
-        # parser (e.g. MeCab), which is expensive and redundant on
-        # every page load.  The reading page rendering uses TextItems
-        # from get_paragraphs(), not Sentence objects — sentences are
-        # only needed by Anki export and term detail views.
-        if not text.sentences:
-            text.load_sentences()
+        # No sentence parsing here.  The reader renders TextItems from
+        # get_paragraphs(), so the Sentence rows (an expensive full-page
+        # parser pass, e.g. MeCab) are only needed by Anki export and the
+        # term detail views, which load them on demand via
+        # Text.load_sentences() / the read_date setter.
 
         # Opening a page doesn't change any term statuses, so we do NOT
         # mark the book's stats stale here — that would force the home
@@ -756,12 +838,23 @@ class Service:
         # change, e.g. via set_unknowns_to_known / bulk_update_status.
 
         if track_page_open:
-            text.start_date = datetime.utcnow()
-            dbbook.current_tx_id = text.id
-
-        self.session.add(dbbook)
-        self.session.add(text)
-        self.session.commit()
+            # The only write path: remember when this page was opened and
+            # that it is the book's current page.  Skip the write when
+            # neither value would change -- re-opening the same page (or
+            # the beacon arriving right after the open) used to open a
+            # write transaction for an identical row.  Second granularity
+            # matches what the column is used for (last-opened ordering
+            # and reading-time stats).
+            now = datetime.utcnow()
+            changed = False
+            if text.start_date is None or abs(now - text.start_date) >= _ONE_SECOND:
+                text.start_date = now
+                changed = True
+            if dbbook.current_tx_id != text.id:
+                dbbook.current_tx_id = text.id
+                changed = True
+            if changed:
+                self.session.commit()
 
         lang = text.book.language
         rs = RenderService(self.session)
@@ -1159,6 +1252,18 @@ class Service:
         lang = dbbook.language
         subs = [list(pair) for pair in lang.parser.text_substitutions(lang)]
 
+        # The two sides are written at import time and never re-checked, so
+        # a book re-imported or re-split halfway through can leave them
+        # describing different characters.  The page then finds no match
+        # and silently renders the chapter without word spans -- no ruby,
+        # no tapping, no status colours, and nothing in the UI saying why.
+        # Catch it here and hand the page a stream built from the markup it
+        # is about to render, which matches by construction.
+        if not _epub_streams_match(chapter_html, tokens, subs):
+            tokens = self._realign_epub_tokens(
+                dbbook, pagenum, chapter_html, subs, tokens
+            )
+
         # The original-look variant of the scoped stylesheet: produced at
         # import for new packages, regenerated from the extracted
         # originals on demand for old ones.  None (theme URL reused)
@@ -1177,6 +1282,53 @@ class Service:
             "tokens": tokens,
             "substitutions": subs,
         }
+
+    def _realign_epub_tokens(self, dbbook, pagenum, chapter_html, subs, stored):
+        """
+        A token stream built from the chapter's own markup.
+
+        The stored stream comes from the page's TextItems while the markup
+        comes from the chapter file; when the two disagree the reader page
+        refuses to mount and the chapter renders as plain text.  Re-parsing
+        the chapter's own text yields a stream that agrees with the markup
+        by construction, so the page always mounts.
+
+        The store is deliberately left alone: rewriting the page's text
+        would move every word's position and orphan the sentences behind
+        them, which is a worse outcome than a chapter that is re-parsed on
+        each open.  Only the render is repaired; [stored] is returned
+        unchanged if the re-parse fails for any reason.
+        """
+        try:
+            lang = dbbook.language
+            rs = RenderService(self.session)
+            paragraphs = rs.get_paragraphs(
+                _chapter_align_text(chapter_html, subs), lang
+            )
+            rebuilt = _epub_tokens_from(paragraphs)
+            if not _epub_streams_match(chapter_html, rebuilt, subs):
+                # Still no agreement -- the markup has something the parser
+                # cannot reproduce.  Leave the stored stream in place.
+                return stored
+            # Words that are new to this chapter must exist before the page
+            # can give them a status colour, same as a normal page open.
+            self._save_new_status_0_terms(paragraphs)
+            current_app.logger.warning(
+                "epub book %s page %s: token stream realigned to the "
+                "chapter markup (%d tokens)",
+                dbbook.id,
+                pagenum,
+                len(rebuilt),
+            )
+            return rebuilt
+        except Exception as e:  # pragma: no cover - defensive
+            current_app.logger.warning(
+                "epub book %s page %s: realign failed (%s)",
+                dbbook.id,
+                pagenum,
+                e,
+            )
+            return stored
 
     def _save_new_rendered_terms(self, items):
         """
@@ -1254,12 +1406,15 @@ class Service:
         lang = term.language
         if lang.term_popup_show_dict_gloss:
             for filename in lang.local_dict_files():
-                gloss = dict_service.lookup(term.text, term.romanization, filename)
-                if gloss:
-                    # The entry's own headword line repeats the term
-                    # and reading already shown above it, and the
-                    # example-sentence tail is for the strip.
-                    stripped = dict_service.strip_duplicate_headword(gloss, term.text)
+                # The entry to show, not the entry as stored: a homograph
+                # stub ("See also: 空く【あく】" and nothing else) is a list
+                # of options, so the card follows its first pointer to a
+                # meaning (see dict_service.resolved_gloss).  The reading
+                # page's Local tab keeps the list, and its links.
+                stripped = dict_service.resolved_gloss(
+                    term.text, term.romanization, filename
+                )
+                if stripped:
                     # A translation copied out of this same entry (the
                     # form's auto-fill used to save the whole card) is
                     # shown above already; the bordered copy below would

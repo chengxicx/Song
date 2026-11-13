@@ -7,6 +7,7 @@ import json
 import math
 import os
 import uuid
+from urllib.parse import quote
 from flask import (
     Blueprint,
     current_app,
@@ -37,7 +38,7 @@ from lute.read.grammar_analysis_service import (
 from lute.read import grammar_precompute
 from lute.read.forms import TextForm
 from lute.read import bilibili_stream
-from lute.i18n import t
+from lute.i18n import t, current_language
 from lute.dict import service as dict_service
 from lute.dict import gloss_format
 from lute.term.model import Repository
@@ -709,6 +710,17 @@ def _reading_for(langid, text):
     return term.romanization if term is not None else None
 
 
+def _sentence_dicts_for(lang):
+    """
+    Sentence-mode tabs for one language, in the language's own
+    dictionary order.  The AI tab is an ordinary 'AI' dictionary row
+    (see Language.active_dict_uris): it only appears when the row exists
+    and the language's "AI sentence translation" switch is on, and its
+    position in the list is the tab's position.
+    """
+    return list(lang.sentence_dict_uris)
+
+
 def _render_book_page(book, pagenum, track_page_open=True):
     """
     Render a particular book page.
@@ -799,7 +811,10 @@ def _render_book_page(book, pagenum, track_page_open=True):
         series_tag=series_tag_for_book(db.session, book),
         series_prev=series["prev"],
         series_next=series["next"],
-        sentence_dict_uris=lang.sentence_dict_uris,
+        sentence_dict_uris=_sentence_dicts_for(lang),
+        ai_grammar_enabled=(
+            getattr(lang, "ai_grammar_analysis", True) is not False
+        ),
         page_num=pagenum,
         page_count=book.page_count,
         show_highlights=show_highlights,
@@ -1193,6 +1208,21 @@ def youtube_subtitle_words(bookid):
     return _gzip_if_accepted(resp)
 
 
+def _render_page_content(paragraphs, page_cue_map):
+    """
+    Render the reading-text fragment with only what it needs.
+
+    render_template() runs the app-wide context processor, which queries
+    the backup settings, scans the Language table, and reads + hashes the
+    theme css.  page_content.html (and the textitem.html it includes) uses
+    none of those, and the reader renders one fragment per page turn, so
+    render the template from the Jinja environment directly and skip those
+    queries and the disk read.
+    """
+    template = current_app.jinja_env.get_template("read/page_content.html")
+    return template.render(paragraphs=paragraphs, page_cue_map=page_cue_map)
+
+
 @bp.route("/start_reading/<int:bookid>/<int:pagenum>", methods=["GET"])
 def start_reading(bookid, pagenum):
     "Called by ajax.  Update the text.start_date, and render page."
@@ -1204,30 +1234,61 @@ def start_reading(bookid, pagenum):
     if (book.book_type or "") == "manga":
         ctx = service.manga_page_context(book, pagenum, True)
         if ctx is None:
-            return render_template(
-                "read/page_content.html", paragraphs=[], page_cue_map=[]
-            )
+            return _render_page_content([], [])
         return render_template("read/manga_page.html", **ctx)
     if (book.book_type or "") == "pdf":
         ctx = service.pdf_page_context(book, pagenum, True)
         if ctx is None:
-            return render_template(
-                "read/page_content.html", paragraphs=[], page_cue_map=[]
-            )
+            return _render_page_content([], [])
         return render_template("read/pdf_page.html", **ctx)
     if (book.book_type or "") == "epub":
         ctx = service.epub_page_context(book, pagenum, True)
         if ctx is None:
-            return render_template(
-                "read/page_content.html", paragraphs=[], page_cue_map=[]
-            )
+            return _render_page_content([], [])
         return render_template("read/epub_page.html", **ctx)
     paragraphs = service.start_reading(book, pagenum)
-    return render_template(
-        "read/page_content.html",
-        paragraphs=paragraphs,
-        page_cue_map=_page_cue_line_map(book, pagenum),
-    )
+    _queue_ai_prefetch(book, paragraphs)
+    return _render_page_content(paragraphs, _page_cue_line_map(book, pagenum))
+
+
+def _queue_ai_prefetch(book, paragraphs):
+    """
+    Warm the first few sentences of the page for the AI panel.
+
+    Best-effort and fire-and-forget: any failure (no provider, disabled
+    in Settings, a busy rate limit) is silent and the reader is never
+    delayed.  Only the first paragraph's sentences are used, so the
+    prefetch is one batched request.
+    """
+    try:
+        from lute.ai import prefetch as ai_prefetch
+        from lute.ai import service as ai_service
+
+        lang = book.language
+        if lang is None or not ai_service.prefetch_enabled():
+            return
+        wanted = ai_service.prefetch_count()
+        texts = []
+        for para in paragraphs:
+            for sentence in para:
+                text = "".join(item.text for item in sentence).strip()
+                if text:
+                    texts.append(text)
+                if len(texts) >= wanted:
+                    break
+            if len(texts) >= wanted:
+                break
+        ai_prefetch.schedule(
+            current_scope_key(),
+            book.id,
+            lang.id,
+            texts,
+            (lang.name or ""),
+            ai_service.target_language_name(lang, current_language()),
+        )
+    except Exception:  # pylint: disable=broad-exception-caught
+        # A prefetch must never break the reading page.
+        pass
 
 
 @bp.route("/update_start_date/<int:bookid>/<int:pagenum>", methods=["GET", "POST"])
@@ -1263,30 +1324,20 @@ def render_page_fragment(book, pagenum, track_page_open=False):
     if (book.book_type or "") == "manga":
         ctx = service.manga_page_context(book, pagenum, track_page_open)
         if ctx is None:
-            return render_template(
-                "read/page_content.html", paragraphs=[], page_cue_map=[]
-            )
+            return _render_page_content([], [])
         return render_template("read/manga_page.html", **ctx)
     if (book.book_type or "") == "pdf":
         ctx = service.pdf_page_context(book, pagenum, track_page_open)
         if ctx is None:
-            return render_template(
-                "read/page_content.html", paragraphs=[], page_cue_map=[]
-            )
+            return _render_page_content([], [])
         return render_template("read/pdf_page.html", **ctx)
     if (book.book_type or "") == "epub":
         ctx = service.epub_page_context(book, pagenum, track_page_open)
         if ctx is None:
-            return render_template(
-                "read/page_content.html", paragraphs=[], page_cue_map=[]
-            )
+            return _render_page_content([], [])
         return render_template("read/epub_page.html", **ctx)
     paragraphs = service.get_paragraphs(book, pagenum)
-    return render_template(
-        "read/page_content.html",
-        paragraphs=paragraphs,
-        page_cue_map=_page_cue_line_map(book, pagenum),
-    )
+    return _render_page_content(paragraphs, _page_cue_line_map(book, pagenum))
 
 
 _EPUB_LOOKS = ("original", "night", "theme")
@@ -1339,8 +1390,19 @@ def epub_render(bookid, pagenum):
 
 @bp.route("/empty", methods=["GET"])
 def empty():
-    "Show an empty/blank page."
-    return ""
+    """
+    Show an empty/blank page.
+
+    This is the word form's and the dictionary frames' "nothing selected"
+    document.  Returning an empty body left the frame's canvas at the
+    browser default, which paints white: in the dark theme the top of the
+    right pane became a plain white block after a second click closed the
+    term form.  The page loads the current theme so the frame paints the
+    themed background (dark or light) and never a white block, while
+    staying empty enough for the form populate to write into it.
+    """
+    return render_template("read/empty.html")
+
 
 
 @bp.route("/grammar_analysis/<int:bookid>/<int:pagenum>", methods=["GET"])
@@ -1541,28 +1603,59 @@ def shadowing_readings():
     """
     Pair the shadowing panel's sentence tokens with kana readings.
 
-    JSON body: {language_id, tokens: [surface, ...], full_text}.  Returns
-    {"tokens": [{"text", "reading"}, ...]} parallel to the input, so the
-    panel can draw furigana above each word (and speak the reading when
-    the word is tapped).  full_text is the sentence the tokens belong to;
-    parsing it whole lets Japanese readings follow context (一つ reads
-    ひとつ, not いち + つ).  Synchronous and cheap -- no audio, no model.
+    JSON body, batch form: {language_id, paragraphs: [{"tokens": [...],
+    "full_text": ...}, ...]}.  Returns {"paragraphs": [{"tokens": [{"text",
+    "reading"}, ...]}, ...]} parallel to the input paragraphs.  The reading
+    page has one paragraph per block, so batching costs one round trip for
+    the whole page instead of one per paragraph.
+
+    The old single-paragraph body {language_id, tokens, full_text} is
+    still accepted, and answered in its old {"tokens": [...]} shape, so
+    an already-loaded page (or another client) keeps working.
+
+    full_text is the sentence the tokens belong to; parsing it whole lets
+    Japanese readings follow context (一つ reads ひとつ, not いち + つ).
+    Synchronous and cheap -- no audio, no model.
     """
     payload = request.get_json(silent=True) or {}
-    tokens = payload.get("tokens") or []
-    if not isinstance(tokens, list) or not all(isinstance(t, str) for t in tokens):
+
+    def _bad():
         return jsonify({"error": "invalid tokens payload"}), 400
-    full_text = payload.get("full_text")
-    if full_text is not None and not isinstance(full_text, str):
-        return jsonify({"error": "invalid tokens payload"}), 400
+
+    batch = payload.get("paragraphs")
+    if batch is None:
+        columns = [payload]
+    else:
+        if not isinstance(batch, list) or not batch:
+            return _bad()
+        columns = batch
+
+    cleaned = []
+    for column in columns:
+        if not isinstance(column, dict):
+            return _bad()
+        tokens = column.get("tokens") or []
+        if not isinstance(tokens, list) or not all(isinstance(t, str) for t in tokens):
+            return _bad()
+        full_text = column.get("full_text")
+        if full_text is not None and not isinstance(full_text, str):
+            return _bad()
+        cleaned.append({"tokens": tokens, "full_text": full_text})
 
     lang = LanguageRepository(db.session).find(payload.get("language_id") or 0)
     if lang is None:
         return jsonify({"error": "language not found"}), 400
 
-    return jsonify(
-        {"tokens": shadowing.annotate_tokens(tokens, lang, full_text=full_text)}
-    )
+    if batch is None:
+        return jsonify(
+            {
+                "tokens": shadowing.annotate_tokens(
+                    cleaned[0]["tokens"], lang, full_text=cleaned[0]["full_text"]
+                )
+            }
+        )
+    annotated = shadowing.annotate_paragraphs(cleaned, lang)
+    return jsonify({"paragraphs": [{"tokens": words} for words in annotated]})
 
 
 def _manga_page_text(book, pagenum):
@@ -1596,7 +1689,10 @@ def _term_form_action(term):
     "The URL a term form POST goes back to, for the given term."
     if term.id:
         return f"/read/edit_term/{term.id}"
-    sendtext = (term.original_text or term.text or "").replace("/", "LUTESLASH")
+    # "/" would break the path segment, so it keeps the old LUTESLASH
+    # placeholder.  Everything else is percent-encoded: a raw % in a path
+    # is rejected by nginx (400 Bad Request) before Flask sees it.
+    sendtext = quote((term.original_text or term.text or "").replace("/", "LUTESLASH"), safe="")
     return f"/read/termform/{term.language_id}/{sendtext}"
 
 
@@ -1697,6 +1793,29 @@ def _local_gloss(lang, langid, text, reading=None):
     return None
 
 
+def _local_shown_gloss(lang, langid, text, reading=None):
+    """
+    The entry a card *shows* for ``text``: _local_gloss's entry with a
+    homograph stub followed to the meaning it points at (see
+    dict_service.resolved_gloss), across the language's dictionaries in
+    the same tab order.
+
+    The Local tab itself keeps using _local_gloss: there the "See also"
+    list is the way to the word's other readings, which is exactly what
+    a reading pane is for.
+    """
+    if lang is None:
+        return None
+    use_reading = reading or _reading_for(langid, text)
+    for filename in lang.local_dict_files():
+        shown = dict_service.resolved_gloss(
+            text, use_reading, filename, prefer_reading=bool(reading)
+        )
+        if shown:
+            return shown
+    return None
+
+
 @bp.route("/localdict/<int:langid>/<filename>/<text>", methods=["GET"])
 def local_dict_file(langid, filename, text):
     """
@@ -1720,15 +1839,20 @@ def local_dict_file(langid, filename, text):
             filename,
             prefer_reading=bool(xref_reading),
         )
+    stripped = dict_service.strip_duplicate_headword(gloss, text)
     return render_template(
         "read/localdict.html",
         text=text,
         # The card's head is the term; the definition need not open
         # by repeating it (an entry reached through its reading keeps
         # its own headword -- see strip_duplicate_headword).
-        gloss=dict_service.strip_duplicate_headword(gloss, text),
-        blocks=gloss_format.parse_gloss(
-            dict_service.strip_duplicate_headword(gloss, text)
+        gloss=stripped,
+        # English phonetic runs are data, not meaning: the card only
+        # draws them when the language asks (default off, see
+        # Language.show_dict_phonetics / gloss_format.display_blocks).
+        blocks=gloss_format.display_blocks(
+            gloss_format.parse_gloss(stripped),
+            show_phonetics=bool(lang.show_dict_phonetics) if lang else False,
         ),
         langid=langid,
     )
@@ -1749,7 +1873,10 @@ def local_dict(langid, text):
         "read/localdict.html",
         text=text,
         gloss=stripped,
-        blocks=gloss_format.parse_gloss(stripped),
+        blocks=gloss_format.display_blocks(
+            gloss_format.parse_gloss(stripped),
+            show_phonetics=bool(lang.show_dict_phonetics) if lang else False,
+        ),
         langid=langid,
     )
 
@@ -1770,10 +1897,14 @@ def local_dict_lookup(langid, text):
     gloss_format.compact_gloss): the auto-fill saves that, not the
     whole card -- a translation holding the entry's tail of example
     sentences makes every popup and flashcard that shows it enormous.
+    It is the *shown* entry's definitions, so a homograph stub
+    ("See also: 空く【あく】") saves that reading's meaning rather than
+    a list of the readings (see dict_service.resolved_gloss).
     """
     lang = db.session.get(Language, langid)
     gloss = _local_gloss(lang, langid, text)
-    return jsonify({"gloss": gloss, "compact": gloss_format.compact_gloss(gloss)})
+    shown = _local_shown_gloss(lang, langid, text) if gloss else None
+    return jsonify({"gloss": gloss, "compact": gloss_format.compact_gloss(shown)})
 
 
 @bp.route("/flashcopied", methods=["GET"])
