@@ -79,6 +79,13 @@ class FakeEl {
   querySelectorAll() {
     return scopeButtons;
   }
+  // updateAiNav() reads the real reader pane through panel[0].querySelector;
+  // a stub without it crashes every grammar-panel render before any markup
+  // is produced.  The code bails out when the lookup returns null, so a
+  // no-op stub is all the harness needs.
+  querySelector() {
+    return null;
+  }
 }
 
 // The scope buttons, rebuilt whenever the panel re-renders (the markup is an
