@@ -802,7 +802,7 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
         the queue had nothing to serve and the session came up empty.
         """
         rows = requests.get(
-            f"{self.home}/dev_api/sqlresult/select BkID, count(*) from texts group by BkID",
+            f"{self.home}/dev_api/sqlresult/select TxBkID, count(*) from texts group by TxBkID",
             timeout=5,
         ).json()
         for row in rows:
