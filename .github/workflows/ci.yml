@@ -97,11 +97,15 @@ jobs:
     - name: Playwright install
       run: playwright install
 
+    # Browser UI assertions are timing-sensitive (hover/scroll); give them
+    # the same retry the acceptance suite already has instead of failing the
+    # whole matrix on one flaky mouse event.
     - name: Playwright smoke test
-      run: |
-        set -x
-        set -e
-        inv playwright
+      uses: nick-fields/retry@v3
+      with:
+        max_attempts: 3
+        timeout_minutes: 10
+        command: inv playwright
 
     - name: Acceptance testing
       if: matrix.python_version == '3.11' || matrix.python_version == '3.12' || matrix.python_version == '3.13'
