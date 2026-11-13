@@ -180,11 +180,17 @@ def start_import(app, book, username=None, text_upload=None, audio_upload=None):
             saved.append(path)
             book.text_source_path = path
             book.text_stream = None
+            # The staged copy has a generated name; keep the uploaded one so
+            # the importer can report "book.txt is empty" rather than
+            # "bookimport_<uuid>.txt is empty" (and pick the parser from the
+            # user's extension).
+            book.text_stream_filename = text_upload.filename
         if audio_upload is not None and getattr(audio_upload, "filename", ""):
             path = _save_upload(temppath, audio_upload)
             saved.append(path)
             book.audio_source_path = path
             book.audio_stream = None
+            book.audio_stream_filename = audio_upload.filename
     except Exception:
         for path in saved:
             _safe_remove(path)

@@ -262,6 +262,27 @@ def test_wiping_the_test_db_clears_finished_import_tasks(app, client, english):
         assert _wait_for_terminal(after_wipe_id)["state"] == "finished"
 
 
+def test_failed_upload_names_the_original_file_not_the_staged_copy(
+    app, app_context, english
+):
+    """
+    Error text must name the file the user picked.
+
+    The worker imports from a temp copy called bookimport_<uuid>.txt; the
+    extractor builds its messages (and picks its parser) from the name it
+    is given, so passing the path produced "bookimport_9f3c... is not
+    utf-8 encoding" for a file the user had called non_utf_8.txt.
+    """
+    upload = FileStorage(stream=io.BytesIO(b"\xff\xfe\xfd"), filename="non_utf_8.txt")
+    task_id, _ = import_task.start_import(
+        app, _book(english.id, title="Bad encoding", text=""), None, text_upload=upload
+    )
+    status = _wait_for_terminal(task_id)
+    assert status["state"] == "error"
+    assert "non_utf_8.txt is not utf-8 encoding" in status["error"]
+    assert "bookimport_" not in status["error"]
+
+
 def test_status_endpoint_answers_unknown_for_an_unknown_task(client):
     resp = client.get("/book/import/status/does-not-exist")
     assert resp.get_json() == {"state": "unknown"}

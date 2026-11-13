@@ -792,17 +792,33 @@ class LuteTestClient:  # pylint: disable=too-many-public-methods
 
     def mark_all_texts_read(self):
         """
-        Mark every text as read.
+        Finish every page the way the reader does.
 
         Shadowing (like cloze) is only admitted for a term that occurs in
-        a sentence the user has actually read -- the card reads a real
-        sentence, so there has to be one.  The reading page sets this
-        date when a page is finished; here the scenario wants the queue,
-        not the reading session, so the date is set directly.
+        a sentence the user has actually read, and the card's sentence is
+        read out of that table.  /read/page_done runs mark_page_read,
+        which also parses the page into `sentences`; a bare UPDATE of
+        txreaddate marks the text as read but leaves the table empty, so
+        the queue had nothing to serve and the session came up empty.
         """
-        sql = "update texts set txreaddate = '2026-01-01 00:00:00'"
-        resp = requests.get(f"{self.home}/dev_api/execsql/{sql}", timeout=5)
-        assert resp.status_code == 200, resp.text
+        rows = requests.get(
+            f"{self.home}/dev_api/sqlresult/select BkID, count(*) from texts group by BkID",
+            timeout=5,
+        ).json()
+        for row in rows:
+            bookid, page_count = (int(part) for part in row.split("; "))
+            for pagenum in range(1, page_count + 1):
+                resp = requests.post(
+                    f"{self.home}/read/page_done",
+                    json={
+                        "bookid": bookid,
+                        "pagenum": pagenum,
+                        "restknown": None,
+                        "allpages": False,
+                    },
+                    timeout=5,
+                )
+                assert resp.status_code == 200, resp.text
 
     def term_status(self, word):
         """
