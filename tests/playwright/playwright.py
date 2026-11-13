@@ -739,8 +739,13 @@ def test_term_form_grammar_button_selects_the_current_sentence():
         # pointer, so the panel ignores a mouseenter that no mousemove
         # preceded, and an over-eager gate would silently kill hovering.
         other = page.locator(".grammar-item").first
-        box = other.bounding_box()
-        page.mouse.move(box["x"] + box["width"] / 2, box["y"] + 12, steps=6)
+        # Ring handlers live on .grammar-item__example / .grammar-item__head,
+        # not on the card's padding.  Hover the bound element itself: raw
+        # viewport coordinates can land between them, and while a pin is set
+        # restorePinned() silently draws the rings back, hiding the fact that
+        # the hover never actually fired.
+        other_example = other.locator(".grammar-item__example").first
+        other_example.hover()
         expect(page.locator(".grammar-ring").first).to_be_visible()
         expect(active).to_have_count(1)
         expect(active).to_have_attribute("data-grammar-key", "zz_covers_the_word")
@@ -760,14 +765,10 @@ def test_term_form_grammar_button_selects_the_current_sentence():
         expect(page.locator("#grammar-analysis-panel")).to_be_visible()
 
         # Hovering still cross-highlights -- it just has no pin to come back
-        # to, so leaving clears instead of restoring.  Clicking the title can
-        # scroll the panel into view, so the bounding box captured above can
-        # go stale; re-resolve it and park the pointer first, so Chrome has
-        # to emit a fresh mouseenter (the ring handlers are mouseenter-driven
-        # and ignore an entry with no preceding move).
-        _park_mouse(page)
-        box = other.bounding_box()
-        page.mouse.move(box["x"] + box["width"] / 2, box["y"] + 12, steps=6)
+        # to, so leaving clears instead of restoring.  With no pin there is
+        # nothing to restore the rings, so this is the assertion that really
+        # proves the hover handler fired.
+        other_example.hover()
         expect(page.locator(".grammar-ring").first).to_be_visible()
         expect(active).to_have_count(0)
         _park_mouse(page)
