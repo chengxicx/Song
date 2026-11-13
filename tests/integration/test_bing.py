@@ -259,9 +259,7 @@ def test_bing_save_stores_one_capped_webp(
 
 
 @pytest.mark.parametrize("tier", ["400", "800", "1200"])
-def test_small_image_is_not_enlarged(
-    client, app, monkeypatch, tmp_path, tier
-):
+def test_small_image_is_not_enlarged(client, app, monkeypatch, tmp_path, tier):
     "A 300x200 source stays 300x200 and never grows on disk."
     userimages = _use_tmp_userimages(app, monkeypatch, tmp_path)
     _set_image_size(app, tier)
@@ -276,9 +274,7 @@ def test_small_image_is_not_enlarged(
     assert path.stat().st_size <= len(content)
 
 
-def test_manual_uploads_share_the_single_file_logic(
-    client, app, monkeypatch, tmp_path
-):
+def test_manual_uploads_share_the_single_file_logic(client, app, monkeypatch, tmp_path):
     "Term form uploads and image search manual uploads hit the same logic."
     userimages = _use_tmp_userimages(app, monkeypatch, tmp_path)
     resp = client.post(

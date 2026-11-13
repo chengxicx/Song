@@ -947,9 +947,7 @@ def test_annotate_tokens_strips_zws_from_text():
 
 def test_annotate_paragraphs_looks_terms_up_once(monkeypatch):
     "A page's paragraphs share one saved-reading query."
-    lang = _FakeLanguage(
-        [], parser_type="japanese", readings={"天気": "てんき"}
-    )
+    lang = _FakeLanguage([], parser_type="japanese", readings={"天気": "てんき"})
     calls = []
 
     def _stored(_language, tokens):
@@ -993,7 +991,11 @@ def test_readings_route_batches_paragraphs(app, client, app_context, english):
     # The old single-paragraph body keeps its old response shape.
     resp = client.post(
         "/read/shadowing/readings",
-        json={"language_id": english.id, "tokens": ["The", "cat"], "full_text": "The cat"},
+        json={
+            "language_id": english.id,
+            "tokens": ["The", "cat"],
+            "full_text": "The cat",
+        },
     )
     assert resp.status_code == 200
     body = resp.get_json()
@@ -1154,9 +1156,31 @@ def test_annotate_tokens_saved_term_reading_wins(app_context, japanese):
         readings={"天津駅": "あまつえき"},
         context_readings=[("天津駅", "あまつえき")],
     )
-    annotated = shadowing.annotate_tokens(
-        ["天津駅"], lang, full_text="天津駅へ行きました"
+    annotated = shadowing.annotate_tokens(["天津駅"], lang, full_text="天津駅へ行きました")
+    assert annotated == [{"text": "天津駅", "reading": "てんしんえき"}]
+
+
+def test_saved_reading_wins_for_zws_term_text(app_context, japanese):
+    """
+    A multi-morpheme term's stored text_lc carries zero-width spaces.
+
+    MeCab writes 天津駅 as 天津<zws>駅 while Sudachi keeps it as one
+    token; either shape must still match the cleaned token the reading
+    pane sends, or the user's corrected pronunciation is dropped.  The
+    pre-tokenized input forces the ZWS form so this assertion doesn't
+    depend on which Japanese parser CI happens to have installed.
+    """
+    term = add_terms(japanese, ["天津\u200B駅"])[0]
+    assert "\u200B" in term.text_lc, "expected the multi-morpheme stored shape"
+    term.romanization = "てんしんえき"
+    db.session.commit()
+
+    lang = _db_backed_language(
+        japanese,
+        readings={"天津駅": "あまつえき"},
+        context_readings=[("天津駅", "あまつえき")],
     )
+    annotated = shadowing.annotate_tokens(["天津駅"], lang, full_text="天津駅へ行きました")
     assert annotated == [{"text": "天津駅", "reading": "てんしんえき"}]
 
 
@@ -1176,9 +1200,7 @@ def test_annotate_tokens_ktk_difference_is_not_an_edit(app_context, japanese):
         readings={"天津駅": "あまつえき"},
         context_readings=[("天津駅", "あまつえき")],
     )
-    annotated = shadowing.annotate_tokens(
-        ["天津駅"], lang, full_text="天津駅へ行きました"
-    )
+    annotated = shadowing.annotate_tokens(["天津駅"], lang, full_text="天津駅へ行きました")
     assert annotated == [{"text": "天津駅", "reading": "あまつえき"}]
 
 
@@ -1200,9 +1222,7 @@ def test_route_readings_returns_saved_term_reading(app_context, client, japanese
         },
     )
     assert resp.status_code == 200
-    assert resp.get_json()["tokens"] == [
-        {"text": "東京", "reading": "とうきょうてい"}
-    ]
+    assert resp.get_json()["tokens"] == [{"text": "東京", "reading": "とうきょうてい"}]
 
 
 def test_annotate_tokens_context_parse_error_falls_back_per_token():

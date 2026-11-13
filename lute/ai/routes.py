@@ -106,7 +106,10 @@ def library_import():
         return jsonify({"ok": False, "message": "Choose a .json or .jsonl file."}), 400
     stream = _LimitedStream(upload.stream, library.MAX_IMPORT_BYTES)
     overwrite = str(request.form.get("overwrite", "")).lower() in (
-        "1", "true", "on", "yes",
+        "1",
+        "true",
+        "on",
+        "yes",
     )
     try:
         report = library.import_file(
@@ -171,9 +174,13 @@ def results_delete():
         book_id = int(book_id) if book_id not in ("", None) else None
         lang_id = int(lang_id) if lang_id not in ("", None) else None
     except (TypeError, ValueError):
-        return jsonify({"ok": False, "message": "book_id/lang_id must be integers."}), 400
-    removed = service.delete_results(book_id=book_id, lang_id=lang_id,
-                                     result_type=result_type)
+        return (
+            jsonify({"ok": False, "message": "book_id/lang_id must be integers."}),
+            400,
+        )
+    removed = service.delete_results(
+        book_id=book_id, lang_id=lang_id, result_type=result_type
+    )
     return jsonify({"ok": True, "removed": removed})
 
 
@@ -546,9 +553,7 @@ def _online_lookup_factory():
             return None
         ready, source_lang, target_lang = context
         try:
-            return _sentence_cached_result(
-                sentence, ready, source_lang, target_lang
-            )
+            return _sentence_cached_result(sentence, ready, source_lang, target_lang)
         except Exception:  # pylint: disable=broad-exception-caught
             return None
 
@@ -691,9 +696,7 @@ def translate():
                 # translation field, otherwise a readable retry message.
                 readable = service.sentence_fallback_text(collected["text"])
                 if not readable:
-                    readable = (
-                        "AI returned an unparsable response, please retry."
-                    )
+                    readable = "AI returned an unparsable response, please retry."
                 yield _sse("state", {"state": "fallback"})
                 yield _sse(
                     "result",
@@ -725,7 +728,9 @@ def translate():
             yield _sse("error", {"kind": e.kind, "message": e.message})
         except Exception as e:  # pylint: disable=broad-exception-caught
             message = f"Unexpected translation failure ({type(e).__name__})."
-            yield _sse("state", {"state": "error", "kind": "upstream", "message": message})
+            yield _sse(
+                "state", {"state": "error", "kind": "upstream", "message": message}
+            )
             yield _sse("error", {"kind": "upstream", "message": message})
 
     return Response(
@@ -866,10 +871,10 @@ def grammar_analyze():
             )
             yield _sse("error", {"kind": e.kind, "message": e.message})
         except Exception as e:  # pylint: disable=broad-exception-caught
-            message = (
-                f"Unexpected grammar analysis failure ({type(e).__name__})."
+            message = f"Unexpected grammar analysis failure ({type(e).__name__})."
+            yield _sse(
+                "state", {"state": "error", "kind": "upstream", "message": message}
             )
-            yield _sse("state", {"state": "error", "kind": "upstream", "message": message})
             yield _sse("error", {"kind": "upstream", "message": message})
 
     return Response(

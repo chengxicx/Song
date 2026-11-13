@@ -110,8 +110,10 @@ def cancel(username, book_id, lang_id=None):
     "Drop queued prefetch work for a book (or one language of it)."
     with _lock:
         keys = [
-            key for key in _active
-            if key[0] == (username or "") and key[1] == book_id
+            key
+            for key in _active
+            if key[0] == (username or "")
+            and key[1] == book_id
             and (lang_id is None or key[2] == lang_id)
         ]
         for key in keys:
@@ -137,9 +139,9 @@ def _run_one(job):
     if not service.prefetch_enabled():
         return
     try:
-        ready = service.grammar_ready(service.sentence_provider_for_language_id(
-            job["lang_id"]
-        ))
+        ready = service.grammar_ready(
+            service.sentence_provider_for_language_id(job["lang_id"])
+        )
     except service.AiError:
         return
     provider_id = ready["provider"]
@@ -149,15 +151,21 @@ def _run_one(job):
     for sentence in job["sentences"]:
         if not _is_current(job):
             return
-        if service.sentence_cached_result(
-            sentence, model, job["source_lang"], target_lang, provider_id
-        ) is None:
+        if (
+            service.sentence_cached_result(
+                sentence, model, job["source_lang"], target_lang, provider_id
+            )
+            is None
+        ):
             pending.append(sentence)
     if not pending:
         return
     # One request for the whole batch, behind every live request.
     if not LIMITER.acquire(
-        provider_id, ready["rpm"], priority=PREFETCH, cancel=lambda: not _is_current(job)
+        provider_id,
+        ready["rpm"],
+        priority=PREFETCH,
+        cancel=lambda: not _is_current(job),
     ):
         return
     usage = {}
@@ -182,9 +190,12 @@ def _run_one(job):
         # A live request can finish while this batch is in flight.  If
         # the reader already regenerated the sentence, keep that fresh
         # row instead of replacing it with the background copy.
-        if service.sentence_cached_result(
-            sentence, model, job["source_lang"], target_lang, provider_id
-        ) is not None:
+        if (
+            service.sentence_cached_result(
+                sentence, model, job["source_lang"], target_lang, provider_id
+            )
+            is not None
+        ):
             continue
         service.store_sentence_result(
             sentence,

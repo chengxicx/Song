@@ -351,9 +351,7 @@ def import_file(stream, filename, target_lang="", overwrite=False):
 
     book = db.session.get(Book, book_id) if book_id else None
     if book is None:
-        raise LibraryError(
-            "The file must declare a book_id from your own library."
-        )
+        raise LibraryError("The file must declare a book_id from your own library.")
     lang = db.session.get(Language, lang_id) if lang_id else None
     if lang is None:
         raise LibraryError("The file must declare a valid lang_id.")
@@ -399,9 +397,7 @@ def import_file(stream, filename, target_lang="", overwrite=False):
                 AiResult.result_type == kind,
                 AiResult.sentence == matched,
                 AiResult.target_lang == target_lang,
-                or_(
-                    AiResult.book_id == book.id, AiResult.book_id.is_(None)
-                ),
+                or_(AiResult.book_id == book.id, AiResult.book_id.is_(None)),
             )
             .all()
         )
@@ -478,7 +474,10 @@ def export_book(book_id, lang_id=None, target_lang=None, online_lookup=None):
             continue
         if not isinstance(payload, dict):
             continue
-        if online_lookup is not None and row.result_type == service.RESULT_TYPE_SENTENCE:
+        if (
+            online_lookup is not None
+            and row.result_type == service.RESULT_TYPE_SENTENCE
+        ):
             online = online_lookup(row.sentence, resolved_lang_id)
             if isinstance(online, dict) and online:
                 payload = online
@@ -488,7 +487,9 @@ def export_book(book_id, lang_id=None, target_lang=None, online_lookup=None):
             item["target_lang"] = row.target_lang
         items.append(item)
 
-    langs = sorted({item.get("target_lang", "") for item in items if item.get("target_lang")})
+    langs = sorted(
+        {item.get("target_lang", "") for item in items if item.get("target_lang")}
+    )
     return {
         "version": 1,
         "book_id": book.id,

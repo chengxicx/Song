@@ -135,7 +135,11 @@ class Book(
         if self.id is None:
             return 0
         sess = object_session(self) or db.session
-        return sess.query(func.count(Text.id)).filter(Text.bk_id == self.id).scalar() or 0  # pylint: disable=not-callable
+        # SQLAlchemy builds func.count dynamically; pylint sees a non-callable.
+        # pylint: disable=not-callable
+        return (
+            sess.query(func.count(Text.id)).filter(Text.bk_id == self.id).scalar() or 0
+        )
 
     def page_in_range(self, n):
         "Return page number that is in the book's page count."

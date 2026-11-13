@@ -912,9 +912,7 @@ def test_the_popup_gloss_keeps_a_see_also_when_it_is_all_the_entry_has():
     "Nothing else to show: the pointer still beats an empty card."
     gloss = "See also: 空く【あく】\nSee also: 空く【すく】"
 
-    assert popup_gloss(gloss) == (
-        "See also: 空く【あく】\nSee also: 空く【すく】"
-    )
+    assert popup_gloss(gloss) == ("See also: 空く【あく】\nSee also: 空く【すく】")
 
 
 # --- first_sense / xrefs: what a card can be built from ---------------------

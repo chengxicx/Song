@@ -315,9 +315,7 @@ def bing_save():
 
     try:
         imgdir, stem = _get_dir_and_stem(langid, text)
-        filename, _path = save_image(
-            imgdir, stem, content, current_image_max_edge()
-        )
+        filename, _path = save_image(imgdir, stem, content, current_image_max_edge())
     except UnsafeImageUrl as e:
         return jsonify({"reason": str(e)}), 400
     except OSError as e:
@@ -347,9 +345,7 @@ def manual_image_post():
 
     try:
         imgdir, stem = _get_dir_and_stem(langid, text)
-        filename, _path = save_image(
-            imgdir, stem, f.read(), current_image_max_edge()
-        )
+        filename, _path = save_image(imgdir, stem, f.read(), current_image_max_edge())
     except UnsafeImageUrl as e:
         return jsonify({"reason": str(e)}), 400
     except OSError as e:

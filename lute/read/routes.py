@@ -812,9 +812,7 @@ def _render_book_page(book, pagenum, track_page_open=True):
         series_prev=series["prev"],
         series_next=series["next"],
         sentence_dict_uris=_sentence_dicts_for(lang),
-        ai_grammar_enabled=(
-            getattr(lang, "ai_grammar_analysis", True) is not False
-        ),
+        ai_grammar_enabled=(getattr(lang, "ai_grammar_analysis", True) is not False),
         page_num=pagenum,
         page_count=book.page_count,
         show_highlights=show_highlights,
@@ -1404,7 +1402,6 @@ def empty():
     return render_template("read/empty.html")
 
 
-
 @bp.route("/grammar_analysis/<int:bookid>/<int:pagenum>", methods=["GET"])
 def grammar_analysis(bookid, pagenum):
     """
@@ -1692,7 +1689,9 @@ def _term_form_action(term):
     # "/" would break the path segment, so it keeps the old LUTESLASH
     # placeholder.  Everything else is percent-encoded: a raw % in a path
     # is rejected by nginx (400 Bad Request) before Flask sees it.
-    sendtext = quote((term.original_text or term.text or "").replace("/", "LUTESLASH"), safe="")
+    sendtext = quote(
+        (term.original_text or term.text or "").replace("/", "LUTESLASH"), safe=""
+    )
     return f"/read/termform/{term.language_id}/{sendtext}"
 
 

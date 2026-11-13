@@ -310,9 +310,7 @@ class LanguageForm(FlaskForm):
             provider_entries,
         )
 
-        configured = {
-            e["id"] for e in provider_entries() if e["configured"]
-        }
+        configured = {e["id"] for e in provider_entries() if e["configured"]}
         for d in self.dictionaries.data:
             provider = (d.get("ai_provider") or "").strip()
             if provider and (

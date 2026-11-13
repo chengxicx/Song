@@ -61,11 +61,7 @@ def test_the_newest_row_wins_among_models(app_context, empty_db):
         target_lang="zh",
         source="live",
     )
-    older = (
-        db.session.query(AiResult)
-        .filter_by(provider_id="import")
-        .one()
-    )
+    older = db.session.query(AiResult).filter_by(provider_id="import").one()
     newer = db.session.query(AiResult).filter_by(provider_id="live").one()
     older.updated_at = datetime.now() - timedelta(minutes=5)
     newer.updated_at = datetime.now()
@@ -92,9 +88,7 @@ def test_exact_row_beats_a_newer_row_of_another_model(app_context, empty_db):
         model="m2",
         target_lang="zh",
     )
-    data = service.sentence_cached_result(
-        "Hello.", "m1", "English", "zh", "p1"
-    )
+    data = service.sentence_cached_result("Hello.", "m1", "English", "zh", "p1")
     assert data["translation"] == "exact"
 
 
@@ -111,9 +105,7 @@ def test_legacy_ttl_row_is_upgraded_on_read(app_context, empty_db):
     )
     assert data["translation"] == "Hello."
     assert meta["saved_from"] == "legacy-ttl"
-    assert (
-        db.session.query(AiResult).filter_by(sentence="Hello.").count() == 1
-    )
+    assert db.session.query(AiResult).filter_by(sentence="Hello.").count() == 1
 
 
 def test_migration_copies_old_entries_once(app_context, empty_db):

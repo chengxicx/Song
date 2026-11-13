@@ -87,9 +87,7 @@ class LanguageDictionary(db.Model):
     # Default, i.e. the provider enabled in Settings).  Only the AI row
     # sets it; the reader falls back to the shared choice when empty or
     # when that provider no longer has a key (see lute/ai/service.py).
-    ai_provider = db.Column(
-        "LdAiProvider", db.String(20), nullable=False, default=""
-    )
+    ai_provider = db.Column("LdAiProvider", db.String(20), nullable=False, default="")
     sort_order = db.Column("LdSortOrder", db.SmallInteger, nullable=False)
 
 

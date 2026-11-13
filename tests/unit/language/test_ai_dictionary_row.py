@@ -234,9 +234,7 @@ def test_the_edit_form_shows_the_ai_row_with_a_drag_handle(
     assert 'type="text"' not in block, "no editable URL for the AI row"
 
 
-def test_the_ai_rows_provider_select_uses_the_url_column(
-    client, app_context, empty_db
-):
+def test_the_ai_rows_provider_select_uses_the_url_column(client, app_context, empty_db):
     """
     The AI row has no URL input, so its provider select stands in that
     cell with the same classes: the two left dropdowns then line up
@@ -275,9 +273,7 @@ def test_the_ai_rows_provider_select_uses_the_url_column(
     assert "Anthropic · claude-sonnet-4-5" in ai_block
 
 
-def test_saving_the_ai_rows_provider_choice_is_read_back(
-    client, app_context, empty_db
-):
+def test_saving_the_ai_rows_provider_choice_is_read_back(client, app_context, empty_db):
     _configure_provider("anthropic", "sk-ant-test")
     lang = _language("AI provider save", [])
     _append(lang, _terms_row(1))

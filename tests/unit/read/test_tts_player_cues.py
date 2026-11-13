@@ -36,6 +36,11 @@ _HARNESS = os.path.join(_HERE, "tts_player_cues_harness.js")
 _STATIC_JS = os.path.join(os.path.dirname(lute.__file__), "static", "js")
 _TTS_JS = os.path.join(_STATIC_JS, "tts-player.js")
 _SHADOWING_JS = os.path.join(_STATIC_JS, "lute-shadowing.js")
+# lute-shadowing.js reads the practice sentence through window.lutePlainText,
+# which the reading page loads from this script.  The harness must eval the
+# real file too: both callers have to strip the same chrome (rt/rp, the
+# sentence play button) or cue text and shadowing text drift apart.
+_PLAIN_TEXT_JS = os.path.join(_STATIC_JS, "lute-plain-text.js")
 
 # 故乡, 鲁迅 -- the sentence that motivated this: 68 characters, read
 # straight through it is ~12 s with nowhere to stop.
@@ -60,7 +65,7 @@ def _run(scenario):
     # Bytes in and out with an explicit encoding: the scenario carries
     # CJK, and CI locales are not guaranteed to be UTF-8.
     proc = subprocess.run(
-        [NODE, _HARNESS, _TTS_JS, _SHADOWING_JS],
+        [NODE, _HARNESS, _TTS_JS, _SHADOWING_JS, _PLAIN_TEXT_JS],
         input=json.dumps(scenario).encode("utf-8"),
         capture_output=True,
         check=False,

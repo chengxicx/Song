@@ -21,6 +21,7 @@ import uuid
 from datetime import datetime, timezone
 
 import jaconv
+from sqlalchemy import func
 
 from lute.book import sensevoice
 from lute.book.whisper_transcribe import (
@@ -266,6 +267,14 @@ def _stored_term_readings(language, tokens):
     {token text: stored term romanization} for the tokens that have a
     dictionary term.  Empty when the language isn't db-backed (unit
     tests with duck-typed languages).
+
+    Term.text is built by _parse_string_add_zws, so a multi-morpheme
+    term's text_lc contains zero-width spaces between the parser's
+    tokens (MeCab stores 天津駅 as 天津<zws>駅; Sudachi keeps it as one
+    token).  The reading pane sends cleaned tokens, so both sides must
+    be compared with ZWS removed -- otherwise the saved pronunciation
+    of any multi-morpheme word is invisible and the parser's guess
+    silently wins.
     """
     lang_id = getattr(language, "id", None)
     get_lowercase = getattr(language, "get_lowercase", None)
@@ -275,9 +284,10 @@ def _stored_term_readings(language, tokens):
     if not texts:
         return {}
     keys = [get_lowercase(t) for t in texts]
+    normalized_lc = func.replace(Term.text_lc, "\u200B", "")
     rows = (
-        db.session.query(Term.text_lc, Term.romanization)
-        .filter(Term.language_id == lang_id, Term.text_lc.in_(keys))
+        db.session.query(normalized_lc, Term.romanization)
+        .filter(Term.language_id == lang_id, normalized_lc.in_(keys))
         .all()
     )
     by_lc = {lc: romanization for lc, romanization in rows}

@@ -78,7 +78,9 @@ def edit_settings():
     repo = UserSettingRepository(db.session)
     provider_error = None
     if form.validate_on_submit():
-        from lute.ai import service as ai_service  # pylint: disable=import-outside-toplevel
+        from lute.ai import (
+            service as ai_service,
+        )  # pylint: disable=import-outside-toplevel
         from lute.ai.service import AiError  # pylint: disable=import-outside-toplevel
 
         # The provider list is not one settings row: it is replaced as a
@@ -87,9 +89,7 @@ def edit_settings():
         if "ai_providers_json" in request.form:
             try:
                 ai_service.save_provider_entries(
-                    ai_service.parse_provider_entries_json(
-                        form.ai_providers_json.data
-                    )
+                    ai_service.parse_provider_entries_json(form.ai_providers_json.data)
                 )
             except AiError as e:
                 flash(e.message, "danger")
@@ -138,21 +138,23 @@ def edit_settings():
     import json  # pylint: disable=import-outside-toplevel
 
     from lute.ai.service import all_status as ai_all_status
-    from lute.ai.service import provider_entries  # pylint: disable=import-outside-toplevel
-    from lute.ai.service import public_entries_from_raw  # pylint: disable=import-outside-toplevel
-    from lute.ai.service import parse_provider_entries_json  # pylint: disable=import-outside-toplevel
+    from lute.ai.service import (
+        provider_entries,
+    )  # pylint: disable=import-outside-toplevel
+    from lute.ai.service import (
+        public_entries_from_raw,
+    )  # pylint: disable=import-outside-toplevel
+    from lute.ai.service import (
+        parse_provider_entries_json,
+    )  # pylint: disable=import-outside-toplevel
     from lute.ai.service import AiError  # pylint: disable=import-outside-toplevel
 
     ai_entries = provider_entries()
-    has_provider_error = bool(
-        provider_error or form.errors.get("ai_providers_json")
-    )
+    has_provider_error = bool(provider_error or form.errors.get("ai_providers_json"))
     if has_provider_error and request.method == "POST":
         # Keep the rows the user typed, but never their plaintext key.
         try:
-            raw = parse_provider_entries_json(
-                request.form.get("ai_providers_json", "")
-            )
+            raw = parse_provider_entries_json(request.form.get("ai_providers_json", ""))
             ai_entries = public_entries_from_raw(raw)
         except AiError:
             ai_entries = provider_entries()
