@@ -1,25 +1,27 @@
 name: ci
 
 on:
-  # CI gates the branches that matter, not every push to the working branch.
-  #
-  # all-features-combine is where the work happens, and its pushes are
-  # frequent: gating each one costs the full matrix (12 jobs, ~10 minutes,
-  # 4 Pythons + 2 Windows + docker + style + plugins) for feedback nobody
-  # acts on until the branch is merged.  Run it there on demand instead --
-  # Actions -> ci -> Run workflow, pick the branch.
+  # CI gates the branches that matter, not every push to a working branch.
   #
   # song is the release branch production deploys from: a push to it, or a
   # PR into it, is the point where the whole matrix has to be green.
+  #
+  # all-features-combine is gated too, despite the cost (the full matrix is
+  # 12 jobs / ~10 minutes).  Fixes are cherry-picked onto it rather than
+  # merged, so its tree differs from song's, and until recently the only
+  # check it ever got was the manual dispatch below -- which the fork's
+  # token cannot call (dispatch returns 403 "Resource not accessible by
+  # integration").  In practice that meant the branch every change lands on
+  # was the one branch nobody verified.  Gating pushes here closes that,
+  # and the concurrency block below keeps rapid pushes from stacking.
   push:
     # A branch github-ci can be created and used for ci
     # experiments and tweaks.
-    branches: [ "develop", "master", "github-ci", "windows", "song" ]
+    branches:
+      [ "develop", "master", "github-ci", "windows", "song", "all-features-combine" ]
   pull_request:
     branches: [ "develop", "master", "song" ]
-  # Manual runs, e.g. on all-features-combine before a merge.  Prefer this
-  # over re-adding the branch to `push`: a PR into song runs the same
-  # matrix and is the one that actually gates the merge.
+  # Manual runs, e.g. for a branch that is neither gated nor merged by PR.
   workflow_dispatch:
 
 # Rapid successive pushes to the same branch supersede the earlier
