@@ -147,21 +147,17 @@
        the tabs order and hide like every other dictionary's.
     ---------------------------------------------------------------------- #}
     <tr>
-      <td colspan="2">
-        <h3 style="margin-top:14px; margin-bottom:6px;">{{ t('Local dictionaries (MDX)') }}</h3>
-      </td>
-    </tr>
-    <tr>
       <td style="vertical-align: top;">
-        <div style="color:#666; font-size:0.85em; max-width:24em;">
+        <h3 style="margin-top:14px; margin-bottom:4px;">{{ t('Local dictionaries (MDX)') }}</h3>
+      </td>
+      <td style="vertical-align: top;">
+        <div style="color:var(--text-muted, #666); font-size:0.85em; margin-top:18px;">
           {% if dict_pool_files %}
           {{ t("Add rows of type <b>Local</b> to the dictionary list above.  The row's URL becomes a dropdown of the dictionaries installed on this server, the tab shows in the list's order, and — if the box below is checked — the first matching entry also appears in the term popup for words Lute has no translation for yet.") }}
           {% else %}
           {{ t('No dictionary has been imported on this server yet.  Add one in <a href="/settings/index">Settings</a>, then add rows of type <b>Local</b> to the dictionary list above.') }}
           {% endif %}
         </div>
-      </td>
-      <td>
         {% if dict_pool_files %}
         <datalist id="dict-pool-files">
           {% for f in dict_pool_files %}
@@ -174,7 +170,7 @@
     <tr>
       <td style="vertical-align: top;">
         {{ form.term_popup_show_dict_gloss.label(class="form-control-label") }}
-        <div style="color:#666; font-size:0.85em; max-width:24em;">
+        <div style="color:var(--text-muted, #666); font-size:0.85em; max-width:24em;">
           {{ t('Adds the definition to the popup as well (first local dictionary with an entry wins).  The dictionary tabs are unaffected.') }}
         </div>
       </td>
@@ -183,7 +179,7 @@
     <tr>
       <td style="vertical-align: top;">
         {{ form.show_dict_phonetics.label(class="form-control-label") }}
-        <div style="color:#666; font-size:0.85em; max-width:24em;">
+        <div style="color:var(--text-muted, #666); font-size:0.85em; max-width:24em;">
           {{ t('Show the BrE/NAmE /.../ pronunciation run on the Local dictionary card.  Off by default: the word, part of speech, definitions, translations and examples are always shown.') }}
         </div>
       </td>
@@ -192,7 +188,7 @@
     <tr>
       <td style="vertical-align: top;">
         {{ form.term_translation_source.label(class="form-control-label") }}
-        <div style="color:#666; font-size:0.85em; max-width:24em;">
+        <div style="color:var(--text-muted, #666); font-size:0.85em; max-width:24em;">
           {{ t("What auto-fills a new term's translation.  <b>Local dictionary</b> tries this language's Local dictionaries in tab order, and falls back to online translation when none has an entry.") }}
         </div>
       </td>
@@ -200,9 +196,11 @@
     </tr>
 
     <tr>
-      <td colspan="2">
-        <h3 class="language-form__section-title">{{ t('AI features') }}</h3>
-        <div style="color:#666; font-size:0.85em; max-width:32em;">
+      <td style="vertical-align: top;">
+        <h3 class="language-form__section-title" style="margin-top:14px; margin-bottom:4px;">{{ t('AI features') }}</h3>
+      </td>
+      <td style="vertical-align: top;">
+        <div style="color:var(--text-muted, #666); font-size:0.85em; margin-top:18px;">
           {{ t('The AI provider and API key are configured once in Settings.  These switches decide which AI features this language uses; both are on by default.  The AI tab is a row in the Dictionaries list above: drag it to change its order.') }}
         </div>
       </td>
@@ -219,7 +217,7 @@
         <label class="form-control-label" for="{{ form.grammar_translate_lang.id }}">
           {{ t('AI analysis & translation language') }}
         </label>
-        <div style="color:#666; font-size:0.85em; max-width:24em;">
+        <div style="color:var(--text-muted, #666); font-size:0.85em; max-width:24em;">
           {{ t('Language of grammar explanations and of sentence translation, word meanings, context notes and example translations.  Google Translate Target above is separate.') }}
         </div>
       </td>
@@ -228,7 +226,7 @@
     <tr>
       <td style="vertical-align: top;">
         {{ form.ai_sentence_translation.label(class="form-control-label") }}
-        <div style="color:#666; font-size:0.85em; max-width:24em;">
+        <div style="color:var(--text-muted, #666); font-size:0.85em; max-width:24em;">
           {{ t('Master switch for the AI tab.  Its position is the AI row in the Dictionaries list above; off hides the tab and the AI endpoint refuses this language.') }}
         </div>
       </td>
@@ -237,7 +235,7 @@
     <tr>
       <td style="vertical-align: top;">
         {{ form.ai_grammar_analysis.label(class="form-control-label") }}
-        <div style="color:#666; font-size:0.85em; max-width:24em;">
+        <div style="color:var(--text-muted, #666); font-size:0.85em; max-width:24em;">
           {{ t('Use AI in the Grammar panel.  Off hides the AI section; the grammar library itself is unaffected.') }}
         </div>
       </td>
@@ -267,7 +265,7 @@
     <tr>
       <td style="vertical-align: top;">
         {{ form.show_furigana.label(class="form-control-label") }}
-        <div style="color:#666; font-size:0.85em; max-width:24em;">
+        <div style="color:var(--text-muted, #666); font-size:0.85em; max-width:24em;">
           {{ t('Draw pronunciation readings above words while reading (kana for Japanese, pinyin for Mandarin, jyutping for Cantonese, RTGS romanization for Thai).  Japanese readings follow the Pronunciation characters preference (Settings > Preferences); when that is unset, words show plain.') }}
         </div>
       </td>
@@ -290,7 +288,7 @@
     <tr>
       <td style="vertical-align: top;">
         {{ form.hidden_grammar_levels.label(class="form-control-label") }}
-        <div style="color:#666; font-size:0.85em; max-width:24em;">
+        <div style="color:var(--text-muted, #666); font-size:0.85em; max-width:24em;">
           {{ t('Checked groups disappear from the Analyze grammar panel for this language.  Hiding a level also hides the aggregate rows tagged with it — JLPT N5 covers both Basic forms and Particles.') }}
         </div>
       </td>
