@@ -643,6 +643,11 @@
   // default voice is used, as the old /tts/ fallback did, cached now.
   function speakTermViaBackend(text, langOverride) {
     if (!window.fetch || typeof Audio === "undefined") return false;
+    // Punctuation-only text is refused by edge-tts outright
+    // (NoAudioReceived); native voices read it as silence.  Keep such
+    // terms on the old path -- and keep one failed hover from marking
+    // the page's backend voice bad over nothing.
+    if (!/[\p{L}\p{N}]/u.test(text)) return false;
     const lang = langOverride || getCurrentLangCode();
     let voice = "";
     if ("speechSynthesis" in window) {
@@ -700,7 +705,7 @@
     const reading = (readingText || "").trim();
     const text =
       reading && /[\u3040-\u309F\u30A0-\u30FF]/.test(reading) ? reading : term;
-    if (!text) return;
+    if (!text || !/[\p{L}\p{N}]/u.test(text)) return;
     const lang = getCurrentLangCode();
     let voice = "";
     if ("speechSynthesis" in window) {

@@ -399,8 +399,14 @@
     ttsCancelSpeech();
 
     const cleanText = cue.text.replace(/[#＃]/g, "").trim();
-    if (!cleanText) {
-      // Skip empty cue (shouldn't happen, but be safe) and advance.
+    // Punctuation-only fragments have nothing to say.  CJK quotes and
+    // ellipses split into their own sentences on some books ("」",
+    // "……"), and edge-tts refuses to voice them outright
+    // (NoAudioReceived) -- three of those in a row read as an engine
+    // failure and stopped the player mid-page.  Native voices breeze
+    // through them, so skip them exactly the way the sentence 🔊
+    // injector does.
+    if (!cleanText || !/[\p{L}\p{N}]/u.test(cleanText)) {
       ttsAdvance();
       return;
     }

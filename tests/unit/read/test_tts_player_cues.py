@@ -362,3 +362,42 @@ def test_edge_tts_menu_row_and_next_cue_prefetch():
     assert "if (savedVoice === EDGE_TTS_VOICE_NAME) {" in init
     assert 'savedVoice.indexOf("edge-tts|") === 0' in init
     assert "globalCache.edgeVoices[SL] = savedVoice.slice" in init
+
+
+def test_a_punctuation_only_sentence_does_not_stop_playback():
+    "「」/…… fragments become cues with nothing to say: skipped, not stopped."
+    results = _run(
+        {
+            "sentences": [
+                {"cjk": "他說：「你好。」"},
+                {"cjk": "……"},
+                {"cjk": SHORT_CJK},
+            ],
+            "steps": [
+                {"build": True},
+                {"play": True},
+                {"flush_all": True},
+                {"state": True},
+            ],
+        }
+    )
+    cues = results[-1]["state"]["cues"]
+    assert "……" in [c["text"] for c in cues]
+    # Nothing is spoken for the punctuation fragment...
+    texts = [s["text"] for s in results[-1]["state"]["spoken"]]
+    assert not any(t.strip() and not any(ch.isalnum() for ch in t) for t in texts)
+    # ... and playback ran to the natural end -- the last thing spoken is
+    # the final sentence, not a fail-stopped silence mid-page.
+    assert texts[-1] == SHORT_CJK
+
+
+def test_punctuation_only_text_never_reaches_the_backend():
+    src = open(_TTS_JS, encoding="utf-8").read()
+    playcue = src.split("function ttsPlayCue(")[1].split("\n  }")[0]
+    assert "/[\\p{L}\\p{N}]/u.test(cleanText)" in playcue
+    read_tts_js = os.path.join(_STATIC_JS, "tts.js")
+    tts = open(read_tts_js, encoding="utf-8").read()
+    backend = tts.split("function speakTermViaBackend")[1].split("\n  }")[0]
+    assert "/[\\p{L}\\p{N}]/u.test(text)" in backend
+    pre = tts.split("function scheduleHoverPrefetch")[1].split("\n  }")[0]
+    assert "/[\\p{L}\\p{N}]/u.test(text)" in pre
