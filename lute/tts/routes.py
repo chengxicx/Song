@@ -349,15 +349,11 @@ def tts_voices_for_lang(lang):
     the list changes only when Microsoft ships voices.
     """
     all_voices = _all_edge_voices()
-    chosen = [
-        v for v in all_voices if v.get("Locale", "").lower() == lang.lower()
-    ]
+    chosen = [v for v in all_voices if v.get("Locale", "").lower() == lang.lower()]
     if not chosen:
         primary = primary_subtag(lang)
         chosen = [
-            v
-            for v in all_voices
-            if primary_subtag(v.get("Locale", "")) == primary
+            v for v in all_voices if primary_subtag(v.get("Locale", "")) == primary
         ]
     voices = [
         {"id": v["ShortName"], "gender": v.get("Gender", "")}

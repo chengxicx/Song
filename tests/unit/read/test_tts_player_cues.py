@@ -285,9 +285,10 @@ def test_a_wedged_engine_hands_the_cue_to_the_backend_audio():
     # cue played that way still activates through ttsPlayCue's tail.
     assert "ttsBackendAudio = false;" in src
     assert '"speechSynthesis" in window && !ttsBackendAudio' in src
-    assert "ttsPlayCueViaBackend(idx, cue, cleanText);" in src.split(
-        "// --- Backend /tts/ audio"
-    )[1]
+    assert (
+        "ttsPlayCueViaBackend(idx, cue, cleanText);"
+        in src.split("// --- Backend /tts/ audio")[1]
+    )
 
     # Pausing / stopping must also stop a playing backend clip.
     cancel = src.split("function ttsCancelSpeech()")[1].split("\n  }")[0]
@@ -347,9 +348,7 @@ def test_edge_tts_menu_row_and_next_cue_prefetch():
     assert "edgeOpt.dataset.voiceName = EDGE_TTS_VOICE_NAME;" in populate
     # Green when the backend audio is what is speaking (default mode),
     # and clicking the row pins it, live via the restarted cue.
-    assert (
-        "globalCache.selectedVoice === EDGE_TTS_VOICE_NAME" in populate
-    )
+    assert "globalCache.selectedVoice === EDGE_TTS_VOICE_NAME" in populate
     assert "ttsBackendAudio = true;" in populate
     assert 'fetch("/tts/voice/"' in populate
 
@@ -361,5 +360,5 @@ def test_edge_tts_menu_row_and_next_cue_prefetch():
     # restores which edge voice was chosen ("edge-tts" = the default).
     init = player.split("function ttsInitPlayer")[1].split("\n  }")[0]
     assert "if (savedVoice === EDGE_TTS_VOICE_NAME) {" in init
-    assert "savedVoice.indexOf(\"edge-tts|\") === 0" in init
+    assert 'savedVoice.indexOf("edge-tts|") === 0' in init
     assert "globalCache.edgeVoices[SL] = savedVoice.slice" in init
