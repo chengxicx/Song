@@ -9,7 +9,10 @@ repos:
     hooks:
     - id: black
       name: black
-      entry: black
+      # The venv binary, so the hook works from any shell (PATH need not
+      # have the venv activated; language:system would only find black
+      # when it does).
+      entry: venv/bin/black
       language: system
       types: [python]
       require_serial: true
