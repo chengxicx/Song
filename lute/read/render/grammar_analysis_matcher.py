@@ -1225,14 +1225,25 @@ def example_gloss(example, display_lang):
     shared helper covers the common ``{"<lang>", "en", "zh", "ko"}``
     shape and is what the library-page exporters use.
 
-    A missing translation stays empty rather than falling back to English
-    under a Chinese or Korean heading: the front end hides an empty gloss,
-    which is honest, while a wrong-language one is not.
+    A missing translation used to stay empty -- the front end hides an
+    empty gloss, and a wrong-language one is worse than none.  Under a
+    Chinese heading that left the Mandarin set's own sentences gloss-less
+    (a Chinese sentence carries no Chinese translation of itself), which
+    read as broken next to the Japanese library, so 2026-11-14 the zh
+    branch falls back to the English gloss instead.  Every set that ships
+    a real Chinese gloss still uses it; only truly missing ones show
+    English.
     """
     if not isinstance(example, dict):
         return ""
     if display_lang == "zh":
-        return (example.get("zh") or example.get("chinese") or "").strip()
+        return (
+            example.get("zh")
+            or example.get("chinese")
+            or example.get("en")
+            or example.get("english")
+            or ""
+        ).strip()
     if display_lang == "ko":
         return (example.get("ko") or "").strip()
     return (example.get("en") or example.get("english") or "").strip()
