@@ -23,7 +23,8 @@
  * Auxiliary features retained from the previous TTS module:
  *   - Sentence-level 🔊 buttons at each paragraph / sentence row.
  *   - Word hover pronunciation (configurable delay, 0-300 ms) via
- *     event delegation.
+ *     event delegation, served from the backend /tts/ cache when the
+ *     browser voice has an edge-tts twin (section 2).
  *   - Auto-translation: when a term edit form opens with an empty
  *     #translation, the translation is fetched and auto-filled.
  */
@@ -376,6 +377,11 @@
       if (chainEnded) chainEnded();
     };
 
+    // New speech takes over: pause any cached clip and drop any
+    // pending backend play of an older hover -- exactly what cancel()
+    // does to a displaced utterance.
+    stopTtsCacheAudio();
+    _ttsBackendEpoch += 1;
     try {
       window.speechSynthesis.cancel();
     } catch (_) {}
@@ -455,6 +461,217 @@
     audio.play().catch(notifyStarted);
   }
 
+  // ------------------------------------------------------------------
+  // 2. Term pronunciation via the backend /tts/ cache
+  // ------------------------------------------------------------------
+
+  // SpeechSynthesis re-synthesizes on every call, and its remote voices
+  // (Edge's "Microsoft ... Online (Natural)") pay a full round trip to
+  // Microsoft's service each time -- the API offers no way to cache the
+  // audio, so re-hovering a word waited all over again.
+  //
+  // The backend /tts/ endpoint answers with the very same Microsoft
+  // neural voices ("Microsoft Xiaoxiao Online (Natural)" and edge-tts's
+  // zh-CN-XiaoxiaoNeural are one and the same speaker) as
+  // content-addressed mp3s with a server-side disk cache and immutable
+  // HTTP cache headers.  Term-level speech (hover, click, review cards,
+  // the form speaker button) therefore goes backend-first whenever the
+  // browser voice can be mapped to its edge-tts twin: fetched once,
+  // replayed from an in-memory blob cache afterwards.  Anything else --
+  // a local system voice, voices not loaded yet, a backend failure --
+  // falls back to the old SpeechSynthesis path, which stays the only
+  // speaker for sentence-level audio (the 🔊 buttons and the player) so
+  // the voice picker keeps working exactly as before.
+
+  // url -> blob objectURL, insertion-ordered.  Word clips are a few KB,
+  // so the cap bounds memory well under a MB per hundred words; the
+  // URLs are never revoked -- eviction only happens long after the
+  // clip has played, and revoking one under a still-playing audio
+  // would cut it off.
+  const _ttsBlobCache = new Map();
+  const _TTS_BLOB_CACHE_MAX = 400;
+  // url -> in-flight fetch promise, so the hover prefetch and the
+  // debounced speak that follows share one request.
+  const _ttsBlobFetches = new Map();
+  // Mapped edge-tts voice candidates the backend rejected (a wrong
+  // mapping, or a text that voice refuses): not offered again on this
+  // page; a reload tries them afresh.
+  const _ttsBadVoices = new Set();
+  // Bumped whenever newer speech takes over (a newer hover, any
+  // speakNow), so a slow backend answer for an older hover is dropped
+  // instead of talking over what replaced it.
+  let _ttsBackendEpoch = 0;
+  // The clip now playing from the cache; new speech pauses it the way
+  // speechSynthesis.cancel() displaces an utterance.
+  let _ttsCacheAudio = null;
+
+  function ttsBackendUrl(text, lang, voice) {
+    let url = "/tts/" + lang + "/" + encodeURIComponent(text);
+    if (voice) url += "?voice=" + encodeURIComponent(voice);
+    return url;
+  }
+
+  function fetchTtsBlob(url) {
+    const hit = _ttsBlobCache.get(url);
+    if (hit) return Promise.resolve(hit);
+    const inflight = _ttsBlobFetches.get(url);
+    if (inflight) return inflight;
+    const p = fetch(url)
+      .then(function (r) {
+        if (!r.ok) throw new Error("tts " + r.status);
+        return r.blob();
+      })
+      .then(function (blob) {
+        _ttsBlobFetches.delete(url);
+        const objUrl = URL.createObjectURL(blob);
+        _ttsBlobCache.set(url, objUrl);
+        if (_ttsBlobCache.size > _TTS_BLOB_CACHE_MAX) {
+          _ttsBlobCache.delete(_ttsBlobCache.keys().next().value);
+        }
+        return objUrl;
+      })
+      .catch(function () {
+        // Network down, backend erroring (422 for a fragment it cannot
+        // voice), whatever: null sends the caller to SpeechSynthesis,
+        // and the next hover may try again.
+        _ttsBlobFetches.delete(url);
+        return null;
+      });
+    _ttsBlobFetches.set(url, p);
+    return p;
+  }
+
+  function stopTtsCacheAudio() {
+    if (!_ttsCacheAudio) return;
+    const a = _ttsCacheAudio;
+    _ttsCacheAudio = null;
+    try { a.pause(); } catch (_) {}
+  }
+
+  function playTtsBlob(objUrl) {
+    stopTtsCacheAudio();
+    try { window.speechSynthesis.cancel(); } catch (_) {}
+    const audio = new Audio(objUrl);
+    audio.playbackRate = globalSpeed;
+    _ttsCacheAudio = audio;
+    audio.addEventListener("ended", function () {
+      if (_ttsCacheAudio === audio) _ttsCacheAudio = null;
+    });
+    const p = audio.play();
+    if (p && p.catch) {
+      p.catch(function () {
+        if (_ttsCacheAudio === audio) _ttsCacheAudio = null;
+      });
+    }
+  }
+
+  // The browser voice term speech would use right now: the explicitly
+  // chosen one, or the same auto-pick speakNow applies.
+  function currentBrowserVoice() {
+    if (!("speechSynthesis" in window)) return null;
+    const chosen = getSelectedVoice();
+    if (chosen) return chosen;
+    const voices = window.speechSynthesis.getVoices();
+    if (!voices || voices.length === 0) return null;
+    return selectBestVoiceForLang(voices, getCurrentLangCode());
+  }
+
+  // The edge-tts voice that is the same speaker as the browser voice
+  // that would speak.  Edge's remote voices are named
+  // "Microsoft <Person>[ <Extra>] Online (Natural)" and edge-tts's ids
+  // are <locale>-<Person><Extra>Neural, so the person name plus the
+  // voice's own locale rebuilds the id ("Ava Multilingual" collapses
+  // to AvaMultilingual).  Only the Online (Natural) voices have a
+  // twin -- local system voices keep the browser path.  Returns null
+  // when the active voice has no twin, speaks another language, or was
+  // already rejected by the backend on this page.
+  function mappedEdgeVoice(langTag) {
+    const v = currentBrowserVoice();
+    if (!v || !v.name || !v.lang) return null;
+    const want = (langTag || "").split("-")[0].toLowerCase();
+    const got = (v.lang || "").split("-")[0].toLowerCase();
+    if (!want || want !== got) return null;
+    const m = v.name.match(/Microsoft\s+(.+?)\s+Online/i);
+    if (!m) return null;
+    const candidate = v.lang + "-" + m[1].replace(/\s+/g, "") + "Neural";
+    if (!/^[A-Za-z]{2,4}-[A-Za-z0-9]{2,6}-[A-Za-z]+Neural$/.test(candidate)) {
+      return null;
+    }
+    if (_ttsBadVoices.has(candidate)) return null;
+    return candidate;
+  }
+
+  // Term-level pronunciation through the backend cache.  Returns true
+  // when the backend is engaged (sound now or in flight); false sends
+  // the caller to the browser voice as before.  Without SpeechSynthesis
+  // at all (mobile webviews) the backend's default voice for the
+  // language is used -- the same voice the old /tts/ fallback picked,
+  // except cached now.
+  function speakTermViaBackend(text, langOverride) {
+    if (!window.fetch || typeof Audio === "undefined") return false;
+    const lang = langOverride || getCurrentLangCode();
+    let voice = "";
+    if ("speechSynthesis" in window) {
+      voice = mappedEdgeVoice(lang);
+      if (!voice) return false;
+    }
+    const url = ttsBackendUrl(text, lang, voice);
+    const epoch = ++_ttsBackendEpoch;
+    // A hung backend must not swallow the hover: after 3s give up and
+    // let SpeechSynthesis take it -- uncached, but it talks.
+    const timeout = new Promise(function (resolve) {
+      setTimeout(function () { resolve(null); }, 3000);
+    });
+    Promise.race([fetchTtsBlob(url), timeout]).then(function (objUrl) {
+      if (epoch !== _ttsBackendEpoch) return;
+      if (objUrl) {
+        playTtsBlob(objUrl);
+        return;
+      }
+      if (voice) {
+        // The candidate was rejected, or the backend is too slow to be
+        // worth waiting for again: either way the browser voice is the
+        // safer bet on this page.
+        _ttsBadVoices.add(voice);
+      }
+      if ("speechSynthesis" in window) {
+        speakText(text, null, langOverride);
+      }
+    });
+    return true;
+  }
+
+  // Fire the backend fetch the moment a word is hovered, so the
+  // synthesis happens during the hover delay and the debounced speak
+  // finds the clip already cached.  Skipped when the backend would not
+  // be used anyway (hover pronunciation off, no edge-tts twin), and
+  // debounced briefly so a mouse swept across the text does not
+  // prefetch every word it crosses.
+  let _hoverPrefetchTimer = null;
+  function scheduleHoverPrefetch(rawText, readingText) {
+    if (!SETTINGS.hoverPronunciation) return;
+    if (!window.fetch || typeof Audio === "undefined") return;
+    const term = (rawText || "").replace(/[#＃]/g, "").trim();
+    const reading = (readingText || "").trim();
+    const text =
+      reading && /[\u3040-\u309F\u30A0-\u30FF]/.test(reading) ? reading : term;
+    if (!text) return;
+    const lang = getCurrentLangCode();
+    let voice = "";
+    if ("speechSynthesis" in window) {
+      voice = mappedEdgeVoice(lang);
+      if (!voice) return;
+    }
+    clearTimeout(_hoverPrefetchTimer);
+    _hoverPrefetchTimer = setTimeout(function () {
+      fetchTtsBlob(ttsBackendUrl(text, lang, voice));
+    }, 60);
+  }
+
+  function cancelHoverPrefetch() {
+    clearTimeout(_hoverPrefetchTimer);
+  }
+
   // Speak a term, preferring its annotated reading (the pronunciation /
   // romanization field) when that reading exists and is kana.  Kanji
   // terms whose stored reading differs from what the TTS engine guesses
@@ -466,9 +683,9 @@
     const term = (termText || "").replace(/[#＃]/g, "").trim();
     const reading = (readingText || "").trim();
     if (reading && /[\u3040-\u309F\u30A0-\u30FF]/.test(reading)) {
-      speakText(reading, null, langOverride);
+      if (!speakTermViaBackend(reading, langOverride)) speakText(reading, null, langOverride);
     } else if (term) {
-      speakText(term, null, langOverride);
+      if (!speakTermViaBackend(term, langOverride)) speakText(term, null, langOverride);
     }
   }
 
@@ -745,17 +962,17 @@
     textDiv.addEventListener("mouseover", function (e) {
       const wordSpan = e.target.closest("span.word, span[id^=\"w\"]");
       if (!wordSpan) return;
-      luteHoverSpeakStart(
-        spokenTextForWordSpan(wordSpan),
-        function () { return ttsPlaying; },
-        hoverReadingFor(wordSpan)
-      );
+      const rawText = spokenTextForWordSpan(wordSpan);
+      const readingText = hoverReadingFor(wordSpan);
+      luteHoverSpeakStart(rawText, function () { return ttsPlaying; }, readingText);
+      scheduleHoverPrefetch(rawText, readingText);
     });
 
     textDiv.addEventListener("mouseout", function (e) {
       const wordSpan = e.target.closest("span.word, span[id^=\"w\"]");
       if (wordSpan && !wordSpan.contains(e.relatedTarget)) {
         luteHoverSpeakCancel();
+        cancelHoverPrefetch();
       }
     });
 
