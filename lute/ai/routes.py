@@ -158,6 +158,64 @@ def library_export():
     )
 
 
+@bp.route("/library/prompt", methods=["GET"])
+def library_prompt():
+    """
+    The generation prompt and import-file skeleton for one book.
+
+    An outside AI that follows this prompt replies in the importable
+    format, ready for /ai/library/import.  No provider is called.
+    """
+    book_id = request.args.get("book_id", "")
+    kind = (request.args.get("kind", "sentence") or "sentence").strip().lower()
+    if not str(book_id).isdigit():
+        return jsonify({"ok": False, "message": "book_id is required."}), 400
+    from lute.models.book import Book  # pylint: disable=import-outside-toplevel
+
+    book = db.session.get(Book, int(book_id))
+    if book is None:
+        return jsonify({"ok": False, "message": "Book not found."}), 400
+    if kind == "grammar":
+        target_name = _grammar_language_context(book.language_id)[1]
+    else:
+        kind = "sentence"
+        target_name = _language_context(book.language_id)[1]
+    try:
+        package = library.prompt_package(int(book_id), kind, target_name)
+    except library.LibraryError as e:
+        return jsonify({"ok": False, "message": e.message}), 400
+    return jsonify({"ok": True, **package})
+
+
+@bp.route("/library/sentences", methods=["GET"])
+def library_sentences():
+    "Download the book's sentences as JSONL, one {\"sentence\": ...} per line."
+    book_id = request.args.get("book_id", "")
+    if not str(book_id).isdigit():
+        return jsonify({"ok": False, "message": "book_id is required."}), 400
+    from lute.models.book import Book  # pylint: disable=import-outside-toplevel
+
+    book = db.session.get(Book, int(book_id))
+    if book is None:
+        return jsonify({"ok": False, "message": "Book not found."}), 400
+    lines = [
+        json.dumps({"sentence": s}, ensure_ascii=False)
+        for s in library.book_sentences(int(book_id))
+    ]
+    body = "\n".join(lines)
+    if body:
+        body += "\n"
+    return Response(
+        body,
+        mimetype="application/x-ndjson",
+        headers={
+            "Content-Disposition": (
+                f'attachment; filename="ai-sentences-book-{book_id}.jsonl"'
+            )
+        },
+    )
+
+
 @bp.route("/results/delete", methods=["POST"])
 def results_delete():
     "Delete stored results by book and/or language.  No automatic expiry."

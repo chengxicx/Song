@@ -419,6 +419,27 @@
             .ai-library-report { margin-top: 8px; font-size: 0.85em; }
             .ai-library-report .is-error { color: color-mix(in srgb, #e5484d 80%, var(--font-color, #000)); }
             .ai-library-report a { color: var(--btn-accent, #007aff); }
+            .ai-prompt-panel {
+              margin-top: 10px;
+              border: 1px dashed var(--form-border-color, #ccc);
+              border-radius: var(--form-border-radius, 6px);
+              padding: 10px;
+            }
+            .ai-prompt-panel pre {
+              margin: 0 0 8px;
+              padding: 8px 10px;
+              font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+              font-size: 0.78em;
+              line-height: 1.5;
+              white-space: pre-wrap;
+              word-break: break-word;
+              max-height: 20rem;
+              overflow: auto;
+              color: var(--font-color);
+              background-color: color-mix(in srgb, var(--font-color, #000) 4%, transparent);
+              border: 1px solid var(--form-border-color, #ccc);
+              border-radius: var(--form-border-radius, 3px);
+            }
             #ai_provider_rows .ai-provider-grid { display: grid; grid-template-columns: 9rem minmax(16rem, 1.6fr) minmax(11rem, 1fr) 9rem 9rem 7.5rem; gap: 8px; align-items: start; }
             /* The six-column row needs ~60rem; below that it would push the
                Settings table past the viewport.  Two columns keep every
@@ -541,6 +562,28 @@
             <button type="button" id="ai_library_export_btn" class="btn btn-secondary">
               {{ t('Export this book') }}
             </button>
+          </div>
+          <div class="ai-library-row" style="margin-top: 10px;">
+            <select id="ai_library_kind" class="form-control" style="min-width: 11rem;">
+              <option value="sentence">{{ t('Sentence explanation') }}</option>
+              <option value="grammar">{{ t('Grammar analysis') }}</option>
+            </select>
+            <button type="button" id="ai_library_prompt_btn" class="btn btn-secondary">
+              {{ t('Show generation prompt') }}
+            </button>
+            <button type="button" id="ai_library_sentences_btn" class="btn btn-secondary">
+              {{ t('Download sentence list') }}
+            </button>
+          </div>
+          <div id="ai_library_prompt" class="ai-prompt-panel" hidden>
+            <div class="ai-provider-key-note" style="margin-bottom: 6px;">
+              {{ t('Copy the prompt to any AI and send it the sentence list from "Download sentence list"; import the JSON it returns above.  Importing never calls a provider and never uses your rate limit.') }}
+            </div>
+            <pre id="ai_library_prompt_text"></pre>
+            <button type="button" id="ai_library_copy_btn" class="btn btn-primary" style="padding: 0.22rem 0.9rem;">
+              {{ t('Copy prompt') }}
+            </button>
+            <span id="ai_library_copy_state" class="ai-provider-key-note" style="margin-left: 8px;"></span>
           </div>
         </div>
       </td>
@@ -1363,6 +1406,106 @@
         return;
       }
       window.location = '/ai/library/export?book_id=' + encodeURIComponent(bookEl.value);
+    });
+
+    // Generation prompt: the exact prompts the app itself sends, plus the
+    // import-file skeleton, so any outside AI can produce importable
+    // explanations.  The panel stays collapsed until asked for.
+    const kindEl = document.getElementById('ai_library_kind');
+    const promptBtn = document.getElementById('ai_library_prompt_btn');
+    const sentencesBtn = document.getElementById('ai_library_sentences_btn');
+    const promptBox = document.getElementById('ai_library_prompt');
+    const promptTextEl = document.getElementById('ai_library_prompt_text');
+    const copyBtn = document.getElementById('ai_library_copy_btn');
+    const copyState = document.getElementById('ai_library_copy_state');
+    const SHOW_PROMPT = I18N.t('Show generation prompt');
+    const HIDE_PROMPT = I18N.t('Hide generation prompt');
+
+    function buildPromptText(d) {
+      const wrapper = JSON.stringify(d.wrapper, null, 2).replace(
+        '"items": [],',
+        '"items": [\n    ... one ' + d.kind + ' object per sentence ...\n  ],'
+      );
+      return [
+        d.system_prompt,
+        '',
+        I18N.t('— Send one request per sentence, in this format —'),
+        d.user_prompt,
+        '',
+        I18N.t('— When done, collect the replies into this import file (the ids are already filled in) —'),
+        wrapper,
+        '',
+        I18N.t('Item schema (the keys and types an imported item accepts):'),
+        JSON.stringify(d.item_schema, null, 2),
+      ].join('\n');
+    }
+
+    function refreshPrompt() {
+      promptBtn.disabled = true;
+      fetch(
+        '/ai/library/prompt?book_id=' + encodeURIComponent(bookEl.value) +
+        '&kind=' + encodeURIComponent(kindEl.value)
+      )
+        .then(r => r.json())
+        .then(d => {
+          if (!d.ok) throw new Error(d.message || I18N.t('Could not build the prompt.'));
+          promptTextEl.textContent = buildPromptText(d);
+          promptBox.hidden = false;
+          promptBtn.textContent = HIDE_PROMPT;
+        })
+        .catch(e => showLibraryMessage(e.message || I18N.t('Could not build the prompt.'), false))
+        .finally(() => { promptBtn.disabled = false; });
+    }
+
+    promptBtn.addEventListener('click', function () {
+      if (!bookEl.value) {
+        showLibraryMessage(I18N.t('Choose a book to export.'), false);
+        return;
+      }
+      if (!promptBox.hidden) {
+        promptBox.hidden = true;
+        promptBtn.textContent = SHOW_PROMPT;
+        return;
+      }
+      refreshPrompt();
+    });
+    kindEl.addEventListener('change', function () {
+      if (!promptBox.hidden) refreshPrompt();
+    });
+    bookEl.addEventListener('change', function () {
+      if (!promptBox.hidden) refreshPrompt();
+    });
+
+    sentencesBtn.addEventListener('click', function () {
+      if (!bookEl.value) {
+        showLibraryMessage(I18N.t('Choose a book to export.'), false);
+        return;
+      }
+      window.location = '/ai/library/sentences?book_id=' + encodeURIComponent(bookEl.value);
+    });
+
+    copyBtn.addEventListener('click', function () {
+      const text = promptTextEl.textContent || '';
+      if (!text) return;
+      const done = function () {
+        copyState.textContent = I18N.t('Copied.');
+        setTimeout(function () { copyState.textContent = ''; }, 2000);
+      };
+      const fallback = function () {
+        const range = document.createRange();
+        range.selectNodeContents(promptTextEl);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        document.execCommand('copy');
+        sel.removeAllRanges();
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () { fallback(); done(); });
+      } else {
+        fallback();
+        done();
+      }
     });
   })();
 

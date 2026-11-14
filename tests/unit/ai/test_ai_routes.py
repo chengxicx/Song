@@ -989,6 +989,55 @@ def test_library_import_and_export_endpoints(app_context, client, english):
     assert client.post("/ai/library/import", data={}).status_code == 400
 
 
+def test_library_prompt_endpoint(app_context, client, english):
+    "The prompt package returns the panel's own prompt plus real book ids."
+    from lute.models.book import Sentence
+
+    book = make_book("Prompt book", "placeholder", english)
+    db.session.add(book)
+    db.session.commit()
+    db.session.add(
+        Sentence(tx_id=book.texts[0].id, order=1, text_content="Hello there, friend.")
+    )
+    db.session.commit()
+
+    resp = client.get(f"/ai/library/prompt?book_id={book.id}&kind=grammar")
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["ok"] is True
+    assert data["kind"] == "grammar"
+    assert data["wrapper"]["book_id"] == book.id
+    assert data["wrapper"]["lang_id"] == english.id
+    assert data["sentence_count"] >= 1
+    assert "Hello there, friend." in data["sentences"]
+
+    assert client.get("/ai/library/prompt").status_code == 400
+    assert client.get("/ai/library/prompt?book_id=999999").status_code == 400
+
+
+def test_library_sentences_endpoint(app_context, client, english):
+    "The sentence download is JSONL, one {\"sentence\": ...} object per line."
+    from lute.models.book import Sentence
+
+    book = make_book("Sentence book", "placeholder", english)
+    db.session.add(book)
+    db.session.commit()
+    db.session.add(
+        Sentence(tx_id=book.texts[0].id, order=1, text_content="Hello there, friend.")
+    )
+    db.session.add(Sentence(tx_id=book.texts[0].id, order=2, text_content="Goodbye."))
+    db.session.commit()
+
+    resp = client.get(f"/ai/library/sentences?book_id={book.id}")
+    assert resp.status_code == 200
+    assert "attachment" in resp.headers["Content-Disposition"]
+    lines = resp.get_data(as_text=True).strip().splitlines()
+    sentences = [json.loads(line)["sentence"] for line in lines]
+    assert "Hello there, friend." in sentences
+    assert "Goodbye." in sentences
+    assert client.get("/ai/library/sentences").status_code == 400
+
+
 def test_language_edit_form_renders_the_russian_option(app_context, client, english):
     "The fixed list reaches the page the user edits, not just the Form class."
     body = client.get(f"/language/edit/{english.id}").get_data(as_text=True)
