@@ -392,6 +392,9 @@ window.LuteReview = (function () {
       typing.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
+          // An IME-confirming Enter (candidate selection) must not submit.
+          // Safari reports isComposing false too late, so also gate on 229.
+          if (e.isComposing || e.keyCode === 229) return;
           check_typed(c);
         }
       });
