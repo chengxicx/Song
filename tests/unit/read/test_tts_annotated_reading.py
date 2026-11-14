@@ -173,3 +173,13 @@ def test_termpopup_carries_the_annotated_reading(app_context, client, english, r
     bare = _save_term(repo, english, "speakme-bare")
     body = client.get(f"/read/termpopup/{bare.id}").get_data(as_text=True)
     assert 'class="termpopup-reading"' in body
+
+
+def test_unmapped_browser_voices_still_get_the_edge_tts_default():
+    "Safari & co. hear the edge-tts default unless a device voice was picked."
+    src = _read(_TTS_JS)
+    assert "voiceExplicit: false" in src
+    backend = src.split("function speakTermViaBackend")[1].split("\n  }")[0]
+    assert "if (!voice && globalCache.voiceExplicit) return false;" in backend
+    pre = src.split("function scheduleHoverPrefetch")[1].split("\n  }")[0]
+    assert "if (!voice && globalCache.voiceExplicit) return;" in pre

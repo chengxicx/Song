@@ -1231,6 +1231,25 @@
   // language's row.
   let _ttsCurrentVoiceLang = "";
 
+  // Flip to backend audio when this browser has no voice that maps to
+  // an edge-tts twin (Safari, macOS Chrome, Firefox -- nothing
+  // "Microsoft ... Online") and the user hasn't explicitly picked a
+  // device voice: the same neural voice Edge hears becomes the default
+  // everywhere, and the wedge switch in ttsPlayCue remains as the
+  // safety net (and covers explicit local picks).  Called at init and
+  // again from ttsPopulateVoiceList once the voice list lands
+  // (Chromium fills getVoices() asynchronously); a browser whose list
+  // is still empty simply stays native until then.  One-way on
+  // purpose: a page that started on backend audio stays there.
+  function ttsMaybeUseBackendAudio() {
+    if (ttsBackendAudio || !("speechSynthesis" in window)) return;
+    if (globalCache.voiceExplicit) return;
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length && !mappedEdgeVoice(getCurrentLangCode())) {
+      ttsBackendAudio = true;
+    }
+  }
+
   function ttsResolveCurrentVoice(voices) {
     let name =
       (ttsVoiceBtn && ttsVoiceBtn.dataset.voiceName) ||
@@ -1247,8 +1266,11 @@
     // init-time recommendation often finds an empty list. Auto-select
     // the recommended voice here (once voices exist) so playback and
     // hover pronunciation use a natural voice, and so the dropdown has
-    // a row to highlight and scroll to.
-    if (!name) {
+    // a row to highlight and scroll to -- but not when playback comes
+    // from the backend audio anyway: nothing native is speaking, so
+    // the dropdown stays unhighlighted rather than advertising a voice
+    // that will not be heard.
+    if (!name && !ttsBackendAudio) {
       const recommended = selectBestVoiceForLang(voices, getCurrentLangCode());
       if (recommended) {
         ttsSelectVoice(recommended);
@@ -1284,6 +1306,10 @@
     // leftover placeholder state so the real list renders below.
     _voiceWaitStart = null;
 
+    // Now that the voice list is known, a browser without an edge-tts
+    // twin and without an explicit pick defaults to backend audio.
+    ttsMaybeUseBackendAudio();
+
     // Hide the voices that can never produce sound (see isSpeakableVoice):
     // picking one used to leave the reader silent with nothing to report.
     // If the filter would empty the list, keep everything so the menu
@@ -1312,7 +1338,7 @@
       }
       opt.addEventListener("click", function (e) {
         e.stopPropagation();
-        ttsSelectVoice(voice);
+        ttsSelectVoice(voice, true);
         ttsVoiceDropdown.hidden = true;
       });
       ttsVoiceDropdown.appendChild(opt);
@@ -1387,7 +1413,7 @@
         def.textContent = I18N.t("[default] Use device default voice");
         def.addEventListener("click", function (e) {
           e.stopPropagation();
-          ttsSelectVoice(DEVICE_DEFAULT_VOICE);
+          ttsSelectVoice(DEVICE_DEFAULT_VOICE, true);
           ttsVoiceDropdown.hidden = true;
         });
         ttsVoiceDropdown.appendChild(def);
@@ -1438,23 +1464,28 @@
     return s || I18N.t("Voice");
   }
 
-  function ttsSelectVoice(voice) {
+  // explicit: the pick came from the dropdown, not the auto-
+  // recommendation.  Only explicit picks persist and only they pin
+  // speech to the native engine -- everywhere else the backend's
+  // default neural voice is the default wherever native has no twin.
+  function ttsSelectVoice(voice, explicit) {
     if (!voice) return;
     if (ttsVoiceBtn) {
       ttsVoiceBtn.dataset.voiceName = voice.name;
       if (ttsVoiceLabel) ttsVoiceLabel.textContent = ttsShortVoiceName(voice.name);
     }
     globalCache.selectedVoice = voice.name;
+    globalCache.voiceExplicit = !!explicit;
     // Remember the choice per book language, so re-opening the player
     // (or another book in the same language) starts with the same voice
     // and the dropdown can highlight it again.  The lang is part of the
     // key: macOS exposes "Eddy", "Anna" & co. in dozens of locales under
     // one name, and a bare name restored the wrong language's twin (a
-    // Japanese book suddenly read by the German Eddy).  Older saves are
-    // bare names; ttsFindStoredVoice falls back to the book language's
-    // twin for those.
-    const stored = voice.lang ? voice.name + "|" + voice.lang : voice.name;
-    try { localStorage.setItem("ttsVoice:" + SL, stored); } catch (_) {}
+    // Japanese book suddenly read by the German Eddy).
+    if (explicit) {
+      const stored = voice.lang ? voice.name + "|" + voice.lang : voice.name;
+      try { localStorage.setItem("ttsVoice:" + SL, stored); } catch (_) {}
+    }
     // Update dropdown selected state.
     if (ttsVoiceDropdown) {
       ttsVoiceDropdown.querySelectorAll(".tts-voice-option").forEach(function (opt) {
@@ -1713,13 +1744,35 @@
     if (!ttsCacheElements()) return;
     // Restore the voice chosen for this book language in a previous
     // session, so playback uses it immediately and the dropdown has a
-    // row to highlight / scroll to when the gear is opened.
+    // row to highlight / scroll to when the gear is opened.  Only
+    // explicit picks are saved anymore; bare-name saves from before
+    // voices carried their locale were written by the auto-
+    // recommendation, not the user, so they are dropped and the
+    // backend's default voice takes over (see the switch below).
     if (!globalCache.selectedVoice) {
       try {
         const savedVoice = localStorage.getItem("ttsVoice:" + SL);
-        if (savedVoice) globalCache.selectedVoice = savedVoice;
+        if (
+          savedVoice &&
+          (savedVoice.indexOf("|") >= 0 ||
+            savedVoice === DEVICE_DEFAULT_VOICE.name)
+        ) {
+          globalCache.selectedVoice = savedVoice;
+          globalCache.voiceExplicit = true;
+        } else if (savedVoice) {
+          localStorage.removeItem("ttsVoice:" + SL);
+        }
       } catch (_) {}
     }
+
+    // Safari, macOS Chrome & co. have no "Microsoft ... Online" voices,
+    // so nothing maps to an edge-tts twin.  When the user hasn't
+    // explicitly picked a device voice, play straight from the backend
+    // audio -- the same neural voice Edge hears -- instead of the local
+    // novelty voices, and skip the wedge dance entirely.  Evaluated
+    // here and again when the voice list lands (Chromium populates
+    // getVoices() asynchronously).
+    ttsMaybeUseBackendAudio();
     // The container is rendered by the template but its visibility
     // is controlled by the Player toggle (reading_menu).  The
     // element itself is always present in the DOM so JS can find it.
@@ -1755,8 +1808,12 @@
     }
 
     // Pick up the recommended voice for the current language if the
-    // user hasn't chosen one yet.
-    if (!globalCache.selectedVoice && "speechSynthesis" in window) {
+    // user hasn't chosen one yet -- but not when playback comes from
+    // the backend audio anyway: nothing native is speaking, so the
+    // dropdown stays unhighlighted rather than advertising a voice
+    // that will not be heard.
+    if (!globalCache.selectedVoice && !ttsBackendAudio &&
+        "speechSynthesis" in window) {
       const voices = window.speechSynthesis.getVoices();
       if (voices.length) {
         const rec = selectBestVoiceForLang(voices, getCurrentLangCode());

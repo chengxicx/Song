@@ -316,3 +316,25 @@ def test_voice_memory_is_locale_aware():
     assert 'voice.name + "|" + voice.lang' in select
     assert "opt.dataset.voiceLang" in player
     assert "_ttsCurrentVoiceLang" in player
+
+
+def test_player_defaults_to_backend_audio_without_an_explicit_pick():
+    "No mapped twin + no explicit pick: the player starts on /tts/ audio."
+    player = open(_TTS_JS, encoding="utf-8").read()
+    init = player.split("function ttsInitPlayer")[1].split("\n  }")[0]
+    assert "ttsMaybeUseBackendAudio();" in init
+    # The flip itself, re-evaluated when the voice list lands (Chromium
+    # fills getVoices() asynchronously; Safari is synchronous).
+    flip = player.split("function ttsMaybeUseBackendAudio")[1].split("\n  }")[0]
+    assert "voices.length && !mappedEdgeVoice(getCurrentLangCode())" in flip
+    assert "ttsBackendAudio = true;" in flip
+    populate = player.split("function ttsPopulateVoiceList")[1].split("\n  }")[0]
+    assert "ttsMaybeUseBackendAudio();" in populate
+    # Only explicit picks persist, and legacy bare-name saves (written
+    # by the old auto-recommendation) are dropped on restore.
+    select = player.split("function ttsSelectVoice")[1].split("\n  }")[0]
+    assert "globalCache.voiceExplicit = !!explicit;" in select
+    assert "if (explicit) {" in select
+    restore = init.split("const savedVoice =")[1].split("catch (_) {}")[0]
+    assert 'savedVoice.indexOf("|") >= 0' in restore
+    assert "localStorage.removeItem" in restore

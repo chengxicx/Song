@@ -42,6 +42,7 @@
       sl: "en",
       tl: "",
       selectedVoice: "",
+      voiceExplicit: false,
       lastSpokenWord: "",
       detectedLang: "",
     };
@@ -497,13 +498,15 @@
   // zh-CN-XiaoxiaoNeural are one and the same speaker) as
   // content-addressed mp3s with a server-side disk cache and immutable
   // HTTP cache headers.  Term-level speech (hover, click, review cards,
-  // the form speaker button) therefore goes backend-first whenever the
-  // browser voice can be mapped to its edge-tts twin: fetched once,
-  // replayed from an in-memory blob cache afterwards.  Anything else --
-  // a local system voice, voices not loaded yet, a backend failure --
-  // falls back to the old SpeechSynthesis path, which stays the only
-  // speaker for sentence-level audio (the 🔊 buttons and the player) so
-  // the voice picker keeps working exactly as before.
+  // the form speaker button) therefore goes backend-first: with a
+  // mapped twin the very same voice as the browser's is heard; without
+  // one (Safari, macOS Chrome, Firefox) the backend's default voice for
+  // the language speaks unless the user explicitly picked a device
+  // voice in the player menu.  SpeechSynthesis remains the fallback for
+  // an explicitly chosen local voice, for voices not loaded yet, and
+  // for a backend failure -- and stays the only speaker for
+  // sentence-level audio (the 🔊 buttons and the player) so the voice
+  // picker keeps working exactly as before.
 
   // url -> blob objectURL, insertion-ordered.  Word clips are a few KB,
   // so the cap bounds memory well under a MB per hundred words; the
@@ -625,17 +628,20 @@
 
   // Term-level pronunciation through the backend cache.  Returns true
   // when the backend is engaged (sound now or in flight); false sends
-  // the caller to the browser voice as before.  Without SpeechSynthesis
-  // at all (mobile webviews) the backend's default voice for the
-  // language is used -- the same voice the old /tts/ fallback picked,
-  // except cached now.
+  // the caller to the browser voice.  The backend's default neural
+  // voice for the language speaks whenever the browser voice has no
+  // edge-tts twin (Safari, macOS Chrome, Firefox) AND the user hasn't
+  // explicitly picked a device voice in the player menu -- a local
+  // voice on its own is never worth the round trip unless chosen.
+  // Without SpeechSynthesis at all (mobile webviews) the backend
+  // default voice is used, as the old /tts/ fallback did, cached now.
   function speakTermViaBackend(text, langOverride) {
     if (!window.fetch || typeof Audio === "undefined") return false;
     const lang = langOverride || getCurrentLangCode();
     let voice = "";
     if ("speechSynthesis" in window) {
       voice = mappedEdgeVoice(lang);
-      if (!voice) return false;
+      if (!voice && globalCache.voiceExplicit) return false;
     }
     const url = ttsBackendUrl(text, lang, voice);
     const epoch = ++_ttsBackendEpoch;
@@ -682,7 +688,7 @@
     let voice = "";
     if ("speechSynthesis" in window) {
       voice = mappedEdgeVoice(lang);
-      if (!voice) return;
+      if (!voice && globalCache.voiceExplicit) return;
     }
     clearTimeout(_hoverPrefetchTimer);
     _hoverPrefetchTimer = setTimeout(function () {
