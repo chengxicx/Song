@@ -419,7 +419,7 @@
             .ai-library-report { margin-top: 8px; font-size: 0.85em; }
             .ai-library-report .is-error { color: color-mix(in srgb, #e5484d 80%, var(--font-color, #000)); }
             .ai-library-report a { color: var(--btn-accent, #007aff); }
-            #ai_provider_rows .ai-provider-grid { display: grid; grid-template-columns: 9rem minmax(16rem, 1.6fr) minmax(11rem, 1fr) 9rem 9rem 6rem; gap: 8px; align-items: end; }
+            #ai_provider_rows .ai-provider-grid { display: grid; grid-template-columns: 9rem minmax(16rem, 1.6fr) minmax(11rem, 1fr) 9rem 9rem 7.5rem; gap: 8px; align-items: start; }
             /* The six-column row needs ~60rem; below that it would push the
                Settings table past the viewport.  Two columns keep every
                field usable at tablet widths. */
@@ -427,7 +427,7 @@
               #ai_provider_rows .ai-provider-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             }
             #ai_provider_rows .ai-provider-field { display: flex; flex-direction: column; min-width: 0; }
-            #ai_provider_rows .ai-provider-field > span { font-size: 0.85em; color: color-mix(in srgb, var(--font-color, #000) 64%, transparent); margin-bottom: 2px; }
+            #ai_provider_rows .ai-provider-field > span { font-size: 0.85em; color: color-mix(in srgb, var(--font-color, #000) 64%, transparent); margin-bottom: 2px; white-space: nowrap; }
             #ai_provider_rows .ai-provider-field .form-control,
             #ai_provider_rows .ai-provider-field .form-control:focus { border: 1px solid var(--form-border-color, #ccc); }
             #ai_provider_rows .ai-provider-field .form-control { width: 100%; box-sizing: border-box; padding: 0.24rem 0.4rem; border-radius: var(--form-border-radius, 3px); background-color: var(--input-bg, #fff); color: var(--input-fg, var(--font-color, #000)); }
@@ -1134,7 +1134,11 @@
         '  <label class="ai-provider-field"><span>' + I18N.t('Base URL') + '</span>' +
         '    <input type="text" class="form-control ai-provider-base-url" autocomplete="off" spellcheck="false"></label>' +
         '  <label class="ai-provider-field"><span>' + I18N.t('API key') + '</span>' +
-        '    <input type="password" class="form-control ai-provider-key" autocomplete="off" spellcheck="false"></label>' +
+        '    <input type="password" class="form-control ai-provider-key" autocomplete="off" spellcheck="false"' +
+        (entry.masked ? ' placeholder="' + entry.masked + '"' : '') + '>' +
+        '<span class="ai-provider-key-note">' +
+        (entry.configured ? I18N.t('Leave blank to keep the saved key.') : '') +
+        '</span></label>' +
         '  <label class="ai-provider-field"><span>' + I18N.t('Model') + '</span>' +
         '    <input type="text" class="form-control ai-provider-model" autocomplete="off" spellcheck="false"></label>' +
         '  <label class="ai-provider-field"><span>' + I18N.t('Name (optional)') + '</span>' +
