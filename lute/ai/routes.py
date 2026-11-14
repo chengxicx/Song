@@ -189,7 +189,7 @@ def library_prompt():
 
 @bp.route("/library/sentences", methods=["GET"])
 def library_sentences():
-    "Download the book's sentences as JSONL, one {\"sentence\": ...} per line."
+    'Download the book\'s sentences as JSONL, one {"sentence": ...} per line.'
     book_id = request.args.get("book_id", "")
     if not str(book_id).isdigit():
         return jsonify({"ok": False, "message": "book_id is required."}), 400

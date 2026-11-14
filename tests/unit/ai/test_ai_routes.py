@@ -1016,7 +1016,7 @@ def test_library_prompt_endpoint(app_context, client, english):
 
 
 def test_library_sentences_endpoint(app_context, client, english):
-    "The sentence download is JSONL, one {\"sentence\": ...} object per line."
+    'The sentence download is JSONL, one {"sentence": ...} object per line.'
     from lute.models.book import Sentence
 
     book = make_book("Sentence book", "placeholder", english)
