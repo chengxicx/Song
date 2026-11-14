@@ -719,6 +719,7 @@
   "Show a definition for words Lute has no translation for yet — the word you have never studied.  Import an MDX (MDict) dictionary once and this server converts it into a lookup file.  The pool below is what clients choose from: each language picks one on its own settings page, and the phone app lists the same pool so you can download any of them for offline use.": "Lute に訳のまだない語 — つまり一度も学習していない語 — に定義を表示します。MDX（MDict）辞書を一度インポートすると、このサーバーが検索用ファイルに変換します。下の辞書プールが各クライアントの選択肢です。各言語は自分の設定ページで 1 つを選び、スマホアプリも同じプールを一覧表示するので、その中から好きなものをオフライン用にダウンロードできます。",
   "Show component terms": "構成単語を表示する",
   "Show player": "プレーヤーを表示する",
+  "Show pronunciation above words": "単語の上に発音を表示",
   "Show reading streak on home page": "ホームページに連続読書記録を表示する",
   "Show source URL": "ソース URL を表示",
   "Show text labels": "テキストラベルを表示",

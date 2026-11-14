@@ -16,6 +16,7 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired
 from wtforms.widgets import ListWidget, CheckboxInput
+from lute.i18n import lazy_t
 from lute.language.langtags import tag_choices
 from lute.models.language import (
     AI_DICT_TYPE,
@@ -96,20 +97,25 @@ class LanguageForm(FlaskForm):
         FormField(LanguageDictionaryForm, default=LanguageDictionary)
     )
     show_romanization = BooleanField("Show Pronunciation field")
-    # Furigana (pronunciation readings above words) on the reading page.
-    # Only rendered for parsers that can supply readings -- Japanese
-    # (kana), Mandarin (pinyin), Cantonese (jyutping) -- see _form.html
-    # -- but the field must always exist so populate_obj round-trips
-    # cleanly.
+    # Pronunciation readings above words on the reading page.  "Furigana"
+    # strictly means the Japanese kana case; the label and tooltip say the
+    # generic thing and name each language's system (pinyin, jyutping,
+    # RTGS), but the field and DB column keep the historical name.
+    # Only rendered for parsers that can supply readings -- see
+    # _form.html -- but the field must always exist so populate_obj
+    # round-trips cleanly.  The tooltip reuses the description string
+    # shown next to the checkbox in _form.html, so the one key carries
+    # all the translations.
     show_furigana = BooleanField(
-        "Show furigana above words",
+        lazy_t("Show pronunciation above words"),
         render_kw={
-            "title": (
+            "title": lazy_t(
                 "Draw pronunciation readings above words while reading "
                 "(kana for Japanese, pinyin for Mandarin, jyutping for "
-                "Cantonese).  Japanese readings use the Pronunciation "
-                "characters setting (Settings > Preferences) for their "
-                "script."
+                "Cantonese, RTGS romanization for Thai).  Japanese "
+                "readings follow the Pronunciation characters preference "
+                "(Settings > Preferences); when that is unset, words "
+                "show plain."
             )
         },
     )
