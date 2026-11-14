@@ -2048,9 +2048,16 @@ span.textitem {
    toggle, drawn by lute-furigana.js).  #thetext gets .furigana-on as
    soon as the pane renders, so the roomier line height is reserved
    before the ruby arrives and the text doesn't jump when the readings
-   land.  rt styling follows the shadowing panel's ruby row. */
+   land.  rt styling follows the shadowing panel's ruby row.  The 1.7
+   is only a default: the word spans' line boxes outrank the <p>'s
+   line-height, so a stylesheet-pinned value would make the reading
+   menu's line-height buttons change nothing the eye can see (more so
+   the bigger the word font).  text-options.js writes the user's
+   line-height factor into --furigana-line-height, which therefore
+   wins over 1.7; books where the buttons were never touched keep the
+   roomy row. */
 div#thetext.furigana-on span.textitem {
-    line-height: 1.7;
+    line-height: var(--furigana-line-height, 1.7);
 }
 
 /* The ruby base inherits the pane's line-height, which centers the

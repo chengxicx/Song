@@ -149,19 +149,52 @@ function incrementLineHeight(delta) {
   // the +/- 0.1 steps are consistent multipliers, not px.
   const lhPx = parseFloat(s.getPropertyValue('line-height'));
   const fsPx = parseFloat(s.fontSize);
-  const lhDefault = fsPx > 0 ? lhPx / fsPx : 1.3;
+  let lhDefault = fsPx > 0 ? lhPx / fsPx : 1.3;
+
+  // The row the reader actually sees is the word span's, not the <p>'s:
+  // the furigana-on stylesheet pins span.textitem line-height (the row
+  // reserved for the ruby annotations, --furigana-line-height in
+  // styles.css), and a pinned value outranks anything inherited from the
+  // <p>.  Measure a word span so the +/- steps move away from what is on
+  // screen -- otherwise the first click on a furigana book would jump
+  // from the pinned 1.7 row to the <p>'s smaller factor, reading as
+  // "increase made the lines tighter".  Every #thetext p carries at
+  // least its zero-width placeholder span (page_content.html).
+  const item0 = paras[0].querySelector("span.textitem");
+  if (item0) {
+    const is = window.getComputedStyle(item0);
+    const itemFs = parseFloat(is.fontSize);
+    const itemLhPx = parseFloat(is.lineHeight);
+    if (itemFs > 0 && itemLhPx > 0) {
+      lhDefault = itemLhPx / itemFs;
+    }
+  }
 
   // Key bumped (paraLineHeight -> paraLineHeight2) because the old key
   // may hold a px-derived value (e.g. 5) persisted by the pre-fix code
   // that read the computed line-height in px; applying that as a unitless
   // multiplier would render the text at an absurd 5x spacing.
   const STORAGE_KEY = "paraLineHeight2";
+  const storedRaw = localStorage.getItem(STORAGE_KEY);
   let current_h = getFromLocalStorage(STORAGE_KEY, lhDefault);
   current_h = Number(current_h.toPrecision(2));
   let new_h = clamp(current_h + delta, 1.3, 5);
 
   paras.forEach((p) => { p.style.lineHeight = new_h; });
-  localStorage.setItem(STORAGE_KEY, new_h);
+  // Feed the factor to the furigana-on pin as well: the pinned word-span
+  // line-heights would otherwise drown out the <p>'s inline value and the
+  // buttons would change nothing the eye can see on furigana books --
+  // more so the bigger the word font.  The variable only feeds that one
+  // rule, so furigana-off books, where the <p>'s inline line-height
+  // reaches the spans by inheritance, are untouched.  The post-reload
+  // re-apply only stamps it when a stored value exists: a reader who
+  // never touched the buttons keeps the stylesheet's roomy 1.7 default
+  // (their measured lhDefault IS that pinned row), and their default is
+  // not baked into storage for the next, furigana-off book to inherit.
+  if (delta !== 0 || storedRaw !== null) {
+    theText.style.setProperty("--furigana-line-height", new_h);
+    localStorage.setItem(STORAGE_KEY, new_h);
+  }
   if (delta !== 0 && typeof _splitToScreens === "function") {
     requestAnimationFrame(_splitToScreens);
   }
