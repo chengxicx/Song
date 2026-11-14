@@ -1,4 +1,38 @@
 {
+ "zh_A_de_A": {
+  "examples": [
+   {
+    "en": "Of these toys the big are big and the small are small.",
+    "ko": "이 장난감들은 큰 것은 크고 작은 것은 작다.",
+    "text": "这些玩具大的大，小的小。",
+    "zh": ""
+   },
+   {
+    "en": "Among the students the tall are tall and the short are short.",
+    "ko": "학생들 중에는 키 큰 사람은 크고 작은 사람은 작다.",
+    "text": "同学们高的高，矮的矮。",
+    "zh": ""
+   }
+  ],
+  "name": "A 的 A，B 的 B"
+ },
+ "zh_adj_redup": {
+  "examples": [
+   {
+    "en": "The children went on the outing happily.",
+    "ko": "아이들은 신나게 소풍을 떠났다.",
+    "text": "孩子们高高兴兴地去郊游了。",
+    "zh": ""
+   },
+   {
+    "en": "He walked slowly into the classroom.",
+    "ko": "그는 천천히 교실로 걸어 들어갔다.",
+    "text": "他慢慢地走进了教室。",
+    "zh": ""
+   }
+  ],
+  "name": "形容词重叠 (AA / AABB)"
+ },
  "zh_ba_q": {
   "examples": [
    {
@@ -32,6 +66,40 @@
    }
   ],
   "name": "把 sentence (disposal)"
+ },
+ "zh_ba_yi_V": {
+  "examples": [
+   {
+    "en": "He shut the door with one push and left.",
+    "ko": "그는 문을 탁 닫고 떠나버렸다.",
+    "text": "他把门一关就走了。",
+    "zh": ""
+   },
+   {
+    "en": "Putting the book down at once, he ran out to play.",
+    "ko": "그는 책을 딱 내려놓고는 뛰어나가 놀았다.",
+    "text": "他把书一放，就跑出去玩。",
+    "zh": ""
+   }
+  ],
+  "name": "“把”字句：把 + 宾语 + 一 + 动词"
+ },
+ "zh_bei_gei": {
+  "examples": [
+   {
+    "en": "My glass was broken by him.",
+    "ko": "내 컵이 그에게 깨져 버렸다.",
+    "text": "我的杯子被他给打破了。",
+    "zh": ""
+   },
+   {
+    "en": "The wallet was stolen by him.",
+    "ko": "지갑이 그에게 훔쳐갔다.",
+    "text": "钱包被他给偷走了。",
+    "zh": ""
+   }
+  ],
+  "name": "被动句：被 …… 给 ……"
  },
  "zh_bei_sentence": {
   "examples": [
@@ -67,6 +135,176 @@
   ],
   "name": "比 (than)"
  },
+ "zh_bie": {
+  "examples": [
+   {
+    "en": "Do not forget to take your keys.",
+    "ko": "열쇠를 가져가는 것을 잊지 마라.",
+    "text": "别忘了带钥匙。",
+    "zh": ""
+   },
+   {
+    "en": "Do not worry; take your time.",
+    "ko": "급해하지 말고 천천히 말해라.",
+    "text": "别着急，慢慢说。",
+    "zh": ""
+   }
+  ],
+  "name": "别 (prohibitive)"
+ },
+ "zh_biekan_suishuo": {
+  "examples": [
+   {
+    "en": "Do not be fooled by his youth; he knows a great deal.",
+    "ko": "그가 나이가 어리다고 보지 마라. 아는 것이 적잖다.",
+    "text": "别看他年纪小，懂得可不少。",
+    "zh": ""
+   },
+   {
+    "en": "Though the house is somewhat old, living in it is quite easy.",
+    "ko": "집이 좀 낡다지만 사는 것은 오히려 편하다.",
+    "text": "虽说房子旧了些，住着倒也自在。",
+    "zh": ""
+   }
+  ],
+  "name": "别看 / 虽说"
+ },
+ "zh_bieshuo_dou": {
+  "examples": [
+   {
+    "en": "Never mind primary-school problems; even university students may not manage them.",
+    "ko": "초등학교 문제는 말할 것도 없고 대학생조차 풀지 못할 수도 있다.",
+    "text": "别说小学题，大学生都未必会做。",
+    "zh": ""
+   },
+   {
+    "en": "Let alone running, he can hardly walk.",
+    "ko": "달리기는 말할 것도 없고 그는 걷는 것조차 힘들다.",
+    "text": "别说跑步了，他连走路都困难。",
+    "zh": ""
+   }
+  ],
+  "name": "别说 …… 都/也"
+ },
+ "zh_bieti_duo": {
+  "examples": [
+   {
+    "en": "You cannot imagine how happy I was!",
+    "ko": "얼마나 기뻤는지 말할 나위도 없다!",
+    "text": "别提多高兴了！",
+    "zh": ""
+   },
+   {
+    "en": "You cannot imagine how lively it was!",
+    "ko": "얼마나 흥성거렸는지 두맙것도 없다!",
+    "text": "别提多热闹了！",
+    "zh": ""
+   }
+  ],
+  "name": "别提（有）多 …… 了"
+ },
+ "zh_bijiao_duoshao": {
+  "examples": [
+   {
+    "en": "He bought two more books than I did.",
+    "ko": "그는 나보다 책을 두 권 더 샀다.",
+    "text": "他比我多买了两本书。",
+    "zh": ""
+   },
+   {
+    "en": "You arrived ten minutes earlier than I did.",
+    "ko": "너는 나보다 10분 일찍 도착했다.",
+    "text": "你比我早到了十分钟。",
+    "zh": ""
+   }
+  ],
+  "name": "比较句：比 …… 多/少/早/晚"
+ },
+ "zh_bijiao_geng_hai": {
+  "examples": [
+   {
+    "en": "Today is hotter than yesterday.",
+    "ko": "오늘 날씨가 어제보다 더 덥다.",
+    "text": "今天的天气比昨天更热。",
+    "zh": ""
+   },
+   {
+    "en": "He runs even faster than I do.",
+    "ko": "그는 나보다 더 빨리 달린다.",
+    "text": "他跑得比我还要快。",
+    "zh": ""
+   }
+  ],
+  "name": "比较句：A 比 B 更/还 + 形容词"
+ },
+ "zh_bijiao_shuliang": {
+  "examples": [
+   {
+    "en": "My younger brother is three years younger than I am.",
+    "ko": "남동생은 나보다 세 살 어리다.",
+    "text": "弟弟比我小三岁。",
+    "zh": ""
+   },
+   {
+    "en": "This tree is five metres taller than that one.",
+    "ko": "이 나무는 저 나무보다 5미터 더 크다.",
+    "text": "这棵树比那棵高五米。",
+    "zh": ""
+   }
+  ],
+  "name": "比较句：A + 形容词 + B + 数量短语"
+ },
+ "zh_bijiao_yiyang": {
+  "examples": [
+   {
+    "en": "He is as tall as I am.",
+    "ko": "그는 나와 키가 같다.",
+    "text": "他和我一样高。",
+    "zh": ""
+   },
+   {
+    "en": "This classroom is as big as that one.",
+    "ko": "이 교실은 저 교실만큼 크다.",
+    "text": "这个教室跟那个教室一样大。",
+    "zh": ""
+   }
+  ],
+  "name": "比较句：跟 / 和 …… 一样"
+ },
+ "zh_bijiao_you_mei": {
+  "examples": [
+   {
+    "en": "He is not as careful as you.",
+    "ko": "그는 너만큼 세심하지 못하다.",
+    "text": "他没有你这么细心。",
+    "zh": ""
+   },
+   {
+    "en": "My younger sister is already as tall as Mum.",
+    "ko": "여동생은 벌써 어머니만큼 키가 크다.",
+    "text": "妹妹已经有妈妈这么高了。",
+    "zh": ""
+   }
+  ],
+  "name": "比较句：有 / 没有 …… 这么/那么"
+ },
+ "zh_bijiao_yu_guo": {
+  "examples": [
+   {
+    "en": "This year's output is higher than last year's.",
+    "ko": "올해 생산량은 작년보다 높다.",
+    "text": "今年产量高于去年。",
+    "zh": ""
+   },
+   {
+    "en": "Practice surpasses empty talk.",
+    "ko": "실천은 공론보다 낫다.",
+    "text": "实践胜过空谈。",
+    "zh": ""
+   }
+  ],
+  "name": "比较句：A + 形容词 + 于/过 + B"
+ },
  "zh_bijing": {
   "examples": [
    {
@@ -83,6 +321,23 @@
    }
   ],
   "name": "毕竟 / 反正 (after all / anyway)"
+ },
+ "zh_bing_fou": {
+  "examples": [
+   {
+    "en": "He does not actually like this song.",
+    "ko": "그는 이 노래를 그렇게 좋아하는 것이 아니다.",
+    "text": "他并不喜欢这首歌。",
+    "zh": ""
+   },
+   {
+    "en": "The problem is not really that complicated.",
+    "ko": "문제는 그렇게 복잡하지 않다.",
+    "text": "问题并没有那么复杂。",
+    "zh": ""
+   }
+  ],
+  "name": "并不 / 并没有"
  },
  "zh_bu": {
   "examples": [
@@ -101,6 +356,210 @@
   ],
   "name": "不 (negation)"
  },
+ "zh_bu_bibi": {
+  "examples": [
+   {
+    "en": "She is not much taller than I am.",
+    "ko": "그녀는 나보다 그렇게 크지 않다.",
+    "text": "她不比我高多少。",
+    "zh": ""
+   },
+   {
+    "en": "These trousers are not cheaper than that pair.",
+    "ko": "이 바지는 저 바지보다 싸지 않다.",
+    "text": "这条裤子不比那条便宜。",
+    "zh": ""
+   }
+  ],
+  "name": "比较句：A 不比 B + 形容词"
+ },
+ "zh_bu_bu": {
+  "examples": [
+   {
+    "en": "A room neither big nor small is just right.",
+    "ko": "크지도 작지도 않은 방이 딱 알맞다.",
+    "text": "不大不小的房间正合适。",
+    "zh": ""
+   },
+   {
+    "en": "His words were neither too many nor too few, exactly enough to make the point.",
+    "ko": "그의 말은 많지도 적지도 않게 딱 문제를 설명해 주었다.",
+    "text": "他的话不多不少，正好说明问题。",
+    "zh": ""
+   }
+  ],
+  "name": "不 X 不 Y"
+ },
+ "zh_bu_ye": {
+  "examples": [
+   {
+    "en": "Not going is fine too.",
+    "ko": "가지 않아도 된다.",
+    "text": "不去也可以。",
+    "zh": ""
+   },
+   {
+    "en": "We understand even if he does not say it.",
+    "ko": "그가 말하지 않아도 우리는 알 수 있다.",
+    "text": "他不说我们也明白。",
+    "zh": ""
+   }
+  ],
+  "name": "不 …… 也 ……"
+ },
+ "zh_bubi_buyong": {
+  "examples": [
+   {
+    "en": "You need not come.",
+    "ko": "너는 올 필요 없다.",
+    "text": "你不用来了。",
+    "zh": ""
+   },
+   {
+    "en": "Do not bother him over such a trifle.",
+    "ko": "이런 사소한 일로 그를 귀찮게 할 필요 없다.",
+    "text": "这点小事，不必麻烦他。",
+    "zh": ""
+   }
+  ],
+  "name": "不必 / 不用"
+ },
+ "zh_budan": {
+  "examples": [
+   {
+    "en": "He can speak not only Chinese but also Japanese.",
+    "ko": "그는 중국어를 할 줄 알 뿐만 아니라 일본어도 할 줄 안다.",
+    "text": "他不但会说汉语，而且会说日语。",
+    "zh": ""
+   },
+   {
+    "en": "This restaurant is not only cheap but also tasty.",
+    "ko": "이 식당은 싼 데다가 맛도 좋다.",
+    "text": "这家餐馆不但便宜，而且好吃。",
+    "zh": ""
+   }
+  ],
+  "name": "不但 …… 而且"
+ },
+ "zh_budan_buguang": {
+  "examples": [
+   {
+    "en": "He can not only drive but also repair cars.",
+    "ko": "그는 운전만 할 줄 알 뿐 아니라 차도 고칠 줄 안다.",
+    "text": "他不仅会开车，还会修车。",
+    "zh": ""
+   },
+   {
+    "en": "Not only the students but the teachers joined the contest.",
+    "ko": "학생들만이 아니라 선생님들도 대회에 참가했다.",
+    "text": "不光学生，老师也参加了比赛。",
+    "zh": ""
+   }
+  ],
+  "name": "不仅 / 不光"
+ },
+ "zh_budanbu_faner": {
+  "examples": [
+   {
+    "en": "Far from losing heart, he worked even harder.",
+    "ko": "그는 낙심하기는커녕 오히려 더 노력했다.",
+    "text": "他不但没有灰心，反而更加努力。",
+    "zh": ""
+   },
+   {
+    "en": "The rain did not stop; on the contrary it fell harder.",
+    "ko": "비는 그치기는커녕 오히려 더 세게 내렸다.",
+    "text": "雨不但没有停，反而越下越大。",
+    "zh": ""
+   }
+  ],
+  "name": "不但不/没有 …… 反而"
+ },
+ "zh_buliao": {
+  "examples": [
+   {
+    "en": "Everything seemed to be going well when unexpectedly the car broke down halfway.",
+    "ko": "모두 순조로울 줄 알았는데 뜻밖에 도중에 고장이 났다.",
+    "text": "本以为一切顺利，不料半路出了故障。",
+    "zh": ""
+   },
+   {
+    "en": "We travelled through the night, yet unexpectedly we were still late.",
+    "ko": "우리는 밤새 걸었는데도 뜻밖에 늦어버렸다.",
+    "text": "我们连夜赶路，不料还是迟到了。",
+    "zh": ""
+   }
+  ],
+  "name": "不料"
+ },
+ "zh_buru": {
+  "examples": [
+   {
+    "en": "His Chinese is not as good as yours.",
+    "ko": "그의 중국어는 너만큼 못하다.",
+    "text": "他的汉语不如你。",
+    "zh": ""
+   },
+   {
+    "en": "This restaurant is not as clean as that one.",
+    "ko": "이 식당은 저 식당만큼 깨끗하지 않다.",
+    "text": "这家餐馆不如那家干净。",
+    "zh": ""
+   }
+  ],
+  "name": "比较句：A 不如 B"
+ },
+ "zh_bushi_ershi": {
+  "examples": [
+   {
+    "en": "It is not that he does not want to go; he has no time.",
+    "ko": "그가 가기 싫어서가 아니라 시간이 없는 것이다.",
+    "text": "他不是不想去，而是没时间。",
+    "zh": ""
+   },
+   {
+    "en": "Success comes not from luck but from hard work.",
+    "ko": "성공은 운이 아니라 노력에 달려 있다.",
+    "text": "成功不是靠运气，而是靠努力。",
+    "zh": ""
+   }
+  ],
+  "name": "不是 …… 而是"
+ },
+ "zh_bushi_jiushi": {
+  "examples": [
+   {
+    "en": "Every day he is either in the library or in the classroom.",
+    "ko": "그는 매일 도서관에 있거나 아니면 교실에 있다.",
+    "text": "他每天不是在图书馆，就是在教室。",
+    "zh": ""
+   },
+   {
+    "en": "At weekends he either plays football or basketball.",
+    "ko": "주말이면 그는 축구를 하거나 아니면 농구를 한다.",
+    "text": "周末他不是踢足球，就是打篮球。",
+    "zh": ""
+   }
+  ],
+  "name": "不是 …… 就是"
+ },
+ "zh_bushuo_hai": {
+  "examples": [
+   {
+    "en": "He lives far away, and there is no lift into the bargain.",
+    "ko": "그는 살집이 멀기는커녕 엘리베이터도 없다.",
+    "text": "他住得远不说，还没有电梯。",
+    "zh": ""
+   },
+   {
+    "en": "The food is dear, and not tasty besides.",
+    "ko": "요리는 비쌀뿐 아니라 맛도 없다.",
+    "text": "菜贵不说，还不好吃。",
+    "zh": ""
+   }
+  ],
+  "name": "…… 不说，还 ……"
+ },
  "zh_cai_jiu": {
   "examples": [
    {
@@ -118,6 +577,193 @@
   ],
   "name": "才 / 就 (timing)"
  },
+ "zh_chengdu_1": {
+  "examples": [
+   {
+    "en": "The weather today is very good.",
+    "ko": "오늘 날씨가 아주 좋다.",
+    "text": "今天的天气非常好。",
+    "zh": ""
+   },
+   {
+    "en": "This film is too long.",
+    "ko": "이 영화는 너무 길다.",
+    "text": "这部电影太长了。",
+    "zh": ""
+   }
+  ],
+  "name": "程度副词：很 / 非常 / 太 / 真 / 有点儿"
+ },
+ "zh_chengdu_2": {
+  "examples": [
+   {
+    "en": "He rather likes it.",
+    "ko": "그는 꽤 마음에 들어한다.",
+    "text": "他挺喜欢的。",
+    "zh": ""
+   },
+   {
+    "en": "This dish is rather spicy.",
+    "ko": "이 요리는 좀 맵다.",
+    "text": "这道菜比较辣。",
+    "zh": ""
+   }
+  ],
+  "name": "程度副词：比较 / 特别 / 挺 / 有些"
+ },
+ "zh_chengdu_4": {
+  "examples": [
+   {
+    "en": "There is a great deal of homework today.",
+    "ko": "오늘 숙제가 아주 많다.",
+    "text": "今天的作业十分多。",
+    "zh": ""
+   },
+   {
+    "en": "He especially likes eating dumplings.",
+    "ko": "그는 특히 만두 먹기를 좋아한다.",
+    "text": "他尤其喜欢吃饺子。",
+    "zh": ""
+   }
+  ],
+  "name": "程度副词：十分 / 更加 / 稍微 / 尤其 / 多么"
+ },
+ "zh_chengdu_5": {
+  "examples": [
+   {
+    "en": "This box is quite heavy.",
+    "ko": "이 상자는 상당히 무겁다.",
+    "text": "这个箱子相当重。",
+    "zh": ""
+   },
+   {
+    "en": "He was overly nervous and performed below his usual level.",
+    "ko": "그는 지나치게 긴장하여 평소 실력을 발휘하지 못했다.",
+    "text": "他过于紧张，发挥失常。",
+    "zh": ""
+   }
+  ],
+  "name": "程度副词：过于 / 相当 / 格外 / 极其 / 较为"
+ },
+ "zh_chengdu_79": {
+  "examples": [
+   {
+    "en": "By contrast the difference is especially marked.",
+    "ko": "대조해 보면 반차가 유달리 뚜렷하다.",
+    "text": "对比之下，反差分外明显。",
+    "zh": ""
+   },
+   {
+    "en": "His words are quite thought-provoking.",
+    "ko": "그의 말은 적잖이 계발성을 지닌다.",
+    "text": "他的话颇具启发性。",
+    "zh": ""
+   }
+  ],
+  "name": "程度副词：大为 / 分外 / 何等 / 极力 / 略 / 颇 / 万分 / 尤为 / 愈加 / 越发"
+ },
+ "zh_chengdu_buYu_1": {
+  "examples": [
+   {
+    "en": "The weather today is extremely fine.",
+    "ko": "오늘 날씨는 아주 좋다.",
+    "text": "今天的天气好得很。",
+    "zh": ""
+   },
+   {
+    "en": "Having run five kilometres, he is utterly tired.",
+    "ko": "5킬로미터를 달려서 그는 몹시 피곤하다.",
+    "text": "跑了五公里，他累极了。",
+    "zh": ""
+   }
+  ],
+  "name": "程度补语：得很 / 极了"
+ },
+ "zh_chengdu_buYu_2": {
+  "examples": [
+   {
+    "en": "It is terribly hot today.",
+    "ko": "오늘은 몹시 덥다.",
+    "text": "今天热得厉害。",
+    "zh": ""
+   },
+   {
+    "en": "Having searched all day he is dog-tired.",
+    "ko": "하루 종일 찾아 다녀서 그는 몹시 피곤하다.",
+    "text": "找了一整天，他累死了。",
+    "zh": ""
+   }
+  ],
+  "name": "程度补语：死了 / 厉害"
+ },
+ "zh_chengdu_buYu_3": {
+  "examples": [
+   {
+    "en": "These two days have been extremely busy.",
+    "ko": "이 며칠은 몹시 바빴다.",
+    "text": "这两天忙得不得了。",
+    "zh": ""
+   },
+   {
+    "en": "After the exam he was dead tired.",
+    "ko": "시험을 치르고 나서 그는 몹시 피곤했다.",
+    "text": "考完试，他累得要命。",
+    "zh": ""
+   }
+  ],
+  "name": "程度补语：得 + 不得了 / 要命 / 要死"
+ },
+ "zh_chengdu_buYu_4": {
+  "examples": [
+   {
+    "en": "This person's character is rotten through and through.",
+    "ko": "이 사람의 품성은 철저히 나쁘다.",
+    "text": "这个人的品质坏透了。",
+    "zh": ""
+   },
+   {
+    "en": "The weather today is utterly awful.",
+    "ko": "오늘 날씨는 몹시 나쁘다.",
+    "text": "今天的天气糟透了。",
+    "zh": ""
+   }
+  ],
+  "name": "程度补语：V/形 + 透 + 了 / 透顶"
+ },
+ "zh_chongdie_gushi": {
+  "examples": [
+   {
+    "en": "Having thought it over and over, I decided to go after all.",
+    "ko": "이리저리 생각해 보다가 결국 가기로 결정했다.",
+    "text": "想来想去，还是决定去。",
+    "zh": ""
+   },
+   {
+    "en": "Walking on and on, we reached the river.",
+    "ko": "걷고 걷다 보니 강가에 도착했다.",
+    "text": "走着走着，就到了河边。",
+    "zh": ""
+   }
+  ],
+  "name": "重叠格式：A来A去 / A着A着 / 说A就A"
+ },
+ "zh_chufei_cai": {
+  "examples": [
+   {
+    "en": "Unless you do it yourself you will never learn it.",
+    "ko": "직접 손을 쓰지 않으면 배울 수 없다.",
+    "text": "除非亲自动手，否则学不会。",
+    "zh": ""
+   },
+   {
+    "en": "Only if it rains will the match be postponed.",
+    "ko": "비가 와야만 경기가 연기된다.",
+    "text": "除非下雨，比赛才会延期。",
+    "zh": ""
+   }
+  ],
+  "name": "除非 …… 才/否则"
+ },
  "zh_chule": {
   "examples": [
    {
@@ -134,6 +780,278 @@
    }
   ],
   "name": "除了 (except / besides)"
+ },
+ "zh_cong_qi": {
+  "examples": [
+   {
+    "en": "From next month I will study Japanese.",
+    "ko": "다음 달부터 나는 일본어를 배울 것이다.",
+    "text": "从下个月起，我要学日语。",
+    "zh": ""
+   },
+   {
+    "en": "From this year the park is free to enter.",
+    "ko": "올해부터 공원은 무료로 개방된다.",
+    "text": "从今年起，公园免费开放。",
+    "zh": ""
+   }
+  ],
+  "name": "从 …… 起"
+ },
+ "zh_cong_wang": {
+  "examples": [
+   {
+    "en": "He comes from Beijing.",
+    "ko": "그는 베이징에서 왔다.",
+    "text": "他从北京来。",
+    "zh": ""
+   },
+   {
+    "en": "Go straight on and turn right at the crossing.",
+    "ko": "쭉 앞으로 걷다가 사거리에서 우회전해라.",
+    "text": "一直往前走，到路口右转。",
+    "zh": ""
+   }
+  ],
+  "name": "介词：从 / 往"
+ },
+ "zh_cunxian_3": {
+  "examples": [
+   {
+    "en": "A guest came to our home yesterday.",
+    "ko": "어제 집에 손님이 한 사람 왔다.",
+    "text": "昨天家里来了一个客人。",
+    "zh": ""
+   },
+   {
+    "en": "A picture hangs on the wall.",
+    "ko": "벽에 그림이 한 폭 걸려 있다.",
+    "text": "墙上挂着一幅画。",
+    "zh": ""
+   }
+  ],
+  "name": "存现句 (出现 / 消失)"
+ },
+ "zh_dao_weizhi": {
+  "examples": [
+   {
+    "en": "The meeting runs until twelve noon.",
+    "ko": "회의는 정오 12시까지 진행된다.",
+    "text": "会议开到中午十二点为止。",
+    "zh": ""
+   },
+   {
+    "en": "Registration closes at the end of this month.",
+    "ko": "신청은 이번 달 말까지이다.",
+    "text": "报名到本月底为止。",
+    "zh": ""
+   }
+  ],
+  "name": "到 …… 为止"
+ },
+ "zh_de_adverbial": {
+  "examples": [
+   {
+    "en": "He studies earnestly.",
+    "ko": "그는 성실히 공부한다.",
+    "text": "他认真地学习。",
+    "zh": ""
+   },
+   {
+    "en": "She began to sing with joy.",
+    "ko": "그녀는 기쁘게 노래를 부르기 시작했다.",
+    "text": "她高兴地唱起歌来。",
+    "zh": ""
+   }
+  ],
+  "name": "地 (adverbial marker)"
+ },
+ "zh_dehua": {
+  "examples": [
+   {
+    "en": "If it rains tomorrow, the sports meet will be cancelled.",
+    "ko": "내일 비가 온다면 운동회는 취소된다.",
+    "text": "明天下雨的话，运动会就取消了。",
+    "zh": ""
+   },
+   {
+    "en": "If there is not enough time, we will take a taxi.",
+    "ko": "시간이 안 된다면 우리는 택시를 타고 갈 것이다.",
+    "text": "时间来不及的话，我们就坐出租车去。",
+    "zh": ""
+   }
+  ],
+  "name": "…… 的话 (if)"
+ },
+ "zh_dixu": {
+  "examples": [
+   {
+    "en": "This is Lesson Three.",
+    "ko": "이것은 제3과입니다.",
+    "text": "这是第三课。",
+    "zh": ""
+   },
+   {
+    "en": "Today is her eighteenth birthday.",
+    "ko": "오늘은 그녀의 열여덟 번째 생일이다.",
+    "text": "今天是她的第十八个生日。",
+    "zh": ""
+   }
+  ],
+  "name": "第 + 数词 (ordinal)"
+ },
+ "zh_dongbudong_jiu": {
+  "examples": [
+   {
+    "en": "He loses his temper at every turn.",
+    "ko": "그는 자꾸만 화를 낸다.",
+    "text": "他动不动就发脾气。",
+    "zh": ""
+   },
+   {
+    "en": "The machine breaks down at the slightest excuse.",
+    "ko": "이 기계는 자꾸만 고장이 난다.",
+    "text": "这机器动不动就出毛病。",
+    "zh": ""
+   }
+  ],
+  "name": "动不动就"
+ },
+ "zh_dongci_79": {
+  "examples": [
+   {
+    "en": "He itched to fly back at once.",
+    "ko": "그는 당장 날아가 버리고 싶어 안달이다.",
+    "text": "他恨不得马上飞回去。",
+    "zh": ""
+   },
+   {
+    "en": "This task may well be called arduous.",
+    "ko": "이 임무는 이르기 어려울 정도로 막중하다.",
+    "text": "这项任务可谓艰巨。",
+    "zh": ""
+   }
+  ],
+  "name": "书面动词：巴不得 / 恨不得 / 免不了 / 可谓 / 所谓 / 并非 / 有所"
+ },
+ "zh_dongliangci_3": {
+  "examples": [
+   {
+    "en": "The text has been read twice.",
+    "ko": "본문을 두 번 읽었다.",
+    "text": "课文读了两遍。",
+    "zh": ""
+   },
+   {
+    "en": "He gave a sigh and said nothing.",
+    "ko": "그는 한숨을 한 번 쉬고 아무 말도 하지 않았다.",
+    "text": "他叹了一口气，没有说话。",
+    "zh": ""
+   }
+  ],
+  "name": "动量词：口 / 回 / 遍 / 声 / 下"
+ },
+ "zh_dongliangci_5": {
+  "examples": [
+   {
+    "en": "He glanced at his watch.",
+    "ko": "그는 손목시계를 한 번 흘긋 보았다.",
+    "text": "他看了一眼手表。",
+    "zh": ""
+   },
+   {
+    "en": "The old man handed a bunch of grapes to the child.",
+    "ko": "노인이 포도 한 송이를 아이에게 건넸다.",
+    "text": "老人把一串葡萄递给孩子。",
+    "zh": ""
+   }
+  ],
+  "name": "动量词：眼 / 番 / 串 / 滴 / 扇"
+ },
+ "zh_dongliangci_chang": {
+  "examples": [
+   {
+    "en": "A heavy rain fell.",
+    "ko": "큰비가 한바탕 내렸다.",
+    "text": "下了一场大雨。",
+    "zh": ""
+   },
+   {
+    "en": "He made two trips to the post office.",
+    "ko": "그는 우체국에 두 번 다녀왔다.",
+    "text": "他这趟跑了两趟邮局。",
+    "zh": ""
+   }
+  ],
+  "name": "动量词：场 / 顿 / 趟"
+ },
+ "zh_dongliangci_ci": {
+  "examples": [
+   {
+    "en": "I have been to Beijing twice.",
+    "ko": "나는 베이징에 두 번 가 본 적이 있다.",
+    "text": "我去过两次北京。",
+    "zh": ""
+   },
+   {
+    "en": "This is her first visit to Shanghai.",
+    "ko": "이것은 그녀가 처음으로 상하이에 온 것이다.",
+    "text": "这是她第一次来上海。",
+    "zh": ""
+   }
+  ],
+  "name": "动量词：次"
+ },
+ "zh_dou_le": {
+  "examples": [
+   {
+    "en": "It is already twelve; are you still up?",
+    "ko": "벌써 열두 시인데 아직 안 자냐?",
+    "text": "都十二点了，还没睡吗？",
+    "zh": ""
+   },
+   {
+    "en": "You are already a university student and still play around so much.",
+    "ko": "너는 벌써 대학생인데 아직도 이렇게 놀기만 한다니.",
+    "text": "你都大学生了，还这么贪玩。",
+    "zh": ""
+   }
+  ],
+  "name": "都 …… 了"
+ },
+ "zh_dui_he": {
+  "examples": [
+   {
+    "en": "I am very kind to him.",
+    "ko": "나는 그에게 아주 친절하다.",
+    "text": "我对他很好。",
+    "zh": ""
+   },
+   {
+    "en": "I will have a talk with the teacher this afternoon.",
+    "ko": "오후에 선생님과 이야기를 나눌 것이다.",
+    "text": "下午我要和老师谈一谈。",
+    "zh": ""
+   }
+  ],
+  "name": "介词：和 / 对"
+ },
+ "zh_dui_laishuo": {
+  "examples": [
+   {
+    "en": "For me this is not really hard.",
+    "ko": "나에게는 이것이 그렇게 어렵지 않다.",
+    "text": "对我来说，这不算难。",
+    "zh": ""
+   },
+   {
+    "en": "In a child's eyes everything is new.",
+    "ko": "아이의 눈에는 모든 것이 새롭다.",
+    "text": "在孩子看来，一切都很新鲜。",
+    "zh": ""
+   }
+  ],
+  "name": "对 …… 来说 / 在 …… 看来"
  },
  "zh_erqie": {
   "examples": [
@@ -169,6 +1087,329 @@
   ],
   "name": "然而 / 却 (however)"
  },
+ "zh_fan_zhe_jun": {
+  "examples": [
+   {
+    "en": "All who sign up may take part.",
+    "ko": "신청하는 사람은 모두 참가할 수 있다.",
+    "text": "凡报名者，均可参加。",
+    "zh": ""
+   },
+   {
+    "en": "Everyone whose results pass will be issued a certificate.",
+    "ko": "성적이 합격한 사람은 모두 증서를 발급받는다.",
+    "text": "凡成绩合格者，均发给证书。",
+    "zh": ""
+   }
+  ],
+  "name": "凡 …… （者），均"
+ },
+ "zh_fangshi_4": {
+  "examples": [
+   {
+    "en": "He knocked over the glass on purpose.",
+    "ko": "그는 일부러 물컵을 엎어버렸다.",
+    "text": "他故意打翻了水杯。",
+    "zh": ""
+   },
+   {
+    "en": "The classmates help each other.",
+    "ko": "학급 친구들은 서로 돕는다.",
+    "text": "同学们互相帮助。",
+    "zh": ""
+   }
+  ],
+  "name": "方式副词：故意 / 互相"
+ },
+ "zh_fangshi_5": {
+  "examples": [
+   {
+    "en": "I will arrive on time as far as possible.",
+    "ko": "나는 될 수 있는 한 제시간에 도착하겠다.",
+    "text": "我会尽量按时到达。",
+    "zh": ""
+   },
+   {
+    "en": "The principal came in person to welcome the new students.",
+    "ko": "교장 선생님이 친히 나와서 신입생들을 환영했다.",
+    "text": "校长亲自来欢迎新生。",
+    "zh": ""
+   }
+  ],
+  "name": "方式副词：尽量 / 亲自"
+ },
+ "zh_fangshi_6": {
+  "examples": [
+   {
+    "en": "She prepared the gift specially for you.",
+    "ko": "그녀는 특별히 너를 위해 선물을 준비했다.",
+    "text": "她特意为你准备了礼物。",
+    "zh": ""
+   },
+   {
+    "en": "At this sight he could not help shedding tears.",
+    "ko": "이 장면을 보고 그는 저절로 눈물을 흘렸다.",
+    "text": "看到这一幕，他不禁流下眼泪。",
+    "zh": ""
+   }
+  ],
+  "name": "方式副词：不禁 / 赶忙 / 特地 / 特意 / 偷偷"
+ },
+ "zh_fangshi_79": {
+  "examples": [
+   {
+    "en": "He resolutely gave up the generous terms.",
+    "ko": "그는 결연히 후한한 대우를 포기했다.",
+    "text": "他毅然放弃了优厚的待遇。",
+    "zh": ""
+   },
+   {
+    "en": "He sighed in spite of himself.",
+    "ko": "그는 저절로 한숨을 쉬었다.",
+    "text": "他不由得叹了一口气。",
+    "zh": ""
+   }
+  ],
+  "name": "方式副词：不由得 / 趁机 / 竭力 / 擅自 / 毅然 / 照常 / 执意 / 骤然 / 逐一 / 专程"
+ },
+ "zh_fangzhe_bu": {
+  "examples": [
+   {
+    "en": "Leaving the ready-made method unused is truly puzzling.",
+    "ko": "만들어져 있는 방법을 두고 쓰지 않다니 정말 이해할 수 없다.",
+    "text": "放着现成的方法不用，真是想不通。",
+    "zh": ""
+   },
+   {
+    "en": "Leaving good books unread, you play video games!",
+    "ko": "좋은 책을 두고 읽지 않고 게임이나 하고 있어!",
+    "text": "放着好好的书不读，你打游戏！",
+    "zh": ""
+   }
+  ],
+  "name": "放着 …… 不 ……"
+ },
+ "zh_fanshi_dou": {
+  "examples": [
+   {
+    "en": "Whoever is late must register.",
+    "ko": "지각하는 사람은 모두 등기를 해야 한다.",
+    "text": "凡是迟到的人都要登记。",
+    "zh": ""
+   },
+   {
+    "en": "Every child who follows the rules is praised.",
+    "ko": "규칙을 지키는 아이들은 모두 칭찬을 받는다.",
+    "text": "凡是遵守规则的孩子都受到表扬。",
+    "zh": ""
+   }
+  ],
+  "name": "凡是 …… 都"
+ },
+ "zh_fanwei_3": {
+  "examples": [
+   {
+    "en": "We spent fifty yuan in total.",
+    "ko": "우리는 모두 50위안을 썼다.",
+    "text": "我们一共花了五十元。",
+    "zh": ""
+   },
+   {
+    "en": "He is only joking; do not be angry.",
+    "ko": "그는 그저 농담하는 것일 뿐이니 화내지 마라.",
+    "text": "他只是开玩笑，你别生气。",
+    "zh": ""
+   }
+  ],
+  "name": "范围副词：一共 / 到处 / 只是"
+ },
+ "zh_fanwei_4": {
+  "examples": [
+   {
+    "en": "This class has at least thirty students.",
+    "ko": "이 반에는 적어도 학생이 서른 명은 있다.",
+    "text": "这个班至少有三十个学生。",
+    "zh": ""
+   },
+   {
+    "en": "The whole class has forty-five people in all.",
+    "ko": "반 전체가 모두 45명이다.",
+    "text": "全班共有四十五个人。",
+    "zh": ""
+   }
+  ],
+  "name": "范围副词：共 / 仅 / 至少"
+ },
+ "zh_fanwei_79": {
+  "examples": [
+   {
+    "en": "All the participants are experts in the field.",
+    "ko": "회의 참석자는 모두 해당 분야의 전문가이다.",
+    "text": "与会者均为业内专家。",
+    "zh": ""
+   },
+   {
+    "en": "Pack all the stationery into the schoolbag.",
+    "ko": "문구류를 모조리 가방에 넣어라.",
+    "text": "文具统统装进书包。",
+    "zh": ""
+   }
+  ],
+  "name": "范围副词：皆 / 均 / 统统 / 唯独 / 无非 / 一概"
+ },
+ "zh_fanwen_bushi": {
+  "examples": [
+   {
+    "en": "Is this not obvious?",
+    "ko": "이것이 아주 분명하지 않은가?",
+    "text": "这不是很明显的吗？",
+    "zh": ""
+   },
+   {
+    "en": "Did you not just go there yesterday?",
+    "ko": "너 어제 그곳에 갔다 오지 않았었냐?",
+    "text": "你不是昨天刚去过吗？",
+    "zh": ""
+   }
+  ],
+  "name": "反问句：不是 …… 吗"
+ },
+ "zh_feide_cai": {
+  "examples": [
+   {
+    "en": "He will not believe it until he sees it with his own eyes.",
+    "ko": "그는 자기 눈으로 직접 보고야 믿는다.",
+    "text": "他非得亲眼看到才肯相信。",
+    "zh": ""
+   },
+   {
+    "en": "This dish must be simmered slowly to take the flavour.",
+    "ko": "이 요리는 약한 불로 오래 끓여야만 맛이 든다.",
+    "text": "这道菜非得慢火炖才入味。",
+    "zh": ""
+   }
+  ],
+  "name": "非得 …… 才"
+ },
+ "zh_fouding_79": {
+  "examples": [
+   {
+    "en": "He will never agree.",
+    "ko": "그는 결단코 동의하지 않을 것이다.",
+    "text": "他绝不会同意。",
+    "zh": ""
+   },
+   {
+    "en": "He could do nothing but agree.",
+    "ko": "그는 어쩔 수 없이 승낙할 수밖에 없었다.",
+    "text": "他无可奈何，只好答应。",
+    "zh": ""
+   }
+  ],
+  "name": "否定副词：不见得 / 绝不 / 无从 / 无须 / 无可 / 勿"
+ },
+ "zh_fouze": {
+  "examples": [
+   {
+    "en": "Hurry up, or we will miss the train.",
+    "ko": "서둘러 가라. 그러지 않으면 기차를 놓친다.",
+    "text": "快走吧，否则赶不上火车了。",
+    "zh": ""
+   },
+   {
+    "en": "You must bring your ID, otherwise you will not be let in.",
+    "ko": "신분증을 꼭 지참해야 한다. 아니면 입장할 수 없다.",
+    "text": "必须带上证件，否则不让进门。",
+    "zh": ""
+   }
+  ],
+  "name": "否则"
+ },
+ "zh_gai_le": {
+  "examples": [
+   {
+    "en": "It is time to have dinner.",
+    "ko": "저녁 먹을 때가 되었다.",
+    "text": "该吃晚饭了。",
+    "zh": ""
+   },
+   {
+    "en": "It is late; time to go home.",
+    "ko": "늦었으니 집에 갈 때다.",
+    "text": "不早了，该回家了。",
+    "zh": ""
+   }
+  ],
+  "name": "该 …… 了"
+ },
+ "zh_gaishu_3": {
+  "examples": [
+   {
+    "en": "He is some thirty years old.",
+    "ko": "그는 서른 살 안팎이다.",
+    "text": "他三十来岁。",
+    "zh": ""
+   },
+   {
+    "en": "The meeting lasted about two hours.",
+    "ko": "회의는 대략 두 시간 동안 계속되었다.",
+    "text": "会议大约开了两个小时。",
+    "zh": ""
+   }
+  ],
+  "name": "概数：来 / 左右 / 前后 / 大约 / 倍"
+ },
+ "zh_gaishu_duo": {
+  "examples": [
+   {
+    "en": "There are more than thirty books in the library.",
+    "ko": "도서관에 책이 서른 권이 넘게 있다.",
+    "text": "图书馆里有三十多本书。",
+    "zh": ""
+   },
+   {
+    "en": "He lived in China for more than two years.",
+    "ko": "그는 중국에 2년 넘게 살았다.",
+    "text": "他在中国住了两年多。",
+    "zh": ""
+   }
+  ],
+  "name": "概数：数词 + 多 + 量词"
+ },
+ "zh_gaishu_linjin": {
+  "examples": [
+   {
+    "en": "Three or four students will be enough.",
+    "ko": "학생 세어 명이면 충분하다.",
+    "text": "三四个学生就够了。",
+    "zh": ""
+   },
+   {
+    "en": "The meeting lasted two or three hours.",
+    "ko": "회의가 두어 시간 동안 계속되었다.",
+    "text": "会议开了两三个小时。",
+    "zh": ""
+   }
+  ],
+  "name": "概数：相邻数词连用"
+ },
+ "zh_gan_modal": {
+  "examples": [
+   {
+    "en": "I dare not walk the night road alone.",
+    "ko": "나는 감히 혼자 밤길을 걸을 수 없다.",
+    "text": "我不敢一个人走夜路。",
+    "zh": ""
+   },
+   {
+    "en": "Do you dare reason with him?",
+    "ko": "너는 감히 그와 이야기를 나눌 수 있겠냐?",
+    "text": "你敢跟他讲道理吗？",
+    "zh": ""
+   }
+  ],
+  "name": "能愿动词：敢"
+ },
  "zh_ge": {
   "examples": [
    {
@@ -185,6 +1426,57 @@
    }
   ],
   "name": "个 (common measure word)"
+ },
+ "zh_ge_renhe": {
+  "examples": [
+   {
+    "en": "No one at all may go in.",
+    "ko": "그 누구도 안으로 들어갈 수 없다.",
+    "text": "任何人都不能进去。",
+    "zh": ""
+   },
+   {
+    "en": "Cakes of every flavour are available.",
+    "ko": "각양각색의 맛을 지닌 케이크가 모두 있다.",
+    "text": "各种口味的蛋糕都有。",
+    "zh": ""
+   }
+  ],
+  "name": "各 / 任何"
+ },
+ "zh_gei_prep": {
+  "examples": [
+   {
+    "en": "Please give him a glass of water.",
+    "ko": "그에게 물 한 잔을 주세요.",
+    "text": "请给他一杯水。",
+    "zh": ""
+   },
+   {
+    "en": "Mum knitted a sweater for me.",
+    "ko": "엄마가 나에게 스웨터를 한 벌 만들어 주셨다.",
+    "text": "妈妈给我做了一件毛衣。",
+    "zh": ""
+   }
+  ],
+  "name": "介词：给"
+ },
+ "zh_gen_prep": {
+  "examples": [
+   {
+    "en": "I will go together with him.",
+    "ko": "나는 그와 함께 갈 것이다.",
+    "text": "我跟他一起去。",
+    "zh": ""
+   },
+   {
+    "en": "Discuss it with him.",
+    "ko": "이 일은 그와 상의해 보아라.",
+    "text": "这件事你跟他商量一下吧。",
+    "zh": ""
+   }
+  ],
+  "name": "介词：跟"
  },
  "zh_geng_zui": {
   "examples": [
@@ -220,6 +1512,108 @@
   ],
   "name": "根据 / 按照 (according to)"
  },
+ "zh_gou_de": {
+  "examples": [
+   {
+    "en": "This trip was really tiring.",
+    "ko": "이번 여행은 참 피곤한 일이었다.",
+    "text": "这次旅行够累的。",
+    "zh": ""
+   },
+   {
+    "en": "These luggages are quite heavy.",
+    "ko": "이 짐들은 상당히 무겁다.",
+    "text": "这些行李够重的。",
+    "zh": ""
+   }
+  ],
+  "name": "够 …… 的"
+ },
+ "zh_gu_lianjie": {
+  "examples": [
+   {
+    "en": "It was already late, so we rested first.",
+    "ko": "해가 이미 늦었으므로 먼저 쉬었다.",
+    "text": "天色已晚，故先行歇息。",
+    "zh": ""
+   },
+   {
+    "en": "The rain was too heavy; therefore the match was postponed.",
+    "ko": "비가 너무 많이 왔으므로 경기를 연기했다.",
+    "text": "雨势过大，故比赛延期。",
+    "zh": ""
+   }
+  ],
+  "name": "故 (written therefore)"
+ },
+ "zh_guding_4a": {
+  "examples": [
+   {
+    "en": "If we do not go now it will be too late.",
+    "ko": "지금 가지 않으면 시간에 못 맞춘다.",
+    "text": "再不走就来不及了。",
+    "zh": ""
+   },
+   {
+    "en": "He has plenty of money; do not worry.",
+    "ko": "그에게는 돈이 넉넉하니 걱정할 필요 없다.",
+    "text": "他钱有的是，不用担心。",
+    "zh": ""
+   }
+  ],
+  "name": "来得及 / 有的是 / 说不定"
+ },
+ "zh_guding_4b": {
+  "examples": [
+   {
+    "en": "I never want to be late again.",
+    "ko": "다시는 지각하고 싶지 않다.",
+    "text": "再也不想迟到了。",
+    "zh": ""
+   },
+   {
+    "en": "However much we persuade him, he will not listen.",
+    "ko": "아무리 권해도 듣지 않는다.",
+    "text": "怎么劝他也不听。",
+    "zh": ""
+   }
+  ],
+  "name": "再也不/没 · 怎么都/也 + 不/没"
+ },
+ "zh_guding_5": {
+  "examples": [
+   {
+    "en": "Judging from the data, things are improving.",
+    "ko": "수치로 볼 때 상황이 좋아지고 있다.",
+    "text": "从数据来看，情况在好转。",
+    "zh": ""
+   },
+   {
+    "en": "This committee is made up of nine members.",
+    "ko": "이 위원회는 9명의 위원으로 구성되어 있다.",
+    "text": "这个委员会由九名成员组成。",
+    "zh": ""
+   }
+  ],
+  "name": "从 …… 来看 / …… 以来 / 由 …… 组成"
+ },
+ "zh_gui_gui": {
+  "examples": [
+   {
+    "en": "The blunt words are said first: talking is talking, and doing is doing.",
+    "ko": "미리 흉보를 말해 두는데 말은 말이요 행동은 행동이다.",
+    "text": "丑话说在前头，说归说，做归做。",
+    "zh": ""
+   },
+   {
+    "en": "Fun is fun, but the real business still has to be done.",
+    "ko": "장난은 장난일 뿐 본래 할 일은 해야 한다.",
+    "text": "闹归闹，正事还是要办。",
+    "zh": ""
+   }
+  ],
+  "name": "X 归 X"
+ },
  "zh_guo": {
   "examples": [
    {
@@ -254,6 +1648,57 @@
   ],
   "name": "还 (still / also)"
  },
+ "zh_haishi_ba": {
+  "examples": [
+   {
+    "en": "Let us just go back.",
+    "ko": "우리는 그냥 돌아가자.",
+    "text": "我们还是回去吧。",
+    "zh": ""
+   },
+   {
+    "en": "It is too late; you had better stay the night.",
+    "ko": "너무 늦었으니 그냥 묵고 가라.",
+    "text": "天太晚了，你还是住下来吧。",
+    "zh": ""
+   }
+  ],
+  "name": "还是 …… 吧"
+ },
+ "zh_hao_mudi": {
+  "examples": [
+   {
+    "en": "Set off early so as to catch the first bus.",
+    "ko": "일찍 출발해서 첫 차를 타도록 하자.",
+    "text": "早点出发，好赶上第一班车。",
+    "zh": ""
+   },
+   {
+    "en": "Read aloud so that everyone can hear.",
+    "ko": "모두가 들을 수 있도록 큰 소리로 읽어라.",
+    "text": "你大声念，好让大家都听见。",
+    "zh": ""
+   }
+  ],
+  "name": "……，好 ……"
+ },
+ "zh_haobu_rongyi": {
+  "examples": [
+   {
+    "en": "I got the ticket only with great difficulty.",
+    "ko": "나는 간신히 표를 구했다.",
+    "text": "我好不容易才买到票。",
+    "zh": ""
+   },
+   {
+    "en": "He climbed to the top with much effort.",
+    "ko": "그는 힘겹게 산 꼭대기에 올랐다.",
+    "text": "他好容易爬上了山顶。",
+    "zh": ""
+   }
+  ],
+  "name": "好（不）容易"
+ },
  "zh_hekuang": {
   "examples": [
    {
@@ -270,6 +1715,227 @@
    }
   ],
   "name": "何况 / 况且 (moreover)"
+ },
+ "zh_huayu_biaoji": {
+  "examples": [
+   {
+    "en": "In short, this attempt was a success.",
+    "ko": "요컨대 이번 시도는 성공적이었다.",
+    "text": "总而言之，这次尝试是成功的。",
+    "zh": ""
+   },
+   {
+    "en": "In other words, the problem lies in the management.",
+    "ko": "다시 말해 문제는 경영에 있다.",
+    "text": "换句话说，问题出在管理上。",
+    "zh": ""
+   }
+  ],
+  "name": "话语标记：归根到底 / 换句话说 / 无论如何 / 总而言之"
+ },
+ "zh_huo_huo": {
+  "examples": [
+   {
+    "en": "Whether climbing mountains or viewing the sea, each has its pleasure.",
+    "ko": "등산를 하든 바다를 보든 저마다 재미가 있다.",
+    "text": "或登山，或看海，各有乐趣。",
+    "zh": ""
+   },
+   {
+    "en": "After class I either read or take exercise; life is full.",
+    "ko": "수업 밖에는 책을 읽거나 운동을 하여 생활이 충실하다.",
+    "text": "课余或读书，或运动，生活充实。",
+    "zh": ""
+   }
+  ],
+  "name": "或 …… 或 ……"
+ },
+ "zh_huoshi_huoshi": {
+  "examples": [
+   {
+    "en": "At the weekend I either play ball or swim.",
+    "ko": "주말에는 공놀이를 하거나 수영을 한다.",
+    "text": "周末或是打球，或是游泳。",
+    "zh": ""
+   },
+   {
+    "en": "During the holidays I either go home or travel.",
+    "ko": "휴가 때는 고향에 돌아가거나 여행을 떠난다.",
+    "text": "放假或是回老家，或是去旅行。",
+    "zh": ""
+   }
+  ],
+  "name": "或是 …… 或是"
+ },
+ "zh_huozhe": {
+  "examples": [
+   {
+    "en": "You can play ball or swim at the weekend.",
+    "ko": "주말에 공놀이를 하거나 수영을 할 수 있다.",
+    "text": "周末你可以打球或者游泳。",
+    "zh": ""
+   },
+   {
+    "en": "On Sunday I either read or listen to music.",
+    "ko": "일요일에는 책을 읽거나 음악을 듣는다.",
+    "text": "星期天或者看书，或者听音乐。",
+    "zh": ""
+   }
+  ],
+  "name": "或 / 或者"
+ },
+ "zh_huozhe_huozhe": {
+  "examples": [
+   {
+    "en": "At the weekend I either read at home or go climbing.",
+    "ko": "주말에는 집에서 책을 읽거나 등산하러 간다.",
+    "text": "周末或者在家看书，或者去爬山。",
+    "zh": ""
+   },
+   {
+    "en": "In the evening he either takes a walk or goes jogging.",
+    "ko": "저녁에는 그는 산책을 하거나 달리기를 한다.",
+    "text": "晚上他或者散步，或者跑步。",
+    "zh": ""
+   }
+  ],
+  "name": "或者 …… 或者 ……"
+ },
+ "zh_ji_you": {
+  "examples": [
+   {
+    "en": "The room is both clean and spacious.",
+    "ko": "이 방은 깨끗할 뿐만 아니라 넓기까지 하다.",
+    "text": "这个房间既干净又宽敞。",
+    "zh": ""
+   },
+   {
+    "en": "He can both play the piano and the violin.",
+    "ko": "그는 피아노도 칠 줄 알고 바이올린도 켤 줄 안다.",
+    "text": "他既会弹钢琴，也会拉小提琴。",
+    "zh": ""
+   }
+  ],
+  "name": "既 …… 又/也"
+ },
+ "zh_jiaruo": {
+  "examples": [
+   {
+    "en": "Should it be fine tomorrow, we will set out.",
+    "ko": "만약 내일 날씨가 맑으면 우리는 출발한다.",
+    "text": "假若明天天晴，我们就出发。",
+    "zh": ""
+   },
+   {
+    "en": "Supposing you had not helped, things would not have gone so smoothly.",
+    "ko": "만일 네 도움이 없었다면 일이 이렇게 순조롭지 않았을 것이다.",
+    "text": "假使没有你的帮助，事情不会这么顺利。",
+    "zh": ""
+   }
+  ],
+  "name": "假若 / 假使"
+ },
+ "zh_jiashe_5": {
+  "examples": [
+   {
+    "en": "Take an umbrella, just in case it rains.",
+    "ko": "우산 하나 챙겨라. 만약 비가 오면 어쩌려고.",
+    "text": "带把伞吧，万一下雨呢。",
+    "zh": ""
+   },
+   {
+    "en": "Run quickly, or you will be late.",
+    "ko": "서둘러 달려라. 안 그러면 지각한다.",
+    "text": "快跑吧，要不然就迟到了。",
+    "zh": ""
+   }
+  ],
+  "name": "万一 / 要不然 / 不然"
+ },
+ "zh_jieci_3": {
+  "examples": [
+   {
+    "en": "We all agree about this matter.",
+    "ko": "이 일에 대해 우리는 모두 동의한다.",
+    "text": "关于这件事，我们都同意。",
+    "zh": ""
+   },
+   {
+    "en": "The car drove off eastwards.",
+    "ko": "자동차가 동쪽으로 달려갔다.",
+    "text": "汽车向东开了。",
+    "zh": ""
+   }
+  ],
+  "name": "介词：向 / 关于"
+ },
+ "zh_jieci_4": {
+  "examples": [
+   {
+    "en": "Opinions differ on this question.",
+    "ko": "이 문제에 대해 사람들의 의견이 다르다.",
+    "text": "对于这个问题，大家意见不同。",
+    "zh": ""
+   },
+   {
+    "en": "Owing to the bad weather the flight was delayed.",
+    "ko": "날씨가 좋지 않아서 항공편이 연기되었다.",
+    "text": "由于天气不好，航班推迟了。",
+    "zh": ""
+   }
+  ],
+  "name": "介词：对于 / 由于 / 随着 / 作为"
+ },
+ "zh_jieci_5": {
+  "examples": [
+   {
+    "en": "We have not met since graduation.",
+    "ko": "졸업한 이후 우리는 서로 만난 적이 없다.",
+    "text": "自从毕业以后，我们就没见过。",
+    "zh": ""
+   },
+   {
+    "en": "He carried the luggage upstairs for me.",
+    "ko": "그는 나를 대신하여 짐을 계단 위로 옮겨 주었다.",
+    "text": "他替我把行李搬上了楼。",
+    "zh": ""
+   }
+  ],
+  "name": "介词：自从 / 朝 / 沿 / 替 / 凭"
+ },
+ "zh_jieci_79": {
+  "examples": [
+   {
+    "en": "Acting in the spirit of cooperation, the two sides reached an agreement.",
+    "ko": "협력의 정신에 입각하여 쌍방은 합의에 이르렀다.",
+    "text": "本着合作的精神，双方达成协议。",
+    "zh": ""
+   },
+   {
+    "en": "Based on the above data we draw the conclusion.",
+    "ko": "상기 수치에 근거하여 우리는 결론을 내린다.",
+    "text": "基于以上数据，我们得出结论。",
+    "zh": ""
+   }
+  ],
+  "name": "介词：本着 / 基于 / 鉴于 / 当着"
+ },
+ "zh_jieguo_buYu": {
+  "examples": [
+   {
+    "en": "I finally understood this sentence.",
+    "ko": "나는 마침내 이 문장을 알아들었다.",
+    "text": "我终于听懂了这句话。",
+    "zh": ""
+   },
+   {
+    "en": "Finish reading the text before you rest.",
+    "ko": "본문을 다 읽은 다음에 쉬어라.",
+    "text": "请把课文读完再休息。",
+    "zh": ""
+   }
+  ],
+  "name": "结果补语"
  },
  "zh_jingran": {
   "examples": [
@@ -288,6 +1954,176 @@
   ],
   "name": "竟然 / 居然 (unexpectedly)"
  },
+ "zh_jinguan": {
+  "examples": [
+   {
+    "en": "Although it was raining, the match went ahead as usual.",
+    "ko": "비가 내리고 있었지만 경기는 여전히 예정대로 진행되었다.",
+    "text": "尽管下着雨，比赛还是照常进行。",
+    "zh": ""
+   },
+   {
+    "en": "Even though he was tired he finished his homework.",
+    "ko": "몹시 피곤했지만 그는 숙제를 끝냈다.",
+    "text": "尽管很累，他还是完成了作业。",
+    "zh": ""
+   }
+  ],
+  "name": "尽管 …… 但是"
+ },
+ "zh_jiran_jiu": {
+  "examples": [
+   {
+    "en": "Since you are here, let us eat together.",
+    "ko": "왔으니 같이 식사하자.",
+    "text": "既然你来了，就一起吃饭吧。",
+    "zh": ""
+   },
+   {
+    "en": "Since you promised, you should keep your word.",
+    "ko": "약속했으면 반드시 지켜야 한다.",
+    "text": "既然答应了，就应该做到。",
+    "zh": ""
+   }
+  ],
+  "name": "既然 …… 就"
+ },
+ "zh_jishi_ye": {
+  "examples": [
+   {
+    "en": "Even if it rains, I will still go.",
+    "ko": "비가 온다 해도 나는 가겠다.",
+    "text": "即使下雨，我也要去。",
+    "zh": ""
+   },
+   {
+    "en": "Even if you fail, do not lose heart.",
+    "ko": "설령 실패하더라도 낙심하지 마라.",
+    "text": "即使失败了，也不要灰心。",
+    "zh": ""
+   }
+  ],
+  "name": "即使 …… 也"
+ },
+ "zh_jiushi_ye": {
+  "examples": [
+   {
+    "en": "However busy he is, he still exercises.",
+    "ko": "아무리 바빠도 그는 운동을 한다.",
+    "text": "就是再忙，他也要锻炼。",
+    "zh": ""
+   },
+   {
+    "en": "Even at a loss he would keep the shop open.",
+    "ko": "돈을 잃는다 해도 그는 가게를 계속 열 것이다.",
+    "text": "就是赔钱，他也要把店开下去。",
+    "zh": ""
+   }
+  ],
+  "name": "就是 …… 也"
+ },
+ "zh_jiusuan_ye": {
+  "examples": [
+   {
+    "en": "Even if it earns nothing, he will still do it.",
+    "ko": "돈을 벌지 못한다 해도 그는 이 일을 하겠다.",
+    "text": "就算不赚钱，他也要做这件事。",
+    "zh": ""
+   },
+   {
+    "en": "Even failing a hundred times, I would still try once more.",
+    "ko": "백 번 실패한다 해도 한 번 더 시도하겠다.",
+    "text": "就算失败一百次，也要再试一次。",
+    "zh": ""
+   }
+  ],
+  "name": "就算 …… 也"
+ },
+ "zh_kan_ni_de": {
+  "examples": [
+   {
+    "en": "Look how pleased you are; your mouth cannot close.",
+    "ko": "너 얼마나 기쁜지 입을 다물지도 못하구나.",
+    "text": "瞧你高兴的，嘴都合不上了。",
+    "zh": ""
+   },
+   {
+    "en": "Look how hot and bothered you are; rest a while.",
+    "ko": "너 얼마나 더워서 그러냐. 좀 쉬어라.",
+    "text": "看你热的，快歇一会儿吧。",
+    "zh": ""
+   }
+  ],
+  "name": "看/瞧 + 你/他 + X 的"
+ },
+ "zh_keneng_buYu": {
+  "examples": [
+   {
+    "en": "I really cannot make out this problem.",
+    "ko": "이 문제는 나는 도무지 알아볼 수가 없다.",
+    "text": "这道题我实在看不懂。",
+    "zh": ""
+   },
+   {
+    "en": "The box is too heavy; I cannot move it.",
+    "ko": "상자가 너무 무거워서 내가 옮길 수 없다.",
+    "text": "箱子太重，我搬不动。",
+    "zh": ""
+   }
+  ],
+  "name": "可能补语 (V + 得/不 + 补)"
+ },
+ "zh_keneng_bude": {
+  "examples": [
+   {
+    "en": "Such a place must not be entered.",
+    "ko": "이런 곳은 함부로 가서는 안 된다.",
+    "text": "这种地方去不得。",
+    "zh": ""
+   },
+   {
+    "en": "Food this spicy I simply cannot eat.",
+    "ko": "이렇게 매운 요리는 내가 도무지 먹을 수 없다.",
+    "text": "这么辣的菜，我可吃不得。",
+    "zh": ""
+   }
+  ],
+  "name": "可能补语：动词 + 得/不得"
+ },
+ "zh_keneng_modal": {
+  "examples": [
+   {
+    "en": "It may rain tomorrow.",
+    "ko": "내일 비가 올지도 모른다.",
+    "text": "明天可能下雨。",
+    "zh": ""
+   },
+   {
+    "en": "He may not know the news yet.",
+    "ko": "그는 아직 이 소식을 모를 수도 있다.",
+    "text": "他可能还不知道这个消息。",
+    "zh": ""
+   }
+  ],
+  "name": "可能 (perhaps)"
+ },
+ "zh_keshi": {
+  "examples": [
+   {
+    "en": "I want to go, but I have no time.",
+    "ko": "가고 싶지만 시간이 없다.",
+    "text": "我想去，可是没时间。",
+    "zh": ""
+   },
+   {
+    "en": "The room is not big, but very clean.",
+    "ko": "방은 크지 않지만 아주 깨끗하다.",
+    "text": "房间不大，可是很干净。",
+    "zh": ""
+   }
+  ],
+  "name": "可是 / 可"
+ },
  "zh_le": {
   "examples": [
    {
@@ -304,6 +2140,108 @@
    }
   ],
   "name": "了 (completed action)"
+ },
+ "zh_lian_ye_dou": {
+  "examples": [
+   {
+    "en": "He was so busy he skipped even his meal.",
+    "ko": "그는 너무 바빠서 밥조차 먹지 못했다.",
+    "text": "他忙得连饭都没吃。",
+    "zh": ""
+   },
+   {
+    "en": "The child cannot even write his own name.",
+    "ko": "이 아이는 제 이름도 쓸 줄 모른다.",
+    "text": "这孩子连自己的名字都不会写。",
+    "zh": ""
+   }
+  ],
+  "name": "连 …… 也/都"
+ },
+ "zh_lianci_4": {
+  "examples": [
+   {
+    "en": "He was ill, and therefore did not come to class.",
+    "ko": "그가 아팠기 때문에 수업에 오지 않았다.",
+    "text": "他病了，因此没来上课。",
+    "zh": ""
+   },
+   {
+    "en": "The room is a bit small; however, it is cheap.",
+    "ko": "방이 좀 작지만 그래도 싸다.",
+    "text": "房间小了点，不过很便宜。",
+    "zh": ""
+   }
+  ],
+  "name": "连词：此外 / 不过 / 另外 / 因此"
+ },
+ "zh_lianci_5": {
+  "examples": [
+   {
+    "en": "In short, everyone must work together.",
+    "ko": "요컨대 모두가 힘을 합쳐야 한다.",
+    "text": "总之，大家要齐心协力。",
+    "zh": ""
+   },
+   {
+    "en": "Supposing it snows tomorrow, we will not go to the park.",
+    "ko": "만일 내일 눈이 온다면 우리는 공원에 가지 않을 것이다.",
+    "text": "假如明天下雪，我们就不去公园了。",
+    "zh": ""
+   }
+  ],
+  "name": "连词：以及 / 从而 / 可见 / 总之 / 假如"
+ },
+ "zh_lianci_79": {
+  "examples": [
+   {
+    "en": "If it should rain heavily the sports meet will have to be postponed.",
+    "ko": "만약 큰비가 내리면 운동회는 연기할 수밖에 없다.",
+    "text": "倘若下大雨，运动会就得延期。",
+    "zh": ""
+   },
+   {
+    "en": "Take a raincoat in case the weather changes.",
+    "ko": "날이 변할 경우를 대비하여 우비를 챙겨라.",
+    "text": "带上雨衣，以防天变。",
+    "zh": ""
+   }
+  ],
+  "name": "连词：免得 / 倘若 / 若 / 以防 / 加之 / 乃至"
+ },
+ "zh_liandong_1": {
+  "examples": [
+   {
+    "en": "We are going to the supermarket to shop.",
+    "ko": "우리는 슈퍼에 가서 물건을 산다.",
+    "text": "我们去超市买东西。",
+    "zh": ""
+   },
+   {
+    "en": "He comes to my home for dinner.",
+    "ko": "그는 우리 집에 와서 저녁을 먹는다.",
+    "text": "他来我家吃饭。",
+    "zh": ""
+   }
+  ],
+  "name": "连动句 (来/去 + 动词)"
+ },
+ "zh_liangci_chongdie": {
+  "examples": [
+   {
+    "en": "Every one of these apples is sweet.",
+    "ko": "이 사과들은 하나하나 모두 달다.",
+    "text": "这些苹果个个都很甜。",
+    "zh": ""
+   },
+   {
+    "en": "Every piece of clothing in the shop looks nice.",
+    "ko": "가게의 옷들은 한 벌 한 벌 모두 예쁘다.",
+    "text": "商店里的衣服件件都好看。",
+    "zh": ""
+   }
+  ],
+  "name": "量词重叠"
  },
  "zh_ma": {
   "examples": [
@@ -339,6 +2277,125 @@
   ],
   "name": "没 / 没有 (past negation)"
  },
+ "zh_mei_distribution": {
+  "examples": [
+   {
+    "en": "Everyone should follow the rules.",
+    "ko": "모든 사람이 규칙을 지켜야 한다.",
+    "text": "每个人都应该遵守规则。",
+    "zh": ""
+   },
+   {
+    "en": "He exercises every day.",
+    "ko": "그는 매일 운동을 한다.",
+    "text": "他每天都锻炼身体。",
+    "zh": ""
+   }
+  ],
+  "name": "每 (distribution)"
+ },
+ "zh_mei_shenme_tou": {
+  "examples": [
+   {
+    "en": "This book has nothing worth reading.",
+    "ko": "이 책은 읽을 만한 것이 별로 없다.",
+    "text": "这本书没什么看头。",
+    "zh": ""
+   },
+   {
+    "en": "What is there to stroll around for in this place?",
+    "ko": "이곳에 뭘 거닐 만하냐?",
+    "text": "这个地方有什么逛头？",
+    "zh": ""
+   }
+  ],
+  "name": "没什么 + 动词 + 头（儿）"
+ },
+ "zh_meiyou_jiu_meiyou": {
+  "examples": [
+   {
+    "en": "Without sowing there is no harvest.",
+    "ko": "가을하지 않으면 거두지도 못한다.",
+    "text": "没有耕耘，就没有收获。",
+    "zh": ""
+   },
+   {
+    "en": "Without regular practice there would be no results in the contest.",
+    "ko": "평소의 연습이 없었다면 대회 성적도 없었을 것이다.",
+    "text": "没有平时的练习，就没有比赛的成绩。",
+    "zh": ""
+   }
+  ],
+  "name": "没有 …… 就没有"
+ },
+ "zh_men_plural": {
+  "examples": [
+   {
+    "en": "The students have all arrived.",
+    "ko": "학생들이 모두 다 도착했다.",
+    "text": "同学们都到齐了。",
+    "zh": ""
+   },
+   {
+    "en": "The children are having a great time in the park.",
+    "ko": "아이들이 공원에서 아주 즐겁게 놀고 있다.",
+    "text": "孩子们在公园里玩得很开心。",
+    "zh": ""
+   }
+  ],
+  "name": "—们 (plural suffix)"
+ },
+ "zh_nadao_ye_shi": {
+  "examples": [
+   {
+    "en": "You are right; that is true, come to think of it.",
+    "ko": "네 말이 맞아. 생각해 보니 그렇기도 하다.",
+    "text": "你说得对，那倒也是。",
+    "zh": ""
+   },
+   {
+    "en": "True enough, many hands make light work.",
+    "ko": "그렇긴 해. 사람이 많으면 힘도 세지.",
+    "text": "那倒是，人多力量大。",
+    "zh": ""
+   }
+  ],
+  "name": "那倒（也）是"
+ },
+ "zh_nai_shi": {
+  "examples": [
+   {
+    "en": "This is a fact beyond dispute.",
+    "ko": "이것은 다툼의 여지가 없는 사실이다.",
+    "text": "这乃是不争的事实。",
+    "zh": ""
+   },
+   {
+    "en": "Unity is the source of strength.",
+    "ko": "단결이야말로 힘의 원천이다.",
+    "text": "团结乃是力量之源。",
+    "zh": ""
+   }
+  ],
+  "name": "乃 (written copula)"
+ },
+ "zh_nandao": {
+  "examples": [
+   {
+    "en": "Have you really forgotten?",
+    "ko": "설마 너 잊어버렸냐?",
+    "text": "难道你忘了吗？",
+    "zh": ""
+   },
+   {
+    "en": "Can this way of talking really be right?",
+    "ko": "이렇게 말하는 것이 과연 옳은가?",
+    "text": "难道这样说是对的吗？",
+    "zh": ""
+   }
+  ],
+  "name": "反问句：难道 …… 吗"
+ },
  "zh_nanyi": {
   "examples": [
    {
@@ -355,6 +2412,23 @@
    }
   ],
   "name": "加以 / 予以 / 难以 (formal verb framing)"
+ },
+ "zh_napa_ye": {
+  "examples": [
+   {
+    "en": "Even if I fail, I will still give it a try.",
+    "ko": "실패한다 해도 한 번 시도해 보겠다.",
+    "text": "哪怕失败，也要试一次。",
+    "zh": ""
+   },
+   {
+    "en": "However tired she is, the mother still reads with her child.",
+    "ko": "아무리 피곤해도 어머니는 아이와 함께 책을 읽으신다.",
+    "text": "哪怕再累，妈妈也要陪孩子读书。",
+    "zh": ""
+   }
+  ],
+  "name": "哪怕 …… 也"
  },
  "zh_ne": {
   "examples": [
@@ -373,6 +2447,193 @@
   ],
   "name": "呢 (and you? / ongoing)"
  },
+ "zh_nengyuan_1": {
+  "examples": [
+   {
+    "en": "I can speak a little Chinese.",
+    "ko": "나는 중국어를 조금 할 줄 안다.",
+    "text": "我会说一点儿汉语。",
+    "zh": ""
+   },
+   {
+    "en": "You can come to my place this weekend.",
+    "ko": "주말에 우리 집에 놀러 와도 돼.",
+    "text": "周末你可以来我家玩。",
+    "zh": ""
+   }
+  ],
+  "name": "能愿动词：会 / 能 / 可以"
+ },
+ "zh_nengyuan_2": {
+  "examples": [
+   {
+    "en": "I want to buy a new computer.",
+    "ko": "나는 새 컴퓨터를 한 대 사고 싶다.",
+    "text": "我想买一台新电脑。",
+    "zh": ""
+   },
+   {
+    "en": "He wants to learn to cook Chinese food.",
+    "ko": "그는 중국 요리를 배우려고 한다.",
+    "text": "他要学做中国菜。",
+    "zh": ""
+   }
+  ],
+  "name": "能愿动词：想 / 要"
+ },
+ "zh_nengyuan_3": {
+  "examples": [
+   {
+    "en": "You need more rest.",
+    "ko": "너는 더 쉬어야 한다.",
+    "text": "你需要多休息。",
+    "zh": ""
+   },
+   {
+    "en": "It is time to set off now.",
+    "ko": "이제 출발할 때다.",
+    "text": "现在该出发了。",
+    "zh": ""
+   }
+  ],
+  "name": "能愿动词：需要 / 应该 / 愿意 / 得"
+ },
+ "zh_ni_yi_ju": {
+  "examples": [
+   {
+    "en": "At the meeting everyone put in a word, and the discussion grew heated.",
+    "ko": "회의에서 사람들이 이쪽에서 한마디 저쪽에서 한마디 하며 토론이 뜨거웠다.",
+    "text": "会上大家你一言，我一语，讨论得很热烈。",
+    "zh": ""
+   },
+   {
+    "en": "The children chatted on and on, one line here, one there.",
+    "ko": "아이들은 이쪽 한마디 저쪽 한마디 하며 끝없이 떠들었다.",
+    "text": "孩子们东一句，西一句，聊个没完。",
+    "zh": ""
+   }
+  ],
+  "name": "A 一 + 量词，B 一 + 量词"
+ },
+ "zh_ningke_yebu": {
+  "examples": [
+   {
+    "en": "I would rather suffer a loss than take advantage of others.",
+    "ko": "손해를 보더라도 남의 것을 차지하지 않겠다.",
+    "text": "宁可吃亏，也不占人便宜。",
+    "zh": ""
+   },
+   {
+    "en": "He would rather walk than pay for a taxi.",
+    "ko": "그는 걸어 가더라도 돈을 들여 택시를 타려 하지 않는다.",
+    "text": "他宁可步行，也不肯花钱打车。",
+    "zh": ""
+   }
+  ],
+  "name": "宁可 / 宁愿 …… 也不"
+ },
+ "zh_pinlv_1": {
+  "examples": [
+   {
+    "en": "I often go to school by bike.",
+    "ko": "나는 자전거를 자주 타고 학교에 간다.",
+    "text": "我经常骑自行车上学。",
+    "zh": ""
+   },
+   {
+    "en": "He sometimes cooks at home.",
+    "ko": "그는 때때로 집에서 요리를 한다.",
+    "text": "他有时在家做饭。",
+    "zh": ""
+   }
+  ],
+  "name": "频率副词：有时 / 经常"
+ },
+ "zh_pinlv_3": {
+  "examples": [
+   {
+    "en": "He is always late.",
+    "ko": "그는 늘 지각한다.",
+    "text": "他总是迟到。",
+    "zh": ""
+   },
+   {
+    "en": "I often play basketball on weekends.",
+    "ko": "주말에 나는 자주 농구를 한다.",
+    "text": "周末我常常去打篮球。",
+    "zh": ""
+   }
+  ],
+  "name": "频率副词：总是 / 又 / 常常"
+ },
+ "zh_pinlv_5": {
+  "examples": [
+   {
+    "en": "He usually goes to work by subway.",
+    "ko": "그는 평소 지하철로 출근한다.",
+    "text": "他通常是坐地铁上班。",
+    "zh": ""
+   },
+   {
+    "en": "He is always forgetting his textbook.",
+    "ko": "그는 늘 교재를 가져오는 것을 잊는다.",
+    "text": "他老是忘记带课本。",
+    "zh": ""
+   }
+  ],
+  "name": "频率副词：老是 / 通常 / 时常"
+ },
+ "zh_pinlv_79": {
+  "examples": [
+   {
+    "en": "The alarm sounded now urgent, now slow.",
+    "ko": "경보 소리는 한때는 급박하고 한때는 완만했다.",
+    "text": "警报声时而急促，时而舒缓。",
+    "zh": ""
+   },
+   {
+    "en": "The soldiers of the two squads reached the summit one after another.",
+    "ko": "두 분대의 병사들이 잇달아 정상에 도착했다.",
+    "text": "两队战士相继到达山顶。",
+    "zh": ""
+   }
+  ],
+  "name": "频率副词：屡次 / 时而 / 时时 / 相继 / 一连 / 再度"
+ },
+ "zh_qingtai_3": {
+  "examples": [
+   {
+    "en": "It will probably rain tomorrow.",
+    "ko": "내일은 아마 비가 올 것이다.",
+    "text": "明天大概会下雨。",
+    "zh": ""
+   },
+   {
+    "en": "You must hand in your homework on time.",
+    "ko": "너는 반드시 제시간에 숙제를 내야 한다.",
+    "text": "你必须按时交作业。",
+    "zh": ""
+   }
+  ],
+  "name": "情态副词：大概 / 必须 / 一定 / 差不多 / 好像 / 几乎"
+ },
+ "zh_qingtai_4": {
+  "examples": [
+   {
+    "en": "Perhaps tomorrow will be better.",
+    "ko": "어쩌면 내일이 더 나을지도 모른다.",
+    "text": "也许明天会更好。",
+    "zh": ""
+   },
+   {
+    "en": "I am afraid he cannot come.",
+    "ko": "아마 그는 올 수 없을 것이다.",
+    "text": "他恐怕不能来了。",
+    "zh": ""
+   }
+  ],
+  "name": "情态副词：也许 / 恐怕"
+ },
  "zh_question_words": {
   "examples": [
    {
@@ -389,6 +2650,40 @@
    }
   ],
   "name": "Question words (什么 / 哪 / 谁 / 怎么)"
+ },
+ "zh_quxiang_buYu": {
+  "examples": [
+   {
+    "en": "He suddenly remembered where the key was.",
+    "ko": "그는 문득 열쇠를 어디에 두었는지 떠올렸다.",
+    "text": "他突然想起来钥匙放在哪儿了。",
+    "zh": ""
+   },
+   {
+    "en": "Please carry the box in.",
+    "ko": "그 상자를 안으로 옮겨 주세요.",
+    "text": "请把箱子搬进来。",
+    "zh": ""
+   }
+  ],
+  "name": "趋向补语"
+ },
+ "zh_qwh_renzhi": {
+  "examples": [
+   {
+    "en": "He is afraid of nothing at all.",
+    "ko": "그는 아무것도 두려워하지 않는다.",
+    "text": "他什么都不怕。",
+    "zh": ""
+   },
+   {
+    "en": "Nobody knows where he went.",
+    "ko": "아무도 그가 어디에 갔는지 모른다.",
+    "text": "谁也不知道他去哪儿了。",
+    "zh": ""
+   }
+  ],
+  "name": "疑问代词任指 (…… + 都/也)"
  },
  "zh_rang_jiao": {
   "examples": [
@@ -407,6 +2702,40 @@
   ],
   "name": "让 / 叫 (causative / passive)"
  },
+ "zh_ranhou": {
+  "examples": [
+   {
+    "en": "Wash your hands first, then eat.",
+    "ko": "먼저 손을 씻고 그다음에 식사해라.",
+    "text": "先洗手，然后吃饭。",
+    "zh": ""
+   },
+   {
+    "en": "Mix the ingredients, then heat them.",
+    "ko": "재료를 섞은 다음에 가열해라.",
+    "text": "把材料混合，然后加热。",
+    "zh": ""
+   }
+  ],
+  "name": "然后"
+ },
+ "zh_ren_ye": {
+  "examples": [
+   {
+    "en": "However the storms rise, hold your position steady.",
+    "ko": "아무리 풍파가 일어나도 진지를 굳게 지켜야 한다.",
+    "text": "任凭风浪起，也要稳住阵脚。",
+    "zh": ""
+   },
+   {
+    "en": "Let him say what he will, I will not waver.",
+    "ko": "그가 무슨 말을 하든 나는 흔들리지 않겠다.",
+    "text": "任他说什么，我也不动摇。",
+    "zh": ""
+   }
+  ],
+  "name": "任（凭）…… 也"
+ },
  "zh_ruguo": {
   "examples": [
    {
@@ -423,6 +2752,23 @@
    }
   ],
   "name": "如果 / 要是 (if)"
+ },
+ "zh_shangqie_hekuang": {
+  "examples": [
+   {
+    "en": "Even the veteran teacher finds it hard, let alone a beginner.",
+    "ko": "노교사조차 어렵다고 느끼는데 하물며 초보자야.",
+    "text": "老教师尚且觉得难，何况新手。",
+    "zh": ""
+   },
+   {
+    "en": "Even adults cannot work it out, let alone children.",
+    "ko": "어른조차 계산하지 못하는데 하물며 아이야.",
+    "text": "大人尚且算不过来，何况孩子。",
+    "zh": ""
+   }
+  ],
+  "name": "尚且 …… 何况"
  },
  "zh_shenzhi": {
   "examples": [
@@ -441,6 +2787,23 @@
   ],
   "name": "甚至 (even)"
  },
+ "zh_shi_causative": {
+  "examples": [
+   {
+    "en": "This event moved me deeply.",
+    "ko": "이 일은 나를 몹시 감동시켰다.",
+    "text": "这件事使我很感动。",
+    "zh": ""
+   },
+   {
+    "en": "His words plunged me into deep thought.",
+    "ko": "그의 말은 나를 깊은 사색에 빠지게 했다.",
+    "text": "他的话使我陷入了沉思。",
+    "zh": ""
+   }
+  ],
+  "name": "使 (causative)"
+ },
  "zh_shi_de": {
   "examples": [
    {
@@ -457,6 +2820,465 @@
    }
   ],
   "name": "是 ... 的 (emphasis frame)"
+ },
+ "zh_shi_er_ding": {
+  "examples": [
+   {
+    "en": "The outcome must depend on the investigation.",
+    "ko": "결과가 어떠할지는 조사에 달려 있다.",
+    "text": "结果如何，须视调查而定。",
+    "zh": ""
+   },
+   {
+    "en": "The price is set according to the market.",
+    "ko": "가격은 시장에 따라 정해진다.",
+    "text": "价格视市场而定。",
+    "zh": ""
+   }
+  ],
+  "name": "视 …… 而定"
+ },
+ "zh_shide": {
+  "examples": [
+   {
+    "en": "He ran about like a madman.",
+    "ko": "그는 미친 사람처럼 이리저리 뛰어 다녔다.",
+    "text": "他像疯子似的跑来跑去。",
+    "zh": ""
+   },
+   {
+    "en": "She danced among the flowers like a butterfly.",
+    "ko": "그녀는 나비처럼 꽃 사이에서 춤을 추었다.",
+    "text": "她像蝴蝶似的在花丛中飞舞。",
+    "zh": ""
+   }
+  ],
+  "name": "似的"
+ },
+ "zh_shijian_3": {
+  "examples": [
+   {
+    "en": "I just got home and will be in a meeting very soon.",
+    "ko": "나는 방금 집에 도착했는데 곧 회의가 있다.",
+    "text": "我刚到家，马上就开会。",
+    "zh": ""
+   },
+   {
+    "en": "He has always lived in Shanghai.",
+    "ko": "그는 줄곧 상하이에 살았다.",
+    "text": "他一直住在上海。",
+    "zh": ""
+   }
+  ],
+  "name": "时间副词：马上 / 刚 / 一直"
+ },
+ "zh_shijian_4": {
+  "examples": [
+   {
+    "en": "He is never late.",
+    "ko": "그는 단 한 번도 지각한 적이 없다.",
+    "text": "他从来不迟到。",
+    "zh": ""
+   },
+   {
+    "en": "It suddenly grew dark.",
+    "ko": "하늘이 문득 어두워졌다.",
+    "text": "天忽然黑了下来。",
+    "zh": ""
+   }
+  ],
+  "name": "时间副词：从来 / 赶紧 / 忽然 / 本来 / 重新 / 往往 / 偶尔"
+ },
+ "zh_shijian_5": {
+  "examples": [
+   {
+    "en": "He once lived in Beijing for five years.",
+    "ko": "그는 한때 베이징에서 5년을 산 적이 있다.",
+    "text": "他曾经在北京住过五年。",
+    "zh": ""
+   },
+   {
+    "en": "The moment the alarm sounded everyone rushed out of the building.",
+    "ko": "경보가 울리자 모두 곧바로 건물 밖으로 뛰어 나갔다.",
+    "text": "警报一响，大家立刻跑出楼去。",
+    "zh": ""
+   }
+  ],
+  "name": "时间副词：曾经 / 立刻 / 始终 / 早已 / 即将 / 渐渐"
+ },
+ "zh_shijian_6": {
+  "examples": [
+   {
+    "en": "He has always been punctual.",
+    "ko": "그는 언제나 시간을 엄수한다.",
+    "text": "他一向守时。",
+    "zh": ""
+   },
+   {
+    "en": "During the match he waved to the spectators from time to time.",
+    "ko": "경기 동안 그는 이따금 관중에게 손을 흔들었다.",
+    "text": "比赛期间他不时向观众挥手。",
+    "zh": ""
+   }
+  ],
+  "name": "时间副词：一时 / 不时 / 仍旧 / 依旧 / 一向"
+ },
+ "zh_shijian_79": {
+  "examples": [
+   {
+    "en": "He has always kept his word.",
+    "ko": "그는 늘 말한 대로 신용을 지킨다.",
+    "text": "他向来言而有信。",
+    "zh": ""
+   },
+   {
+    "en": "When the meeting ended the participants left at once.",
+    "ko": "회의가 끝나자 참석자들은 곧장 회장을 떠났다.",
+    "text": "会议结束，与会者随即离场。",
+    "zh": ""
+   }
+  ],
+  "name": "时间副词：姑且 / 届时 / 历来 / 尚 / 随即 / 向来 / 暂且"
+ },
+ "zh_shouci_qici": {
+  "examples": [
+   {
+    "en": "First prepare the ingredients; second, watch the heat.",
+    "ko": "먼저 재료를 준비하고 그다음에 불의 세기를 주의해라.",
+    "text": "首先把材料准备好，其次注意火候。",
+    "zh": ""
+   },
+   {
+    "en": "In planning, first set the goal clearly, then arrange the time.",
+    "ko": "계획을 세울 때 먼저 목표를 분명히 하고 그다음에 시간을 배정해야 한다.",
+    "text": "做计划首先要明确目标，然后安排时间。",
+    "zh": ""
+   }
+  ],
+  "name": "首先 …… 其次 / 然后"
+ },
+ "zh_shuangbin": {
+  "examples": [
+   {
+    "en": "The teacher teaches us Chinese.",
+    "ko": "선생님이 우리에게 중국어를 가르친다.",
+    "text": "老师教我们汉语。",
+    "zh": ""
+   },
+   {
+    "en": "Please pass me that book.",
+    "ko": "그 책을 나에게 건네 주세요.",
+    "text": "请递给我那本书。",
+    "zh": ""
+   }
+  ],
+  "name": "双宾语句"
+ },
+ "zh_shuangchong_fouding": {
+  "examples": [
+   {
+    "en": "I had no choice but to tell him about it.",
+    "ko": "이 일에 대해 나는 그에게 말하지 않을 수 없었다.",
+    "text": "这件事我不得不告诉他。",
+    "zh": ""
+   },
+   {
+    "en": "Such a fine opportunity he simply must not miss.",
+    "ko": "이렇게 좋은 기회라면 그는 가지 않을 수 없다.",
+    "text": "这么好的机会，他非去不可。",
+    "zh": ""
+   }
+  ],
+  "name": "双重否定"
+ },
+ "zh_shuliang_buYu": {
+  "examples": [
+   {
+    "en": "I waited for three hours.",
+    "ko": "나는 세 시간을 기다렸다.",
+    "text": "我等了三个小时。",
+    "zh": ""
+   },
+   {
+    "en": "We read this text twice.",
+    "ko": "이 본문을 우리는 두 번 읽었다.",
+    "text": "这篇课文我们读了两遍。",
+    "zh": ""
+   }
+  ],
+  "name": "数量补语 (V + 了 + 时量/动量)"
+ },
+ "zh_shumian_bijiao": {
+  "examples": [
+   {
+    "en": "His results are second only to the monitor's.",
+    "ko": "그의 성적은 반장 다음이다.",
+    "text": "他的成绩仅次于班长。",
+    "zh": ""
+   },
+   {
+    "en": "In seniority Old Li is surpassed by none but Director Zhang.",
+    "ko": "연륜으로 따지면 리 선생은 장 주임만 못하다.",
+    "text": "论资历，老李莫过于张主任。",
+    "zh": ""
+   }
+  ],
+  "name": "仅次于 / 莫过于"
+ },
+ "zh_shumian_fanwen": {
+  "examples": [
+   {
+    "en": "How easy can starting a business be?",
+    "ko": "창업이 어찌 그리 쉬운 일이겠는가?",
+    "text": "创业谈何容易？",
+    "zh": ""
+   },
+   {
+    "en": "Preparing for an exam hardly requires staying up all night.",
+    "ko": "시험 준비라고 일찌감치 밤을 새울 일이겠는가?",
+    "text": "备考何至于熬夜？",
+    "zh": ""
+   }
+  ],
+  "name": "何至于 / 谈何"
+ },
+ "zh_sihu_fangfu": {
+  "examples": [
+   {
+    "en": "He seems to have learned the truth.",
+    "ko": "그는 진실을 알아버린 것 같다.",
+    "text": "他似乎知道了真相。",
+    "zh": ""
+   },
+   {
+    "en": "The sky looks as if it is about to rain.",
+    "ko": "하늘이 마치 비가 오려는 것처럼 보인다.",
+    "text": "天空仿佛要下雨了。",
+    "zh": ""
+   }
+  ],
+  "name": "似乎 / 仿佛"
+ },
+ "zh_sizige_1": {
+  "examples": [
+   {
+    "en": "Everyone works on it wholeheartedly.",
+    "ko": "모두 한마음 한몸으로 이 일을 한다.",
+    "text": "大家一心一意地做这件事。",
+    "zh": ""
+   },
+   {
+    "en": "He chats away, talking and laughing.",
+    "ko": "그는 말하면서 웃고 떠들며 이야기한다.",
+    "text": "他说起话来有说有笑。",
+    "zh": ""
+   }
+  ],
+  "name": "四字格：一A一B / 无A无B / 有A有B / 没A没B"
+ },
+ "zh_sizige_6": {
+  "examples": [
+   {
+    "en": "He looked this way and that in the street.",
+    "ko": "그는 거리에서 좌우를 두리번두리번 살폈다.",
+    "text": "他在街上左顾右盼。",
+    "zh": ""
+   },
+   {
+    "en": "He ran about east and west looking for a job.",
+    "ko": "일자리를 찾으려고 그는 동서로 뛰어 다녔다.",
+    "text": "为了找工作，他东奔西走。",
+    "zh": ""
+   }
+  ],
+  "name": "四字格：左A右B / 东A西B"
+ },
+ "zh_suanle_dele": {
+  "examples": [
+   {
+    "en": "Forget it; do not mention it again.",
+    "ko": "됐어. 이 일은 다시 입에 담지 말자.",
+    "text": "算了，别提这件事了。",
+    "zh": ""
+   },
+   {
+    "en": "That is enough; stop crying.",
+    "ko": "됐다, 그만해라. 울지 마라.",
+    "text": "行了，得了，别哭了。",
+    "zh": ""
+   }
+  ],
+  "name": "算了 / 得了"
+ },
+ "zh_sui_dan": {
+  "examples": [
+   {
+    "en": "Though the matter is small, its significance is great.",
+    "ko": "일은 작지만 의미는 매우 크다.",
+    "text": "事情虽小，意义却很大。",
+    "zh": ""
+   },
+   {
+    "en": "Though the room is old, it is comfortable to live in.",
+    "ko": "방은 낡지만 살기는 아주 편안하다.",
+    "text": "房间虽旧，住着却很舒服。",
+    "zh": ""
+   }
+  ],
+  "name": "虽 …… 但/可/却"
+ },
+ "zh_suiran_danshi": {
+  "examples": [
+   {
+    "en": "Although he was tired, he kept running to the end.",
+    "ko": "비록 피곤했지만 그는 끝까지 달렸다.",
+    "text": "虽然很累，但是他坚持跑完了。",
+    "zh": ""
+   },
+   {
+    "en": "This dress is pretty, but too expensive.",
+    "ko": "이 옷은 아주 예쁘지만 너무 비싸다.",
+    "text": "这件衣服很好看，但是太贵了。",
+    "zh": ""
+   }
+  ],
+  "name": "虽然 …… 但是 / 可是"
+ },
+ "zh_suo_zhu": {
+  "examples": [
+   {
+    "en": "What is said above is for reference only.",
+    "ko": "위에서 말한 것은 참고로 삼기 바란다.",
+    "text": "以上所说，仅供参考。",
+    "zh": ""
+   },
+   {
+    "en": "What he raised is exactly the question everyone has in mind.",
+    "ko": "그가 제기한 것이 바로 모두가 생각하는 문제다.",
+    "text": "他讲的正是大家所想的问题。",
+    "zh": ""
+   }
+  ],
+  "name": "所 + 动词"
+ },
+ "zh_suowei_jiushi": {
+  "examples": [
+   {
+    "en": "So-called quality education means all-round cultivation.",
+    "ko": "소위 자질이라는 것은 바로 전면적인 수양이다.",
+    "text": "所谓素质，就是全面的修养。",
+    "zh": ""
+   },
+   {
+    "en": "So-called happiness is contentment of the heart.",
+    "ko": "소위 행복이라는 것은 바로 마음속 만족이다.",
+    "text": "所谓幸福，就是内心的满足。",
+    "zh": ""
+   }
+  ],
+  "name": "所谓 …… 就是"
+ },
+ "zh_verb_redup": {
+  "examples": [
+   {
+    "en": "Let us discuss this question a bit.",
+    "ko": "모두 이 문제를 좀 토론해 보자.",
+    "text": "大家讨论讨论这个问题。",
+    "zh": ""
+   },
+   {
+    "en": "Let me have a look at that photo.",
+    "ko": "그 사진을 좀 보게 해 줘.",
+    "text": "让我看一看那张照片。",
+    "zh": ""
+   }
+  ],
+  "name": "动词重叠 (A一A / A了A / ABAB)"
+ },
+ "zh_wei_qijian": {
+  "examples": [
+   {
+    "en": "For the sake of caution, check it once more.",
+    "ko": "신중을 기하기 위해 다시 한번 대조해 보라.",
+    "text": "为慎重起见，再核对一遍。",
+    "zh": ""
+   },
+   {
+    "en": "For safety's sake, fasten your seat belt.",
+    "ko": "안전을 위해 안전띠를 매 주기 바란다.",
+    "text": "为安全起见，请系好安全带。",
+    "zh": ""
+   }
+  ],
+  "name": "为（了）…… 起见"
+ },
+ "zh_weibi": {
+  "examples": [
+   {
+    "en": "This news is not necessarily accurate.",
+    "ko": "이 소식이 반드시 정확한 것은 아니다.",
+    "text": "这个消息未必准确。",
+    "zh": ""
+   },
+   {
+    "en": "Expensive things are not necessarily good.",
+    "ko": "비싼 물건이 반드시 좋은 것은 아니다.",
+    "text": "贵的东西未必好。",
+    "zh": ""
+   }
+  ],
+  "name": "未必"
+ },
+ "zh_weideshi": {
+  "examples": [
+   {
+    "en": "He gets up early every day for the purpose of memorising words.",
+    "ko": "그는 매일 일찍 일어나는데 그 목적은 단어를 외우기 위해서다.",
+    "text": "他每天早起，为的是背单词。",
+    "zh": ""
+   },
+   {
+    "en": "I am saving money so as to buy a bicycle.",
+    "ko": "나는 돈을 모으는데 그것은 자전거를 사기 위해서다.",
+    "text": "我存钱，为的是买一辆自行车。",
+    "zh": ""
+   }
+  ],
+  "name": "为的是"
+ },
+ "zh_weile": {
+  "examples": [
+   {
+    "en": "To pass the exam he studies late into the night every day.",
+    "ko": "시험에 합격하기 위해 그는 매일 밤늦게까지 공부한다.",
+    "text": "为了通过考试，他每天学习到深夜。",
+    "zh": ""
+   },
+   {
+    "en": "For the sake of his family he gave up the job in the big city.",
+    "ko": "가족을 위해 그는 대도시의 직장을 포기했다.",
+    "text": "为了家人，他放弃了大城市的工作。",
+    "zh": ""
+   }
+  ],
+  "name": "为了 (purpose)"
+ },
+ "zh_weile_er": {
+  "examples": [
+   {
+    "en": "Strive for the sake of the dream.",
+    "ko": "꿈을 위해 노력하다.",
+    "text": "为了梦想而努力。",
+    "zh": ""
+   },
+   {
+    "en": "Live frugally for the children's sake.",
+    "ko": "아이들을 위해 아껴 쓰며 절약하다.",
+    "text": "为了孩子而省吃俭用。",
+    "zh": ""
+   }
+  ],
+  "name": "为了 …… 而 ……"
  },
  "zh_wulun": {
   "examples": [
@@ -475,6 +3297,125 @@
   ],
   "name": "无论 / 不管 (regardless)"
  },
+ "zh_wulun_yufou": {
+  "examples": [
+   {
+    "en": "Whether you agree or not, please tell us in good time.",
+    "ko": "동의하든 하지 않든 제때 알려 주기 바란다.",
+    "text": "无论同意与否，请及时告知。",
+    "zh": ""
+   },
+   {
+    "en": "Whether taking part or not, hand in the form all the same.",
+    "ko": "참가하든 하지 않든 신청서를 내야 한다.",
+    "text": "无论参加与否，都要交报名表。",
+    "zh": ""
+   }
+  ],
+  "name": "无论 …… 与否"
+ },
+ "zh_xian_zaizhihou": {
+  "examples": [
+   {
+    "en": "Eat first, then do your homework.",
+    "ko": "먼저 밥을 먹고 그다음에 숙제를 해라.",
+    "text": "你先吃饭，然后写作业。",
+    "zh": ""
+   },
+   {
+    "en": "Let us see the film first and eat afterwards.",
+    "ko": "우리 먼저 영화를 보고 나서 밥을 먹자.",
+    "text": "咱们先看电影，再吃饭。",
+    "zh": ""
+   }
+  ],
+  "name": "先 …… 再 / 然后"
+ },
+ "zh_xiangbi": {
+  "examples": [
+   {
+    "en": "Compared with last year this year is much warmer.",
+    "ko": "작년에 비해 올해가 훨씬 따뜻하다.",
+    "text": "跟去年相比，今年暖和多了。",
+    "zh": ""
+   },
+   {
+    "en": "Compared with flying I prefer the train.",
+    "ko": "비행기를 타는 것에 비해 나는 기차 타기를 더 좋아한다.",
+    "text": "与坐飞机相比，我更喜欢坐火车。",
+    "zh": ""
+   }
+  ],
+  "name": "跟 …… 相比"
+ },
+ "zh_xiao_prefix": {
+  "examples": [
+   {
+    "en": "Xiao Wang is my classmate.",
+    "ko": "샤오왕은 나의 학급 친구이다.",
+    "text": "小王是我的同学。",
+    "zh": ""
+   },
+   {
+    "en": "Xiao Li did not come to work today.",
+    "ko": "샤오리는 오늘 출근하지 않았다.",
+    "text": "小李今天没来上班。",
+    "zh": ""
+   }
+  ],
+  "name": "小 + 姓 (familiar prefix)"
+ },
+ "zh_xuanze_q": {
+  "examples": [
+   {
+    "en": "Would you like tea or coffee?",
+    "ko": "차를 마실까, 커피를 마실까?",
+    "text": "你喝茶还是咖啡？",
+    "zh": ""
+   },
+   {
+    "en": "Shall we go by train or by plane?",
+    "ko": "우리 기차로 갈까, 비행기로 갈까?",
+    "text": "我们坐火车去还是坐飞机去？",
+    "zh": ""
+   }
+  ],
+  "name": "选择问句 (…… 还是 ……？)"
+ },
+ "zh_yao_kuai_le": {
+  "examples": [
+   {
+    "en": "The sky is heavily overcast; it is about to rain.",
+    "ko": "하늘이 아주 흐려서 곧 비가 올 것 같다.",
+    "text": "天阴得厉害，快要下雨了。",
+    "zh": ""
+   },
+   {
+    "en": "The train is leaving; get on quickly.",
+    "ko": "기차가 곧 떠나려고 하니 서둘러 타라.",
+    "text": "火车就要开了，快上车吧。",
+    "zh": ""
+   }
+  ],
+  "name": "要 / 快要 / 就要 …… 了"
+ },
+ "zh_yao_me_yao_me": {
+  "examples": [
+   {
+    "en": "At the weekend I either rest at home or go out for a walk.",
+    "ko": "주말에는 집에서 쉬거나 아니면 나가서 거닐거나 한다.",
+    "text": "周末要么在家休息，要么出去走走。",
+    "zh": ""
+   },
+   {
+    "en": "Either apologise now, or never see me again.",
+    "ko": "지금 사과하든가 아니면 앞으로 나를 다시 보지 말든가 해라.",
+    "text": "要么你现在道歉，要么以后别再见我。",
+    "zh": ""
+   }
+  ],
+  "name": "要么 …… 要么"
+ },
  "zh_ye_dou": {
   "examples": [
    {
@@ -491,6 +3432,74 @@
    }
   ],
   "name": "也 / 都 (also / all)"
+ },
+ "zh_yi_dou_bu": {
+  "examples": [
+   {
+    "en": "He does not know at all.",
+    "ko": "그는 조금도 모른다.",
+    "text": "他一点儿也不知道。",
+    "zh": ""
+   },
+   {
+    "en": "He did not mention it at all.",
+    "ko": "이 일에 대해 그는 한마디도 언급하지 않았다.",
+    "text": "这件事他一句话都没提。",
+    "zh": ""
+   }
+  ],
+  "name": "一 …… 也/都 + 不/没"
+ },
+ "zh_yi_jiu": {
+  "examples": [
+   {
+    "en": "As soon as he got home, he started cooking.",
+    "ko": "그는 집에 도착하자마자 요리를 시작했다.",
+    "text": "他一到家就开始做饭。",
+    "zh": ""
+   },
+   {
+    "en": "I get nervous whenever I think of the exam.",
+    "ko": "나는 시험 생각만 하면 긴장된다.",
+    "text": "我一想到考试就紧张。",
+    "zh": ""
+   }
+  ],
+  "name": "一 …… 就 ……"
+ },
+ "zh_yi_liang_biyiliang": {
+  "examples": [
+   {
+    "en": "My younger brother grows taller year by year.",
+    "ko": "남동생의 키는 해마다 점점 커진다.",
+    "text": "弟弟的个子一年比一年高。",
+    "zh": ""
+   },
+   {
+    "en": "His results get better each time.",
+    "ko": "그의 성적은 한 번 할 때마다 점점 좋아진다.",
+    "text": "他的成绩一次比一次好。",
+    "zh": ""
+   }
+  ],
+  "name": "一 + 量词 + 比 + 一 + 量词"
+ },
+ "zh_yibian": {
+  "examples": [
+   {
+    "en": "Please leave contact details so that we can notify you in time.",
+    "ko": "제때 통지할 수 있도록 연락처를 남겨 주세요.",
+    "text": "请留下联系方式，以便及时通知你。",
+    "zh": ""
+   },
+   {
+    "en": "Copy the text out once so as to deepen the memory.",
+    "ko": "기억을 깊이 하기 위해 본문을 한 번 베껴라.",
+    "text": "把课文抄一遍，以便加深记忆。",
+    "zh": ""
+   }
+  ],
+  "name": "以便"
  },
  "zh_yibian_yibian": {
   "examples": [
@@ -509,6 +3518,74 @@
   ],
   "name": "一边 ... 一边 ..."
  },
+ "zh_yichang_dadu": {
+  "examples": [
+   {
+    "en": "After the meeting everyone was exceptionally excited.",
+    "ko": "회의가 끝난 후 모두가 이상도록 흥분했다.",
+    "text": "会议结束后，大家异常兴奋。",
+    "zh": ""
+   },
+   {
+    "en": "Most of the new students come from the countryside.",
+    "ko": "신입생은 대부분 농촌 출신이다.",
+    "text": "新生大都来自农村。",
+    "zh": ""
+   }
+  ],
+  "name": "程度/范围副词：异常 / 大都 / 净"
+ },
+ "zh_yidan_jiu": {
+  "examples": [
+   {
+    "en": "Once you have made up your mind, do not waver.",
+    "ko": "일단 결심을 하면 흔들리지 말아야 한다.",
+    "text": "一旦下定决心，就不要动摇。",
+    "zh": ""
+   },
+   {
+    "en": "Once a fire starts it is hard to control.",
+    "ko": "불이 일단 붙으면 통제하기 어렵다.",
+    "text": "火一旦烧起来，就很难控制。",
+    "zh": ""
+   }
+  ],
+  "name": "一旦 …… 就"
+ },
+ "zh_yifangmian": {
+  "examples": [
+   {
+    "en": "Studying Chinese helps one find a job and, on the other hand, understand the culture.",
+    "ko": "중국어를 배우면 한편으로는 직장을 구하는 데 도움이 되고 다른 한편으로는 문화를 이해할 수 있다.",
+    "text": "学习汉语一方面能找工作，另一方面能了解文化。",
+    "zh": ""
+   },
+   {
+    "en": "His suggestion is workable on the one hand but too costly on the other.",
+    "ko": "그의 제안은 한편으로는 실행 가능하지만 다른 한편으로는 비용이 너무 많이 든다.",
+    "text": "他的建议一方面可行，另一方面成本太高。",
+    "zh": ""
+   }
+  ],
+  "name": "一方面 …… 另一方面"
+ },
+ "zh_yihui_yihui": {
+  "examples": [
+   {
+    "en": "He reads for a while and plays with his phone for a while.",
+    "ko": "그는 잠깐 책을 읽다가 잠깐 휴대폰을 만지작거린다.",
+    "text": "他一会儿看书，一会儿玩手机。",
+    "zh": ""
+   },
+   {
+    "en": "The sky is now clear, now overcast.",
+    "ko": "하늘은 잠깐 맑았다가 잠깐 흐려진다.",
+    "text": "天一会儿晴，一会儿阴。",
+    "zh": ""
+   }
+  ],
+  "name": "一会儿 …… 一会儿 ……"
+ },
  "zh_yijing": {
   "examples": [
    {
@@ -525,6 +3602,23 @@
    }
   ],
   "name": "已经 (already)"
+ },
+ "zh_yilai_erlai": {
+  "examples": [
+   {
+    "en": "For one thing the road was long, for another time was short, so I did not go.",
+    "ko": "첫째는 길이 멀고 둘째는 시간이 촉박하여 나는 가지 않았다.",
+    "text": "一来路远，二来时间紧，我就没去。",
+    "zh": ""
+   },
+   {
+    "en": "Partly it was too dear, partly impractical, so we did not buy the machine.",
+    "ko": "하나는 너무 비싸고 하나는 실용성이 없어 이 기계를 사지 않았다.",
+    "text": "一则太贵，二则不实用，这台机器没买。",
+    "zh": ""
+   }
+  ],
+  "name": "一来 …… 二来 / 一则 …… 二则"
  },
  "zh_yimian": {
   "examples": [
@@ -543,6 +3637,40 @@
   ],
   "name": "以免 (lest / so as to avoid)"
  },
+ "zh_yin_er": {
+  "examples": [
+   {
+    "en": "He succeeded through diligence.",
+    "ko": "그는 부지런함으로 인하여 성공했다.",
+    "text": "他因勤奋而成功。",
+    "zh": ""
+   },
+   {
+    "en": "The small village grew rich through tourism.",
+    "ko": "작은 마을은 관광으로 인하여 부유해졌다.",
+    "text": "小村因旅游而富裕起来。",
+    "zh": ""
+   }
+  ],
+  "name": "因 …… 而 ……"
+ },
+ "zh_yiner": {
+  "examples": [
+   {
+    "en": "He studies hard and hence achieves excellent results.",
+    "ko": "그는 열심히 공부하여 그 결과 성적이 우수하다.",
+    "text": "他学习刻苦，因而成绩优异。",
+    "zh": ""
+   },
+   {
+    "en": "The river rose and consequently the bridge was submerged.",
+    "ko": "강물이 불어나서 그 결과 다리가 잠겼다.",
+    "text": "河水上涨，因而桥被淹没了。",
+    "zh": ""
+   }
+  ],
+  "name": "因而"
+ },
  "zh_yinwei_suoyi": {
   "examples": [
    {
@@ -559,6 +3687,57 @@
    }
   ],
   "name": "因为 / 所以 (because / so)"
+ },
+ "zh_yiqi_yikuai": {
+  "examples": [
+   {
+    "en": "Let us go together.",
+    "ko": "우리 같이 가자.",
+    "text": "我们一起去吧。",
+    "zh": ""
+   },
+   {
+    "en": "Let us go to the cinema together this weekend.",
+    "ko": "주말에 우리 같이 영화 보러 가자.",
+    "text": "周末我们一块儿去看电影。",
+    "zh": ""
+   }
+  ],
+  "name": "一起 / 一块儿"
+ },
+ "zh_yishi_yishi": {
+  "examples": [
+   {
+    "en": "He is lucid one moment and confused the next.",
+    "ko": "그는 한때 정신이 들었다가 한때 몽롱해진다.",
+    "text": "他一时清醒，一时糊涂。",
+    "zh": ""
+   },
+   {
+    "en": "The old man is joyful one moment and sorrowful the next.",
+    "ko": "노인은 한때 기뻐하다가 한때 근심한다.",
+    "text": "老人一时高兴，一时忧愁。",
+    "zh": ""
+   }
+  ],
+  "name": "一时 …… 一时 ……"
+ },
+ "zh_yizai_zaishan": {
+  "examples": [
+   {
+    "en": "The teacher stressed safety again and again.",
+    "ko": "선생님은 두세 번 안전을 강조하셨다.",
+    "text": "老师再三强调安全。",
+    "zh": ""
+   },
+   {
+    "en": "The United Nations has repeatedly appealed for peace.",
+    "ko": "유엔은 거듭 평화를 호소했다.",
+    "text": "联合国一再呼吁和平。",
+    "zh": ""
+   }
+  ],
+  "name": "频率副词：一再 / 再三"
  },
  "zh_yizhi": {
   "examples": [
@@ -577,6 +3756,74 @@
   ],
   "name": "以至 / 以致 (so that / resulting in)"
  },
+ "zh_you_np": {
+  "examples": [
+   {
+    "en": "I have an elder brother and a younger sister.",
+    "ko": "나에게는 형과 여동생이 하나씩 있다.",
+    "text": "我有一个哥哥和一个妹妹。",
+    "zh": ""
+   },
+   {
+    "en": "There is a new book on the table.",
+    "ko": "책상 위에 새 책이 한 권 있다.",
+    "text": "桌子上有一本新书。",
+    "zh": ""
+   }
+  ],
+  "name": "“有”字句 / 存现句"
+ },
+ "zh_you_shenme_hao": {
+  "examples": [
+   {
+    "en": "What is worth watching in this?",
+    "ko": "이게 볼게 뭐냐?",
+    "text": "这有什么好看的？",
+    "zh": ""
+   },
+   {
+    "en": "What is there to argue about in such a matter?",
+    "ko": "이런 일에 뭘 그렇게 다투겠냐?",
+    "text": "这种事有什么好争的？",
+    "zh": ""
+   }
+  ],
+  "name": "有什么（好）X 的"
+ },
+ "zh_you_you": {
+  "examples": [
+   {
+    "en": "This apple is both big and sweet.",
+    "ko": "이 사과는 크고 달기까지 하다.",
+    "text": "这个苹果又大又甜。",
+    "zh": ""
+   },
+   {
+    "en": "She is both clever and diligent.",
+    "ko": "그녀는 똑똑하고 성실하기까지 하다.",
+    "text": "她又聪明又勤奋。",
+    "zh": ""
+   }
+  ],
+  "name": "又 …… 又 ……"
+ },
+ "zh_you_zhe": {
+  "examples": [
+   {
+    "en": "This city has a long history.",
+    "ko": "이 도시는 유구한 역사를 지니고 있다.",
+    "text": "这座城市有着悠久的历史。",
+    "zh": ""
+   },
+   {
+    "en": "A deep friendship exists between them.",
+    "ko": "그들 사이에는 깊은 우정이 있다.",
+    "text": "他们之间有着深厚的友谊。",
+    "zh": ""
+   }
+  ],
+  "name": "“有”字句：主语 + 有着 + 宾语"
+ },
  "zh_yueyue": {
   "examples": [
    {
@@ -593,6 +3840,142 @@
    }
   ],
   "name": "越 ... 越 ... (the more ... the more)"
+ },
+ "zh_yuqi_3": {
+  "examples": [
+   {
+    "en": "He has finally arrived.",
+    "ko": "그는 마침내 도착했다.",
+    "text": "他终于到了。",
+    "zh": ""
+   },
+   {
+    "en": "Actually I knew about it long ago.",
+    "ko": "사실 나는 이 일을 오래전부터 알고 있었다.",
+    "text": "其实我早就知道这件事了。",
+    "zh": ""
+   }
+  ],
+  "name": "语气副词：当然 / 其实 / 终于"
+ },
+ "zh_yuqi_4": {
+  "examples": [
+   {
+    "en": "Are you going or not, after all?",
+    "ko": "대체 너 갈 거냐 안 가냐?",
+    "text": "你到底去不去？",
+    "zh": ""
+   },
+   {
+    "en": "Be extremely careful when crossing the road.",
+    "ko": "길을 건널 때는 아주 조심해야 한다.",
+    "text": "过马路时千万要小心。",
+    "zh": ""
+   }
+  ],
+  "name": "语气副词：千万 / 确实 / 只好 / 差点儿 / 正好 / 究竟 / 到底"
+ },
+ "zh_yuqi_5": {
+  "examples": [
+   {
+    "en": "He has not rested at all.",
+    "ko": "그는 전혀 쉰 적이 없다.",
+    "text": "他根本没有休息过。",
+    "zh": ""
+   },
+   {
+    "en": "It began to rain, just as expected.",
+    "ko": "과연 하늘에서 비가 내리기 시작했다.",
+    "text": "天果然下起雨来了。",
+    "zh": ""
+   }
+  ],
+  "name": "语气副词：根本 / 果然 / 简直 / 绝对 / 的确 / 反而 / 刚好 / 白"
+ },
+ "zh_yuqi_6": {
+  "examples": [
+   {
+    "en": "He clearly knew the answer yet pretended not to.",
+    "ko": "그는 분명히 답을 알면서도 모르는 척했다.",
+    "text": "他明明知道答案，却装作不知道。",
+    "zh": ""
+   },
+   {
+    "en": "Rather than wait, I may as well do it myself.",
+    "ko": "기다리기보다 차라리 직접 해 버리자.",
+    "text": "与其等着，干脆自己动手。",
+    "zh": ""
+   }
+  ],
+  "name": "语气副词：恰好 / 倒是 / 干脆 / 明明 / 总算"
+ },
+ "zh_yuqi_79": {
+  "examples": [
+   {
+    "en": "No wonder he disagreed; there was a hidden reason.",
+    "ko": "그가 동의하지 않은 이유가 따로 있었으니 당연하다.",
+    "text": "难怪他不同意，原来另有隐情。",
+    "zh": ""
+   },
+   {
+    "en": "You may as well try it first and see.",
+    "ko": "일단 해 보고 본 다음 말하는 것이 좋겠다.",
+    "text": "你不妨先试试再说。",
+    "zh": ""
+   }
+  ],
+  "name": "语气副词：必定 / 不妨 / 反倒 / 好在 / 何必 / 莫非 / 难怪 / 偏偏 / 势必 / 索性 / 万万 / 未免 / 务必 / 幸好 / 终究 / 何尝"
+ },
+ "zh_yuqi_ningke": {
+  "examples": [
+   {
+    "en": "Rather than sit waiting for a chance, better to take the initiative.",
+    "ko": "기회를 앉아서 기다리기보다 주동적으로 나서는 편이 낫다.",
+    "text": "与其坐等机会，不如主动出击。",
+    "zh": ""
+   },
+   {
+    "en": "Rather than complain, better to change yourself.",
+    "ko": "불평하기보다 자신을 바꾸는 편이 낫다.",
+    "text": "与其抱怨，不如改变自己。",
+    "zh": ""
+   }
+  ],
+  "name": "与其 …… 宁可/不如"
+ },
+ "zh_yuqi_zhuci": {
+  "examples": [
+   {
+    "en": "Do not hurry; take it easy.",
+    "ko": "서두르지 말고 천천히 해라.",
+    "text": "别急嘛，慢慢来啦。",
+    "zh": ""
+   },
+   {
+    "en": "Whether you go or not, tell us in advance either way.",
+    "ko": "가든 가지 않든 미리 한번 말해 두어야 한다.",
+    "text": "去也好，不去也罢，你都要提前说一声。",
+    "zh": ""
+   }
+  ],
+  "name": "语气助词：啦 / 嘛 / 也好 …… 也罢"
+ },
+ "zh_yushi": {
+  "examples": [
+   {
+    "en": "It began to rain, so we moved the meeting indoors.",
+    "ko": "비가 내리자 우리는 회의를 실내로 옮겼다.",
+    "text": "天下雨了，于是我们改在室内开会。",
+    "zh": ""
+   },
+   {
+    "en": "He nodded, and at that everyone quieted down.",
+    "ko": "그가 고개를 끄덕이자 모두가 조용해졌다.",
+    "text": "他点了点头，于是大家都安静下来。",
+    "zh": ""
+   }
+  ],
+  "name": "于是"
  },
  "zh_zai": {
   "examples": [
@@ -611,6 +3994,57 @@
   ],
   "name": "在 (at / doing)"
  },
+ "zh_zai_fanfu": {
+  "examples": [
+   {
+    "en": "Give it one more try.",
+    "ko": "한 번 더 시도해 보자.",
+    "text": "再试一次吧。",
+    "zh": ""
+   },
+   {
+    "en": "This word is hard; please say it once more.",
+    "ko": "이 단어는 어려우니 한 번 더 말해 주세요.",
+    "text": "这个词很难，请再说一遍。",
+    "zh": ""
+   }
+  ],
+  "name": "再 (again)"
+ },
+ "zh_zai_fangmian_na": {
+  "examples": [
+   {
+    "en": "In his studies he works very hard.",
+    "ko": "공부 면에서 그는 많은 노력을 기울인다.",
+    "text": "在学习方面，他很下功夫。",
+    "zh": ""
+   },
+   {
+    "en": "Take Chinese: the tones are the hardest to master.",
+    "ko": "중국어를 예로 들면 성조를 익히는 것이 가장 어렵다.",
+    "text": "拿汉语来说，声调最难掌握。",
+    "zh": ""
+   }
+  ],
+  "name": "在 …… 方面 / 拿 …… 来说"
+ },
+ "zh_zai_ye": {
+  "examples": [
+   {
+    "en": "However hard it is, I will keep at it.",
+    "ko": "아무리 어려워도 끝까지 해내겠다.",
+    "text": "再难也要坚持下去。",
+    "zh": ""
+   },
+   {
+    "en": "However late it is, I must still ring him.",
+    "ko": "아무리 늦어도 그에게 전화를 해야 한다.",
+    "text": "再晚也得给他打个电话。",
+    "zh": ""
+   }
+  ],
+  "name": "再 …… 也"
+ },
  "zh_zhe": {
   "examples": [
    {
@@ -627,6 +4061,23 @@
    }
   ],
   "name": "着 (ongoing / state)"
+ },
+ "zh_zhengfan": {
+  "examples": [
+   {
+    "en": "Are you tired?",
+    "ko": "너 피곤하냐?",
+    "text": "你是不是累了？",
+    "zh": ""
+   },
+   {
+    "en": "Are you going climbing this weekend or not?",
+    "ko": "주말에 등산 가겠느냐?",
+    "text": "周末你去不去爬山？",
+    "zh": ""
+   }
+  ],
+  "name": "正反问句 (V 不 V)"
  },
  "zh_zhengzai": {
   "examples": [
@@ -645,6 +4096,23 @@
   ],
   "name": "正在 (right now)"
  },
+ "zh_zhici_zhiji": {
+  "examples": [
+   {
+    "en": "On the occasion of the New Year I offer my sincere wishes.",
+    "ko": "새해를 맞이하는 이 시점에 삼가 축원을 전한다.",
+    "text": "值此新年之际，谨致祝愿。",
+    "zh": ""
+   },
+   {
+    "en": "At the time of graduation the students parted reluctantly.",
+    "ko": "졸업의 시점에 학생들은 미련을 남기며 헤어졌다.",
+    "text": "值此毕业之际，同学们依依惜别。",
+    "zh": ""
+   }
+  ],
+  "name": "值此 …… 之际"
+ },
  "zh_zhiqian_zhihou": {
   "examples": [
    {
@@ -661,5 +4129,107 @@
    }
   ],
   "name": "以前 / 以后 / 之前 / 之后 (before / after)"
+ },
+ "zh_zhiyao_jiu": {
+  "examples": [
+   {
+    "en": "As long as you tell the truth, I will not be angry.",
+    "ko": "네가 사실대로 말하기만 하면 나는 화내지 않겠다.",
+    "text": "只要你说实话，我就不生气。",
+    "zh": ""
+   },
+   {
+    "en": "As long as you work hard, you can surely learn it well.",
+    "ko": "노력하기만 하면 반드시 잘 배울 수 있다.",
+    "text": "只要你努力，就一定能学好。",
+    "zh": ""
+   }
+  ],
+  "name": "只要 …… 就"
+ },
+ "zh_zhiyou_cai": {
+  "examples": [
+   {
+    "en": "Only by working hard can one improve.",
+    "ko": "노력해야만 진보할 수 있다.",
+    "text": "只有努力才能进步。",
+    "zh": ""
+   },
+   {
+    "en": "The match will be cancelled only if it rains.",
+    "ko": "비가 와야만 경기가 취소된다.",
+    "text": "只有下雨，比赛才会取消。",
+    "zh": ""
+   }
+  ],
+  "name": "只有 …… 才"
+ },
+ "zh_zhiyu_chuwai": {
+  "examples": [
+   {
+    "en": "As for the cost, we will discuss it later.",
+    "ko": "비용에 관해서는 나중에 논의하자.",
+    "text": "至于费用，以后再谈。",
+    "zh": ""
+   },
+   {
+    "en": "Apart from this he has no other hobbies.",
+    "ko": "이것 이외에 그는 다른 취미가 없다.",
+    "text": "除此之外，他没有别的爱好。",
+    "zh": ""
+   }
+  ],
+  "name": "至于 / 除 …… 之外"
+ },
+ "zh_zhuangtai_buYu": {
+  "examples": [
+   {
+    "en": "She runs extremely fast.",
+    "ko": "그녀는 아주 빠르게 달린다.",
+    "text": "她跑得飞快。",
+    "zh": ""
+   },
+   {
+    "en": "He speaks Chinese very well.",
+    "ko": "그는 중국어를 아주 잘한다.",
+    "text": "他汉语说得非常好。",
+    "zh": ""
+   }
+  ],
+  "name": "状态补语 (V + 得 + 描述)"
+ },
+ "zh_zhuci_79": {
+  "examples": [
+   {
+    "en": "It is no more than this.",
+    "ko": "요컨대 이것뿐이다.",
+    "text": "不过如此罢了。",
+    "zh": ""
+   },
+   {
+    "en": "Believe it or not, the facts are there.",
+    "ko": "믿든 믿지 않든 사실은 거기에 있다.",
+    "text": "信也罢，不信也罢，事实摆在那里。",
+    "zh": ""
+   }
+  ],
+  "name": "语气助词：罢了 / 也罢 / 矣"
+ },
+ "zh_zongran": {
+  "examples": [
+   {
+    "en": "Even though difficulties abound, we must face them head on.",
+    "ko": "비록 어려움이 겹겹이 있다 해도 맞서 나아가야 한다.",
+    "text": "纵然困难重重，也要迎难而上。",
+    "zh": ""
+   },
+   {
+    "en": "Even in defeat there is honour in the effort.",
+    "ko": "설령 실패하더라도 그것도 영광이다.",
+    "text": "纵使失败，也虽败犹荣。",
+    "zh": ""
+   }
+  ],
+  "name": "纵然 / 纵使"
  }
 }
