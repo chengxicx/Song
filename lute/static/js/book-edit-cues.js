@@ -150,8 +150,9 @@
   function autosize(t) {
     // field-sizing: content (.cue-txt in styles.css) sizes the textarea
     // in CSS on engines that support it; this JS stays only as the
-    // fallback for the others.
-    if (CSS.supports("field-sizing", "content")) return;
+    // fallback for the others.  (typeof guard: the Node harness that
+    // unit-tests this file has no CSS global.)
+    if (typeof CSS !== "undefined" && CSS.supports("field-sizing", "content")) return;
     // Skip nodes inside the still-hidden panel: scrollHeight measures 0
     // there, which would clamp the editor to a 0px sliver.  The panel's
     // setType()/activation re-runs autosize once the panel is rendered.
