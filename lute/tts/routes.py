@@ -302,6 +302,73 @@ def tts_speak(lang, text):
     return resp
 
 
+@bp.route("/tts/voice/<lang>", methods=["GET"])
+def tts_default_voice(lang):
+    """
+    The edge-tts voice the backend uses for *lang* by default.
+
+    The reading page's voice menu shows the actual edge-tts voice behind
+    its "[edge-tts]" entry; the mapping lives here (VOICE_MAP), so the
+    frontend asks once per language and caches the answer.  The answer
+    never changes for a given deploy, so cache it for a day.
+    """
+    resp = jsonify({"voice": voice_for_tag(lang)})
+    resp.headers["Cache-Control"] = "public, max-age=86400"
+    return resp
+
+
+# The full edge-tts voice list, fetched from Microsoft once per process
+# (a few hundred entries); the per-language menus filter it.
+_EDGE_VOICES_CACHE = None
+
+
+def _all_edge_voices():
+    """The full edge-tts voice list, or [] when it cannot be fetched."""
+    global _EDGE_VOICES_CACHE
+    if _EDGE_VOICES_CACHE is None:
+        if not _EDGE_TTS_AVAILABLE:
+            _EDGE_VOICES_CACHE = []
+        else:
+            try:
+                _EDGE_VOICES_CACHE = asyncio.run(edge_tts.list_voices())
+            except Exception:  # pylint: disable=broad-exception-caught
+                current_app.logger.exception("edge-tts list_voices failed")
+                _EDGE_VOICES_CACHE = []
+    return _EDGE_VOICES_CACHE
+
+
+@bp.route("/tts/voices/<lang>", methods=["GET"])
+def tts_voices_for_lang(lang):
+    """
+    The edge-tts voices that can speak *lang*, for the voice menu.
+
+    Exact locale match first ("ja-JP"), falling back to the primary
+    subtag ("ja") when the locale has no voices of its own.  Each entry
+    is {"id", "gender"}; "id" is exactly what /tts accepts as ?voice=
+    (same gate, see `_requested_voice_is_acceptable`).  Cached a day --
+    the list changes only when Microsoft ships voices.
+    """
+    all_voices = _all_edge_voices()
+    chosen = [
+        v for v in all_voices if v.get("Locale", "").lower() == lang.lower()
+    ]
+    if not chosen:
+        primary = primary_subtag(lang)
+        chosen = [
+            v
+            for v in all_voices
+            if primary_subtag(v.get("Locale", "")) == primary
+        ]
+    voices = [
+        {"id": v["ShortName"], "gender": v.get("Gender", "")}
+        for v in chosen
+        if v.get("ShortName")
+    ]
+    resp = jsonify({"voices": voices})
+    resp.headers["Cache-Control"] = "public, max-age=86400"
+    return resp
+
+
 def _generate_audio(text, voice, filepath):
     """
     Use edge-tts to synthesize *text* with *voice*, saving to *filepath*.

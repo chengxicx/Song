@@ -338,3 +338,28 @@ def test_player_defaults_to_backend_audio_without_an_explicit_pick():
     restore = init.split("const savedVoice =")[1].split("catch (_) {}")[0]
     assert 'savedVoice.indexOf("|") >= 0' in restore
     assert "localStorage.removeItem" in restore
+
+
+def test_edge_tts_menu_row_and_next_cue_prefetch():
+    "The backend voice is a first-class row; the next cue warms early."
+    player = open(_TTS_JS, encoding="utf-8").read()
+    populate = player.split("function ttsPopulateVoiceList")[1].split("\n  }")[0]
+    assert "edgeOpt.dataset.voiceName = EDGE_TTS_VOICE_NAME;" in populate
+    # Green when the backend audio is what is speaking (default mode),
+    # and clicking the row pins it, live via the restarted cue.
+    assert (
+        "globalCache.selectedVoice === EDGE_TTS_VOICE_NAME" in populate
+    )
+    assert "ttsBackendAudio = true;" in populate
+    assert 'fetch("/tts/voice/"' in populate
+
+    via = player.split("function ttsPlayCueViaBackend")[1].split("\n  }")[0]
+    assert "const next = ttsCues[idx + 1];" in via
+    assert "fetch(nextUrl).catch" in via
+
+    # A saved edge-tts pick skips the native engine from the start and
+    # restores which edge voice was chosen ("edge-tts" = the default).
+    init = player.split("function ttsInitPlayer")[1].split("\n  }")[0]
+    assert "if (savedVoice === EDGE_TTS_VOICE_NAME) {" in init
+    assert "savedVoice.indexOf(\"edge-tts|\") === 0" in init
+    assert "globalCache.edgeVoices[SL] = savedVoice.slice" in init

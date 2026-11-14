@@ -47,3 +47,41 @@ def test_voice_for_tag_default_mapping_unchanged():
     # The ?voice= path must not disturb the language -> default voice table.
     assert voice_for_tag("ja-JP") == "ja-JP-NanamiNeural"
     assert voice_for_tag("unknown-XX") is not None
+
+
+def test_default_voice_endpoint(app_context, client):
+    "GET /tts/voice/<lang> names the backend's default edge-tts voice."
+    rv = client.get("/tts/voice/ja-JP")
+    assert rv.status_code == 200
+    assert rv.get_json() == {"voice": "ja-JP-NanamiNeural"}
+    # The answer is deploy-stable: cacheable for a day.
+    assert "max-age=86400" in rv.headers["Cache-Control"]
+
+
+def test_voices_endpoint_lists_same_language_edge_voices(
+    app_context, client, monkeypatch
+):
+    "GET /tts/voices/<lang> lists the language's edge-tts voices."
+    from lute.tts import routes as tts_routes
+
+    monkeypatch.setattr(
+        tts_routes,
+        "_EDGE_VOICES_CACHE",
+        [
+            {"Locale": "ja-JP", "ShortName": "ja-JP-NanamiNeural", "Gender": "Female"},
+            {"Locale": "ja-JP", "ShortName": "ja-JP-KeitaNeural", "Gender": "Male"},
+            {"Locale": "en-US", "ShortName": "en-US-AvaNeural", "Gender": "Female"},
+        ],
+    )
+    rv = client.get("/tts/voices/ja-JP")
+    assert rv.status_code == 200
+    assert rv.get_json()["voices"] == [
+        {"id": "ja-JP-NanamiNeural", "gender": "Female"},
+        {"id": "ja-JP-KeitaNeural", "gender": "Male"},
+    ]
+    # A bare-language request falls back to the primary subtag.
+    rv2 = client.get("/tts/voices/ja")
+    assert [v["id"] for v in rv2.get_json()["voices"]] == [
+        "ja-JP-NanamiNeural",
+        "ja-JP-KeitaNeural",
+    ]

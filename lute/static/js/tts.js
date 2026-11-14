@@ -43,11 +43,17 @@
       tl: "",
       selectedVoice: "",
       voiceExplicit: false,
+      edgeVoices: {},
       lastSpokenWord: "",
       detectedLang: "",
     };
   }
   const globalCache = window.top.__LUTE_TTS_CACHE__;
+
+  // The player's voice-menu entry for the backend's own voice (see
+  // tts-player.js): picking it pins speech to edge-tts, so hover here
+  // must not treat that pick as a native-voice choice.
+  const EDGE_TTS_VOICE_NAME = "edge-tts";
 
   // Read SL from: local input -> shared cache -> default
   const SL_INPUT = document.getElementById("tts_lang");
@@ -640,8 +646,19 @@
     const lang = langOverride || getCurrentLangCode();
     let voice = "";
     if ("speechSynthesis" in window) {
-      voice = mappedEdgeVoice(lang);
-      if (!voice && globalCache.voiceExplicit) return false;
+      const edgePicked =
+        globalCache.voiceExplicit &&
+        globalCache.selectedVoice === EDGE_TTS_VOICE_NAME;
+      if (edgePicked) {
+        // The user picked an edge-tts voice in the menu: it wins over
+        // the browser twin, the server's default when none was chosen.
+        voice = (globalCache.edgeVoices || {})[lang] || "";
+      } else {
+        voice = mappedEdgeVoice(lang);
+        // An explicit pick of a device voice pins hover to the native
+        // engine; anything else lets the backend's default voice speak.
+        if (!voice && globalCache.voiceExplicit) return false;
+      }
     }
     const url = ttsBackendUrl(text, lang, voice);
     const epoch = ++_ttsBackendEpoch;
@@ -687,8 +704,15 @@
     const lang = getCurrentLangCode();
     let voice = "";
     if ("speechSynthesis" in window) {
-      voice = mappedEdgeVoice(lang);
-      if (!voice && globalCache.voiceExplicit) return;
+      const edgePicked =
+        globalCache.voiceExplicit &&
+        globalCache.selectedVoice === EDGE_TTS_VOICE_NAME;
+      if (edgePicked) {
+        voice = (globalCache.edgeVoices || {})[lang] || "";
+      } else {
+        voice = mappedEdgeVoice(lang);
+        if (!voice && globalCache.voiceExplicit) return;
+      }
     }
     clearTimeout(_hoverPrefetchTimer);
     _hoverPrefetchTimer = setTimeout(function () {

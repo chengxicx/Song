@@ -391,6 +391,12 @@
 
     ttsCueIndex = idx;
     ttsActivateCue(idx);
+    // A cue (re)start always displaces whatever is currently sounding --
+    // a replayed cue (loop, seek, rate change, voice change) must not
+    // overlap its predecessor.  In the SpeechSynthesis branch the
+    // cancel() used to live; backend-audio cues need the stop() just as
+    // much, so do both here.
+    ttsCancelSpeech();
 
     const cleanText = cue.text.replace(/[#＃]/g, "").trim();
     if (!cleanText) {
@@ -403,7 +409,6 @@
     ttsVirtualTime = cue.start;
 
     if ("speechSynthesis" in window && !ttsBackendAudio) {
-      ttsCancelSpeech();
       const gen = ttsPlayGen;
       const utterance = new SpeechSynthesisUtterance();
       utterance.text = cleanText;
@@ -556,7 +561,14 @@
   function ttsPlayCueViaBackend(idx, cue, cleanText) {
     const gen = ttsPlayGen;
     const lang = getCurrentLangCode();
-    const url = "/tts/" + lang + "/" + encodeURIComponent(cleanText);
+    // The picked edge-tts voice wins; otherwise the browser's twin when
+    // one maps (Edge), otherwise the server's default for the language.
+    const picked = (globalCache.edgeVoices || {})[lang];
+    const voice =
+      globalCache.selectedVoice === EDGE_TTS_VOICE_NAME
+        ? picked || ""
+        : mappedEdgeVoice(lang) || "";
+    const url = ttsBackendUrl(cleanText, lang, voice);
     const audio = new Audio(url);
     audio.playbackRate = ttsRate;
     ttsCurrentUtterance = {
@@ -603,6 +615,19 @@
     };
     audio.addEventListener("error", fail);
     audio.play().catch(fail);
+
+    // Warm the next cue while this one plays: the fetch lands in the
+    // browser's HTTP cache (the responses are immutable) and the
+    // server's disk cache, so the next clause starts the moment its
+    // turn comes instead of waiting out a cold synthesis round trip.
+    const next = ttsCues[idx + 1];
+    if (next) {
+      const nextText = next.text.replace(/[#＃]/g, "").trim();
+      if (nextText) {
+        const nextUrl = ttsBackendUrl(nextText, lang, voice);
+        fetch(nextUrl).catch(function () {});
+      }
+    }
   }
 
   // Decide what to play after the current cue ends.
@@ -1256,12 +1281,20 @@
       globalCache.selectedVoice ||
       "";
     const found = ttsFindStoredVoice(voices, name, getCurrentLangCode());
-    if (name && name !== DEVICE_DEFAULT_VOICE.name && !found) {
+    if (
+      name &&
+      name !== DEVICE_DEFAULT_VOICE.name &&
+      name !== EDGE_TTS_VOICE_NAME &&
+      !found
+    ) {
       name = "";
       globalCache.selectedVoice = "";
       if (ttsVoiceBtn) delete ttsVoiceBtn.dataset.voiceName;
       try { localStorage.removeItem("ttsVoice:" + SL); } catch (_) {}
     }
+    // A composite save ("name|lang") resolves to the live voice; the
+    // dropdown rows compare bare names, so hand back the resolved one.
+    if (found) name = found.name;
     // getVoices() loads asynchronously in Chromium/Edge, so the
     // init-time recommendation often finds an empty list. Auto-select
     // the recommended voice here (once voices exist) so playback and
@@ -1323,6 +1356,110 @@
     listedVoices.sort(function (a, b) { return a.lang.localeCompare(b.lang); });
 
     ttsVoiceDropdown.innerHTML = "";
+
+    // The backend's own voices as first-class menu entries at the top:
+    // on browsers without "Microsoft ... Online" voices this is what is
+    // actually speaking, so the speaking one gets the green row.  The
+    // first row is the language's default edge voice; the rest are the
+    // language's other edge-tts voices (fetched from the server, which
+    // owns the mapping).  Picking any of them pins edge-tts for the
+    // book language -- on Edge too, as an opt-in.
+    const langTag = getCurrentLangCode();
+    const edgePicked =
+      globalCache.voiceExplicit &&
+      globalCache.selectedVoice === EDGE_TTS_VOICE_NAME;
+    const edgeLangPick = (globalCache.edgeVoices || {})[langTag] || "";
+    const edgeOpt = document.createElement("div");
+    edgeOpt.className = "tts-voice-option tts-voice-edge";
+    edgeOpt.setAttribute("role", "option");
+    edgeOpt.dataset.voiceName = EDGE_TTS_VOICE_NAME;
+    edgeOpt.dataset.voiceLang = "";
+    edgeOpt.textContent = "[edge-tts] " + I18N.t("Default voice") +
+      " (" + langTag + ")";
+    if (ttsBackendAudio && (!edgePicked || !edgeLangPick)) {
+      edgeOpt.classList.add("selected");
+    }
+    edgeOpt.addEventListener("click", function (e) {
+      e.stopPropagation();
+      // Pin edge-tts for this language -- live, too: the flag routes
+      // the restarted current cue through the backend audio.
+      ttsBackendAudio = true;
+      globalCache.edgeVoices = globalCache.edgeVoices || {};
+      globalCache.edgeVoices[langTag] = "";
+      ttsSelectVoice({ name: EDGE_TTS_VOICE_NAME, lang: "" }, true);
+      ttsVoiceDropdown.hidden = true;
+    });
+    ttsVoiceDropdown.appendChild(edgeOpt);
+    // The mappings live server-side (VOICE_MAP + the full edge-tts
+    // list); ask once per language and label the rows with the real
+    // speakers ("Nanami", not "ja-JP-NanamiNeural").  Answers are
+    // cached for a day.
+    const knownVoices = (globalCache.backendVoiceNames =
+      globalCache.backendVoiceNames || {});
+    const allEdge = (globalCache.backendVoiceList =
+      globalCache.backendVoiceList || {});
+    const labelDefault = function () {
+      edgeOpt.textContent = "[edge-tts] " + edgePerson(knownVoices[langTag]) +
+        " (" + langTag + ")";
+    };
+    if (knownVoices[langTag]) {
+      labelDefault();
+    } else {
+      fetch("/tts/voice/" + encodeURIComponent(langTag))
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (j) {
+          if (!j || !j.voice) return;
+          knownVoices[langTag] = j.voice;
+          labelDefault();
+        })
+        .catch(function () {});
+    }
+    const buildEdgeRows = function () {
+      // A rebuild drops the previous specific rows so a re-entrant
+      // fetch cannot duplicate them.
+      ttsVoiceDropdown
+        .querySelectorAll(
+          ".tts-voice-edge[data-voice-lang]:not([data-voice-lang=''])"
+        )
+        .forEach(function (el) {
+          el.remove();
+        });
+      (allEdge[langTag] || []).forEach(function (v) {
+        if (v.id === knownVoices[langTag]) return; // the top row is it
+        const row = document.createElement("div");
+        row.className = "tts-voice-option tts-voice-edge";
+        row.setAttribute("role", "option");
+        row.dataset.voiceName = EDGE_TTS_VOICE_NAME;
+        row.dataset.voiceLang = v.id;
+        row.textContent = "[edge-tts] " + edgePerson(v.id) +
+          (v.gender === "Male" ? " ♂" : " ♀") + " (" + langTag + ")";
+        if (ttsBackendAudio && edgePicked && edgeLangPick === v.id) {
+          row.classList.add("selected");
+        }
+        row.addEventListener("click", function (e) {
+          e.stopPropagation();
+          ttsBackendAudio = true;
+          globalCache.edgeVoices = globalCache.edgeVoices || {};
+          globalCache.edgeVoices[langTag] = v.id;
+          ttsSelectVoice({ name: EDGE_TTS_VOICE_NAME, lang: v.id }, true);
+          ttsVoiceDropdown.hidden = true;
+        });
+        ttsVoiceDropdown.appendChild(row);
+      });
+    };
+    if (allEdge[langTag]) {
+      buildEdgeRows();
+    } else {
+      fetch("/tts/voices/" + encodeURIComponent(langTag))
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (j) {
+          if (!j || !j.voices || !j.voices.length) return;
+          allEdge[langTag] = j.voices;
+          buildEdgeRows();
+        })
+        .catch(function () {});
+    }
+
     listedVoices.forEach(function (voice) {
       const opt = document.createElement("div");
       opt.className = "tts-voice-option";
@@ -1468,6 +1605,13 @@
   // recommendation.  Only explicit picks persist and only they pin
   // speech to the native engine -- everywhere else the backend's
   // default neural voice is the default wherever native has no twin.
+  // "ja-JP-NanamiNeural" -> "Nanami", for the "[edge-tts]" menu rows.
+  function edgePerson(voiceId) {
+    return String(voiceId)
+      .replace(/^[A-Za-z]{2,4}(-[A-Za-z0-9]{2,6})?-/, "")
+      .replace(/Neural$/, "");
+  }
+
   function ttsSelectVoice(voice, explicit) {
     if (!voice) return;
     if (ttsVoiceBtn) {
@@ -1755,10 +1899,23 @@
         if (
           savedVoice &&
           (savedVoice.indexOf("|") >= 0 ||
-            savedVoice === DEVICE_DEFAULT_VOICE.name)
+            savedVoice === DEVICE_DEFAULT_VOICE.name ||
+            savedVoice === EDGE_TTS_VOICE_NAME)
         ) {
           globalCache.selectedVoice = savedVoice;
           globalCache.voiceExplicit = true;
+          // A saved edge-tts pick means the user chose the backend
+          // voice for this language: skip the native engine entirely,
+          // and remember WHICH edge voice ("edge-tts" = the default).
+          if (savedVoice === EDGE_TTS_VOICE_NAME) {
+            ttsBackendAudio = true;
+            globalCache.edgeVoices = globalCache.edgeVoices || {};
+            globalCache.edgeVoices[SL] = "";
+          } else if (savedVoice.indexOf("edge-tts|") === 0) {
+            ttsBackendAudio = true;
+            globalCache.edgeVoices = globalCache.edgeVoices || {};
+            globalCache.edgeVoices[SL] = savedVoice.slice("edge-tts|".length);
+          }
         } else if (savedVoice) {
           localStorage.removeItem("ttsVoice:" + SL);
         }

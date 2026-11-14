@@ -180,6 +180,11 @@ def test_unmapped_browser_voices_still_get_the_edge_tts_default():
     src = _read(_TTS_JS)
     assert "voiceExplicit: false" in src
     backend = src.split("function speakTermViaBackend")[1].split("\n  }")[0]
+    # An explicit pick of an edge-tts voice wins over the browser twin;
+    # an explicit pick of a device voice pins the native engine.
+    assert "globalCache.selectedVoice === EDGE_TTS_VOICE_NAME" in backend
+    assert "(globalCache.edgeVoices || {})[lang]" in backend
     assert "if (!voice && globalCache.voiceExplicit) return false;" in backend
     pre = src.split("function scheduleHoverPrefetch")[1].split("\n  }")[0]
-    assert "if (!voice && globalCache.voiceExplicit) return;" in pre
+    assert "globalCache.selectedVoice === EDGE_TTS_VOICE_NAME" in pre
+    assert 'const EDGE_TTS_VOICE_NAME = "edge-tts";' in src
