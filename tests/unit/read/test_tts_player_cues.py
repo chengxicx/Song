@@ -264,3 +264,55 @@ def test_shadowing_practises_the_clause_the_cue_covers():
     assert whole["spanCount"] == 59
     assert whole["fullText"] == LONG_CJK
     assert whole["elConnected"] is True
+
+
+def test_a_wedged_engine_hands_the_cue_to_the_backend_audio():
+    "Safari's engine drops cues (onend with no onstart): replay from /tts/."
+    src = open(_TTS_JS, encoding="utf-8").read()
+
+    onend = src.split("utterance.onend = function ()")[1].split("\n      };")[0]
+    assert "if (!started)" in onend
+    assert "ttsBackendAudio = true" in onend
+    assert "ttsPlayCueViaBackend(idx, cue, cleanText)" in onend
+
+    # A same-generation "canceled"/"interrupted" is the same wedge: a
+    # real cancel bumps the generation before the events can fire.
+    onerror = src.split("utterance.onerror = function (ev)")[1].split("\n      };")[0]
+    assert 'err === "interrupted" || err === "canceled"' in onerror
+    assert "ttsPlayCueViaBackend(idx, cue, cleanText)" in onerror
+
+    # Once wedged, the whole page keeps playing as backend audio, and a
+    # cue played that way still activates through ttsPlayCue's tail.
+    assert "ttsBackendAudio = false;" in src
+    assert '"speechSynthesis" in window && !ttsBackendAudio' in src
+    assert "ttsPlayCueViaBackend(idx, cue, cleanText);" in src.split(
+        "// --- Backend /tts/ audio"
+    )[1]
+
+    # Pausing / stopping must also stop a playing backend clip.
+    cancel = src.split("function ttsCancelSpeech()")[1].split("\n  }")[0]
+    assert "ttsCurrentUtterance.stop" in cancel
+
+
+def test_voice_memory_is_locale_aware():
+    "Same-named voices across locales must not cross over (macOS Eddy)."
+    read_tts_js = os.path.join(_STATIC_JS, "tts.js")
+    src = open(read_tts_js, encoding="utf-8").read()
+    # The shared resolver matches name+lang exactly, then the book
+    # language's twin, then any same-named voice (old bare-name saves).
+    assert "function ttsFindStoredVoice" in src
+    finder = src.split("function ttsFindStoredVoice")[1].split("\n  }")[0]
+    assert 'stored.indexOf("|")' in finder
+    assert "v.lang === lang" in finder
+    assert "indexOf(pl) === 0" in finder
+    # getSelectedVoice goes through the resolver instead of a bare find.
+    getter = src.split("function getSelectedVoice")[1].split("\n  }")[0]
+    assert "ttsFindStoredVoice(voices, stored, getCurrentLangCode())" in getter
+
+    player = open(_TTS_JS, encoding="utf-8").read()
+    # The save carries the lang ("name|lang"); the dropdown row and the
+    # player's own resolution follow the lang too.
+    select = player.split("function ttsSelectVoice")[1].split("\n  }")[0]
+    assert 'voice.name + "|" + voice.lang' in select
+    assert "opt.dataset.voiceLang" in player
+    assert "_ttsCurrentVoiceLang" in player

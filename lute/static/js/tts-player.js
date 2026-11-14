@@ -64,6 +64,17 @@
   // (see the onerror handler in ttsPlayCue).  Reset by any successful
   // start; three in a row stops playback instead of spinning.
   let ttsFailStreak = 0;
+  // Play every remaining cue through the backend /tts/ audio instead of
+  // SpeechSynthesis.  Safari's synthesis engine wedges after a few
+  // utterances: speak() goes silent but onend still fires (or onerror
+  // reports "interrupted"), so the timeline races through the page in
+  // silence -- reading a few words then flying through the rest, with
+  // no recovery short of a reload.  Once a cue is dropped this way the
+  // rest of the page is served as plain <audio> from /tts/ (same
+  // Microsoft neural voices via edge-tts, disk- and HTTP-cached), which
+  // plays reliably everywhere.  Persists for the page: the wedge does
+  // not recover mid-session, and a reload resets it.
+  let ttsBackendAudio = false;
   let ttsPollTimer = null;
   // Voice-list load detection. On mobile browsers getVoices() can stay
   // empty for a long time (chromium populates it lazily), and
@@ -351,6 +362,13 @@
 
   function ttsCancelSpeech() {
     ttsPlayGen += 1;
+    // Cues played through the backend audio are wrapped in an object
+    // with a stop() -- cancel() only reaches SpeechSynthesis, so the
+    // audio has to be paused here or pause / stop / seek would leave
+    // it playing to its end.
+    if (ttsCurrentUtterance && typeof ttsCurrentUtterance.stop === "function") {
+      try { ttsCurrentUtterance.stop(); } catch (_) {}
+    }
     if ("speechSynthesis" in window) {
       try { window.speechSynthesis.cancel(); } catch (_) {}
     }
@@ -384,7 +402,7 @@
     ttsCueStartedAt = performance.now();
     ttsVirtualTime = cue.start;
 
-    if ("speechSynthesis" in window) {
+    if ("speechSynthesis" in window && !ttsBackendAudio) {
       ttsCancelSpeech();
       const gen = ttsPlayGen;
       const utterance = new SpeechSynthesisUtterance();
@@ -428,6 +446,15 @@
       };
       utterance.onend = function () {
         if (gen !== ttsPlayGen) return; // stale event (user jumped)
+        // Safari's wedged engine fires onend with no sound ever played
+        // (no onstart): advancing here would race the timeline through
+        // the page in silence.  Serve the rest of the page from the
+        // backend /tts/ audio instead -- this cue included.
+        if (!started) {
+          ttsBackendAudio = true;
+          ttsPlayCueViaBackend(idx, cue, cleanText);
+          return;
+        }
         // Record the real duration so the timeline is accurate on
         // subsequent plays and after rate changes.  The clause rest
         // that follows is part of it: the cue's timeline span covers
@@ -441,8 +468,12 @@
         ttsAdvance();
       };
       // A voice that starts speaking proves it works; the failure streak
-      // below is only about voices that never make a sound at all.
+      // below is only about voices that never make a sound at all.  The
+      // started flag also feeds the Safari wedge detection in onend:
+      // an onend without an onstart means no sample was ever played.
+      let started = false;
       utterance.onstart = function () {
+        started = true;
         ttsFailStreak = 0;
       };
       utterance.onerror = function (ev) {
@@ -468,6 +499,17 @@
         if (failed && !isLocal && retries < 3) {
           markVoiceFailed(activeVoice && activeVoice.name);
           ttsPlayCue(idx, undefined, retries + 1);
+          return;
+        }
+        // A real cancel always bumps the generation first (see
+        // ttsCancelSpeech), so a same-generation "canceled" /
+        // "interrupted" -- like an onend that arrives without onstart --
+        // is the engine misreporting: Safari's wedge.  Nothing said
+        // here will ever be said by SpeechSynthesis again this page, so
+        // switch the rest of it to the backend audio.
+        if (!started || err === "interrupted" || err === "canceled") {
+          ttsBackendAudio = true;
+          ttsPlayCueViaBackend(idx, cue, cleanText);
           return;
         }
         ttsFailStreak += 1;
@@ -499,7 +541,20 @@
       return;
     }
 
-    // --- Fallback: backend /tts/ endpoint ---
+    // --- Backend /tts/ audio: no SpeechSynthesis, or Safari's engine
+    // has already wedged on this page (see ttsBackendAudio). ---
+    ttsPlayCueViaBackend(idx, cue, cleanText);
+  }
+
+  // Play one cue as a plain <audio> of the backend /tts/ mp3.  This was
+  // the no-SpeechSynthesis fallback and is now also Safari's landing
+  // spot once its synthesis engine wedges (see ttsBackendAudio): the
+  // media element plays reliably everywhere, benefits from the server's
+  // disk cache and the immutable HTTP cache, and timeupdate drives the
+  // playhead where SpeechSynthesis would have used boundary events.
+  // ttsPlayCue has already activated the cue and stamped the playhead.
+  function ttsPlayCueViaBackend(idx, cue, cleanText) {
+    const gen = ttsPlayGen;
     const lang = getCurrentLangCode();
     const url = "/tts/" + lang + "/" + encodeURIComponent(cleanText);
     const audio = new Audio(url);
@@ -512,22 +567,42 @@
         audio.load();
       },
     };
+    audio.addEventListener("playing", function () {
+      ttsFailStreak = 0;
+    });
     audio.addEventListener("timeupdate", function () {
-      if (ttsCueIndex !== idx) return;
+      if (gen !== ttsPlayGen || ttsCueIndex !== idx) return;
       ttsVirtualTime = cue.start + (audio.currentTime || 0);
     });
     audio.addEventListener("ended", function () {
-      if (ttsCueIndex !== idx) return;
+      if (gen !== ttsPlayGen || ttsCueIndex !== idx) return;
       cue.actualDuration = audio.duration || cue.duration;
       ttsRecomputeTimeline();
       ttsVirtualTime = cue.end;
       ttsAdvance();
     });
-    audio.addEventListener("error", function () {
-      if (ttsCueIndex !== idx) return;
+    // The stop() in ttsCancelSpeech strips the src, which surfaces here
+    // as an error event -- the generation guard above is what keeps it
+    // from being read as a failed cue.
+    const fail = function () {
+      if (gen !== ttsPlayGen || ttsCueIndex !== idx) return;
+      ttsFailStreak += 1;
+      if (ttsFailStreak >= 3) {
+        // The backend cannot voice this book either: stop instead of
+        // spinning the timeline through the whole page in silence.
+        try {
+          console.warn(
+            "TTS: backend /tts/ audio failed too (" + url + "); playback stopped."
+          );
+        } catch (_) {}
+        ttsFailStreak = 0;
+        ttsStop();
+        return;
+      }
       ttsAdvance();
-    });
-    audio.play().catch(function () { ttsAdvance(); });
+    };
+    audio.addEventListener("error", fail);
+    audio.play().catch(fail);
   }
 
   // Decide what to play after the current cue ends.
@@ -1150,16 +1225,19 @@
   // "Google ..." voice, see isSpeakableVoice) -- is dropped so the
   // recommendation can take over instead of leaving playback silent.
   // Returns the effective current voice name ("" when none).
+  // The lang of the voice ttsResolveCurrentVoice last resolved, for
+  // marking the dropdown row: with same-named voices across locales
+  // (macOS's "Eddy" & friends) a name alone would light up the wrong
+  // language's row.
+  let _ttsCurrentVoiceLang = "";
+
   function ttsResolveCurrentVoice(voices) {
     let name =
       (ttsVoiceBtn && ttsVoiceBtn.dataset.voiceName) ||
       globalCache.selectedVoice ||
       "";
-    if (
-      name &&
-      name !== DEVICE_DEFAULT_VOICE.name &&
-      !voices.some(function (v) { return v.name === name && isSpeakableVoice(v); })
-    ) {
+    const found = ttsFindStoredVoice(voices, name, getCurrentLangCode());
+    if (name && name !== DEVICE_DEFAULT_VOICE.name && !found) {
       name = "";
       globalCache.selectedVoice = "";
       if (ttsVoiceBtn) delete ttsVoiceBtn.dataset.voiceName;
@@ -1175,7 +1253,12 @@
       if (recommended) {
         ttsSelectVoice(recommended);
         name = recommended.name;
+        _ttsCurrentVoiceLang = recommended.lang || "";
+      } else {
+        _ttsCurrentVoiceLang = "";
       }
+    } else {
+      _ttsCurrentVoiceLang = found ? found.lang || "" : "";
     }
     return name;
   }
@@ -1219,8 +1302,14 @@
       opt.className = "tts-voice-option";
       opt.setAttribute("role", "option");
       opt.dataset.voiceName = voice.name;
+      opt.dataset.voiceLang = voice.lang || "";
       opt.textContent = I18N.t("[") + voice.lang + I18N.t("] ") + voice.name;
-      if (voice.name === currentName) opt.classList.add("selected");
+      if (
+        voice.name === currentName &&
+        (voice.lang || "") === _ttsCurrentVoiceLang
+      ) {
+        opt.classList.add("selected");
+      }
       opt.addEventListener("click", function (e) {
         e.stopPropagation();
         ttsSelectVoice(voice);
@@ -1358,12 +1447,22 @@
     globalCache.selectedVoice = voice.name;
     // Remember the choice per book language, so re-opening the player
     // (or another book in the same language) starts with the same voice
-    // and the dropdown can highlight it again.
-    try { localStorage.setItem("ttsVoice:" + SL, voice.name); } catch (_) {}
+    // and the dropdown can highlight it again.  The lang is part of the
+    // key: macOS exposes "Eddy", "Anna" & co. in dozens of locales under
+    // one name, and a bare name restored the wrong language's twin (a
+    // Japanese book suddenly read by the German Eddy).  Older saves are
+    // bare names; ttsFindStoredVoice falls back to the book language's
+    // twin for those.
+    const stored = voice.lang ? voice.name + "|" + voice.lang : voice.name;
+    try { localStorage.setItem("ttsVoice:" + SL, stored); } catch (_) {}
     // Update dropdown selected state.
     if (ttsVoiceDropdown) {
       ttsVoiceDropdown.querySelectorAll(".tts-voice-option").forEach(function (opt) {
-        opt.classList.toggle("selected", opt.dataset.voiceName === voice.name);
+        opt.classList.toggle(
+          "selected",
+          opt.dataset.voiceName === voice.name &&
+            opt.dataset.voiceLang === (voice.lang || "")
+        );
       });
     }
     // If we're playing, restart the current cue with the new voice.

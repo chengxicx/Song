@@ -256,6 +256,36 @@
     return local.length > 0 ? local[0] : null;
   }
 
+  // Resolve a remembered voice name to a live voice object.  macOS's
+  // novelty voices ("Eddy", "Flo", "Grandma", "Anna", ...) exist in
+  // dozens of locales under the SAME name, so a bare name can resolve
+  // to the wrong language's twin -- a Japanese book read by the German
+  // Eddy.  "name|lang" pairs (see the player's save) match exactly;
+  // bare names prefer a voice of the book's language and only then
+  // fall back to the first same-named one.
+  function ttsFindStoredVoice(voices, stored, preferLang) {
+    if (!stored || !voices || voices.length === 0) return null;
+    const pipe = stored.indexOf("|");
+    const name = pipe >= 0 ? stored.slice(0, pipe) : stored;
+    const lang = pipe >= 0 ? stored.slice(pipe + 1) : "";
+    const named = voices.filter(function (v) {
+      return v.name === name && isSpeakableVoice(v);
+    });
+    if (named.length === 0) return null;
+    if (lang) {
+      const exact = named.find(function (v) { return v.lang === lang; });
+      if (exact) return exact;
+    }
+    if (preferLang) {
+      const pl = String(preferLang).toLowerCase();
+      const inLang = named.find(function (v) {
+        return (v.lang || "").toLowerCase().indexOf(pl) === 0;
+      });
+      if (inLang) return inLang;
+    }
+    return named[0];
+  }
+
   // The explicitly chosen voice, if this device still offers it and it
   // can actually speak.  A remembered remote ("Google ...") voice is
   // deliberately ignored here -- it would silence every utterance -- so
@@ -263,25 +293,17 @@
   function getSelectedVoice() {
     if (!("speechSynthesis" in window)) return null;
 
+    const voices = window.speechSynthesis.getVoices();
     const voiceSelect = document.getElementById("tts-voice-btn");
-    if (voiceSelect && voiceSelect.dataset.voiceName) {
-      const voices = window.speechSynthesis.getVoices();
-      const found = voices.find(function (v) {
-        return v.name === voiceSelect.dataset.voiceName && isSpeakableVoice(v);
-      });
-      // A voice that already failed here is treated as "not chosen": the
-      // caller then falls through to selectBestVoiceForLang, which knows
-      // to skip it as well.
-      if (found && !_failedVoices.has(found.name)) return found;
-    }
-
-    if (globalCache.selectedVoice) {
-      const voices = window.speechSynthesis.getVoices();
-      const found = voices.find(function (v) {
-        return v.name === globalCache.selectedVoice && isSpeakableVoice(v);
-      });
-      if (found && !_failedVoices.has(found.name)) return found;
-    }
+    const stored =
+      (voiceSelect && voiceSelect.dataset.voiceName) ||
+      globalCache.selectedVoice ||
+      "";
+    // A voice that already failed here is treated as "not chosen": the
+    // caller then falls through to selectBestVoiceForLang, which knows
+    // to skip it as well.
+    const found = ttsFindStoredVoice(voices, stored, getCurrentLangCode());
+    if (found && !_failedVoices.has(found.name)) return found;
 
     return null;
   }
