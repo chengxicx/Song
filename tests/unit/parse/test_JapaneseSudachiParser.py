@@ -152,6 +152,30 @@ def test_context_readings_keep_a_compound_together(app_context):
     assert ("日", "にち") in _context_readings(p, "一日が長かった")
 
 
+def test_context_readings_do_not_invent_person_names(app_context):
+    """
+    The furigana caller reads its tokens joined into one string, so
+    name-like adjacencies the page never had can arise: 上田 + 実 + は
+    parses as the (real) name 上田実, giving 実 the given-name reading
+    みのる where the word on its own -- and in the term card -- is じつ.
+    A person-name reading over a bare kanji morpheme falls back to that
+    surface's isolated reading; genuine names, whose isolated parse is
+    also a person name, are untouched.
+    """
+    current_settings()["japanese_reading"] = "hiragana"
+    p = _make_parser()
+
+    assert p.get_reading("実") == "じつ"
+
+    morphs = _context_readings(p, "上田実は今日学校でスピーチコンテストが開かれたんですけど")
+    assert ("実", "じつ") in morphs
+    assert ("実", "みのる") not in morphs
+
+    # A genuine name, whose bare parse is also a person name, is kept.
+    assert p.get_reading("田中") == "たなか"
+    assert ("田中", "たなか") in _context_readings(p, "田中さんに会う")
+
+
 def test_context_readings_need_the_reading_setting(app_context):
     "No japanese_reading setting means no furigana to give."
     current_settings()["japanese_reading"] = ""
