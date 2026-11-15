@@ -323,3 +323,66 @@ def test_export_default_stays_per_book(app_context, empty_db, english):
     exported = library.export_book(book.id)
     assert exported["match"] == "book"
     assert exported["items"][0]["translation"] == "你好"
+
+
+# ---------------------------------------------------------------------
+# Generation prompt package
+# ---------------------------------------------------------------------
+
+
+def test_prompt_package_sentence(app_context, empty_db, english):
+    "The sentence package carries the panel's own prompt and real ids."
+    book = _make_book(english, ["One hello.", "Two worlds."])
+    package = library.prompt_package(book.id, "sentence", "Simplified Chinese")
+
+    assert package["kind"] == "sentence"
+    assert package["book_id"] == book.id
+    assert package["lang_id"] == english.id
+    assert "translation and language tutor" in package["system_prompt"]
+    assert "Simplified Chinese" in package["system_prompt"]
+    assert package["user_prompt"].startswith("Sentence (English):")
+    assert package["item_schema"]["kind"] == "sentence"
+    assert package["wrapper"]["book_id"] == book.id
+    assert package["wrapper"]["target_lang"] == "Simplified Chinese"
+    assert package["wrapper"]["items"] == []
+    assert package["sentences"] == ["One hello.", "Two worlds."]
+    assert package["sentence_count"] == 2
+
+
+def test_prompt_package_grammar(app_context, empty_db, english):
+    "The grammar package uses the analysis prompt and schema."
+    book = _make_book(english)
+    package = library.prompt_package(book.id, "grammar", "Simplified Chinese")
+
+    assert package["kind"] == "grammar"
+    assert "grammar-analysis engine" in package["system_prompt"]
+    assert package["item_schema"]["kind"] == "grammar"
+    assert "skeleton" in package["item_schema"]
+    assert package["wrapper"]["target_lang"] == "Simplified Chinese"
+
+
+def test_prompt_package_unknown_kind_falls_back_to_sentence(
+    app_context, empty_db, english
+):
+    "An unrecognised kind is treated as the sentence package."
+    book = _make_book(english)
+    package = library.prompt_package(book.id, "nonsense", "English")
+    assert package["kind"] == "sentence"
+
+
+def test_prompt_package_unknown_book(app_context, empty_db, english):
+    with pytest.raises(library.LibraryError):
+        library.prompt_package(987654, "sentence", "English")
+
+
+def test_prompt_package_previews_a_limited_number_of_sentences(
+    app_context, empty_db, english, monkeypatch
+):
+    "The inline list is capped; the count always covers the whole book."
+    sentences = [f"Sentence number {i}." for i in range(1, 12)]
+    book = _make_book(english, sentences)
+    monkeypatch.setattr(library, "SENTENCE_PREVIEW_LIMIT", 3)
+
+    package = library.prompt_package(book.id, "sentence", "English")
+    assert package["sentence_count"] == 11
+    assert len(package["sentences"]) == 3

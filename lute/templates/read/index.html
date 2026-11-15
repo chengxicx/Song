@@ -60,7 +60,7 @@
    annotates unconditionally on load (its annotate() ignores
    LUTE_FURIGANA.enabled), so "off" has to mean "absent" -- the same
    contract read/epub_render.html states for its own include.  Loading it
-   always made the per-language "Show furigana" box a no-op: every
+   always made the per-language pronunciation box a no-op: every
    Japanese page drew ruby whether or not the user asked for it. #}
 {% if show_furigana %}
 <script type="text/javascript" src="{{ vstatic('js/lute-furigana.js') }}" charset="utf-8" defer></script>

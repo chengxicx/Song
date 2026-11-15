@@ -65,6 +65,41 @@ def test_tts_js_prefers_a_kana_annotation():
     assert "speakText(term, null, langOverride)" in helper
 
 
+def test_term_pronunciation_prefers_the_backend_cache():
+    "Term speech tries the backend /tts/ cache, falling back to the browser."
+    src = _read(_TTS_JS)
+    assert "function speakTermViaBackend" in src
+    helper = src.split("function speakTermText")[1].split("\n  }")[0]
+    # Each utterance asks the backend cache first and keeps the old
+    # SpeechSynthesis path as the fallback.
+    assert "speakTermViaBackend(reading, langOverride)" in helper
+    assert "speakText(reading, null, langOverride)" in helper
+    assert "speakTermViaBackend(term, langOverride)" in helper
+    assert "speakText(term, null, langOverride)" in helper
+    # The backend only engages when the active browser voice maps to an
+    # edge-tts twin (Edge's "Microsoft <name> Online (Natural)" ones),
+    # so a local system voice keeps the browser path it always had.
+    mapper = src.split("function mappedEdgeVoice")[1].split("\n  }")[0]
+    assert "Microsoft\\s+(.+?)\\s+Online" in mapper
+
+
+def test_hover_prefetches_the_backend_audio():
+    "A hover prefetches during the delay; moving off the word cancels it."
+    src = _read(_TTS_JS)
+    over = src.split('textDiv.addEventListener("mouseover"')[1].split("\n    });")[0]
+    assert "scheduleHoverPrefetch(rawText, readingText)" in over
+    out = src.split('textDiv.addEventListener("mouseout"')[1].split("\n    });")[0]
+    assert "cancelHoverPrefetch()" in out
+
+
+def test_new_speech_displaces_the_cached_clip():
+    "speakNow pauses the cached clip and drops pending backend plays."
+    src = _read(_TTS_JS)
+    block = src.split("function speakNow(")[1].split("\n  }")[0]
+    assert "stopTtsCacheAudio();" in block
+    assert "_ttsBackendEpoch += 1;" in block
+
+
 def test_hover_pronunciation_accepts_a_reading():
     "The shared hover engine speaks the annotation when handed one."
     src = _read(_TTS_JS)
@@ -138,3 +173,18 @@ def test_termpopup_carries_the_annotated_reading(app_context, client, english, r
     bare = _save_term(repo, english, "speakme-bare")
     body = client.get(f"/read/termpopup/{bare.id}").get_data(as_text=True)
     assert 'class="termpopup-reading"' in body
+
+
+def test_unmapped_browser_voices_still_get_the_edge_tts_default():
+    "Safari & co. hear the edge-tts default unless a device voice was picked."
+    src = _read(_TTS_JS)
+    assert "voiceExplicit: false" in src
+    backend = src.split("function speakTermViaBackend")[1].split("\n  }")[0]
+    # An explicit pick of an edge-tts voice wins over the browser twin;
+    # an explicit pick of a device voice pins the native engine.
+    assert "globalCache.selectedVoice === EDGE_TTS_VOICE_NAME" in backend
+    assert "(globalCache.edgeVoices || {})[lang]" in backend
+    assert "if (!voice && globalCache.voiceExplicit) return false;" in backend
+    pre = src.split("function scheduleHoverPrefetch")[1].split("\n  }")[0]
+    assert "globalCache.selectedVoice === EDGE_TTS_VOICE_NAME" in pre
+    assert 'const EDGE_TTS_VOICE_NAME = "edge-tts";' in src

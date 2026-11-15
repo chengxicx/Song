@@ -64,6 +64,17 @@
   // (see the onerror handler in ttsPlayCue).  Reset by any successful
   // start; three in a row stops playback instead of spinning.
   let ttsFailStreak = 0;
+  // Play every remaining cue through the backend /tts/ audio instead of
+  // SpeechSynthesis.  Safari's synthesis engine wedges after a few
+  // utterances: speak() goes silent but onend still fires (or onerror
+  // reports "interrupted"), so the timeline races through the page in
+  // silence -- reading a few words then flying through the rest, with
+  // no recovery short of a reload.  Once a cue is dropped this way the
+  // rest of the page is served as plain <audio> from /tts/ (same
+  // Microsoft neural voices via edge-tts, disk- and HTTP-cached), which
+  // plays reliably everywhere.  Persists for the page: the wedge does
+  // not recover mid-session, and a reload resets it.
+  let ttsBackendAudio = false;
   let ttsPollTimer = null;
   // Voice-list load detection. On mobile browsers getVoices() can stay
   // empty for a long time (chromium populates it lazily), and
@@ -351,6 +362,13 @@
 
   function ttsCancelSpeech() {
     ttsPlayGen += 1;
+    // Cues played through the backend audio are wrapped in an object
+    // with a stop() -- cancel() only reaches SpeechSynthesis, so the
+    // audio has to be paused here or pause / stop / seek would leave
+    // it playing to its end.
+    if (ttsCurrentUtterance && typeof ttsCurrentUtterance.stop === "function") {
+      try { ttsCurrentUtterance.stop(); } catch (_) {}
+    }
     if ("speechSynthesis" in window) {
       try { window.speechSynthesis.cancel(); } catch (_) {}
     }
@@ -373,10 +391,22 @@
 
     ttsCueIndex = idx;
     ttsActivateCue(idx);
+    // A cue (re)start always displaces whatever is currently sounding --
+    // a replayed cue (loop, seek, rate change, voice change) must not
+    // overlap its predecessor.  In the SpeechSynthesis branch the
+    // cancel() used to live; backend-audio cues need the stop() just as
+    // much, so do both here.
+    ttsCancelSpeech();
 
     const cleanText = cue.text.replace(/[#＃]/g, "").trim();
-    if (!cleanText) {
-      // Skip empty cue (shouldn't happen, but be safe) and advance.
+    // Punctuation-only fragments have nothing to say.  CJK quotes and
+    // ellipses split into their own sentences on some books ("」",
+    // "……"), and edge-tts refuses to voice them outright
+    // (NoAudioReceived) -- three of those in a row read as an engine
+    // failure and stopped the player mid-page.  Native voices breeze
+    // through them, so skip them exactly the way the sentence 🔊
+    // injector does.
+    if (!cleanText || !/[\p{L}\p{N}]/u.test(cleanText)) {
       ttsAdvance();
       return;
     }
@@ -384,8 +414,7 @@
     ttsCueStartedAt = performance.now();
     ttsVirtualTime = cue.start;
 
-    if ("speechSynthesis" in window) {
-      ttsCancelSpeech();
+    if ("speechSynthesis" in window && !ttsBackendAudio) {
       const gen = ttsPlayGen;
       const utterance = new SpeechSynthesisUtterance();
       utterance.text = cleanText;
@@ -428,6 +457,15 @@
       };
       utterance.onend = function () {
         if (gen !== ttsPlayGen) return; // stale event (user jumped)
+        // Safari's wedged engine fires onend with no sound ever played
+        // (no onstart): advancing here would race the timeline through
+        // the page in silence.  Serve the rest of the page from the
+        // backend /tts/ audio instead -- this cue included.
+        if (!started) {
+          ttsBackendAudio = true;
+          ttsPlayCueViaBackend(idx, cue, cleanText);
+          return;
+        }
         // Record the real duration so the timeline is accurate on
         // subsequent plays and after rate changes.  The clause rest
         // that follows is part of it: the cue's timeline span covers
@@ -441,8 +479,12 @@
         ttsAdvance();
       };
       // A voice that starts speaking proves it works; the failure streak
-      // below is only about voices that never make a sound at all.
+      // below is only about voices that never make a sound at all.  The
+      // started flag also feeds the Safari wedge detection in onend:
+      // an onend without an onstart means no sample was ever played.
+      let started = false;
       utterance.onstart = function () {
+        started = true;
         ttsFailStreak = 0;
       };
       utterance.onerror = function (ev) {
@@ -468,6 +510,17 @@
         if (failed && !isLocal && retries < 3) {
           markVoiceFailed(activeVoice && activeVoice.name);
           ttsPlayCue(idx, undefined, retries + 1);
+          return;
+        }
+        // A real cancel always bumps the generation first (see
+        // ttsCancelSpeech), so a same-generation "canceled" /
+        // "interrupted" -- like an onend that arrives without onstart --
+        // is the engine misreporting: Safari's wedge.  Nothing said
+        // here will ever be said by SpeechSynthesis again this page, so
+        // switch the rest of it to the backend audio.
+        if (!started || err === "interrupted" || err === "canceled") {
+          ttsBackendAudio = true;
+          ttsPlayCueViaBackend(idx, cue, cleanText);
           return;
         }
         ttsFailStreak += 1;
@@ -499,9 +552,29 @@
       return;
     }
 
-    // --- Fallback: backend /tts/ endpoint ---
+    // --- Backend /tts/ audio: no SpeechSynthesis, or Safari's engine
+    // has already wedged on this page (see ttsBackendAudio). ---
+    ttsPlayCueViaBackend(idx, cue, cleanText);
+  }
+
+  // Play one cue as a plain <audio> of the backend /tts/ mp3.  This was
+  // the no-SpeechSynthesis fallback and is now also Safari's landing
+  // spot once its synthesis engine wedges (see ttsBackendAudio): the
+  // media element plays reliably everywhere, benefits from the server's
+  // disk cache and the immutable HTTP cache, and timeupdate drives the
+  // playhead where SpeechSynthesis would have used boundary events.
+  // ttsPlayCue has already activated the cue and stamped the playhead.
+  function ttsPlayCueViaBackend(idx, cue, cleanText) {
+    const gen = ttsPlayGen;
     const lang = getCurrentLangCode();
-    const url = "/tts/" + lang + "/" + encodeURIComponent(cleanText);
+    // The picked edge-tts voice wins; otherwise the browser's twin when
+    // one maps (Edge), otherwise the server's default for the language.
+    const picked = (globalCache.edgeVoices || {})[lang];
+    const voice =
+      globalCache.selectedVoice === EDGE_TTS_VOICE_NAME
+        ? picked || ""
+        : mappedEdgeVoice(lang) || "";
+    const url = ttsBackendUrl(cleanText, lang, voice);
     const audio = new Audio(url);
     audio.playbackRate = ttsRate;
     ttsCurrentUtterance = {
@@ -512,22 +585,55 @@
         audio.load();
       },
     };
+    audio.addEventListener("playing", function () {
+      ttsFailStreak = 0;
+    });
     audio.addEventListener("timeupdate", function () {
-      if (ttsCueIndex !== idx) return;
+      if (gen !== ttsPlayGen || ttsCueIndex !== idx) return;
       ttsVirtualTime = cue.start + (audio.currentTime || 0);
     });
     audio.addEventListener("ended", function () {
-      if (ttsCueIndex !== idx) return;
+      if (gen !== ttsPlayGen || ttsCueIndex !== idx) return;
       cue.actualDuration = audio.duration || cue.duration;
       ttsRecomputeTimeline();
       ttsVirtualTime = cue.end;
       ttsAdvance();
     });
-    audio.addEventListener("error", function () {
-      if (ttsCueIndex !== idx) return;
+    // The stop() in ttsCancelSpeech strips the src, which surfaces here
+    // as an error event -- the generation guard above is what keeps it
+    // from being read as a failed cue.
+    const fail = function () {
+      if (gen !== ttsPlayGen || ttsCueIndex !== idx) return;
+      ttsFailStreak += 1;
+      if (ttsFailStreak >= 3) {
+        // The backend cannot voice this book either: stop instead of
+        // spinning the timeline through the whole page in silence.
+        try {
+          console.warn(
+            "TTS: backend /tts/ audio failed too (" + url + "); playback stopped."
+          );
+        } catch (_) {}
+        ttsFailStreak = 0;
+        ttsStop();
+        return;
+      }
       ttsAdvance();
-    });
-    audio.play().catch(function () { ttsAdvance(); });
+    };
+    audio.addEventListener("error", fail);
+    audio.play().catch(fail);
+
+    // Warm the next cue while this one plays: the fetch lands in the
+    // browser's HTTP cache (the responses are immutable) and the
+    // server's disk cache, so the next clause starts the moment its
+    // turn comes instead of waiting out a cold synthesis round trip.
+    const next = ttsCues[idx + 1];
+    if (next) {
+      const nextText = next.text.replace(/[#＃]/g, "").trim();
+      if (nextText) {
+        const nextUrl = ttsBackendUrl(nextText, lang, voice);
+        fetch(nextUrl).catch(function () {});
+      }
+    }
   }
 
   // Decide what to play after the current cue ends.
@@ -1150,32 +1256,70 @@
   // "Google ..." voice, see isSpeakableVoice) -- is dropped so the
   // recommendation can take over instead of leaving playback silent.
   // Returns the effective current voice name ("" when none).
+  // The lang of the voice ttsResolveCurrentVoice last resolved, for
+  // marking the dropdown row: with same-named voices across locales
+  // (macOS's "Eddy" & friends) a name alone would light up the wrong
+  // language's row.
+  let _ttsCurrentVoiceLang = "";
+
+  // Flip to backend audio when this browser has no voice that maps to
+  // an edge-tts twin (Safari, macOS Chrome, Firefox -- nothing
+  // "Microsoft ... Online") and the user hasn't explicitly picked a
+  // device voice: the same neural voice Edge hears becomes the default
+  // everywhere, and the wedge switch in ttsPlayCue remains as the
+  // safety net (and covers explicit local picks).  Called at init and
+  // again from ttsPopulateVoiceList once the voice list lands
+  // (Chromium fills getVoices() asynchronously); a browser whose list
+  // is still empty simply stays native until then.  One-way on
+  // purpose: a page that started on backend audio stays there.
+  function ttsMaybeUseBackendAudio() {
+    if (ttsBackendAudio || !("speechSynthesis" in window)) return;
+    if (globalCache.voiceExplicit) return;
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length && !mappedEdgeVoice(getCurrentLangCode())) {
+      ttsBackendAudio = true;
+    }
+  }
+
   function ttsResolveCurrentVoice(voices) {
     let name =
       (ttsVoiceBtn && ttsVoiceBtn.dataset.voiceName) ||
       globalCache.selectedVoice ||
       "";
+    const found = ttsFindStoredVoice(voices, name, getCurrentLangCode());
     if (
       name &&
       name !== DEVICE_DEFAULT_VOICE.name &&
-      !voices.some(function (v) { return v.name === name && isSpeakableVoice(v); })
+      name !== EDGE_TTS_VOICE_NAME &&
+      !found
     ) {
       name = "";
       globalCache.selectedVoice = "";
       if (ttsVoiceBtn) delete ttsVoiceBtn.dataset.voiceName;
       try { localStorage.removeItem("ttsVoice:" + SL); } catch (_) {}
     }
+    // A composite save ("name|lang") resolves to the live voice; the
+    // dropdown rows compare bare names, so hand back the resolved one.
+    if (found) name = found.name;
     // getVoices() loads asynchronously in Chromium/Edge, so the
     // init-time recommendation often finds an empty list. Auto-select
     // the recommended voice here (once voices exist) so playback and
     // hover pronunciation use a natural voice, and so the dropdown has
-    // a row to highlight and scroll to.
-    if (!name) {
+    // a row to highlight and scroll to -- but not when playback comes
+    // from the backend audio anyway: nothing native is speaking, so
+    // the dropdown stays unhighlighted rather than advertising a voice
+    // that will not be heard.
+    if (!name && !ttsBackendAudio) {
       const recommended = selectBestVoiceForLang(voices, getCurrentLangCode());
       if (recommended) {
         ttsSelectVoice(recommended);
         name = recommended.name;
+        _ttsCurrentVoiceLang = recommended.lang || "";
+      } else {
+        _ttsCurrentVoiceLang = "";
       }
+    } else {
+      _ttsCurrentVoiceLang = found ? found.lang || "" : "";
     }
     return name;
   }
@@ -1201,6 +1345,10 @@
     // leftover placeholder state so the real list renders below.
     _voiceWaitStart = null;
 
+    // Now that the voice list is known, a browser without an edge-tts
+    // twin and without an explicit pick defaults to backend audio.
+    ttsMaybeUseBackendAudio();
+
     // Hide the voices that can never produce sound (see isSpeakableVoice):
     // picking one used to leave the reader silent with nothing to report.
     // If the filter would empty the list, keep everything so the menu
@@ -1214,16 +1362,126 @@
     listedVoices.sort(function (a, b) { return a.lang.localeCompare(b.lang); });
 
     ttsVoiceDropdown.innerHTML = "";
+
+    // The backend's own voices as first-class menu entries at the top:
+    // on browsers without "Microsoft ... Online" voices this is what is
+    // actually speaking, so the speaking one gets the green row.  The
+    // first row is the language's default edge voice; the rest are the
+    // language's other edge-tts voices (fetched from the server, which
+    // owns the mapping).  Picking any of them pins edge-tts for the
+    // book language -- on Edge too, as an opt-in.
+    const langTag = getCurrentLangCode();
+    const edgePicked =
+      globalCache.voiceExplicit &&
+      globalCache.selectedVoice === EDGE_TTS_VOICE_NAME;
+    const edgeLangPick = (globalCache.edgeVoices || {})[langTag] || "";
+    const edgeOpt = document.createElement("div");
+    edgeOpt.className = "tts-voice-option tts-voice-edge";
+    edgeOpt.setAttribute("role", "option");
+    edgeOpt.dataset.voiceName = EDGE_TTS_VOICE_NAME;
+    edgeOpt.dataset.voiceLang = "";
+    edgeOpt.textContent = "[edge-tts] " + I18N.t("Default voice") +
+      " (" + langTag + ")";
+    if (ttsBackendAudio && (!edgePicked || !edgeLangPick)) {
+      edgeOpt.classList.add("selected");
+    }
+    edgeOpt.addEventListener("click", function (e) {
+      e.stopPropagation();
+      // Pin edge-tts for this language -- live, too: the flag routes
+      // the restarted current cue through the backend audio.
+      ttsBackendAudio = true;
+      globalCache.edgeVoices = globalCache.edgeVoices || {};
+      globalCache.edgeVoices[langTag] = "";
+      ttsSelectVoice({ name: EDGE_TTS_VOICE_NAME, lang: "" }, true);
+      ttsVoiceDropdown.hidden = true;
+    });
+    ttsVoiceDropdown.appendChild(edgeOpt);
+    // The mappings live server-side (VOICE_MAP + the full edge-tts
+    // list); ask once per language and label the rows with the real
+    // speakers ("Nanami", not "ja-JP-NanamiNeural").  Answers are
+    // cached for a day.
+    const knownVoices = (globalCache.backendVoiceNames =
+      globalCache.backendVoiceNames || {});
+    const allEdge = (globalCache.backendVoiceList =
+      globalCache.backendVoiceList || {});
+    const labelDefault = function () {
+      edgeOpt.textContent = "[edge-tts] " + edgePerson(knownVoices[langTag]) +
+        " (" + langTag + ")";
+    };
+    if (knownVoices[langTag]) {
+      labelDefault();
+    } else {
+      fetch("/tts/voice/" + encodeURIComponent(langTag))
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (j) {
+          if (!j || !j.voice) return;
+          knownVoices[langTag] = j.voice;
+          labelDefault();
+        })
+        .catch(function () {});
+    }
+    const buildEdgeRows = function () {
+      // A rebuild drops the previous specific rows so a re-entrant
+      // fetch cannot duplicate them.
+      ttsVoiceDropdown
+        .querySelectorAll(
+          ".tts-voice-edge[data-voice-lang]:not([data-voice-lang=''])"
+        )
+        .forEach(function (el) {
+          el.remove();
+        });
+      (allEdge[langTag] || []).forEach(function (v) {
+        if (v.id === knownVoices[langTag]) return; // the top row is it
+        const row = document.createElement("div");
+        row.className = "tts-voice-option tts-voice-edge";
+        row.setAttribute("role", "option");
+        row.dataset.voiceName = EDGE_TTS_VOICE_NAME;
+        row.dataset.voiceLang = v.id;
+        row.textContent = "[edge-tts] " + edgePerson(v.id) +
+          (v.gender === "Male" ? " ♂" : " ♀") + " (" + langTag + ")";
+        if (ttsBackendAudio && edgePicked && edgeLangPick === v.id) {
+          row.classList.add("selected");
+        }
+        row.addEventListener("click", function (e) {
+          e.stopPropagation();
+          ttsBackendAudio = true;
+          globalCache.edgeVoices = globalCache.edgeVoices || {};
+          globalCache.edgeVoices[langTag] = v.id;
+          ttsSelectVoice({ name: EDGE_TTS_VOICE_NAME, lang: v.id }, true);
+          ttsVoiceDropdown.hidden = true;
+        });
+        ttsVoiceDropdown.appendChild(row);
+      });
+    };
+    if (allEdge[langTag]) {
+      buildEdgeRows();
+    } else {
+      fetch("/tts/voices/" + encodeURIComponent(langTag))
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (j) {
+          if (!j || !j.voices || !j.voices.length) return;
+          allEdge[langTag] = j.voices;
+          buildEdgeRows();
+        })
+        .catch(function () {});
+    }
+
     listedVoices.forEach(function (voice) {
       const opt = document.createElement("div");
       opt.className = "tts-voice-option";
       opt.setAttribute("role", "option");
       opt.dataset.voiceName = voice.name;
+      opt.dataset.voiceLang = voice.lang || "";
       opt.textContent = I18N.t("[") + voice.lang + I18N.t("] ") + voice.name;
-      if (voice.name === currentName) opt.classList.add("selected");
+      if (
+        voice.name === currentName &&
+        (voice.lang || "") === _ttsCurrentVoiceLang
+      ) {
+        opt.classList.add("selected");
+      }
       opt.addEventListener("click", function (e) {
         e.stopPropagation();
-        ttsSelectVoice(voice);
+        ttsSelectVoice(voice, true);
         ttsVoiceDropdown.hidden = true;
       });
       ttsVoiceDropdown.appendChild(opt);
@@ -1298,7 +1556,7 @@
         def.textContent = I18N.t("[default] Use device default voice");
         def.addEventListener("click", function (e) {
           e.stopPropagation();
-          ttsSelectVoice(DEVICE_DEFAULT_VOICE);
+          ttsSelectVoice(DEVICE_DEFAULT_VOICE, true);
           ttsVoiceDropdown.hidden = true;
         });
         ttsVoiceDropdown.appendChild(def);
@@ -1349,21 +1607,43 @@
     return s || I18N.t("Voice");
   }
 
-  function ttsSelectVoice(voice) {
+  // explicit: the pick came from the dropdown, not the auto-
+  // recommendation.  Only explicit picks persist and only they pin
+  // speech to the native engine -- everywhere else the backend's
+  // default neural voice is the default wherever native has no twin.
+  // "ja-JP-NanamiNeural" -> "Nanami", for the "[edge-tts]" menu rows.
+  function edgePerson(voiceId) {
+    return String(voiceId)
+      .replace(/^[A-Za-z]{2,4}(-[A-Za-z0-9]{2,6})?-/, "")
+      .replace(/Neural$/, "");
+  }
+
+  function ttsSelectVoice(voice, explicit) {
     if (!voice) return;
     if (ttsVoiceBtn) {
       ttsVoiceBtn.dataset.voiceName = voice.name;
       if (ttsVoiceLabel) ttsVoiceLabel.textContent = ttsShortVoiceName(voice.name);
     }
     globalCache.selectedVoice = voice.name;
+    globalCache.voiceExplicit = !!explicit;
     // Remember the choice per book language, so re-opening the player
     // (or another book in the same language) starts with the same voice
-    // and the dropdown can highlight it again.
-    try { localStorage.setItem("ttsVoice:" + SL, voice.name); } catch (_) {}
+    // and the dropdown can highlight it again.  The lang is part of the
+    // key: macOS exposes "Eddy", "Anna" & co. in dozens of locales under
+    // one name, and a bare name restored the wrong language's twin (a
+    // Japanese book suddenly read by the German Eddy).
+    if (explicit) {
+      const stored = voice.lang ? voice.name + "|" + voice.lang : voice.name;
+      try { localStorage.setItem("ttsVoice:" + SL, stored); } catch (_) {}
+    }
     // Update dropdown selected state.
     if (ttsVoiceDropdown) {
       ttsVoiceDropdown.querySelectorAll(".tts-voice-option").forEach(function (opt) {
-        opt.classList.toggle("selected", opt.dataset.voiceName === voice.name);
+        opt.classList.toggle(
+          "selected",
+          opt.dataset.voiceName === voice.name &&
+            opt.dataset.voiceLang === (voice.lang || "")
+        );
       });
     }
     // If we're playing, restart the current cue with the new voice.
@@ -1614,13 +1894,48 @@
     if (!ttsCacheElements()) return;
     // Restore the voice chosen for this book language in a previous
     // session, so playback uses it immediately and the dropdown has a
-    // row to highlight / scroll to when the gear is opened.
+    // row to highlight / scroll to when the gear is opened.  Only
+    // explicit picks are saved anymore; bare-name saves from before
+    // voices carried their locale were written by the auto-
+    // recommendation, not the user, so they are dropped and the
+    // backend's default voice takes over (see the switch below).
     if (!globalCache.selectedVoice) {
       try {
         const savedVoice = localStorage.getItem("ttsVoice:" + SL);
-        if (savedVoice) globalCache.selectedVoice = savedVoice;
+        if (
+          savedVoice &&
+          (savedVoice.indexOf("|") >= 0 ||
+            savedVoice === DEVICE_DEFAULT_VOICE.name ||
+            savedVoice === EDGE_TTS_VOICE_NAME)
+        ) {
+          globalCache.selectedVoice = savedVoice;
+          globalCache.voiceExplicit = true;
+          // A saved edge-tts pick means the user chose the backend
+          // voice for this language: skip the native engine entirely,
+          // and remember WHICH edge voice ("edge-tts" = the default).
+          if (savedVoice === EDGE_TTS_VOICE_NAME) {
+            ttsBackendAudio = true;
+            globalCache.edgeVoices = globalCache.edgeVoices || {};
+            globalCache.edgeVoices[SL] = "";
+          } else if (savedVoice.indexOf("edge-tts|") === 0) {
+            ttsBackendAudio = true;
+            globalCache.edgeVoices = globalCache.edgeVoices || {};
+            globalCache.edgeVoices[SL] = savedVoice.slice("edge-tts|".length);
+          }
+        } else if (savedVoice) {
+          localStorage.removeItem("ttsVoice:" + SL);
+        }
       } catch (_) {}
     }
+
+    // Safari, macOS Chrome & co. have no "Microsoft ... Online" voices,
+    // so nothing maps to an edge-tts twin.  When the user hasn't
+    // explicitly picked a device voice, play straight from the backend
+    // audio -- the same neural voice Edge hears -- instead of the local
+    // novelty voices, and skip the wedge dance entirely.  Evaluated
+    // here and again when the voice list lands (Chromium populates
+    // getVoices() asynchronously).
+    ttsMaybeUseBackendAudio();
     // The container is rendered by the template but its visibility
     // is controlled by the Player toggle (reading_menu).  The
     // element itself is always present in the DOM so JS can find it.
@@ -1656,8 +1971,12 @@
     }
 
     // Pick up the recommended voice for the current language if the
-    // user hasn't chosen one yet.
-    if (!globalCache.selectedVoice && "speechSynthesis" in window) {
+    // user hasn't chosen one yet -- but not when playback comes from
+    // the backend audio anyway: nothing native is speaking, so the
+    // dropdown stays unhighlighted rather than advertising a voice
+    // that will not be heard.
+    if (!globalCache.selectedVoice && !ttsBackendAudio &&
+        "speechSynthesis" in window) {
       const voices = window.speechSynthesis.getVoices();
       if (voices.length) {
         const rec = selectBestVoiceForLang(voices, getCurrentLangCode());

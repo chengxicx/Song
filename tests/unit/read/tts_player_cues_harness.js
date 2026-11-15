@@ -348,6 +348,7 @@ class SpeechSynthesisUtterance {
     this.lang = "";
     this.rate = 1;
     this.voice = null;
+    this.onstart = null;
     this.onend = null;
     this.onerror = null;
     this.onboundary = null;
@@ -368,6 +369,10 @@ const speechSynthesis = {
   cancel() {},
   speak(u) {
     spoken.push({ text: u.text, at: nowMs, rate: u.rate });
+    // Real engines fire onstart when sound actually begins; the player
+    // uses an onend-without-onstart to detect Safari's wedged engine
+    // (cue handed to the backend audio), so the fake must start too.
+    if (typeof u.onstart === "function") u.onstart();
     setTimeout(function () {
       if (typeof u.onend === "function") u.onend();
     }, UTTER_MS);

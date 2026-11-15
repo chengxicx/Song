@@ -2048,9 +2048,16 @@ span.textitem {
    toggle, drawn by lute-furigana.js).  #thetext gets .furigana-on as
    soon as the pane renders, so the roomier line height is reserved
    before the ruby arrives and the text doesn't jump when the readings
-   land.  rt styling follows the shadowing panel's ruby row. */
+   land.  rt styling follows the shadowing panel's ruby row.  The 1.7
+   is only a default: the word spans' line boxes outrank the <p>'s
+   line-height, so a stylesheet-pinned value would make the reading
+   menu's line-height buttons change nothing the eye can see (more so
+   the bigger the word font).  text-options.js writes the user's
+   line-height factor into --furigana-line-height, which therefore
+   wins over 1.7; books where the buttons were never touched keep the
+   roomy row. */
 div#thetext.furigana-on span.textitem {
-    line-height: 1.7;
+    line-height: var(--furigana-line-height, 1.7);
 }
 
 /* The ruby base inherits the pane's line-height, which centers the
@@ -3653,8 +3660,12 @@ input[type="checkbox"][disabled] + label {
 }
 
 #dict-image-btn:hover {
-    background-color: #623006;
-    filter: invert(1);
+    /* was #623006 shown through filter: invert(1) */
+    background-color: #9dcff9;
+}
+
+#dict-image-btn:hover::before {
+    background-color: #fff;
 }
 
 .dict-btn.dict-btn-active,
@@ -3691,8 +3702,12 @@ input[type="checkbox"][disabled] + label {
 }
 
 #dict-image-btn.dict-btn-active {
-    background-color: #97531f;
-    filter: invert(1);
+    /* was #97531f shown through filter: invert(1) */
+    background-color: #68ace0;
+}
+
+#dict-image-btn.dict-btn-active::before {
+    background-color: #fff;
 }
 
 .dictframe {
@@ -3709,10 +3724,11 @@ input[type="checkbox"][disabled] + label {
 }
 
 #dict-image-btn {
-    background: url("../icn/images.svg");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 85%;
+    /* The single-colour icon renders on ::before through a mask, so its
+       colour is a plain background-color instead of the old invert/sepia/
+       hue-rotate filter chain.  The tab itself stays unfilled: the old
+       background: url(...) shorthand had reset .dict-btn's fill. */
+    background-color: transparent;
 
     /* width: 32px; */
     padding-top: 1.6rem;
@@ -3724,8 +3740,15 @@ input[type="checkbox"][disabled] + label {
     /* justify-self: center; */
     /* margin-bottom: 4px; */
     cursor: pointer;
+}
 
-    filter: invert(66%) sepia(33%) saturate(700%) hue-rotate(170deg) brightness(92%) contrast(90%);
+#dict-image-btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    mask: url("../icn/images.svg") center / 85% no-repeat;
+    background-color: #66aadf;
+    forced-color-adjust: none;
 }
 
 #dict-list-container.dict-list-hide {
@@ -5386,6 +5409,12 @@ body.cue-panel-open.cue-panel-closed #cuePanelTab {
     resize: none;
     overflow-y: auto;
     line-height: 1.45;
+    /* Grow the textarea to fit its cue text; the autosize() JS in
+       book-edit-cues.js remains as the fallback for engines without
+       field-sizing.  110px matches that fallback's clamp. */
+    field-sizing: content;
+    height: auto;
+    max-block-size: 110px;
 }
 
 .cue-panel-footer {

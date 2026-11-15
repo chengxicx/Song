@@ -1,6 +1,6 @@
 /* Furigana above reading-page words.
  *
- * Enabled per language (Language > "Show furigana above words"), and only
+ * Enabled per language (Language > "Show pronunciation above words"), and only
  * for parsers that can supply readings -- Japanese (kana via Sudachi/
  * MeCab), Mandarin (pinyin), Cantonese (jyutping) and Thai (RTGS
  * romanization) via their plugins; the flag reaches us via LUTE_FURIGANA

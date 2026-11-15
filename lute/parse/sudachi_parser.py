@@ -29,6 +29,17 @@ from lute.settings.current import current_settings
 from lute.term import pos_tags
 
 
+def _pos_is_person_name(pos) -> bool:
+    "True for 名詞-固有名詞-人名 morphemes (surname, given name, etc.)."
+    return (
+        pos is not None
+        and len(pos) > 2
+        and pos[0] == "名詞"
+        and pos[1] == "固有名詞"
+        and pos[2] == "人名"
+    )
+
+
 class JapaneseSudachiParser(AbstractParser):
     """
     Japanese parser using SudachiPy.
@@ -505,11 +516,9 @@ class JapaneseSudachiParser(AbstractParser):
         tok = self._build_tokenizer(dict_type)
         split_mode = self._get_split_mode(mode)
 
-        morphs = [
-            (m.surface(), m.reading_form())
-            for m in tok.tokenize(text, mode=split_mode)
-            if m.surface()
-        ]
+        ms = [m for m in tok.tokenize(text, mode=split_mode) if m.surface()]
+        morphs = [(m.surface(), m.reading_form()) for m in ms]
+        pos = [m.part_of_speech() for m in ms]
 
         out = []
         for i, (surface, reading) in enumerate(morphs):
@@ -520,6 +529,20 @@ class JapaneseSudachiParser(AbstractParser):
                 window_kana = self._neighbour_window_kana(tok, morphs, i, split_mode)
                 if window_kana:
                     kana = window_kana
+                if _pos_is_person_name(pos[i]):
+                    # The furigana caller reads its tokens joined into one
+                    # string, so name-like adjacencies the page never had
+                    # can arise: 上田 + 実 + は parses as the (real) name
+                    # 上田実, giving 実 the given-name reading ミノル where
+                    # 実は wants ジツ.  A person-name reading over a bare
+                    # kanji morpheme is far likelier such an artifact than
+                    # the truth, and the bare surface's own reading is what
+                    # the term card and its saved romanization say -- so
+                    # answer that instead.
+                    isolated = self.get_reading(surface)
+                    if isolated:
+                        out.append((surface, isolated))
+                        continue
             out.append(
                 (surface, self._reading_from_kana(surface, kana, jp_reading_setting))
             )

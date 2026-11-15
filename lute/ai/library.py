@@ -31,6 +31,9 @@ from lute.models.language import Language
 
 MAX_IMPORT_BYTES = 50 * 1024 * 1024
 FUZZY_THRESHOLD = 0.90
+# How many sentences the prompt package carries inline; the full list is
+# the /ai/library/sentences download.
+SENTENCE_PREVIEW_LIMIT = 100
 _GRAMMAR_KEYS = (
     "skeleton",
     "clauses",
@@ -499,4 +502,80 @@ def export_book(book_id, lang_id=None, target_lang=None, online_lookup=None):
         "model": "mixed",
         "match": "online" if online_lookup is not None else "book",
         "items": items,
+    }
+
+
+# ---------------------------------------------------------------------
+# Generation prompt package (write the explanations anywhere, import here)
+# ---------------------------------------------------------------------
+
+
+def prompt_package(book_id, kind, target_name):
+    """
+    What an outside AI needs to write this book's explanations.
+
+    ``kind`` is ``sentence`` or ``grammar``; ``target_name`` is the
+    explanation language resolved the way the reading panel resolves it
+    (the routes' _language_context / _grammar_language_context), so a
+    file the AI produces lands in rows the panel actually finds.  The
+    wrapper skeleton carries the book's real ids: its reply can be
+    imported without edits.
+    """
+    book = db.session.get(Book, int(book_id))
+    if book is None:
+        raise LibraryError("Book not found.")
+    kind = "grammar" if kind == "grammar" else "sentence"
+    lang = book.language
+    source = (lang.name or "") if lang is not None else ""
+    if kind == "grammar":
+        system_prompt = service.build_grammar_system_prompt(source, target_name)
+        user_prompt = service.build_grammar_user_prompt(
+            "<one sentence from the book>", source
+        )
+        schema = {
+            "sentence": "...",
+            "kind": "grammar",
+            "translation": "...",
+            "skeleton": {"subject": "", "verb": "", "object": ""},
+            "clauses": [{"type": "", "text": "", "role": ""}],
+            "grammar_points": [{"name": "", "role": "", "fragment": ""}],
+            "tense_voice": {"tense": "", "voice": "", "aspect": ""},
+            "pitfalls": [""],
+        }
+    else:
+        system_prompt = service.build_translation_system_prompt(source, target_name)
+        user_prompt = service.build_translation_user_prompt(
+            "<one sentence from the book>", source
+        )
+        schema = {
+            "sentence": "...",
+            "kind": "sentence",
+            "translation": "...",
+            "segments": [{"part": "", "reading": "", "meaning": "", "role": ""}],
+            "grammar": [{"point": "", "explanation": "", "fragment": ""}],
+            "context": "",
+            "examples": [{"source": "", "translation": ""}],
+        }
+    sentences = book_sentences(book.id)
+    return {
+        "book_id": book.id,
+        "book_title": book.title,
+        "lang_id": lang.id if lang is not None else None,
+        "source_lang": source,
+        "target_lang": target_name,
+        "kind": kind,
+        "system_prompt": system_prompt,
+        "user_prompt": user_prompt,
+        "item_schema": schema,
+        "wrapper": {
+            "version": 1,
+            "book_id": book.id,
+            "book_title": book.title,
+            "lang_id": lang.id if lang is not None else None,
+            "target_lang": target_name,
+            "model": "mixed",
+            "items": [],
+        },
+        "sentences": sentences[:SENTENCE_PREVIEW_LIMIT],
+        "sentence_count": len(sentences),
     }

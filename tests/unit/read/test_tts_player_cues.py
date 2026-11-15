@@ -264,3 +264,140 @@ def test_shadowing_practises_the_clause_the_cue_covers():
     assert whole["spanCount"] == 59
     assert whole["fullText"] == LONG_CJK
     assert whole["elConnected"] is True
+
+
+def test_a_wedged_engine_hands_the_cue_to_the_backend_audio():
+    "Safari's engine drops cues (onend with no onstart): replay from /tts/."
+    src = open(_TTS_JS, encoding="utf-8").read()
+
+    onend = src.split("utterance.onend = function ()")[1].split("\n      };")[0]
+    assert "if (!started)" in onend
+    assert "ttsBackendAudio = true" in onend
+    assert "ttsPlayCueViaBackend(idx, cue, cleanText)" in onend
+
+    # A same-generation "canceled"/"interrupted" is the same wedge: a
+    # real cancel bumps the generation before the events can fire.
+    onerror = src.split("utterance.onerror = function (ev)")[1].split("\n      };")[0]
+    assert 'err === "interrupted" || err === "canceled"' in onerror
+    assert "ttsPlayCueViaBackend(idx, cue, cleanText)" in onerror
+
+    # Once wedged, the whole page keeps playing as backend audio, and a
+    # cue played that way still activates through ttsPlayCue's tail.
+    assert "ttsBackendAudio = false;" in src
+    assert '"speechSynthesis" in window && !ttsBackendAudio' in src
+    assert (
+        "ttsPlayCueViaBackend(idx, cue, cleanText);"
+        in src.split("// --- Backend /tts/ audio")[1]
+    )
+
+    # Pausing / stopping must also stop a playing backend clip.
+    cancel = src.split("function ttsCancelSpeech()")[1].split("\n  }")[0]
+    assert "ttsCurrentUtterance.stop" in cancel
+
+
+def test_voice_memory_is_locale_aware():
+    "Same-named voices across locales must not cross over (macOS Eddy)."
+    read_tts_js = os.path.join(_STATIC_JS, "tts.js")
+    src = open(read_tts_js, encoding="utf-8").read()
+    # The shared resolver matches name+lang exactly, then the book
+    # language's twin, then any same-named voice (old bare-name saves).
+    assert "function ttsFindStoredVoice" in src
+    finder = src.split("function ttsFindStoredVoice")[1].split("\n  }")[0]
+    assert 'stored.indexOf("|")' in finder
+    assert "v.lang === lang" in finder
+    assert "indexOf(pl) === 0" in finder
+    # getSelectedVoice goes through the resolver instead of a bare find.
+    getter = src.split("function getSelectedVoice")[1].split("\n  }")[0]
+    assert "ttsFindStoredVoice(voices, stored, getCurrentLangCode())" in getter
+
+    player = open(_TTS_JS, encoding="utf-8").read()
+    # The save carries the lang ("name|lang"); the dropdown row and the
+    # player's own resolution follow the lang too.
+    select = player.split("function ttsSelectVoice")[1].split("\n  }")[0]
+    assert 'voice.name + "|" + voice.lang' in select
+    assert "opt.dataset.voiceLang" in player
+    assert "_ttsCurrentVoiceLang" in player
+
+
+def test_player_defaults_to_backend_audio_without_an_explicit_pick():
+    "No mapped twin + no explicit pick: the player starts on /tts/ audio."
+    player = open(_TTS_JS, encoding="utf-8").read()
+    init = player.split("function ttsInitPlayer")[1].split("\n  }")[0]
+    assert "ttsMaybeUseBackendAudio();" in init
+    # The flip itself, re-evaluated when the voice list lands (Chromium
+    # fills getVoices() asynchronously; Safari is synchronous).
+    flip = player.split("function ttsMaybeUseBackendAudio")[1].split("\n  }")[0]
+    assert "voices.length && !mappedEdgeVoice(getCurrentLangCode())" in flip
+    assert "ttsBackendAudio = true;" in flip
+    populate = player.split("function ttsPopulateVoiceList")[1].split("\n  }")[0]
+    assert "ttsMaybeUseBackendAudio();" in populate
+    # Only explicit picks persist, and legacy bare-name saves (written
+    # by the old auto-recommendation) are dropped on restore.
+    select = player.split("function ttsSelectVoice")[1].split("\n  }")[0]
+    assert "globalCache.voiceExplicit = !!explicit;" in select
+    assert "if (explicit) {" in select
+    restore = init.split("const savedVoice =")[1].split("catch (_) {}")[0]
+    assert 'savedVoice.indexOf("|") >= 0' in restore
+    assert "localStorage.removeItem" in restore
+
+
+def test_edge_tts_menu_row_and_next_cue_prefetch():
+    "The backend voice is a first-class row; the next cue warms early."
+    player = open(_TTS_JS, encoding="utf-8").read()
+    populate = player.split("function ttsPopulateVoiceList")[1].split("\n  }")[0]
+    assert "edgeOpt.dataset.voiceName = EDGE_TTS_VOICE_NAME;" in populate
+    # Green when the backend audio is what is speaking (default mode),
+    # and clicking the row pins it, live via the restarted cue.
+    assert "globalCache.selectedVoice === EDGE_TTS_VOICE_NAME" in populate
+    assert "ttsBackendAudio = true;" in populate
+    assert 'fetch("/tts/voice/"' in populate
+
+    via = player.split("function ttsPlayCueViaBackend")[1].split("\n  }")[0]
+    assert "const next = ttsCues[idx + 1];" in via
+    assert "fetch(nextUrl).catch" in via
+
+    # A saved edge-tts pick skips the native engine from the start and
+    # restores which edge voice was chosen ("edge-tts" = the default).
+    init = player.split("function ttsInitPlayer")[1].split("\n  }")[0]
+    assert "if (savedVoice === EDGE_TTS_VOICE_NAME) {" in init
+    assert 'savedVoice.indexOf("edge-tts|") === 0' in init
+    assert "globalCache.edgeVoices[SL] = savedVoice.slice" in init
+
+
+def test_a_punctuation_only_sentence_does_not_stop_playback():
+    "「」/…… fragments become cues with nothing to say: skipped, not stopped."
+    results = _run(
+        {
+            "sentences": [
+                {"cjk": "他說：「你好。」"},
+                {"cjk": "……"},
+                {"cjk": SHORT_CJK},
+            ],
+            "steps": [
+                {"build": True},
+                {"play": True},
+                {"flush_all": True},
+                {"state": True},
+            ],
+        }
+    )
+    cues = results[-1]["state"]["cues"]
+    assert "……" in [c["text"] for c in cues]
+    # Nothing is spoken for the punctuation fragment...
+    texts = [s["text"] for s in results[-1]["state"]["spoken"]]
+    assert not any(t.strip() and not any(ch.isalnum() for ch in t) for t in texts)
+    # ... and playback ran to the natural end -- the last thing spoken is
+    # the final sentence, not a fail-stopped silence mid-page.
+    assert texts[-1] == SHORT_CJK
+
+
+def test_punctuation_only_text_never_reaches_the_backend():
+    src = open(_TTS_JS, encoding="utf-8").read()
+    playcue = src.split("function ttsPlayCue(")[1].split("\n  }")[0]
+    assert "/[\\p{L}\\p{N}]/u.test(cleanText)" in playcue
+    read_tts_js = os.path.join(_STATIC_JS, "tts.js")
+    tts = open(read_tts_js, encoding="utf-8").read()
+    backend = tts.split("function speakTermViaBackend")[1].split("\n  }")[0]
+    assert "/[\\p{L}\\p{N}]/u.test(text)" in backend
+    pre = tts.split("function scheduleHoverPrefetch")[1].split("\n  }")[0]
+    assert "/[\\p{L}\\p{N}]/u.test(text)" in pre
