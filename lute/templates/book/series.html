@@ -44,6 +44,7 @@
       <th style="text-align: left">{{ t('Title') }}</th>
       <th style="text-align: left">{{ t('Language') }}</th>
       <th style="text-align: left">{{ t('Tags') }}</th>
+      <th style="text-align: left">{{ t('AI Explain') }}</th>
       <th style="text-align: left">{{ t('Progress') }}</th>
       <th style="text-align: left">{{ t('Word count') }}</th>
       <th style="text-align: left">{{ t('Status') }}</th>
@@ -148,8 +149,9 @@
       stateSaveCallback: function(settings, data) {
         // Version must match the home book table (the state is shared):
         // it stores column visibility/order by index, so it has to be
-        // invalidated whenever a column is added or moved.
-        data.version = 6;
+        // invalidated whenever a column is added or moved.  (v7 = the AI
+        // Explain column added between Tags and Progress, same as home.)
+        data.version = 7;
         data.search = { search: "", regex: false, smart: true };
         data.columns.forEach(function(c) { c.search = { search: "", regex: false, smart: true }; });
         var stateJson = JSON.stringify(data);
@@ -169,7 +171,7 @@
         if (saved) {
           try {
               var ld = JSON.parse(saved);
-              if (ld && ld.version === 6) {
+              if (ld && ld.version === 7) {
               ld.search = { search: "", regex: false, smart: true };
               callback(ld);
               return;
@@ -184,7 +186,7 @@
             if (resp && resp.value) {
               try {
                 var sd = JSON.parse(resp.value);
-                if (sd && sd.version === 6) {
+                if (sd && sd.version === 7) {
                   localStorage.setItem('booklisting_datatables_state', resp.value);
                   sd.search = { search: "", regex: false, smart: true };
                   callback(sd);
@@ -219,14 +221,15 @@
       },
       columns: [
         { name: "BookType", className: "col-type", width: "4%", data: "BookType", searchable: false, render: render_book_type },
-        { name: "BkTitle", className: "col-title", width: "24%", data: "BkTitle", type: "natural", render: render_book_title },
+        { name: "BkTitle", className: "col-title", width: "22%", data: "BkTitle", type: "natural", render: render_book_title },
         { name: "LgName", className: "col-lang", width: "8%", data: "LgName" },
-        { name: "TagList", className: "col-tags", width: "15%", data: "TagList", render: render_tag_list },
+        { name: "TagList", className: "col-tags", width: "13%", data: "TagList", render: render_tag_list },
+        { name: "AiExplainPercent", className: "col-aiexplain", width: "8%", data: "AiExplainPercent", searchable: false, render: render_ai_explain },
         { name: "ProgressPercent", className: "col-progress", width: "8%", data: "ProgressPercent", searchable: false, render: render_book_progress },
         { name: "WordCount", className: "col-words", width: "8%", data: "WordCount" },
-        { name: "UnknownPercent", className: "col-status", width: "12%", data: "UnknownPercent", searchable: false, render: render_book_stats_graph_placeholder },
-        { name: "NewWordPercent", className: "col-newword", width: "12%", data: "NewWordPercent", searchable: false, orderable: true, render: render_new_word_placeholder },
-        { name: "LastOpenedDate", className: "col-lastread", width: "10%", data: "LastOpenedDate", searchable: false, render: render_last_opened_date },
+        { name: "UnknownPercent", className: "col-status", width: "11%", data: "UnknownPercent", searchable: false, render: render_book_stats_graph_placeholder },
+        { name: "NewWordPercent", className: "col-newword", width: "11%", data: "NewWordPercent", searchable: false, orderable: true, render: render_new_word_placeholder },
+        { name: "LastOpenedDate", className: "col-lastread", width: "9%", data: "LastOpenedDate", searchable: false, render: render_last_opened_date },
         { name: "Actions", className: "col-actions", width: "6%", data: null, searchable: false, orderable: false, render: render_book_actions },
       ],
     });
@@ -242,6 +245,7 @@
         BkTitle: I18N.t('Title'),
         LgName: I18N.t('Language'),
         TagList: I18N.t('Tags'),
+        AiExplainPercent: I18N.t('AI Explain'),
         ProgressPercent: I18N.t('Progress'),
         WordCount: I18N.t('Word count'),
         UnknownPercent: I18N.t('Status'),

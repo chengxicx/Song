@@ -8,6 +8,7 @@ title order with a continue-reading shortcut.
 import json
 import re
 
+from lute.book.sentence_stats import AI_EXPLAIN_PERCENT_SQL, SENTENCE_STATS_SQL
 from lute.book.stats import get_difficulty_label
 from lute.db import db
 from lute.models.repositories import MissingUserSettingKeyException
@@ -36,7 +37,7 @@ def series_tag_for_book(session, book):
     return next((st for st in configured_series_tags(session) if st in tag_texts), None)
 
 
-_SERIES_BOOKS_SQL = """
+_SERIES_BOOKS_SQL = f"""
 SELECT
     b.BkID AS BkID,
     b.BkTitle AS BkTitle,
@@ -51,6 +52,9 @@ SELECT
     c.new_word_percent AS NewWordPercent,
     c.unknownpercent AS UnknownPercent,
     c.status_distribution AS StatusDistribution,
+    COALESCE(sentstats.sentencecount, 0) AS SentenceCount,
+    COALESCE(sentstats.explainedcount, 0) AS AiExplainedCount,
+    {AI_EXPLAIN_PERCENT_SQL} AS AiExplainPercent,
     CASE WHEN completed_books.BkID IS NULL THEN 0 ELSE 1 END AS IsCompleted,
     b.BkBookType AS BookType
 FROM books b
@@ -71,6 +75,7 @@ LEFT OUTER JOIN (
     group by TxBkID
 ) readpages on readpages.BkID = b.BkID
 LEFT OUTER JOIN bookstats c on c.BkID = b.BkID
+{SENTENCE_STATS_SQL}
 LEFT OUTER JOIN (
     SELECT BtBkID as BkID, GROUP_CONCAT(T2Text, ', ') AS taglist
     FROM
@@ -255,6 +260,9 @@ def get_series_overview(session, tagtext, lgid=None):
                 "UnknownPercent": r.UnknownPercent,
                 "NewWordPercent": r.NewWordPercent,
                 "LastOpenedDate": r.LastOpenedDate,
+                "SentenceCount": r.SentenceCount,
+                "AiExplainedCount": r.AiExplainedCount,
+                "AiExplainPercent": r.AiExplainPercent,
                 "StatusDistribution": r.StatusDistribution,
                 "DifficultyLabel": label,
                 "DifficultyColor": color_class,

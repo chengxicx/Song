@@ -280,3 +280,50 @@ def test_neighbours_stay_in_language(
         "prev": None,
         "next": {"id": _de2.id, "title": "Erin-de-02"},
     }, "the German set starts at its own first volume"
+
+
+# ======================================================================
+# AI Explain column: the same per-book figures the home table shows
+# (see test_datatables.py for the airesults matching rules).
+# ======================================================================
+
+from uuid import uuid4  # noqa: E402
+
+from lute.ai.service import clean_sentence  # noqa: E402
+from lute.models.ai_result import AiResult  # noqa: E402
+
+
+def _add_ai_result(sentence_text):
+    "Store an airesults row the way the app does (sentence text is cleaned)."
+    db.session.add(
+        AiResult(
+            key=f"test-{uuid4()}",
+            result_type="sentence",
+            sentence=clean_sentence(sentence_text),
+            result_json="{}",
+        )
+    )
+
+
+def test_overview_reports_ai_explain(app_context, _erin_books):
+    """
+    Each overview row carries the shared renderer's fields: the book's
+    sentence count, how many have a stored AI sentence explanation, and
+    the percentage.  Books without explanations report 0.
+    """
+    b1, _b2, _other = _erin_books
+    b1.texts[0].load_sentences()
+    db.session.add(b1)
+    db.session.commit()
+    sents = b1.texts[0].sentences
+    assert len(sents) >= 1
+    _add_ai_result(sents[0].text_content)
+    db.session.commit()
+
+    vm = get_series_overview(db.session, "Erin")
+    rows = {b["BkTitle"]: b for b in vm["books"]}
+    n = len(sents)
+    assert rows["Erin-01"]["SentenceCount"] == n
+    assert rows["Erin-01"]["AiExplainedCount"] == 1
+    assert rows["Erin-01"]["AiExplainPercent"] == (1 * 100) // n
+    assert rows["Erin-02"]["AiExplainPercent"] == 0, "no stored explanations"
