@@ -1,0 +1,12 @@
+-- Add books.BkSharedBy, the username of the account that shared this
+-- book with the current account's owner.
+--
+-- Each user has their own database file, so "sharing a book" means
+-- copying the book's content rows into the other user's db (see
+-- lute/multiuser/book_share.py).  The copy carries the sharer's name so
+-- the bookshelf can show where the book came from; it is NULL for books
+-- the owner imported themselves.
+--
+-- Reading state (BkCurrentTxID, page read dates, read positions) is
+-- reset in the copy: the two accounts' reading records stay independent.
+ALTER TABLE books ADD COLUMN BkSharedBy TEXT;

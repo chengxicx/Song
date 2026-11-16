@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Share books with {{ target }}{% endblock %}
+
+{% block header %}Share books with {{ target }}{% endblock %}
+
+{% block body %}
+
+<p style="margin-top: 0;">
+  <a href="/users/index">&larr; Users</a>
+</p>
+
+<p style="color: #565f89; max-width: 900px;">
+  A shared book is copied into {{ target }}'s own library, so their reading
+  progress, terms and bookmarks stay completely separate from yours. The copy
+  opens at page 1. Sharing a book that was already shared is skipped, so their
+  progress is never overwritten.
+</p>
+
+{% if books %}
+<form method="POST" action="{{ url_for('multiuser.users_books', name=target) }}">
+  <table class="table dataTable no-footer" style="margin: 0 0 10px;">
+    <thead>
+      <tr>
+        <th style="width: 30px;"><input type="checkbox" id="checkall"></th>
+        <th>Title</th>
+        <th style="width: 130px;">Language</th>
+        <th style="width: 70px;">Pages</th>
+        <th style="width: 100px;">Type</th>
+        <th style="width: 110px;">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in books %}
+      <tr>
+        <td>
+          <input type="checkbox" name="bookid" value="{{ b.id }}" class="bookcb"
+                 {% if b.id in assigned_ids %}disabled title="Already shared with {{ target }}"{% endif %}>
+        </td>
+        <td>
+          {{ b.title }}
+          {% if b.archived %}<span style="color: #565f89; font-size: 12px;">(archived)</span>{% endif %}
+        </td>
+        <td>{{ b.language }}</td>
+        <td>{{ b.pages }}</td>
+        <td>{{ b.book_type or 'text' }}</td>
+        <td>
+          {% if b.id in assigned_ids %}
+          <span style="color: #2f9e44;">shared</span>
+          {% else %}
+          <span style="color: #565f89;">&mdash;</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p>
+    <button type="submit" id="sharebtn" style="padding: 6px 14px; background: #2563eb; color: #fff; border: none; border-radius: 4px; cursor: pointer; opacity: 0.5;" disabled>
+      Share selected
+    </button>
+    <span id="selcount" style="color: #565f89; font-size: 12px; margin-left: 8px;">nothing selected</span>
+  </p>
+</form>
+{% else %}
+<p>You have no books in your own library to share.</p>
+{% endif %}
+
+<h3 style="margin-top: 28px;">Shared with {{ target }}</h3>
+
+{% if shared %}
+<table class="table dataTable no-footer" style="margin: 0;">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th style="width: 130px;">Shared by</th>
+      <th style="width: 170px;">When</th>
+      <th style="width: 120px;">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for s in shared %}
+    <tr>
+      <td>
+        {{ s.title }}
+        {% if s.missing %}
+        <span style="color: #e03131; font-size: 12px;">(copy deleted by {{ target }})</span>
+        {% endif %}
+      </td>
+      <td>{{ s.admin }}</td>
+      <td>{{ s.created_at }}</td>
+      <td>
+        <form method="POST" action="{{ url_for('multiuser.users_unshare_book', name=target, dst_bkid=s.dst_bkid) }}"
+              style="display: inline;"
+              onsubmit="return confirm('Remove this book from {{ target }}\'s library?\n\nThis deletes their copy AND their reading records for it (progress, terms read on it, bookmarks). This cannot be undone.');">
+          <button type="submit" style="padding: 2px 8px; background: #e03131; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+            Remove
+          </button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p style="color: #565f89;">Nothing has been shared with {{ target }} yet.</p>
+{% endif %}
+
+<script>
+(function () {
+  var all = document.getElementById('checkall');
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('.bookcb'));
+  var btn = document.getElementById('sharebtn');
+  var count = document.getElementById('selcount');
+
+  function refresh() {
+    var n = boxes.filter(function (b) { return b.checked && !b.disabled; }).length;
+    if (count) { count.textContent = n ? (n + ' selected') : 'nothing selected'; }
+    if (btn) {
+      btn.disabled = n === 0;
+      btn.style.opacity = n === 0 ? '0.5' : '1';
+    }
+  }
+
+  if (all) {
+    all.addEventListener('change', function () {
+      boxes.forEach(function (b) { if (!b.disabled) { b.checked = all.checked; } });
+      refresh();
+    });
+  }
+  boxes.forEach(function (b) { b.addEventListener('change', refresh); });
+  refresh();
+})();
+</script>
+
+{% endblock %}

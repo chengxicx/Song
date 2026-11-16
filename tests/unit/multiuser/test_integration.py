@@ -13,7 +13,7 @@ from lute.app_factory import create_app
 from lute.models.book import Book as BookModel
 from lute.book.model import Book as ServiceBook, Repository as ServiceRepository
 from lute.models.repositories import UserSettingRepository
-from lute.multiuser import context, paths, store
+from lute.multiuser import book_share, context, paths, store
 from lute.language.service import Service as LanguageService
 from lute.read import shadowing
 
@@ -365,3 +365,60 @@ def test_bing_image_writes_are_scoped_to_the_current_user(mu_client, mu_enabled_
         mu_enabled_app.env_config.base_config, "mei"
     ).userimagespath
     assert os.listdir(os.path.join(mei_images, str(mei_lang_id)))
+
+
+def test_admin_shares_a_book_with_another_account(mu_client, mu_enabled_app):
+    """
+    An admin shares a book: the child account gets its own copy starting
+    at page 1, only admins can reach the sharing page, and removing the
+    share deletes the child's copy.
+    """
+    mu_client.login("admin", "pass1234")
+    mu_client.post(
+        "/users/new",
+        data={"username": "mei", "password": "meipass1", "confirm": "meipass1"},
+    )
+
+    with mu_enabled_app.app_context(), context.user_scope("admin"):
+        lang = _make_language(db.session, "English")
+        _make_book(db.session, lang, "SharedBook")
+        admin_book_id = (
+            db.session.query(BookModel).filter(BookModel.title == "SharedBook").one().id
+        )
+
+    resp = mu_client.get("/users/mei/books")
+    assert resp.status_code == 200
+    assert b"SharedBook" in resp.data
+
+    resp = mu_client.post(
+        "/users/mei/books",
+        data={"bookid": [str(admin_book_id)]},
+        follow_redirects=True,
+    )
+    assert b"Shared 1 book" in resp.data
+
+    base = mu_enabled_app.env_config.base_config
+    shared = book_share.shared_books(base, "mei")
+    assert len(shared) == 1
+    assert shared[0]["missing"] is False
+
+    with mu_enabled_app.app_context(), context.user_scope("mei"):
+        copies = db.session.query(BookModel).all()
+        assert [b.title for b in copies] == ["SharedBook"]
+        assert copies[0].current_tx_id == 0, "the copy starts at page 1"
+
+    # Non-admins cannot open another account's sharing page.
+    mu_client.post("/logout")
+    assert mu_client.login("mei", "meipass1").status_code == 302
+    resp = mu_client.get("/users/admin/books", follow_redirects=True)
+    assert b"Only an admin" in resp.data
+
+    # Removing the share deletes the copy from the child's library.
+    mu_client.post("/logout")
+    mu_client.login("admin", "pass1234")
+    resp = mu_client.post(
+        f"/users/mei/books/unshare/{shared[0]['dst_bkid']}", follow_redirects=True
+    )
+    assert b"Removed the shared copy" in resp.data
+    with mu_enabled_app.app_context(), context.user_scope("mei"):
+        assert db.session.query(BookModel).count() == 0

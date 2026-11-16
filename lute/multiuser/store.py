@@ -99,6 +99,30 @@ def _ensure_schema(conn):
             value TEXT NOT NULL
         )"""
     )
+    # Book sharing record: one row per book copied from an admin's db
+    # into another user's db (lute/multiuser/book_share.py).  Lives here
+    # rather than in the per-user dbs so the admin's book page can show
+    # every share at once, and so a copy can still be found after the
+    # source book was edited or deleted.
+    conn.execute(
+        """CREATE TABLE IF NOT EXISTS bookassignments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            admin TEXT NOT NULL,
+            target TEXT NOT NULL,
+            src_bkid INTEGER NOT NULL,
+            dst_bkid INTEGER NOT NULL,
+            title TEXT NOT NULL DEFAULT '',
+            created_at TEXT NOT NULL
+        )"""
+    )
+    conn.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS bookassignments_target_dst "
+        "ON bookassignments (target, dst_bkid)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS bookassignments_admin_src "
+        "ON bookassignments (admin, src_bkid)"
+    )
 
 
 def create_users_db(admin_username, password_hash):
@@ -255,6 +279,9 @@ def delete_user(username):
             conn.commit()
         finally:
             conn.close()
+    # Book-share records reference the account by name; drop them so the
+    # admin's book page never offers to unshare a vanished user.
+    delete_assignments_for_user(username)
 
 
 def _admin_count():
@@ -277,3 +304,107 @@ def is_admin(username):
 
 def admin_usernames():
     return [u["username"] for u in users() if u["role"] == _ROLE_ADMIN]
+
+
+# ---------------------------------------------------------------------------
+# book sharing records
+
+
+def _bookassignments_conn():
+    "Open users.db for book-assignment reads (schema is created on write)."
+    if not _users_dbfile or not os.path.exists(_users_dbfile):
+        return None
+    conn = sqlite3.connect(_users_dbfile)
+    _ensure_schema(conn)
+    return conn
+
+
+def record_assignment(admin, target, src_bkid, dst_bkid, title):
+    "Remember that src_bkid was copied to dst_bkid in the target's db."
+    with _write_lock:
+        conn = _open_users_db()
+        try:
+            conn.execute(
+                "INSERT OR REPLACE INTO bookassignments "
+                "(admin, target, src_bkid, dst_bkid, title, created_at) "
+                "VALUES (?, ?, ?, ?, ?, datetime('now'))",
+                (admin, target, src_bkid, dst_bkid, title or ""),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+
+
+def assignments(target=None):
+    """
+    Book-assignment rows, newest first.
+
+    target=None returns every row (admins only, for the accounts page);
+    a target name narrows it to that account.
+    """
+    conn = _bookassignments_conn()
+    if conn is None:
+        return []
+    try:
+        sql = (
+            "SELECT id, admin, target, src_bkid, dst_bkid, title, created_at "
+            "FROM bookassignments"
+        )
+        params = ()
+        if target is not None:
+            sql += " WHERE target = ?"
+            params = (target,)
+        sql += " ORDER BY id DESC"
+        rows = conn.execute(sql, params).fetchall()
+    finally:
+        conn.close()
+    return [
+        {
+            "id": r[0],
+            "admin": r[1],
+            "target": r[2],
+            "src_bkid": r[3],
+            "dst_bkid": r[4],
+            "title": r[5],
+            "created_at": r[6],
+        }
+        for r in rows
+    ]
+
+
+def find_assignment(target, src_bkid):
+    "The row for (target, source book), or None."
+    for a in assignments(target):
+        if a["src_bkid"] == src_bkid:
+            return a
+    return None
+
+
+def delete_assignment(target, dst_bkid):
+    "Forget a share (after its copy was removed or is already gone)."
+    with _write_lock:
+        conn = _open_users_db()
+        try:
+            conn.execute(
+                "DELETE FROM bookassignments WHERE target = ? AND dst_bkid = ?",
+                (target, dst_bkid),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+
+
+def delete_assignments_for_user(username):
+    "Drop share records that reference a deleted account."
+    if not _users_dbfile or not os.path.exists(_users_dbfile):
+        return
+    with _write_lock:
+        conn = _open_users_db()
+        try:
+            conn.execute(
+                "DELETE FROM bookassignments WHERE target = ? OR admin = ?",
+                (username, username),
+            )
+            conn.commit()
+        finally:
+            conn.close()

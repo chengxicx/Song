@@ -32,6 +32,9 @@
         <a href="/users/me/password">Change password</a>
         {% else %}
         <a href="/users/{{ u.username }}/password" style="margin-right: 12px;">Change password</a>
+        {% if u.username != current_username %}
+        <a href="/users/{{ u.username }}/books" style="margin-right: 12px;">Books</a>
+        {% endif %}
         {% if not (u.role == 'admin' and users|selectattr('role','equalto','admin')|list|length <= 1) %}
         <form method="POST" action="/users/delete/{{ u.username }}" style="display:inline;"
               onsubmit="return confirm('Delete {{ u.username }} and ALL their data (books, terms, audio, images)? This cannot be undone.');">

@@ -26,7 +26,7 @@ from flask import (
 from lute.db import db
 from lute.db.management import add_default_user_settings
 from lute.db.setup.main import setup_db
-from lute.multiuser import context, paths, store, switching
+from lute.multiuser import book_share, context, paths, store, switching
 from lute.multiuser.permissions import admin_only_if_multiuser
 from lute.multiuser.switching import SwitchError
 from lute.i18n import t
@@ -265,6 +265,78 @@ def change_own_password():
             except ValueError as e:
                 flash(str(e))
     return render_template("multiuser/user_password.html", target=None)
+
+
+# ---------------------------------------------------------------------------
+# book sharing (admin)
+#
+# Each account has its own database, so sharing a book means copying its
+# content into the target's db; the target's reading records stay their
+# own because progress/terms/bookmarks are never copied.
+
+
+@bp.route("/users/<name>/books", methods=["GET", "POST"])
+@admin_required
+def users_books(name):
+    "Share books from the admin's library into another account."
+    if not store.user_exists(name):
+        flash(f"User '{name}' does not exist.")
+        return redirect("/users/index")
+    me = session.get("user")
+    if name == me:
+        flash(t("You cannot share books with your own account."))
+        return redirect("/users/index")
+    base = _base_config()
+
+    if request.method == "POST":
+        shared = 0
+        skipped = 0
+        for raw in request.form.getlist("bookid"):
+            try:
+                result = book_share.share_book(base, me, name, int(raw))
+            except (book_share.ShareError, ValueError) as e:
+                flash(f"Not shared: {e}")
+                continue
+            if result["skipped"]:
+                skipped += 1
+            else:
+                shared += 1
+        if shared:
+            flash(
+                f"Shared {shared} book(s) with '{name}'.  They open at page 1, "
+                "and their reading records stay separate."
+            )
+        if skipped:
+            flash(
+                f"{skipped} book(s) were already shared with '{name}' and were "
+                "skipped, so their progress is kept."
+            )
+        return redirect(url_for("multiuser.users_books", name=name))
+
+    books = book_share.admin_books(base, me)
+    shared_rows = book_share.shared_books(base, name)
+    return render_template(
+        "multiuser/user_books.html",
+        target=name,
+        books=books,
+        shared=shared_rows,
+        assigned_ids={r["src_bkid"] for r in shared_rows},
+    )
+
+
+@bp.route("/users/<name>/books/unshare/<int:dst_bkid>", methods=["POST"])
+@admin_required
+def users_unshare_book(name, dst_bkid):
+    "Remove a shared copy (and its reading records) from an account."
+    if not store.user_exists(name):
+        flash(f"User '{name}' does not exist.")
+        return redirect("/users/index")
+    try:
+        book_share.unshare_book(_base_config(), name, dst_bkid)
+        flash(f"Removed the shared copy from '{name}'.")
+    except book_share.ShareError as e:
+        flash(str(e))
+    return redirect(url_for("multiuser.users_books", name=name))
 
 
 # ---------------------------------------------------------------------------
