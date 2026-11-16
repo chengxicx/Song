@@ -1,0 +1,9 @@
+three.js 0.160.1
+https://unpkg.com/three@0.160.1/build/three.module.min.js
+
+Vendored as a single self-contained ES module: it has no top-level
+imports, so the page can map the bare specifier "three" to it with an
+import map and the browser loads the whole library in one request.
+
+Upgrade by replacing the file and this note together; vstatic() derives
+the cache-busting hash from the file contents.

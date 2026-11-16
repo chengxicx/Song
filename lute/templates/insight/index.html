@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ t('3D charts') }}{% endblock %}
+{% block header %}{{ t('3D charts') }}{% endblock %}
+
+{% block body %}
+<div id="insight3d" data-language-id="{{ language_id or '' }}">
+
+  <div class="i3d-bar">
+    <label for="insight3d_language">{{ t('Language') }}</label>
+    <select id="insight3d_language">
+      {% for lang in languages %}
+      <option value="{{ lang.id }}" {% if lang.id == language_id %}selected{% endif %}>
+        {{ lang.name }} ({{ lang.count }})
+      </option>
+      {% endfor %}
+    </select>
+    <span id="insight3d_status" class="i3d-status"></span>
+  </div>
+
+  <div class="i3d-tabs">
+    <button type="button" class="active" data-insight-chart="retention">{{ t('Retention surface') }}</button>
+    <button type="button" data-insight-chart="galaxy">{{ t('Lexicon galaxy') }}</button>
+    <button type="button" data-insight-chart="terrain">{{ t('Reading terrain') }}</button>
+    <button type="button" data-insight-chart="levels">{{ t('Level towers') }}</button>
+  </div>
+
+  <div class="i3d-stage">
+    <canvas id="insight3d_canvas" aria-label="{{ t('3D charts') }}"></canvas>
+    <div id="insight3d_labels" class="i3d-labels"></div>
+  </div>
+
+  <p class="i3d-help">{{ t('Drag to rotate, scroll or pinch to zoom, double-click to reset.') }}</p>
+
+  <div id="insight3d_fallback" class="i3d-fallback">
+    {{ t('These charts need WebGL, which this device or browser did not provide. A summary is shown instead.') }}
+  </div>
+
+  <p id="insight3d_note" class="i3d-note"></p>
+</div>
+
+<style>
+  #insight3d { max-width: 62rem; }
+  #insight3d .i3d-bar { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+  #insight3d .i3d-bar label { font-weight: bold; }
+  #insight3d .i3d-status { opacity: 0.8; font-size: 0.9em; }
+  #insight3d .i3d-tabs { display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0.75rem 0; }
+  #insight3d .i3d-tabs button {
+    padding: 0.35rem 0.8rem; cursor: pointer; background: transparent;
+    border: 1px solid #8886; border-radius: 3px; color: inherit; font: inherit;
+  }
+  #insight3d .i3d-tabs button.active { border-color: currentColor; font-weight: bold; }
+  #insight3d .i3d-stage {
+    position: relative; width: 100%; height: 62vh; min-height: 320px;
+    border: 1px solid #8883; border-radius: 4px; overflow: hidden;
+  }
+  #insight3d canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+  #insight3d canvas:active { cursor: grabbing; }
+  #insight3d .i3d-labels { position: absolute; inset: 0; pointer-events: none; }
+  #insight3d .i3d-label {
+    position: absolute; left: 0; top: 0; white-space: nowrap;
+    font-size: 11px; opacity: 0.8; color: inherit;
+  }
+  #insight3d .i3d-help, #insight3d .i3d-note { font-size: 0.85em; opacity: 0.75; }
+  /* Without WebGL the canvas stays empty, so the stage is removed and the
+     text summary takes its place instead of leaving a blank 62vh box. */
+  #insight3d.i3d-no-webgl .i3d-stage,
+  #insight3d.i3d-no-webgl .i3d-help { display: none; }
+  #insight3d .i3d-fallback { margin-top: 0.75rem; }
+  #insight3d .insight3d-table { border-collapse: collapse; margin-top: 0.5rem; }
+  #insight3d .insight3d-table th,
+  #insight3d .insight3d-table td { border: 1px solid #8884; padding: 0.2rem 0.5rem; text-align: left; }
+</style>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "{{ vstatic('vendor/three/three.module.min.js') }}",
+    "insight3d-scenes": "{{ vstatic_js('insight3d-scenes.js') }}"
+  }
+}
+</script>
+<script type="module" src="{{ vstatic_js('insight3d.js') }}"></script>
+{% endblock %}

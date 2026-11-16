@@ -198,6 +198,37 @@ def _sample(row):
     }
 
 
+def retention_samples(session, lang_id):
+    """
+    ``(stability_days, elapsed_days, recalled)`` per review log.
+
+    Both numbers come out of the log's "before" snapshot: stability is
+    the FSRS memory stability the card had when it was shown, elapsed is
+    the gap since its previous review.  Logs written before the snapshot
+    existed cannot be placed on a grid, so they are skipped.
+
+    Used by the 3D retention surface (lute/insight/service.py); the
+    stats page keeps using its own flattened samples.
+    """
+    out = []
+    for row in _fetch_logs(session, lang_id):
+        before = _before_snapshot(row[3])
+        stability = before.get("stability")
+        if stability is None:
+            continue
+        try:
+            stability = float(stability)
+        except (TypeError, ValueError):
+            continue
+        if stability <= 0:
+            continue
+        elapsed = _elapsed_days(before, _as_datetime(row[0]))
+        if elapsed is None:
+            continue
+        out.append((stability, elapsed, int(row[1] or 0) != _AGAIN))
+    return out
+
+
 def _before_snapshot(raw):
     "The 'before' dict out of a log's JSON payload; {} when absent or broken."
     if not raw:
