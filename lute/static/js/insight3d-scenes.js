@@ -223,33 +223,35 @@ function buildGalaxy(data) {
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
   geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
+  // Measure the cloud before drawing it: both the point size and the
+  // frame come from its extent, which depends entirely on the data.
+  const box = new THREE.Box3().setFromBufferAttribute(
+    geometry.getAttribute('position')
+  );
+  const extent = new THREE.Vector3();
+  box.getSize(extent);
+  const center = new THREE.Vector3();
+  box.getCenter(center);
+
   group.add(
     new THREE.Points(
       geometry,
       new THREE.PointsMaterial({
-        size: count > 2500 ? 0.035 : 0.05,
+        // Sized from the cloud, not a fixed world unit: the same 0.05 is
+        // a fat blob on a 2-unit cloud and an invisible speck on a
+        // 10-unit one.
+        size: Math.max(0.05, extent.length() * 0.016),
         vertexColors: true,
         transparent: true,
-        opacity: 0.85,
+        opacity: 0.9,
         sizeAttenuation: true
       })
     )
   );
 
-  // Frame the actual cloud: a normalised cloud rarely sits on the origin
-  // (status and token axes are only populated where the user has words),
-  // so a fixed camera would show a chart in one corner.
-  const box = new THREE.Box3().setFromBufferAttribute(
-    geometry.getAttribute('position')
-  );
-  const size = new THREE.Vector3();
-  box.getSize(size);
-  const center = new THREE.Vector3();
-  box.getCenter(center);
-
   const frame = new THREE.LineSegments(
     new THREE.EdgesGeometry(
-      new THREE.BoxGeometry(size.x || 1, size.y || 1, size.z || 1)
+      new THREE.BoxGeometry(extent.x || 1, extent.y || 1, extent.z || 1)
     ),
     new THREE.LineBasicMaterial({
       color: new THREE.Color('#888888'),
@@ -277,7 +279,7 @@ function buildGalaxy(data) {
     }
   ];
 
-  const radius = Math.max(3.2, size.length() * 1.15);
+  const radius = Math.max(3.2, extent.length() * 1.15);
   return {
     group: group,
     labels: labels,
@@ -326,7 +328,11 @@ function buildTerrain(data) {
 
   for (let c = 0; c < cols; c += 1) {
     for (let r = 0; r < rows; r += 1) {
-      const value = ((weeks[c] && weeks[c][r]) || 0) / max;
+      const ratio = ((weeks[c] && weeks[c][r]) || 0) / max;
+      // Daily counts are heavy-tailed: one 2000-word day next to a
+      // 40-word day turns the surface into a plateau plus blades. sqrt
+      // keeps quiet days visible without hiding the big ones.
+      const value = Math.sqrt(ratio);
       positions.push(
         (c - (cols - 1) / 2) * sx,
         value * heightScale,
@@ -480,7 +486,7 @@ function buildLevels(data) {
   return {
     group: group,
     labels: labels,
-    view: { radius: 5.6, theta: 0.5, phi: 1.0, target: [0, 0.6, 0] }
+    view: { radius: 4.8, theta: 0.5, phi: 1.0, target: [0, 0.55, 0] }
   };
 }
 
