@@ -36,6 +36,11 @@ def delete_all_data(session):
         # Whole-book grammar analyses cascade on the book delete below, but
         # every new table is listed here so a wipe cannot leave one alive.
         "delete from bookgrammar",
+        # Eudic sync rows cascade on the language delete, and eudicconfig
+        # has no foreign key at all -- a wipe that left it behind would
+        # keep the user's API key after "delete everything".
+        "delete from eudicsync",
+        "delete from eudicconfig",
         "delete from languages",
         "delete from tags",
         "delete from tags2",

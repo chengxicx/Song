@@ -230,6 +230,24 @@ class TermRepository:
             return None
         return terms[0]
 
+    def find_by_statuses(self, langid, statuses):
+        """
+        Every term in a language at any of the given statuses, by id.
+
+        Used by the bulk features that need "all the words I'm actually
+        studying" without going through the datatables filters (which
+        carry UI-only state).
+        """
+        wanted = [int(s) for s in statuses]
+        if not wanted:
+            return []
+        return (
+            self.session.query(Term)
+            .filter(and_(Term.language_id == langid, Term.status.in_(wanted)))
+            .order_by(Term.id)
+            .all()
+        )
+
     def delete_empty_images(self):
         """
         Data clean-up: delete empty images.

@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ t('Eudic sync') }}{% endblock %}
+{% block header %}{{ t('Eudic sync') }}{% endblock %}
+
+{% block body %}
+<div id="eudic_page"
+     data-language-id="{{ language_id or '' }}"
+     data-scope-bucket="{{ scope.bucket if scope else '' }}"
+     data-scope-category="{{ scope.category_id if scope else '' }}">
+
+  <p class="eudic-note">
+    {{ t('Words, statuses and example sentences go to Eudic as a studylist. Only the word and its star can be sent: Eudic has no writable translation field, and its mastered list is read-only.') }}
+  </p>
+
+  <div class="eudic-block">
+    <h3>{{ t('Connection') }}</h3>
+    <form method="POST" action="{{ url_for('eudic.save_config') }}" class="eudic-form">
+      <input type="hidden" name="language_id" value="{{ language_id or '' }}">
+
+      <label for="eudic_api_key">{{ t('Eudic API key') }}</label>
+      <input type="password" id="eudic_api_key" name="api_key" autocomplete="off"
+             spellcheck="false" placeholder="{{ api_key_mask or t('Paste the key from my.eudic.net/OpenAPI/Authorization') }}">
+      <span class="eudic-hint">{{ t('Leave blank to keep the saved key.') }}</span>
+
+      <label for="eudic_bucket">{{ t('Eudic library') }}</label>
+      <select id="eudic_bucket" name="bucket">
+        {% for b in buckets %}
+        <option value="{{ b }}" {% if scope and scope.bucket == b %}selected{% endif %}>
+          {{ b }}{% if b == 'en' %} — {{ t('Eudic Dictionary') }}{% elif b == 'fr' %} — {{ t('French Assistant') }}{% elif b == 'de' %} — {{ t('German Assistant') }}{% elif b == 'es' %} — {{ t('Spanish Assistant') }}{% endif %}
+        </option>
+        {% endfor %}
+      </select>
+      <span class="eudic-hint">{{ t('The library is a product slot, not the word language: a Japanese list lives inside the en library as its own studylist.') }}</span>
+
+      <label for="eudic_language">{{ t('Lute language') }}</label>
+      <select id="eudic_language" name="language_id">
+        {% for lang in languages %}
+        <option value="{{ lang.id }}" {% if lang.id == language_id %}selected{% endif %}>
+          {{ lang.name }} ({{ lang.count }})
+        </option>
+        {% endfor %}
+      </select>
+
+      <label for="eudic_category">{{ t('Eudic word list') }}</label>
+      <select id="eudic_category" name="category_id">
+        {% if scope %}
+        <option value="{{ scope.category_id }}" selected>
+          {{ scope.category_name or scope.category_id }}
+        </option>
+        {% endif %}
+      </select>
+      <input type="hidden" id="eudic_category_name" name="category_name"
+             value="{{ scope.category_name if scope else '' }}">
+      <button type="button" class="btn" id="eudic_refresh_categories">
+        {{ t('Load word lists') }}
+      </button>
+
+      <div class="eudic-actions">
+        <button type="submit" class="btn btn-primary">{{ t('Save') }}</button>
+        {% if has_key %}
+        <button type="submit" class="btn" formaction="{{ url_for('eudic.disconnect') }}"
+                onclick="return confirm('{{ t('Forget the saved Eudic API key?') }}');">
+          {{ t('Disconnect') }}
+        </button>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+  {% if scope %}
+  <div class="eudic-block">
+    <h3>{{ t('Status') }}</h3>
+    <dl class="eudic-stats">
+      <dt>{{ t('Mapped words') }}</dt><dd>{{ stats.mapped if stats else 0 }}</dd>
+      <dt>{{ t('On Eudic') }}</dt><dd>{{ stats.on_remote if stats else 0 }}</dd>
+      <dt>{{ t('Words with errors') }}</dt><dd>{{ stats.errored if stats else 0 }}</dd>
+      <dt>{{ t('Last pushed') }}</dt><dd>{{ stats.last_pushed or '—' }}</dd>
+      <dt>{{ t('Last pulled') }}</dt><dd>{{ stats.last_pulled or '—' }}</dd>
+    </dl>
+
+    <div class="eudic-actions">
+      <button type="button" class="btn" data-eudic-mode="preview">{{ t('Preview differences') }}</button>
+      <button type="button" class="btn" data-eudic-mode="pull">{{ t('Pull from Eudic') }}</button>
+      <button type="button" class="btn" data-eudic-mode="push">{{ t('Push to Eudic') }}</button>
+      <button type="button" class="btn btn-primary" data-eudic-mode="twoway">{{ t('Two-way sync') }}</button>
+      <a class="btn" href="{{ url_for('eudic.export_csv', language_id=language_id) }}">{{ t('Export CSV') }}</a>
+    </div>
+
+    <div id="eudic_progress_wrap" hidden>
+      <progress id="eudic_progress" max="100" value="0"></progress>
+      <span id="eudic_progress_message"></span>
+    </div>
+    <div id="eudic_message" class="eudic-message"></div>
+    <div id="eudic_warning" class="eudic-warning" hidden></div>
+    <div id="eudic_result"></div>
+
+    {% if errors %}
+    <details class="eudic-errors">
+      <summary>{{ t('Recent failures') }} ({{ errors|length }})</summary>
+      <table class="eudic-table">
+        <tr><th>{{ t('Word') }}</th><th>{{ t('Error') }}</th><th>{{ t('When') }}</th></tr>
+        {% for e in errors %}
+        <tr><td>{{ e.word }}</td><td>{{ e.error }}</td><td>{{ e.at }}</td></tr>
+        {% endfor %}
+      </table>
+      <form method="POST" action="{{ url_for('eudic.reset_errors') }}">
+        <input type="hidden" name="language_id" value="{{ language_id }}">
+        <button type="submit" class="btn">{{ t('Clear failures') }}</button>
+      </form>
+    </details>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if not has_key %}
+  <p class="eudic-note">
+    {{ t('Get a key at my.eudic.net/OpenAPI/Authorization, then save it above.') }}
+  </p>
+  {% endif %}
+</div>
+
+<style>
+  #eudic_page { max-width: 46rem; }
+  #eudic_page .eudic-block { margin: 1.5rem 0; }
+  #eudic_page .eudic-form { display: flex; flex-direction: column; gap: 0.35rem; }
+  #eudic_page .eudic-form label { font-weight: bold; margin-top: 0.6rem; }
+  #eudic_page .eudic-form select,
+  #eudic_page .eudic-form input[type=password] { max-width: 26rem; }
+  #eudic_page .eudic-hint { font-size: 0.85em; opacity: 0.75; max-width: 34rem; }
+  #eudic_page .eudic-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+  #eudic_page .eudic-stats { display: grid; grid-template-columns: max-content 1fr; gap: 0.2rem 1rem; }
+  #eudic_page .eudic-stats dt { font-weight: bold; }
+  #eudic_page .eudic-stats dd { margin: 0; }
+  #eudic_page .eudic-warning { border-left: 4px solid #c0392b; padding: 0.5rem 0.75rem; margin: 0.75rem 0; }
+  #eudic_page .eudic-message { margin: 0.75rem 0; font-weight: bold; min-height: 1.2em; }
+  #eudic_page .eudic-table { border-collapse: collapse; margin: 0.5rem 0; }
+  #eudic_page .eudic-table th,
+  #eudic_page .eudic-table td { border: 1px solid #8884; padding: 0.25rem 0.5rem; text-align: left; }
+  #eudic_page .eudic-counts { display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 0.5rem 0; }
+  #eudic_page .eudic-count { min-width: 5rem; }
+  #eudic_page .eudic-count b { display: block; font-size: 1.4em; }
+  #eudic_page #eudic_progress { width: 100%; max-width: 26rem; }
+</style>
+
+<script src="{{ vstatic_js('eudic.js') }}"></script>
+{% endblock %}
