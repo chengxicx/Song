@@ -313,9 +313,12 @@ function buildTerrain(data) {
 
   // Flatten to one chronological series and smooth it. Adjacent days in
   // this 52x7 grid are independent samples, so raw values give a ridge of
-  // vertical blades rather than a terrain; a 7-day mean is what makes the
-  // shape readable. The caption says so -- the heights are averages, not
-  // single-day counts.
+  // vertical blades rather than a terrain. A 7-day window is one column
+  // wide and does not touch the week-to-week swings; a 4-week mean does,
+  // which is what makes the shape a landscape. The caption says so -- the
+  // heights are averages, not single-day counts. Exact daily numbers are
+  // on /stats/.
+  const SMOOTH_HALF_WINDOW = 14;
   const flat = [];
   weeks.forEach(function (week) {
     week.forEach(function (count) {
@@ -325,7 +328,11 @@ function buildTerrain(data) {
   const smoothed = flat.map(function (_value, index) {
     let sum = 0;
     let seen = 0;
-    for (let k = index - 3; k <= index + 3; k += 1) {
+    for (
+      let k = index - SMOOTH_HALF_WINDOW;
+      k <= index + SMOOTH_HALF_WINDOW;
+      k += 1
+    ) {
       if (k < 0 || k >= flat.length) continue;
       sum += flat[k];
       seen += 1;

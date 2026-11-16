@@ -329,7 +329,7 @@ const Insight3D = (function () {
     galaxy:
       'One point per word: when it entered study, its status, and how many tokens it spans.',
     terrain:
-      'Daily words read, smoothed over 7 days; one column per week.',
+      'Daily words read, smoothed over 4 weeks; one column per week.',
     levels:
       'One column per level; the bands are statuses and the wireframe is the full vocabulary list. Heights are square-root scaled so small counts stay visible.'
   };

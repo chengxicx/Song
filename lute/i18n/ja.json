@@ -240,7 +240,7 @@
   "Currently": "現在",
   "Custom styles": "カスタムスタイル",
   "DELE Progress": "DELE 進捗",
-  "Daily words read, smoothed over 7 days; one column per week.": "1 日の読書語数。7 日移動平均で平滑化し、1 列が 1 週間です。",
+  "Daily words read, smoothed over 4 weeks; one column per week.": "1 日の読書語数。4 週間の移動平均で平滑化し、1 列が 1 週間です。",
   "Dashed cells = Not seen (from the CEFR list) · Inflected forms are matched to their base word · Click a level bar to drill down.": "破線セル = 未学習（CEFR リスト基準）· 活用形は原形に一致させます · レベルバーをクリックして詳細表示。",
   "Data path:": "データパス：",
   "Database:": "データベース：",
