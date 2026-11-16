@@ -309,8 +309,30 @@ function buildTerrain(data) {
     };
   }
 
-  const max = Math.max(1, data.max || 1);
   const heightScale = 1.6;
+
+  // Flatten to one chronological series and smooth it. Adjacent days in
+  // this 52x7 grid are independent samples, so raw values give a ridge of
+  // vertical blades rather than a terrain; a 7-day mean is what makes the
+  // shape readable. The caption says so -- the heights are averages, not
+  // single-day counts.
+  const flat = [];
+  weeks.forEach(function (week) {
+    week.forEach(function (count) {
+      flat.push(count || 0);
+    });
+  });
+  const smoothed = flat.map(function (_value, index) {
+    let sum = 0;
+    let seen = 0;
+    for (let k = index - 3; k <= index + 3; k += 1) {
+      if (k < 0 || k >= flat.length) continue;
+      sum += flat[k];
+      seen += 1;
+    }
+    return seen ? sum / seen : 0;
+  });
+  const smoothMax = Math.max(1, Math.max.apply(null, smoothed));
 
   // Fixed world size regardless of how many weeks there are: the plane
   // used to be `weeks.length` units wide, so a year of history (52 units)
@@ -328,17 +350,13 @@ function buildTerrain(data) {
 
   for (let c = 0; c < cols; c += 1) {
     for (let r = 0; r < rows; r += 1) {
-      const ratio = ((weeks[c] && weeks[c][r]) || 0) / max;
-      // Daily counts are heavy-tailed: one 2000-word day next to a
-      // 40-word day turns the surface into a plateau plus blades. sqrt
-      // keeps quiet days visible without hiding the big ones.
-      const value = Math.sqrt(ratio);
+      const ratio = (smoothed[c * rows + r] || 0) / smoothMax;
       positions.push(
         (c - (cols - 1) / 2) * sx,
-        value * heightScale,
+        ratio * heightScale,
         (r - (rows - 1) / 2) * sz
       );
-      const color = heightColor(value);
+      const color = heightColor(ratio);
       colors.push(color.r, color.g, color.b);
     }
   }

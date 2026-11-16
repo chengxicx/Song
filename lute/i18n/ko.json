@@ -240,7 +240,7 @@
   "Currently": "현재",
   "Custom styles": "사용자 정의 스타일",
   "DELE Progress": "DELE 진도",
-  "Daily words read, one column per week. Heights are square-root scaled.": "하루 읽은 단어 수. 한 열이 일주일입니다. 높이는 제곱근으로 압축했습니다.",
+  "Daily words read, smoothed over 7 days; one column per week.": "하루 읽은 단어 수. 7일 이동 평균으로 평활화했고, 한 열이 일주일입니다.",
   "Dashed cells = Not seen (from the CEFR list) · Inflected forms are matched to their base word · Click a level bar to drill down.": "점선 칸 = 미학습(CEFR 목록 기준) · 굴절형은 원형에 일치시킵니다 · 레벨 막대를 클릭하면 상세 표시.",
   "Data path:": "데이터 경로:",
   "Database:": "데이터베이스:",

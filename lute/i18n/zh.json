@@ -240,7 +240,7 @@
   "Currently": "当前",
   "Custom styles": "自定义样式",
   "DELE Progress": "DELE 进度",
-  "Daily words read, one column per week. Heights are square-root scaled.": "每日阅读词数，每一列代表一周。高度按平方根缩放。",
+  "Daily words read, smoothed over 7 days; one column per week.": "每日阅读词数，按 7 日平滑；每一列代表一周。",
   "Dashed cells = Not seen (from the CEFR list) · Inflected forms are matched to their base word · Click a level bar to drill down.": "虚线格 = 未学过（对照 CEFR 词表）· 变形词会归并到原形 · 点击级别条可下钻。",
   "Data path:": "数据路径：",
   "Database:": "数据库：",

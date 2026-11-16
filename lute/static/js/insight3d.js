@@ -328,7 +328,8 @@ const Insight3D = (function () {
       'Measured recall over memory stability and days since the last review; the faint lines are the FSRS prediction.',
     galaxy:
       'One point per word: when it entered study, its status, and how many tokens it spans.',
-    terrain: 'Daily words read, one column per week. Heights are square-root scaled.',
+    terrain:
+      'Daily words read, smoothed over 7 days; one column per week.',
     levels:
       'One column per level; the bands are statuses and the wireframe is the full vocabulary list. Heights are square-root scaled so small counts stay visible.'
   };
