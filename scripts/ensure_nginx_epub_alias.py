@@ -13,6 +13,7 @@ nothing when the block is already there or when this host has no nginx.
 """
 
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -24,9 +25,15 @@ SITE = "/etc/nginx/sites-enabled/default"
 # is told, rather than guessing at a placement.
 MARKER = "# ---------- 静态资源"
 ANCHOR = "location /static/epub/"
-ALIAS = "alias <prod-app-root>/lute_data/static/epub/;"
+# The app root differs per install (/opt/lute here), so the check matches
+# the tail of the alias path rather than one absolute prefix.  Matching a
+# fixed "<prod-app-root>/..." string made this report a missing alias on
+# every deploy even when the config was correct.
+ALIAS_RE = re.compile(r"alias\s+\S*lute_data/static/epub/?\s*;")
+# This file lives at <app-root>/scripts/, so the app root is two levels up.
+APP_ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
-BLOCK = """    # reader-mode EPUB 的章节与素材：在数据目录，与数据库同一份备份，
+BLOCK_TEMPLATE = """    # reader-mode EPUB 的章节与素材：在数据目录，与数据库同一份备份，
     # 不在代码目录里。前缀更长，nginx 会优先于下面的 /static/。
     location /static/epub/ {
         alias <prod-app-root>/lute_data/static/epub/;
@@ -44,6 +51,11 @@ BLOCK = """    # reader-mode EPUB 的章节与素材：在数据目录，与数�
 """
 
 
+def render_block():
+    "The location block to insert, with this checkout's absolute data path."
+    return BLOCK_TEMPLATE.replace("<prod-app-root>", APP_ROOT)
+
+
 def reload_nginx():
     subprocess.run(["nginx", "-t"], check=True, capture_output=True)
     subprocess.run(["systemctl", "reload", "nginx"], check=True, capture_output=True)
@@ -58,7 +70,7 @@ def main():
         source = f.read()
 
     if ANCHOR in source:
-        if ALIAS not in source:
+        if ALIAS_RE.search(source) is None:
             print(
                 "⚠️ nginx already has /static/epub/ but not the data-directory "
                 "alias -- check " + SITE,
@@ -82,7 +94,7 @@ def main():
     shutil.copy2(SITE, backup)
 
     with open(SITE, "w", encoding="utf-8") as f:
-        f.write(source[:index] + BLOCK + source[index:])
+        f.write(source[:index] + render_block() + source[index:])
     print("nginx: added /static/epub/ -> data directory")
 
     try:
