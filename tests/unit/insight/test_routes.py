@@ -75,6 +75,41 @@ def test_unknown_language_id_does_not_crash(page):
     assert resp.get_json()["empty"] is True
 
 
+def test_default_language_is_the_one_with_the_most_words(app, monkeypatch):
+    """
+    The page must not open on a stray list. get_term_languages() sorts by
+    name, so picking the first would favour whichever language happens to
+    be alphabetically early regardless of how much is in it.
+    """
+    from lute.insight import routes
+
+    monkeypatch.setattr(
+        routes,
+        "_languages",
+        lambda: [
+            {"id": 1, "name": "Arabic", "count": 132},
+            {"id": 13, "name": "Japanese", "count": 21480},
+        ],
+    )
+    with app.test_request_context("/insight/"):
+        assert routes._language_id() == 13
+
+
+def test_requested_language_wins_over_the_default(app, monkeypatch):
+    from lute.insight import routes
+
+    monkeypatch.setattr(
+        routes,
+        "_languages",
+        lambda: [
+            {"id": 1, "name": "Arabic", "count": 132},
+            {"id": 13, "name": "Japanese", "count": 21480},
+        ],
+    )
+    with app.test_request_context("/insight/?language_id=1"):
+        assert routes._language_id() == 1
+
+
 def test_stats_page_is_untouched(page):
     "The 3D page must not have added anything to /stats/ itself."
     resp = page.get("/stats/")

@@ -24,12 +24,21 @@ def _languages():
 
 
 def _language_id():
-    "The requested language, falling back to the first one with words."
+    """
+    The requested language, else the one with the most words.
+
+    Not "the first one": get_term_languages() sorts by name, so a stray
+    Arabic list with a hundred words would be picked over the Japanese
+    list with twenty thousand, and the page would open on four empty
+    charts.
+    """
     requested = request.args.get("language_id", type=int)
     if requested:
         return requested
     langs = _languages()
-    return langs[0]["id"] if langs else None
+    if not langs:
+        return None
+    return max(langs, key=lambda lang: lang["count"])["id"]
 
 
 @bp.route("/", methods=["GET"])
