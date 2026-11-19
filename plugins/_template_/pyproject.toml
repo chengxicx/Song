@@ -23,4 +23,4 @@ dependencies = [
 
 
 [project.entry-points."lute.plugin.parse"]
-lute_mandarin = "lute_langname_parser.parser:LangNameParser"
+lute_langname = "lute_langname_parser.parser:LangNameParser"
