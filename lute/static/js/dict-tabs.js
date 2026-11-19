@@ -483,6 +483,12 @@ function createLookupButtons(tab_count = 5, activateDictID = null) {
   LookupButton.TERM_DICTS.forEach((dict, index) => { new DictButton(dict,`dict${index}`); });
   _layoutDictTabs(LookupButton.all, tab_count);
 
+  // The static Sentence / Image buttons are LookupButtons too, so create
+  // them before the frames are connected below; otherwise their iframes
+  // never reach #dictframes and clicking them loads nothing visible.
+  for (let b of [new SentenceLookupButton(), new ImageLookupButton()])
+    document.getElementById("dicttabsstatic").appendChild(b.btn);
+
   // The frames must be in the document before a lookup loads into them:
   // the AI tab posts a form targeted at its frame by name, which only
   // resolves for a connected iframe.
@@ -496,9 +502,6 @@ function createLookupButtons(tab_count = 5, activateDictID = null) {
     target_button.activate();
     target_button.do_lookup();
   }
-
-  for (let b of [new SentenceLookupButton(), new ImageLookupButton()])
-    document.getElementById("dicttabsstatic").appendChild(b.btn);
 }
 
 
