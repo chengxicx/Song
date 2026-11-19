@@ -3805,6 +3805,10 @@ input[type="checkbox"][disabled] + label {
     background: none;
     width: 100%;
     position: relative;
+    /* The list drops the .dict-btn class, so it no longer gets that rule's
+       grey; without this the label inherits --font-color, which is near
+       white on the dark themes and vanishes on the light aliceblue menu. */
+    color: #5b5b5b;
 }
 
 .dict-menu-item:hover {
