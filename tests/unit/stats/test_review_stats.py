@@ -9,7 +9,7 @@ review_stats.py is written under.
 """
 
 import json
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, time, timedelta, timezone
 
 from lute.db import db
 from lute.models.review import ReviewCard, ReviewLog
@@ -26,6 +26,27 @@ def _utcnow():
 def _ago(days=0.0, hours=0.0):
     "A naive-UTC datetime in the past."
     return _utcnow() - timedelta(days=days, hours=hours)
+
+
+def _bucketed_ago(days=0):
+    """
+    A naive-UTC datetime whose LOCAL-date bucket is exactly
+    (local today - days), whatever the wall clock.
+
+    get_review_stats buckets review logs by the machine's local date
+    (fromtimestamp of the stored UTC instant) and slices the "today"
+    window with date.today(), both local.  A log stamped "UTC now -
+    1h" straddles midnight: the nightly can fire shortly after local
+    midnight (GitHub's schedule start times are not guaranteed), and
+    then that log belongs to yesterday's bucket, so the "today"
+    window counts 0 and test_period_windows fails.  Anchoring to
+    local noon pins the bucket -- noon is always inside its own date
+    on any machine, in any timezone, at any hour the test runs.
+    """
+    local_now = datetime.now().astimezone()
+    target = (local_now - timedelta(days=days)).date()
+    noon = datetime.combine(target, time(12, 0), tzinfo=local_now.tzinfo)
+    return noon.astimezone(timezone.utc).replace(tzinfo=None)
 
 
 def _iso(dt):
@@ -345,7 +366,12 @@ def test_language_filter(empty_db, spanish, english):
 def test_period_windows(empty_db, spanish):
     "today/7days/monthly slice the daily series; a two-year-old review drops out."
     card = _make_card(_one_term(spanish), reps=2, state=2)
-    for when in (_ago(hours=1), _ago(days=3), _ago(days=8), _ago(days=400)):
+    for when in (
+        _bucketed_ago(),
+        _bucketed_ago(days=3),
+        _bucketed_ago(days=8),
+        _bucketed_ago(days=400),
+    ):
         _make_log(card, when, 3, reps_before=1, before=_snapshot())
 
     assert get_review_stats(db.session, None, "today")["summary"]["reviews"] == 1
@@ -360,8 +386,17 @@ def test_period_windows(empty_db, spanish):
 def test_monthly_series_is_aggregated_by_calendar_month(empty_db, spanish):
     "The monthly chart buckets by month, not by day."
     card = _make_card(_one_term(spanish), reps=2, state=2)
-    _make_log(card, _ago(hours=1), 3, reps_before=1, before=_snapshot())
-    _make_log(card, _ago(days=1), 3, reps_before=1, before=_snapshot())
+    _make_log(card, _bucketed_ago(), 3, reps_before=1, before=_snapshot())
+    # A second log on an earlier day of the SAME month: day - 1 lands
+    # there always (0 on the 1st, so the two logs share a day then --
+    # still one monthly bucket).
+    _make_log(
+        card,
+        _bucketed_ago(days=date.today().day - 1),
+        3,
+        reps_before=1,
+        before=_snapshot(),
+    )
 
     series = get_review_stats(db.session, None, "monthly")["daily"]
     this_month = date.today().replace(day=1).isoformat()
