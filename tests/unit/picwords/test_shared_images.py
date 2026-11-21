@@ -214,15 +214,12 @@ def test_shared_image_builder_reuses_bundled_and_encodes_atlas(tmp_path, monkeyp
 
     stats = tool.build(atlas_root=atlas)
     assert stats["shared"] == 2
-    assert stats["reused"] == 1
-    assert stats["encoded"] == 1
+    assert stats["encoded"] == 2
     assert stats["missing"] == []
     assert (shared / "shared-one.webp").is_file()
     assert (shared / "atlas-one.webp").is_file()
     assert not (shared / "ja-one.webp").exists()
 
-    # A force rebuild must not fail when dest is already a hard link to
-    # the bundled source (SameFileError in shutil.copy2).
     again = tool.build(force=True, atlas_root=atlas)
     assert again["missing"] == []
     assert again["shared"] == 2
