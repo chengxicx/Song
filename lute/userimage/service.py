@@ -25,7 +25,7 @@ import tempfile
 from PIL import Image, ImageOps, UnidentifiedImageError
 
 THUMBNAIL_MAX_EDGE = 400
-THUMBNAIL_QUALITY = 80
+THUMBNAIL_QUALITY = 30
 THUMBNAIL_SUFFIX = "_thumb.webp"
 
 # Settings key and accepted values (see lute/settings/forms.py).
@@ -35,7 +35,10 @@ IMAGE_MAX_EDGE_CHOICES = (400, 800, 1200)
 
 # Single-file marker: these images need no derived thumbnail.
 SINGLE_FILE_SUFFIX = "_wc"
-WEBP_QUALITY = 82
+
+# Word-card images are small thumbnails, so q30 keeps them tiny without
+# a visible difference at their display size.
+WEBP_QUALITY = 30
 
 # Formats a browser can display from a file with this extension, used when
 # re-encoding would make a small image bigger than the source.
