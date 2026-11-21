@@ -161,8 +161,25 @@
       msgEl.style.display = 'block';
     }
 
+    // Proxy/server errors (413, 504, an expired session, ...) arrive as
+    // HTML, not JSON.  Parse defensively so the user sees the actual
+    // status instead of "Unexpected token '<'".
+    function jsonOrThrow(r) {
+      return r.text().then(function (text) {
+        try {
+          return JSON.parse(text);
+        } catch (e) {
+          var clean = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+          throw new Error(
+            'HTTP ' + r.status + ' ' + (r.statusText || '') +
+            (clean ? ' — ' + clean.slice(0, 240) : '')
+          );
+        }
+      });
+    }
+
     function refresh() {
-      return fetch('/_feature/installed').then(function (r) { return r.json(); }).then(render);
+      return fetch('/_feature/installed').then(jsonOrThrow).then(render);
     }
 
     btn.addEventListener('click', function () {
@@ -181,7 +198,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({ spec: spec })
-      }).then(function (r) { return r.json(); }).then(function (d) {
+      }).then(jsonOrThrow).then(function (d) {
         btn.disabled = false;
         showMsg(d.ok, d.message + (d.ok ? ' Restart Lute to activate it.' : ''));
         if (d.ok) { specEl.value = ''; }
@@ -195,7 +212,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({ name: name, kind: kind || 'feature' })
-      }).then(function (r) { return r.json(); }).then(function (d) {
+      }).then(jsonOrThrow).then(function (d) {
         var restartHint = (d.ok && d.restart_needed) ? ' Restart Lute to activate it.' : '';
         showMsg(d.ok, d.message + restartHint);
         refresh();
@@ -209,7 +226,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({ name: name, kind: kind || 'feature' })
-      }).then(function (r) { return r.json(); }).then(function (d) {
+      }).then(jsonOrThrow).then(function (d) {
         showMsg(d.ok, d.message);
         refresh();
       }).catch(function (e) { showMsg(false, 'Request failed: ' + e); });
@@ -219,7 +236,7 @@
       btn.disabled = true;
       showMsg(true, label);
       fetch('/_feature/upload_install', { method: 'POST', body: fd })
-        .then(function (r) { return r.json(); }).then(function (d) {
+        .then(jsonOrThrow).then(function (d) {
           btn.disabled = false;
           showMsg(d.ok, d.message + (d.ok ? ' Restart Lute to activate it.' : ''));
           return refresh();

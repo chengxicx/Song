@@ -583,6 +583,12 @@ def _create_app(app_config, extra_config):
         # book imports).  200 MB matches the Nginx client_max_body_size
         # on the production server.
         "MAX_CONTENT_LENGTH": 200 * 1024 * 1024,
+        # A folder upload sends one multipart part per file.  Werkzeug's
+        # default cap of 1000 rejects large feature plugins (e.g. a
+        # picture deck with >1500 images) with an HTML 413 before the
+        # upload route can answer JSON.  MAX_CONTENT_LENGTH above is the
+        # real size guard.
+        "MAX_FORM_PARTS": 10000,
         "SESSION_COOKIE_SAMESITE": "Lax",
         "PERMANENT_SESSION_LIFETIME": 86400 * 30,
         # Flask's default (True) re-signs the permanent session cookie with a
