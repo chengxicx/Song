@@ -177,6 +177,57 @@ def test_catalog_generator_uses_english_as_the_base(tmp_path, monkeypatch):
     assert entry["labels"]["zh"] == "图书馆"
 
 
+def test_shared_image_builder_reuses_bundled_and_encodes_atlas(tmp_path, monkeypatch):
+    tool = load_tool("build_shared_images")
+    data = tmp_path / "data"
+    images = tmp_path / "img"
+    shared = images / "shared"
+    atlas = tmp_path / "atlas"
+    data.mkdir()
+    images.mkdir()
+
+    from PIL import Image  # pylint: disable=import-outside-toplevel
+
+    def save_webp(path, color):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        Image.new("RGB", (8, 8), color).save(path, "WEBP")
+
+    save_webp(images / "shared-one.webp", (10, 20, 30))
+    save_webp(images / "ja" / "ja-one.webp", (40, 50, 60))
+    save_webp(atlas / "public" / "atlas" / "img" / "atlas-one.webp", (70, 80, 90))
+    (data / "images.json").write_text(
+        json.dumps(
+            {
+                "images": {
+                    "shared-one": {"status": "shared", "languages": ["en", "ja"]},
+                    "atlas-one": {"status": "shared", "languages": ["en"]},
+                    "ja-one": {"status": "ja_only", "languages": ["ja"]},
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(tool, "DATA_DIR", data)
+    monkeypatch.setattr(tool, "IMAGES_FILE", data / "images.json")
+    monkeypatch.setattr(tool, "IMAGE_DIR", images)
+    monkeypatch.setattr(tool, "SHARED_DIR", shared)
+
+    stats = tool.build(atlas_root=atlas)
+    assert stats["shared"] == 2
+    assert stats["reused"] == 1
+    assert stats["encoded"] == 1
+    assert stats["missing"] == []
+    assert (shared / "shared-one.webp").is_file()
+    assert (shared / "atlas-one.webp").is_file()
+    assert not (shared / "ja-one.webp").exists()
+
+    # A force rebuild must not fail when dest is already a hard link to
+    # the bundled source (SameFileError in shutil.copy2).
+    again = tool.build(force=True, atlas_root=atlas)
+    assert again["missing"] == []
+    assert again["shared"] == 2
+
+
 def test_catalog_generator_reports_missing_files(tmp_path, monkeypatch):
     tool = load_tool("build_image_catalog")
     data = tmp_path / "data"
@@ -298,16 +349,24 @@ def test_package_image_zip_uses_shared_and_language_dirs(tmp_path, monkeypatch):
 
     ids = tool.referenced_ids("ja")
     assert ids == {"shared-one", "ja-one"}
-    out = tmp_path / "images.zip"
-    count = tool.write_image_zip(out, "ja", ids)
-    assert count == 2
 
     import zipfile  # pylint: disable=import-outside-toplevel
 
-    with zipfile.ZipFile(out) as archive:
+    # English is the shared base pack.
+    en_zip = tmp_path / "en.zip"
+    assert tool.write_image_zip(en_zip, "en", ids) == 1
+    with zipfile.ZipFile(en_zip) as archive:
+        assert set(archive.namelist()) == {
+            "shared/shared-one.webp",
+            "manifest-en.json",
+        }
+
+    # Japanese only ships its own images; shared/ is installed once.
+    ja_zip = tmp_path / "ja.zip"
+    assert tool.write_image_zip(ja_zip, "ja", ids) == 1
+    with zipfile.ZipFile(ja_zip) as archive:
         names = set(archive.namelist())
-        manifest = json.loads(archive.read("manifest.json"))
-    assert "shared/shared-one.webp" in names
+        manifest = json.loads(archive.read("manifest-ja.json"))
     assert "ja/ja-one.webp" in names
-    assert manifest["count"] == 2
-    assert sorted(manifest["files"]) == ["ja/ja-one.webp", "shared/shared-one.webp"]
+    assert "shared/shared-one.webp" not in names
+    assert manifest["count"] == 1
