@@ -114,6 +114,69 @@ def test_catalog_generator_marks_cross_language_images_shared(tmp_path, monkeypa
     assert payload["images"]["y"]["file"] == "ja/y.webp"
 
 
+def test_catalog_generator_uses_english_as_the_base(tmp_path, monkeypatch):
+    tool = load_tool("build_image_catalog")
+    data = tmp_path / "data"
+    images = tmp_path / "img"
+    atlas = tmp_path / "atlas"
+    data.mkdir()
+    _save(images / "ja" / "x.webp")
+    _save(atlas / "public" / "atlas" / "img" / "x.webp")
+    (data / "catalog.json").write_text(
+        json.dumps(
+            {
+                "languages": [
+                    {"key": "en", "dataset": "en.json"},
+                    {"key": "ja", "dataset": "ja.json"},
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    (data / "en.json").write_text(
+        json.dumps(
+            {
+                "words": [
+                    {
+                        "text": "library",
+                        "meaning": "图书馆",
+                        "meaning_en": "a place with books",
+                        "concept": "library",
+                        "images": [{"id": "x", "source": "word-atlas", "shared": True}],
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    (data / "ja.json").write_text(
+        json.dumps(
+            {
+                "words": [
+                    {
+                        "text": "図書館",
+                        "meaning": "图书馆",
+                        "concept": "toshokan",
+                        "images": [{"id": "x", "source": "word-atlas", "shared": True}],
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(tool, "DATA_DIR", data)
+    monkeypatch.setattr(tool, "IMAGE_DIR", images)
+    monkeypatch.setattr(tool, "STATUS_FILE", tmp_path / "status.json")
+
+    payload, errors = tool.build(atlas)
+    assert not errors
+    entry = payload["images"]["x"]
+    assert entry["status"] == "shared"
+    assert entry["languages"] == ["en", "ja"]
+    assert entry["labels"]["en"] == "library"
+    assert entry["labels"]["zh"] == "图书馆"
+
+
 def test_catalog_generator_reports_missing_files(tmp_path, monkeypatch):
     tool = load_tool("build_image_catalog")
     data = tmp_path / "data"
