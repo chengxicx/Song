@@ -96,7 +96,7 @@ class LanguageForm(FlaskForm):
     dictionaries = FieldList(
         FormField(LanguageDictionaryForm, default=LanguageDictionary)
     )
-    show_romanization = BooleanField("Show Pronunciation field")
+    show_romanization = BooleanField(lazy_t("Show Pronunciation field"))
     # Pronunciation readings above words on the reading page.  "Furigana"
     # strictly means the Japanese kana case; the label and tooltip say the
     # generic thing and name each language's system (pinyin, jyutping,
