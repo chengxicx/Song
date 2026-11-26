@@ -1759,6 +1759,26 @@ div#thetext > p {
     font-size: 0;
 }
 
+/* Blank lines in the book text are rendered as empty paragraphs (a
+   zero-width-space placeholder, see page_content.html).  As a normal
+   paragraph each one claims a full line box plus the paragraph margins,
+   so a book that separates its paragraphs with blank lines reads as
+   double-spaced and the line-height buttons cannot close those gaps --
+   the blank row is a line box of its own.  Keep the break visible, but
+   at a fraction of a line; the paragraph margins still separate the
+   actual paragraphs.  !important: text-options.js writes the user's
+   line-height factor inline on every <p>, which would otherwise win. */
+div#thetext > p.empty-paragraph {
+    line-height: 0.45 !important;
+    margin: 0 !important;
+}
+
+/* The furigana-on rule pins span.textitem's line-height directly, which
+   would give the placeholder its own full ruby row again; pin it back. */
+div#thetext > p.empty-paragraph > span.textitem {
+    line-height: 0.45 !important;
+}
+
 /* End-of-book controls: two ghost icon buttons centred over the
    reserved bottom strip of the last screen ("mark rest as known" and
    "back to Home / book set").  The strip is hidden until the reader
