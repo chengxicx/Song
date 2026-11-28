@@ -2318,8 +2318,6 @@ def test_silent_clip_is_reported_as_a_microphone_problem(
     ), patch.object(
         shadowing, "transcribe_clip", return_value=("the", 2.2)
     ), patch.object(
-        shadowing, "SILENT_CLIP_PEAK", 0.01
-    ), patch.object(
         sensevoice, "peak_amplitude", return_value=0.0004
     ):
         resp = client.post(
@@ -2338,3 +2336,32 @@ def test_silent_clip_is_reported_as_a_microphone_problem(
     assert status["state"] == "error"
     assert "silent" in status["error"]
     assert "microphone" in status["error"]
+
+
+def test_quiet_clip_that_scored_is_left_alone(app, app_context, client, english):
+    """
+    A quiet microphone must not reject a take the engine actually scored:
+    the level check only explains a failure, it never creates one.
+    """
+
+    def _fake_clip(audio_path, lang_code, model_size="small"):
+        return "The calm cat.", 6.0
+
+    with patch.object(
+        shadowing, "whisper_status", return_value={"installed": True}
+    ), patch.object(shadowing, "transcribe_clip", side_effect=_fake_clip), patch.object(
+        sensevoice, "peak_amplitude", return_value=0.004
+    ):
+        resp = client.post(
+            "/read/shadowing/transcribe",
+            data={
+                "language_id": str(english.id),
+                "tokens": json.dumps(["The", "calm", "cat"]),
+                "audio": (io.BytesIO(b"fake webm bytes"), "clip.webm"),
+            },
+            content_type="multipart/form-data",
+        )
+        status = _wait_for_task(resp.get_json()["task_id"])
+
+    assert status["state"] == "finished"
+    assert status["result"]["score"] == 100

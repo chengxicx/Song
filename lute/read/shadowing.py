@@ -76,13 +76,19 @@ FUZZY_MATCH_RATIO_JA = 0.45
 SINGLE_WORD_MAX_EDITS = 1
 SINGLE_WORD_MIN_MORAE = 3
 
-# Peak sample value below which a recording holds no usable speech
-# (-40 dBFS).  A working microphone at a normal input volume peaks well
-# above this even in a quiet room, so a clip under it is a device problem
-# -- wrong input, muted, or a system volume at zero -- and the engine's
-# answer to it is a fragment (a spoken コップ comes back as こ。).  Saying
-# so beats grading that fragment as a wrong answer.
-SILENT_CLIP_PEAK = 0.01
+# Peak sample value below which a recording holds no speech at all
+# (-54 dBFS).  A working microphone at any usable input volume clears it
+# even in a quiet room; under it there is only digital silence, so the
+# engine's answer to the clip is pure invention.
+SILENT_CLIP_PEAK = 0.002
+
+# Peak below which a *failing* take is blamed on the input level rather
+# than on the reading (-34 dBFS).  Speech this quiet still decodes, but
+# it comes back as a fragment -- a spoken コップ answering "こ。" -- and
+# the card reads that as a wrong answer instead of the capture problem it
+# is.  Only consulted when the take already failed, so a quiet
+# microphone never rejects a take the engine actually scored.
+QUIET_CLIP_PEAK = 0.02
 
 
 def tokenize_for_diff(text, language):
@@ -1900,6 +1906,15 @@ def _run_task(
                     text[:80],
                     "".join(_clean_token(t) for t in tokens)[:80],
                 )
+                # Speech this quiet decodes as a fragment of itself, so
+                # the low score is the input level talking, not the
+                # reading.  Say which, or the learner retries forever.
+                if peak is not None and peak < QUIET_CLIP_PEAK:
+                    raise RuntimeError(
+                        "the recording is too quiet for the engine "
+                        f"(peak {peak:.4f}) -- check the microphone the "
+                        "browser picked and the system input volume"
+                    )
             # A word the engine wrote in kanji for a kana word in the
             # sentence was scored against that kana (see
             # _same_word_across_script), so annotate it with the kana the
