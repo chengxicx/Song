@@ -42,19 +42,6 @@ def _service():
     return EudicService(db.session)
 
 
-def _selected_scope(service, language_id):
-    "The scope the page should show, or None."
-    scopes = service.scopes()
-    if language_id is not None and language_id in scopes:
-        pass
-    elif scopes:
-        language_id = sorted(scopes)[0]
-    else:
-        return None, None
-    scope = service.scope_for(language_id)
-    return language_id, scope
-
-
 @bp.route("/", methods=["GET"])
 def index():
     "The sync page."
@@ -62,15 +49,26 @@ def index():
     languages = get_term_languages(db.session)
     supported = {lang["id"]: lang for lang in languages}
 
-    raw_id = request.args.get("language_id", type=int)
-    if raw_id is not None:
-        language_id, scope = _selected_scope(service, raw_id)
-    else:
-        language_id, scope = _selected_scope(service, None)
-
     # Only offer languages that have at least one term; a language with no
     # words has nothing to reconcile.
     choices = [lang for lang in languages if lang["count"] > 0]
+    offered = [lang["id"] for lang in choices]
+
+    # An explicitly requested language always wins, even before it has a
+    # studylist mapping: the page is where that mapping gets created, so
+    # falling back to a *different* configured language made the dropdown
+    # snap back to whatever was configured first.
+    raw_id = request.args.get("language_id", type=int)
+    language_id = raw_id if raw_id in offered else None
+    if language_id is None:
+        scopes = service.scopes()
+        configured = [lg_id for lg_id in offered if lg_id in scopes]
+        if configured:
+            language_id = min(configured)
+        elif offered:
+            language_id = offered[0]
+
+    scope = service.scope_for(language_id) if language_id is not None else None
 
     stats = service.stats(scope) if scope else None
     errors = service.recent_errors(scope) if scope else []

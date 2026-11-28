@@ -16,8 +16,6 @@
   <div class="eudic-block">
     <h3>{{ t('Connection') }}</h3>
     <form method="POST" action="{{ url_for('eudic.save_config') }}" class="eudic-form">
-      <input type="hidden" name="language_id" value="{{ language_id or '' }}">
-
       <label for="eudic_api_key">{{ t('Eudic API key') }}</label>
       <input type="password" id="eudic_api_key" name="api_key" autocomplete="off"
              spellcheck="false" placeholder="{{ api_key_mask or t('Paste the key from my.eudic.net/OpenAPI/Authorization') }}">
@@ -41,6 +39,9 @@
         </option>
         {% endfor %}
       </select>
+      {% if language_id and not scope %}
+      <span class="eudic-hint">{{ t('Not synced yet: pick a library, load its word lists, then Save.') }}</span>
+      {% endif %}
 
       <label for="eudic_category">{{ t('Eudic word list') }}</label>
       <select id="eudic_category" name="category_id">

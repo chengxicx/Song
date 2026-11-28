@@ -47,6 +47,51 @@ def test_configured_page_renders_the_actions(page, app_context, english):
         assert marker in html, f"missing from page: {marker}"
 
 
+def _add_term(lg_id, text):
+    from lute.term.model import Repository as TermRepository
+
+    repo = TermRepository(db.session)
+    term = repo.find_or_new(lg_id, text)
+    term.status = 3
+    repo.add(term)
+    repo.commit()
+
+
+def test_an_explicit_language_wins_over_a_configured_one(
+    page, app_context, english, arabic
+):
+    """
+    Regression: the dropdown reloads /eudic/?language_id=N, and N used to be
+    replaced by the first *configured* language, so picking English landed
+    on Arabic every time.
+    """
+    _add_term(arabic.id, "كتاب")
+    EudicService(db.session).set_scope(arabic.id, "en", "111", "arabic list")
+
+    html = page.get(f"/eudic/?language_id={english.id}").data.decode("utf-8")
+    assert f'data-language-id="{english.id}"' in html
+    assert "arabic list" not in html
+
+
+def test_the_page_falls_back_to_a_configured_language(
+    page, app_context, english, arabic
+):
+    "With no argument, land on a language that is actually mapped."
+    _add_term(arabic.id, "كتاب")
+    EudicService(db.session).set_scope(arabic.id, "en", "111", "arabic list")
+
+    html = page.get("/eudic/").data.decode("utf-8")
+    assert f'data-language-id="{arabic.id}"' in html
+    assert "arabic list" in html
+
+
+def test_the_form_carries_one_language_id_only(page):
+    "A second (hidden) field shadowed the dropdown on submit."
+    html = page.get("/eudic/").data.decode("utf-8")
+    assert 'type="hidden" name="language_id"' not in html
+    assert html.count('name="language_id"') == 1
+
+
 def test_saving_the_key_encrypts_it(page, app_context):
     page.post("/eudic/config", data={"api_key": "MY-SECRET-KEY"})
     row = EudicConfigRepository(db.session).load()
