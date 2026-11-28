@@ -98,7 +98,7 @@ const EudicPage = (function () {
     const rows = [
       [t('New here'), plan.push_new],
       [t('Changed here'), plan.push_update],
-      [t('Conflicts (Lute wins)'), plan.conflicts],
+      [t('Conflicts (Song wins)'), plan.conflicts],
       [t('New on Eudic'), plan.pull_new],
       [t('Changed on Eudic'), plan.pull_update],
       [t('Already matching'), plan.unchanged],

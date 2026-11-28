@@ -15,6 +15,7 @@ import logging
 from flask import (
     Blueprint,
     current_app,
+    flash,
     jsonify,
     redirect,
     render_template,
@@ -40,6 +41,32 @@ SYNC_MODES = ("preview", "push", "pull", "twoway")
 
 def _service():
     return EudicService(db.session)
+
+
+def _language_name(lg_id):
+    "The display name for a language id."
+    for lang in get_term_languages(db.session):
+        if lang["id"] == lg_id:
+            return lang["name"]
+    return f"#{lg_id}"
+
+
+def _other_owner(service, language_id, bucket, category_id):
+    """
+    The other language already syncing this studylist, or None.
+
+    A studylist holds one language's vocabulary, and a pull imports
+    *everything* on the remote side that the local language lacks -- so
+    pointing two languages at one list would quietly make each adopt the
+    other's words.  The mapping is therefore exclusive.
+    """
+    category_id = str(category_id)
+    for lg_id, scope in service.scopes().items():
+        if lg_id == language_id:
+            continue
+        if scope["bucket"] == bucket and scope["category_id"] == category_id:
+            return lg_id
+    return None
 
 
 @bp.route("/", methods=["GET"])
@@ -100,7 +127,17 @@ def save_config():
     category_id = (request.form.get("category_id") or "").strip()
     category_name = (request.form.get("category_name") or "").strip()
     if language_id and bucket in EUDIC_BUCKETS and category_id:
-        service.set_scope(language_id, bucket, category_id, category_name)
+        owner = _other_owner(service, language_id, bucket, category_id)
+        if owner is None:
+            service.set_scope(language_id, bucket, category_id, category_name)
+        else:
+            flash(
+                t(
+                    "That Eudic word list is already synced with %(lang)s."
+                    " One word list per language."
+                )
+                % {"lang": _language_name(owner)}
+            )
     return redirect(url_for("eudic.index", language_id=language_id))
 
 

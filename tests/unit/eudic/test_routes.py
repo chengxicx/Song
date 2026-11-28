@@ -1,6 +1,7 @@
 """Route smoke tests for the Eudic page."""
 
 import json
+import re
 
 import pytest
 
@@ -132,6 +133,57 @@ def test_saving_a_scope_stores_bucket_and_category(page, app_context, english):
 def test_unsupported_bucket_is_rejected_by_the_categories_endpoint(page):
     resp = page.get("/eudic/categories?bucket=ja")
     assert resp.status_code == 400
+
+
+def _post_scope(client, lg_id, bucket, category_id, category_name, follow=False):
+    return client.post(
+        "/eudic/config",
+        data={
+            "language_id": str(lg_id),
+            "bucket": bucket,
+            "category_id": category_id,
+            "category_name": category_name,
+        },
+        follow_redirects=follow,
+    )
+
+
+def test_a_word_list_cannot_be_shared_by_two_languages(
+    page, app_context, english, arabic
+):
+    """
+    A pull imports everything on the remote side that the local language
+    lacks, so pointing two languages at one list would make each adopt the
+    other's words.
+    """
+    EudicService(db.session).set_scope(english.id, "en", "111", "english list")
+
+    resp = _post_scope(page, arabic.id, "en", "111", "arabic list", follow=True)
+
+    scopes = EudicService(db.session).scopes()
+    assert arabic.id not in scopes
+    assert scopes[english.id]["category_name"] == "english list"
+    # The flash names the language that owns the list.  Its wording is
+    # translated per the user's ui_language, so match the notice box and
+    # the name, not the sentence.
+    notice = re.search(
+        r'<div class="flash-notice">(.*?)</div>', resp.data.decode("utf-8"), re.S
+    )
+    assert notice is not None, "no notice was shown for the refused mapping"
+    assert "English" in notice.group(1)
+
+
+def test_the_same_language_can_resave_its_own_mapping(page, app_context, english):
+    EudicService(db.session).set_scope(english.id, "en", "111", "first")
+    _post_scope(page, english.id, "en", "111", "renamed")
+    assert EudicService(db.session).scopes()[english.id]["category_name"] == "renamed"
+
+
+def test_a_different_list_is_still_allowed(page, app_context, english, arabic):
+    "Only the studylist is exclusive; the library is shared by design."
+    EudicService(db.session).set_scope(english.id, "en", "111", "english list")
+    _post_scope(page, arabic.id, "en", "222", "arabic list")
+    assert EudicService(db.session).scopes()[arabic.id]["category_id"] == "222"
 
 
 def test_sync_without_a_scope_is_refused(page):

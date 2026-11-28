@@ -31,7 +31,7 @@
       </select>
       <span class="eudic-hint">{{ t('The library is a product slot, not the word language: a Japanese list lives inside the en library as its own studylist.') }}</span>
 
-      <label for="eudic_language">{{ t('Lute language') }}</label>
+      <label for="eudic_language">{{ t('Song language') }}</label>
       <select id="eudic_language" name="language_id">
         {% for lang in languages %}
         <option value="{{ lang.id }}" {% if lang.id == language_id %}selected{% endif %}>
