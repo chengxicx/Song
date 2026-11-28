@@ -2303,3 +2303,38 @@ def test_edit_distance_counts_one_mora():
     assert shadowing._edit_distance("きたー", "きた") == 1
     assert shadowing._edit_distance("つよい", "あつい") == 2
     assert shadowing._edit_distance("", "かな") == 2
+
+
+def test_silent_clip_is_reported_as_a_microphone_problem(
+    app, app_context, client, english
+):
+    """
+    A take the microphone mostly missed still gets an answer out of the
+    engine -- a fragment -- and scoring it would read as a wrong reading.
+    The take never reaches the diff: the learner said the word.
+    """
+    with patch.object(
+        shadowing, "whisper_status", return_value={"installed": True}
+    ), patch.object(
+        shadowing, "transcribe_clip", return_value=("the", 2.2)
+    ), patch.object(
+        shadowing, "SILENT_CLIP_PEAK", 0.01
+    ), patch.object(
+        sensevoice, "peak_amplitude", return_value=0.0004
+    ):
+        resp = client.post(
+            "/read/shadowing/transcribe",
+            data={
+                "language_id": str(english.id),
+                "tokens": json.dumps(["the", "calm", "cat"]),
+                "isolated": "1",
+                "audio": (io.BytesIO(b"fake webm bytes"), "clip.webm"),
+            },
+            content_type="multipart/form-data",
+        )
+        task_id = resp.get_json()["task_id"]
+        status = _wait_for_task(task_id)
+
+    assert status["state"] == "error"
+    assert "silent" in status["error"]
+    assert "microphone" in status["error"]

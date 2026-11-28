@@ -76,6 +76,14 @@ FUZZY_MATCH_RATIO_JA = 0.45
 SINGLE_WORD_MAX_EDITS = 1
 SINGLE_WORD_MIN_MORAE = 3
 
+# Peak sample value below which a recording holds no usable speech
+# (-40 dBFS).  A working microphone at a normal input volume peaks well
+# above this even in a quiet room, so a clip under it is a device problem
+# -- wrong input, muted, or a system volume at zero -- and the engine's
+# answer to it is a fragment (a spoken コップ comes back as こ。).  Saying
+# so beats grading that fragment as a wrong answer.
+SILENT_CLIP_PEAK = 0.01
+
 
 def tokenize_for_diff(text, language):
     """
@@ -1803,6 +1811,17 @@ def _run_task(
                 )
             if not (text or "").strip():
                 raise RuntimeError("no speech detected in the recording")
+            # A nearly silent clip still gets an answer out of the engine
+            # -- a fragment -- which scores as a wrong reading.  The
+            # learner said the word; the microphone is what failed, so
+            # say that instead of grading the fragment.
+            peak = sensevoice.peak_amplitude(audio_path)
+            if peak is not None and peak < SILENT_CLIP_PEAK:
+                raise RuntimeError(
+                    "the recording is silent (peak "
+                    f"{peak:.4f}) -- check the microphone the browser "
+                    "picked and the system input volume"
+                )
             # Display-side script restore: a traditional book sentence
             # gets its transcription back in traditional Han (SenseVoice
             # emits simplified even for Cantonese).  Scoring is
@@ -1873,10 +1892,11 @@ def _run_task(
                 # deleted below.  One warning per failed take.
                 logging.getLogger(__name__).warning(
                     "shadowing take scored low: source=%s engine=%s "
-                    "score=%s heard=%r wanted=%r",
+                    "score=%s peak=%s heard=%r wanted=%r",
                     source,
                     engine,
                     comparison["score"],
+                    "-" if peak is None else f"{peak:.4f}",
                     text[:80],
                     "".join(_clean_token(t) for t in tokens)[:80],
                 )

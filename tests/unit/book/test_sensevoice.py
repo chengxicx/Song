@@ -599,3 +599,19 @@ def test_punctuation_only_cues_are_dropped(model_dir_tmp, monkeypatch):
     assert [c["text"] for c in cues] == ["ことば。"]
     assert cues[0]["start"] == 3.0
     assert text == "ことば。"
+
+
+def test_peak_amplitude_reads_silence_and_refuses_undecodable(tmp_path):
+    """
+    Shadowing blames a near-silent take on the microphone instead of
+    grading the fragment the engine answers.  A file it cannot decode is
+    NOT silence -- that is the engine's error to report.
+    """
+    pytest.importorskip("av")
+    silent = tmp_path / "silent.wav"
+    _write_wav(str(silent), 1)
+    assert sensevoice.peak_amplitude(str(silent)) == 0.0
+
+    bogus = tmp_path / "bogus.webm"
+    bogus.write_bytes(b"not audio")
+    assert sensevoice.peak_amplitude(str(bogus)) is None

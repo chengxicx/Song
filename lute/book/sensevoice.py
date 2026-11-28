@@ -334,6 +334,33 @@ def _container_duration_secs(audio_path):
         return 0.0
 
 
+def peak_amplitude(audio_path):
+    """
+    Peak absolute sample of a clip, 0..1, or None when it cannot be
+    decoded.
+
+    Microphone troubleshooting, used by shadowing: a take whose input
+    device was wrong, muted, or turned down to nothing decodes as near
+    silence, and the engine then answers a meaningless fragment (a spoken
+    コップ coming back as "こ。"), which reads as a wrong answer instead
+    of the capture problem it is.  Decodes through the same PyAV path the
+    transcriptions use, so the number describes exactly the samples the
+    engine was handed.
+
+    None is not "silent": an undecodable file is the engine's error to
+    report, and guessing at it here would mask it.
+    """
+    import numpy as np  # pylint: disable=import-outside-toplevel
+
+    try:
+        _sr, samples, _duration = _decode_16k_mono(audio_path)
+    except Exception:  # pylint: disable=broad-exception-caught
+        return None
+    if not samples.size:
+        return 0.0
+    return float(np.abs(samples).max())
+
+
 def transcribe_clip(audio_path, lang_code):
     """
     Transcribe one short recording (shadowing takes).
