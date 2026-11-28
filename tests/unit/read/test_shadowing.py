@@ -2237,7 +2237,7 @@ def test_single_word_absorbs_one_mora_of_asr_noise():
     res = shadowing.compare_tokens(["ジーンズ"], "ジゅーンズ", lang, isolated_word=True)
     assert res["statuses"] == [2]
     assert res["score"] == 100
-    assert res["word_ratio"] >= shadowing.SINGLE_WORD_MATCH_RATIO
+    assert res["word_ratio"] > 0.8
 
 
 def test_single_word_symbol_for_a_loanword_matches():
@@ -2253,7 +2253,7 @@ def test_single_word_short_of_the_bar_is_not_a_match():
     lang = _FakeLanguage(["あつい"], parser_type="japanese")
     res = shadowing.compare_tokens(["つよい"], "あつい", lang, isolated_word=True)
     assert res["statuses"][0] != 2
-    assert res["word_ratio"] < shadowing.SINGLE_WORD_MATCH_RATIO
+    assert shadowing._edit_distance("つよい", "あつい") == 2
 
 
 def test_multi_word_takes_keep_the_strict_per_pair_thresholds():
@@ -2271,3 +2271,35 @@ def test_multi_word_takes_keep_the_strict_per_pair_thresholds():
     res = shadowing.compare_tokens(["つよい", "です"], "あつい です", lang)
     assert "word_ratio" not in res
     assert res["statuses"][0] != 2
+
+
+def test_single_word_voiced_ending_is_engine_noise():
+    """
+    コップ heard as コッピ: a three-mora word is one edit from the truth,
+    which a similarity ratio calls 0.67 -- below any sane bar.  The edit
+    count is what says "one mora", whatever the word's length.
+    """
+    lang = _FakeLanguage(["コッピ"], parser_type="japanese")
+    res = shadowing.compare_tokens(["コップ"], "コッピ", lang, isolated_word=True)
+    assert res["statuses"] == [2]
+    assert res["score"] == 100
+
+
+def test_single_word_voicing_swap_is_still_not_a_match():
+    """
+    クラス heard as グラス is one edit too, but voicing is the difference
+    the learner most plausibly made themselves -- they may have said the
+    other word, and a one-word card has nothing else to judge it by.
+    """
+    lang = _FakeLanguage(["グラス"], parser_type="japanese")
+    res = shadowing.compare_tokens(["クラス"], "グラス", lang, isolated_word=True)
+    assert res["statuses"][0] != 2
+
+
+def test_edit_distance_counts_one_mora():
+    "The helper the single-word pass reasons with."
+    assert shadowing._edit_distance("こっぷ", "こっぴ") == 1
+    assert shadowing._edit_distance("じーんず", "じゅーんず") == 1
+    assert shadowing._edit_distance("きたー", "きた") == 1
+    assert shadowing._edit_distance("つよい", "あつい") == 2
+    assert shadowing._edit_distance("", "かな") == 2

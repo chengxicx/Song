@@ -69,12 +69,11 @@ FUZZY_MATCH_RATIO_JA = 0.45
 # surrounding sentence to disambiguate, and the engine's orthographic
 # noise -- a small kana it inserts (ジーンズ heard as ジゅーンズ), a ー it
 # drops (ギター as ギタ), a symbol for a loanword (パーセント written as
-# %セ) -- lands one mora away from the truth.  On a word of three morae
-# and up, 0.8 means "at most one mora off", which is engine noise; a
-# genuinely different word stays below it (つよい misheard as あつい is
-# 0.33).  Shorter keys are left alone: two characters carry too little
-# evidence for a ratio to mean anything.
-SINGLE_WORD_MATCH_RATIO = 0.8
+# %セ) -- lands one mora away from the truth.  One edit on a word of
+# three morae and up is engine noise, not a different word; two is a
+# different word (つよい misheard as あつい is two edits away).  Shorter
+# keys are left alone: two morae carry too little evidence.
+SINGLE_WORD_MAX_EDITS = 1
 SINGLE_WORD_MIN_MORAE = 3
 
 
@@ -886,6 +885,37 @@ def _ja_sound_key(text):
     return jaconv.kata2hira(folded)
 
 
+def _edit_distance(a, b):
+    """
+    Levenshtein distance between two sound keys.
+
+    Keys are a handful of characters, so the plain two-row DP is plenty;
+    it exists because a ratio hides the fact that one mora of noise on a
+    three-mora word (コップ heard as コッピ) lands at 0.67 while the same
+    one mora on a long word lands above 0.85 -- the edit count is what
+    says "one mora", whatever the length.
+    """
+    if a == b:
+        return 0
+    if not a:
+        return len(b)
+    if not b:
+        return len(a)
+    previous = list(range(len(b) + 1))
+    for i, ca in enumerate(a, 1):
+        current = [i]
+        for j, cb in enumerate(b, 1):
+            current.append(
+                min(
+                    previous[j] + 1,
+                    current[j - 1] + 1,
+                    previous[j - 1] + (ca != cb),
+                )
+            )
+        previous = current
+    return previous[-1]
+
+
 def _make_key_fn(language):
     """
     Return token -> comparable diff key, with the parser resolved once.
@@ -1485,11 +1515,11 @@ def compare_tokens(
     # graded against the whole heard string: with no neighbouring words
     # to disambiguate, the per-pair thresholds above are tuned for
     # words inside a sentence and call one mora of engine noise a
-    # different word.  Whole-string similarity separates the two: the
-    # same word with an inserted small kana or a dropped ー stays above
-    # SINGLE_WORD_MATCH_RATIO, a genuinely different word does not.
+    # different word.  An edit count separates the two cleanly -- the
+    # same word with an inserted small kana, a dropped ー or a voiced
+    # ending is one edit away at any word length.
     #
-    # Only on the caller's say-so: わたし heard as わたくし is one mora
+    # Only on the caller's say-so: わたし heard as わたくし is one edit
     # apart too, and inside a sentence that stays the near-miss it is --
     # a different word form the learner really needs to see flagged.
     if isolated_word and result["total"] == 1:
@@ -1503,16 +1533,24 @@ def compare_tokens(
             default=0.0,
         )
         result["word_ratio"] = round(best, 3)
-        if (
-            wanted
-            and len(wanted) >= SINGLE_WORD_MIN_MORAE
-            and best >= SINGLE_WORD_MATCH_RATIO
-        ):
+        for form in heard_forms:
+            if len(wanted) < SINGLE_WORD_MIN_MORAE:
+                break
+            edits = _edit_distance(wanted, form)
+            if edits == 0 or edits > SINGLE_WORD_MAX_EDITS:
+                continue
+            # Voicing alone is the one difference the pair rescues above
+            # already refuse to call exact (クラス heard as グラス): the
+            # learner may well have said the other word, and a one-word
+            # card has nothing else to judge it by.
+            if _strip_dakuten(wanted) == _strip_dakuten(form):
+                continue
             statuses[scored[0]] = STATUS_MATCH
             # The near-miss / miss readouts sat beside the old verdict;
             # the word is green now, so they must not ship.
             result["spoken_for_fuzzy"].pop(scored[0], None)
             result["spoken_for_miss"].pop(scored[0], None)
+            break
 
     result["matched"] = sum(1 for s in statuses if s == STATUS_MATCH)
     result["fuzzy"] = sum(1 for s in statuses if s == STATUS_FUZZY)
