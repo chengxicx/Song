@@ -2208,3 +2208,66 @@ def test_transcription_available_needs_sensevoice_or_whisper(
 
     monkeypatch.setattr(shadowing, "whisper_status", lambda: {"installed": False})
     assert shadowing.transcription_available(spanish) is False
+
+
+# ---------------------------------------------------------------------
+# One-word takes (the picture deck's speaking cards)
+#
+# A single-word clip is the whole recording, so there is no neighbouring
+# word to disambiguate what the engine wrote.  Orthographic noise within
+# one mora is engine error, not a different word, and these takes are
+# graded on whole-string similarity instead of the per-pair thresholds
+# used inside a sentence.
+# ---------------------------------------------------------------------
+
+
+def test_ja_sound_key_spells_out_symbols():
+    "An engine writes % for a spoken パーセント; both must land on one key."
+    assert shadowing._ja_sound_key("パーセント") == "ぱーせんと"
+    assert shadowing._ja_sound_key("%セ") == "ぱーせんとせ"
+    assert shadowing._ja_sound_key("ジーンズ") == "じーんず"
+
+
+def test_single_word_absorbs_one_mora_of_asr_noise():
+    """
+    SenseVoice re-cut ジーンズ into ジゅー + ンズ: one inserted small kana.
+    The learner said the word; the deck must not fail the card.
+    """
+    lang = _FakeLanguage(["ジゅー", "ンズ"], parser_type="japanese")
+    res = shadowing.compare_tokens(["ジーンズ"], "ジゅーンズ", lang, isolated_word=True)
+    assert res["statuses"] == [2]
+    assert res["score"] == 100
+    assert res["word_ratio"] >= shadowing.SINGLE_WORD_MATCH_RATIO
+
+
+def test_single_word_symbol_for_a_loanword_matches():
+    "パーセント heard as %セ: the symbol is the word, said right."
+    lang = _FakeLanguage(["%セ", "。"], parser_type="japanese")
+    res = shadowing.compare_tokens(["パーセント"], "%セ。", lang, isolated_word=True)
+    assert res["statuses"] == [2]
+    assert res["score"] == 100
+
+
+def test_single_word_short_of_the_bar_is_not_a_match():
+    "A different word is still a different word: つよい heard as あつい."
+    lang = _FakeLanguage(["あつい"], parser_type="japanese")
+    res = shadowing.compare_tokens(["つよい"], "あつい", lang, isolated_word=True)
+    assert res["statuses"][0] != 2
+    assert res["word_ratio"] < shadowing.SINGLE_WORD_MATCH_RATIO
+
+
+def test_multi_word_takes_keep_the_strict_per_pair_thresholds():
+    """
+    Inside a sentence the neighbours disambiguate, so one mora of noise
+    is still the half-credit near-miss it has always been -- the
+    single-word pass must not reach into these takes.
+    """
+    lang = _FakeLanguage(["つよい", "です"], parser_type="japanese")
+    res = shadowing.compare_tokens(["つよい", "です"], "つよい です", lang)
+    assert res["statuses"] == [2, 2]
+    assert "word_ratio" not in res
+
+    lang = _FakeLanguage(["あつい", "です"], parser_type="japanese")
+    res = shadowing.compare_tokens(["つよい", "です"], "あつい です", lang)
+    assert "word_ratio" not in res
+    assert res["statuses"][0] != 2

@@ -1544,6 +1544,16 @@ def shadowing_transcribe():
 
     source = (request.form.get("source") or "").strip() or "read"
     book_id = request.form.get("book_id", type=int)
+    # A clip that is one word by itself (a picture-deck speaking card),
+    # not a sentence of one word: the diff grades it on whole-string
+    # similarity, since there is no neighbouring word to disambiguate
+    # the engine's spelling.  See shadowing.compare_tokens.
+    isolated_word = (request.form.get("isolated") or "").strip().lower() in (
+        "1",
+        "true",
+        "on",
+        "yes",
+    )
 
     temppath = current_app.env_config.temppath
     os.makedirs(temppath, exist_ok=True)
@@ -1563,6 +1573,7 @@ def shadowing_transcribe():
         full_text=full_text,
         source=source,
         book_id=book_id,
+        isolated_word=isolated_word,
     )
     return jsonify({"task_id": task_id})
 

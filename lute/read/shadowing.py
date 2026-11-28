@@ -64,6 +64,19 @@ FUZZY_MATCH_RATIO = 0.6
 # than a silent miss, so Japanese pairs near-match from 0.45 up.
 FUZZY_MATCH_RATIO_JA = 0.45
 
+# A one-word take (the picture deck's "say this word" cards) is graded
+# against the whole heard string instead of per-token pairs: there is no
+# surrounding sentence to disambiguate, and the engine's orthographic
+# noise -- a small kana it inserts (ジーンズ heard as ジゅーンズ), a ー it
+# drops (ギター as ギタ), a symbol for a loanword (パーセント written as
+# %セ) -- lands one mora away from the truth.  On a word of three morae
+# and up, 0.8 means "at most one mora off", which is engine noise; a
+# genuinely different word stays below it (つよい misheard as あつい is
+# 0.33).  Shorter keys are left alone: two characters carry too little
+# evidence for a ratio to mean anything.
+SINGLE_WORD_MATCH_RATIO = 0.8
+SINGLE_WORD_MIN_MORAE = 3
+
 
 def tokenize_for_diff(text, language):
     """
@@ -844,6 +857,35 @@ def _zh_numeral_key(text):
     return _ZH_NUMERAL_RE.sub(lambda m: str(_han_numeral_run_value(m.group())), text)
 
 
+# Symbols an ASR engine drops into Japanese output where the book prints
+# a loanword in katakana.  Folded on BOTH sides of the diff, so a mapping
+# can only ever join two spellings of one word.
+_JA_SYMBOL_READINGS = {
+    "%": "パーセント",
+    "％": "パーセント",
+    "℃": "ど",
+    "￥": "えん",
+    "¥": "えん",
+    "＄": "どる",
+    "$": "どる",
+    "×": "かける",
+    "＋": "ぷらす",
+}
+
+
+def _ja_sound_key(text):
+    """
+    A Japanese token -> hiragana sound key, with symbols spelled out.
+
+    kata2hira folds a katakana surface to its sound (ワクワク -> わくわく)
+    and leaves kanji alone; the alias pass then spells out the symbols an
+    engine emits in place of a spoken loanword, which is how the book's
+    パーセント and an engine's %セ reach one comparable key.
+    """
+    folded = "".join(_JA_SYMBOL_READINGS.get(ch, ch) for ch in (text or "").strip())
+    return jaconv.kata2hira(folded)
+
+
 def _make_key_fn(language):
     """
     Return token -> comparable diff key, with the parser resolved once.
@@ -877,7 +919,7 @@ def _make_key_fn(language):
             # two keys share no characters at all (ratio 0.0, a flat
             # miss).  kata2hira leaves kanji alone, so the reading path
             # is unaffected.
-            return jaconv.kata2hira((reading or token).strip())
+            return _ja_sound_key(reading or token)
         try:
             out = parser.get_lowercase(token)
         except Exception:  # pylint: disable=broad-exception-caught
@@ -922,7 +964,7 @@ def _context_keys(tokens, full_text, language, base_key_of):
     keys = []
     for entry, raw in zip(aligned, tokens):
         reading = (entry.get("reading") or "").strip()
-        keys.append(jaconv.kata2hira(reading) if reading else base_key_of(raw))
+        keys.append(_ja_sound_key(reading) if reading else base_key_of(raw))
     return keys
 
 
@@ -1075,6 +1117,7 @@ def compare_tokens(
     language,
     spoken_tokens=None,
     original_full_text=None,
+    isolated_word=False,
 ):
     """
     Diff the user's transcription against the sentence's word tokens.
@@ -1090,6 +1133,12 @@ def compare_tokens(
       (see _context_keys), judging the user against the readings the
       panel actually displays; without it the isolated per-token
       readings are used, as before.
+    isolated_word: the caller declares this take IS one word, not a
+      sentence of one word (the picture deck's "say this word" cards).
+      The per-pair thresholds below assume neighbouring words
+      disambiguate the engine's spelling, which an isolated clip has
+      none of, so such a take is graded on whole-string similarity
+      instead -- see the single-word pass before the score.
 
     Returns {
       "statuses": [STATUS_* per original token],
@@ -1432,6 +1481,39 @@ def compare_tokens(
             result["extras"].extend(spoken[j1:j2])
         # "delete": original tokens never spoken -- stay misses.
 
+    # A one-word take (the picture deck's "say this word" cards) is
+    # graded against the whole heard string: with no neighbouring words
+    # to disambiguate, the per-pair thresholds above are tuned for
+    # words inside a sentence and call one mora of engine noise a
+    # different word.  Whole-string similarity separates the two: the
+    # same word with an inserted small kana or a dropped ー stays above
+    # SINGLE_WORD_MATCH_RATIO, a genuinely different word does not.
+    #
+    # Only on the caller's say-so: わたし heard as わたくし is one mora
+    # apart too, and inside a sentence that stays the near-miss it is --
+    # a different word form the learner really needs to see flagged.
+    if isolated_word and result["total"] == 1:
+        wanted = keyed[0]
+        heard_forms = [k for k in ["".join(spoken_keys)] + spoken_keys if k]
+        best = max(
+            (
+                difflib.SequenceMatcher(None, wanted, form).ratio()
+                for form in heard_forms
+            ),
+            default=0.0,
+        )
+        result["word_ratio"] = round(best, 3)
+        if (
+            wanted
+            and len(wanted) >= SINGLE_WORD_MIN_MORAE
+            and best >= SINGLE_WORD_MATCH_RATIO
+        ):
+            statuses[scored[0]] = STATUS_MATCH
+            # The near-miss / miss readouts sat beside the old verdict;
+            # the word is green now, so they must not ship.
+            result["spoken_for_fuzzy"].pop(scored[0], None)
+            result["spoken_for_miss"].pop(scored[0], None)
+
     result["matched"] = sum(1 for s in statuses if s == STATUS_MATCH)
     result["fuzzy"] = sum(1 for s in statuses if s == STATUS_FUZZY)
     # Near-misses get half credit: the word was recognisably attempted.
@@ -1580,6 +1662,7 @@ def start_task(
     full_text=None,
     source="read",
     book_id=None,
+    isolated_word=False,
 ):
     """
     Register and launch a background scoring task.
@@ -1591,7 +1674,10 @@ def start_task(
     (Japanese reads its keys in context -- see compare_tokens).
     source/book_id describe where the take came from ("read" page or
     "review" card, and the book on the reading page) and land on the
-    persisted attempt.  Returns the task_id.
+    persisted attempt.  isolated_word marks a clip that is one word by
+    itself (a picture-deck speaking card) rather than a sentence, which
+    changes how the diff grades it -- see compare_tokens.  Returns the
+    task_id.
     """
     purge_finished_tasks()
     task_id = uuid.uuid4().hex
@@ -1609,6 +1695,7 @@ def start_task(
             full_text,
             source,
             book_id,
+            isolated_word,
         ),
         daemon=True,
     )
@@ -1627,6 +1714,7 @@ def _run_task(
     full_text=None,
     source="read",
     book_id=None,
+    isolated_word=False,
 ):
     "Thread body: transcribe, diff, store the result. Cleans its temp file."
     try:
@@ -1689,6 +1777,7 @@ def _run_task(
                 lang,
                 spoken_tokens=spoken_tokens,
                 original_full_text=full_text,
+                isolated_word=isolated_word,
             )
             rate = None
             if duration and duration > 0:
@@ -1735,6 +1824,24 @@ def _run_task(
                 "tokens_per_minute": rate,
                 "token_kind": "morpheme" if is_japanese_language(lang) else "word",
             }
+            if "word_ratio" in comparison:
+                # One-word take: how close the heard string was to the
+                # word.  Diagnostic, and the knob a caller can tune on.
+                result["word_ratio"] = comparison["word_ratio"]
+            if comparison["score"] < 68:
+                # "Why was a correct reading graded wrong?" has no answer
+                # after the fact unless the heard text is on record: the
+                # take is not persisted with it, and the temp audio is
+                # deleted below.  One warning per failed take.
+                logging.getLogger(__name__).warning(
+                    "shadowing take scored low: source=%s engine=%s "
+                    "score=%s heard=%r wanted=%r",
+                    source,
+                    engine,
+                    comparison["score"],
+                    text[:80],
+                    "".join(_clean_token(t) for t in tokens)[:80],
+                )
             # A word the engine wrote in kanji for a kana word in the
             # sentence was scored against that kana (see
             # _same_word_across_script), so annotate it with the kana the

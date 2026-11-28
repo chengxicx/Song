@@ -204,7 +204,7 @@ window.LuteRecorder = (function () {
 
   /* Submit one take and poll it to completion.
      args: { blob, languageId, tokens, fullText, model, source, bookId,
-             onProgress(state, elapsedSecs) }.
+             isolated, onProgress(state, elapsedSecs) }.
      Resolves { state: "finished", result } or { state: "error", error }. */
   async function scoreTake(args) {
     const fd = new FormData();
@@ -219,6 +219,11 @@ window.LuteRecorder = (function () {
     if (args.model) fd.append("model", args.model);
     if (args.source) fd.append("source", args.source);
     if (args.bookId) fd.append("book_id", String(args.bookId));
+    // The take is one word by itself (a picture-deck speaking card), not
+    // a sentence of one word: the server grades it on whole-string
+    // similarity, since an isolated clip gives the engine no context to
+    // help it spell what it heard.
+    if (args.isolated) fd.append("isolated", "1");
 
     let taskId = null;
     try {
